@@ -2,3 +2,4 @@ node_modules
 timetable_images
 timetable_userdata
 *.swp
+*.DS_Store
