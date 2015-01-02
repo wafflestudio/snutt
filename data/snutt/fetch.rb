@@ -112,10 +112,10 @@ end
 data = "srchCond=0&pageNo=1&workType=EX&sortKey=&sortOrder=&srchOpenSchyy=#{year}&currSchyy=#{year}&srchOpenShtm=#{shtm}&srchCptnCorsFg=&srchOpenShyr=&srchSbjtCd=&srchSbjtNm=&srchOpenUpSbjtFldCd=&srchOpenSbjtFldCd=&srchOpenUpDeptCd=&srchOpenDeptCd=&srchOpenSubmattFgCd=&srchOpenPntMin=&srchOpenPntMax=&srchCamp=&srchBdNo=&srchProfNm=&srchTlsnAplyCapaCntMin=&srchTlsnAplyCapaCntMax=&srchTlsnRcntMin=&srchTlsnRcntMax=&srchOpenSbjtTmNm=&srchOpenSbjtTm=&srchOpenSbjtTmVal=&srchLsnProgType=&srchMrksGvMthd="
 res, data = http.post(path, data)
 
-open(xls_filename,"w") do |file|
-	file.print(res.body)
-end
-puts "download complete : #{year}_#{semester}.xls"
+# open(xls_filename,"w") do |file|
+# 	file.print(res.body)
+# end
+# puts "download complete : #{year}_#{semester}.xls"
 
 #convert
 puts "start converting from xls to txt"
@@ -171,7 +171,8 @@ open("#{txt_filename}.tmp", "w") do |file|
 		instructor = m[i,14]
 		quota = m[i,15].to_i
 		enrollment = m[i,16].to_i
-		remark = m[i,17].gsub(/\n/, " ")
+		remark = m[i,17].gsub(/
+\n/, " ")
 		category = category_map["#{course_number};#{lecture_number}"]
 
 =begin
