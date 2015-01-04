@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "dependencies": {
     "mime": "",
-		"restler": "",
+    "restler": "",
     "routes": "",
     "underscore": "",
-		"querystring" : "",
+    "querystring": "",
     "node-jquery-deparam": "",
     "mkdirp": "",
-		"winston": "",
-		"mongodb": "",
-		"mongoose": ""
+    "winston": "",
+    "mongodb": "",
+    "mongoose": ""
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-contrib-watch": "^0.6.1"
   }
 }
