@@ -4,23 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 
 //var routes = require('./routes/home');
 //var users = require('./routes/users');
 var routes = require('./routes/routes');
 
 var app = express();
-
-// connect mongoose
-
-mongoose.connect('mongodb://localhost/snutt', function(err) {
-  if(err) {
-    console.log(err);
-    throw err;
-  }
-  console.log('mongodb connected');
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
