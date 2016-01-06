@@ -18,7 +18,9 @@ var LectureSchema = mongoose.Schema({
   quota: Number,
   enrollment: Number,
   remark: String,
-  category: String
+  category: String,
+  created_at: Date,
+  updated_at: Date
 });
 
 module.exports = mongoose.model('Lecture', LectureSchema);
