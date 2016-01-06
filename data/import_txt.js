@@ -1,20 +1,16 @@
 var fs = require('fs');
-var config = require('../../config')
-var Lecture = require('../../model/_lecture')
-var util = require('./import_txt_utils')
-
-var time_str_to_array = util.time_str_to_array;
-var insert_course = util.insert_course;
+var Lecture = require('../model/lecture')
+var updateLectures = require('./update_lectures')
 
 if (process.argv.length != 4) {
 	console.log("Invalid arguments")
-	console.log("usage: $ node importTxt.js 2015 S");
+	console.log("usage: $ node importTxt.js 2016 1");
 	process.exit(1);
 }
 
 var year = Number(process.argv[2])
 var semester = process.argv[3]
-var datapath = config.snutt.ROOT_DATA_PATH + "/txt/"+year+"_"+semester+".txt";
+var datapath = __dirname + "/txt/"+year+"_"+semester+".txt";
 
 fs.readFile(datapath, function (err, data) {
 	if (err) {
@@ -27,20 +23,19 @@ fs.readFile(datapath, function (err, data) {
 	var header = lines.slice(0, 3);
 	var courses = lines.slice(3);
 
-	if (year != header[0].split("/")[0].trim() || 
+	if (year != header[0].split("/")[0].trim() ||
 		semester != header[0].split("/")[1].trim()) {
 		console.log("Textfile does not match with given parameter")
 		process.exit(1);
 	}
-	var updated_time = header[1];
-
+	var semesterIndex = ['1', 'S', '2', 'W'].indexOf(semester) + 1
 	//delete existing courserbook of input semester before update
-	Lecture.remove({ year: year, semester: semester}, function(err) {
-		if (err) 
+	Lecture.remove({ year: year, semester: semesterIndex}, function(err) {
+		if (err)
 			console.log(err)
 		else {
 			console.log("removed existing coursebook for this semester")
-			insert_course(courses, year, semester, function(){
+			updateLectures(courses, year, semesterIndex, function(){
 				process.exit(0);
 			})
 		}

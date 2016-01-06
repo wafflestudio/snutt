@@ -9,7 +9,7 @@ require 'roo-xls'
 
 if ARGV.length != 2 then
   puts "Argument error !"
-  puts "usage example : ruby fetch.rb 2012 S"
+  puts "usage example : ruby fetch.rb 2016 1"
   exit!
 end
 year = ARGV[0]
@@ -79,7 +79,7 @@ puts "download complete : #{year}_#{semester}.xls"
 general_types_to_code.keys.each do |type|
   xls_filename_typed="#{Dir.getwd()}/xls/#{year}_#{semester}_#{type}.xls"
   data = "srchCond=1&pageNo=1&workType=EX&sortKey=&sortOrder=&srchOpenSchyy=#{year}&currSchyy=#{year}&srchOpenShtm=#{shtm}&srchCptnCorsFg=&srchOpenShyr=&srchSbjtCd=&srchSbjtNm=&srchOpenUpSbjtFldCd=&srchOpenSbjtFldCd=#{general_types_to_code[type]}&srchOpenUpDeptCd=&srchOpenDeptCd=&srchOpenMjCd=&srchOpenSubmattFgCd=&srchOpenPntMin=&srchOpenPntMax=&srchCamp=&srchBdNo=&srchProfNm=&srchTlsnAplyCapaCntMin=&srchTlsnAplyCapaCntMax=&srchTlsnRcntMin=&srchTlsnRcntMax=&srchOpenSbjtTmNm=&srchOpenSbjtTm=&srchOpenSbjtTmVal=&srchLsnProgType=&srchMrksGvMthd="
-  
+
   res, data = http.post(path, data)
   open(xls_filename_typed,"w") do |file|
     file.print(res.body)
@@ -113,7 +113,7 @@ def convert_classtime(time)
   return "#{wday}(#{from_ctime}-#{duration})"
 end
 
-# Converts i-th row of m into string. 
+# Converts i-th row of m into string.
 # Returns "" for 교양 courses, if type is not given.
 def row_to_string(m, i, type="")
   classification = m[i,0]
@@ -171,11 +171,11 @@ open("#{txt_filename}.tmp", "w") do |file|
   puts "start putting general courses"
   general_types_to_code.keys.each do |type|
     xls_filename_typed="#{Dir.getwd()}/xls/#{year}_#{semester}_#{type}.xls"
-    # during summer/winter session, some type of general courses are not open
     begin
       excel = Roo::Excel.new(xls_filename_typed);
       m = excel.to_matrix
-    rescue RuntimeError 
+    # during summer/winter semester, some types of general courses are not provided
+    rescue RuntimeError
       next
     end
     puts "putting #{type}"
@@ -191,4 +191,3 @@ File.rename("#{txt_filename}.tmp", txt_filename)
 
 #make data.zip
 `sh zip.sh`
-`echo '{"updated_at": #{Time.now.to_i}}' > ../../api/sugang.json `
