@@ -23,4 +23,8 @@ var LectureSchema = mongoose.Schema({
   updated_at: Date
 });
 
+Lecture.index({ year: 1, semester: 1, classification: 1 })
+Lecture.index({ year: 1, semester: 1, department: 1 })
+Lecture.index({ year: 1, semester: 1, course_title: 1 })
+
 module.exports = mongoose.model('Lecture', LectureSchema);
