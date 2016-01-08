@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
-var secretKey = require('../../config/secretKey');
+var secretKey = require('../../config/secretKey.sample');
 
 var User = require('../../model/user');
 
@@ -19,10 +19,10 @@ router.post('/login_local', function(req, res, next) {
             var token = jwt.sign(user, secretKey.jwtSecret, {
               expiresIn : '180d' //FIXME : expire time
             });
-            
+
             res.json({
-              success : true, 
-              message : 'Authentication success.', 
+              success : true,
+              message : 'Authentication success.',
               token : token
             });
           }
