@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 
 var CourseBook = require('../../model/courseBook');
 var Lecture = require('../../model/lecture');
-var secretKey = require('../../config/secretKey.sample');
+var secretKey = require('../../config/secretKey');
 
 var authRouter = require('./auth');
 var timetableRouter = require('./timetable');
