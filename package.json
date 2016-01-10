@@ -14,6 +14,8 @@
     "express": "~4.13.1",
     "jade": "~1.11.0",
     "jsonwebtoken": "~5.5.0",
+    "kerberos": "0.0.17",
+    "lodash": "^3.10.1",
     "mongoose": "~4.3.3",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0"
