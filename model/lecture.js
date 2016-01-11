@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+var mongoose = require('../db');
 
 var LectureSchema = mongoose.Schema({
   year: { type: Number, required: true },
