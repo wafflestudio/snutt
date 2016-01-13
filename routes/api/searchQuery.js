@@ -1,5 +1,6 @@
 var router = require('express').Router();
 var Lecture = require('../../model/lecture')
+var timeJsonToMask = require('../../data/update_lectures').timeJsonToMask
 
 //something similar to LIKE query in SQL
 function like(str, option) {
@@ -12,6 +13,15 @@ function like(str, option) {
   return reg
 }
 
+function timeRangesToBinaryConditions(timeJson) {
+  return timeJsonToMask(timeJson).map(function(bit, idx) {
+    var condition = {}
+    if (bit != 0)
+      condition['$bitsAnySet'] = bit
+    condition['$bitsAllClear'] = (~(bit << 6))>>>6
+    return condition
+  })
+}
 
 module.exports = router.post('/', function(req, res, next) {
   var query = {}
@@ -30,6 +40,12 @@ module.exports = router.post('/', function(req, res, next) {
       }).join('|')
       + ')'
     query.department = { $regex: orRegex, $options: 'i'}
+  }
+  if (req.body.time) {
+    var conditions = timeRangesToBinaryConditions(req.body.time)
+    conditions.forEach(function(condition, idx) {
+      query['class_time_mask.' + idx] = condition
+    })
   }
 
   Lecture.find(query).sort('course_number').lean().exec(function (err, lectures) {

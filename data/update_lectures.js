@@ -71,6 +71,7 @@ function insert_course(lines, year, semesterIndex, next)
       callback();
       return;
     }
+    var timeJson = timeAndPlaceToJson(components[7], components[8])
     var lecture = new Lecture({
       year: Number(year),
       semester: semesterIndex,
@@ -82,7 +83,8 @@ function insert_course(lines, year, semesterIndex, next)
       course_title: components[5],
       credit: Number(components[6]),
       class_time: components[7],
-      class_time_json: timeAndPlaceToJson(components[7], components[8]),
+      class_time_json: timeJson,
+      class_time_mask: timeJsonToMask(timeJson),
       instructor: components[9],
       quota: Number(components[10]),
       enrollment: Number(components[11]),
