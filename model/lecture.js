@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
+var mongoose = require('../db');
 
 var LectureSchema = mongoose.Schema({
   year: { type: Number, required: true },
-  semester: { type: String, required: true },
+  semester: { type: Number, required: true },
   classification: { type: String, required: true },
   department: String,
   academic_year: String,
@@ -14,6 +14,7 @@ var LectureSchema = mongoose.Schema({
   class_time_json: [
   { day : Number, start: Number, len: Number, place : String }
   ],
+  class_time_mask: { type: [ Number ], required: true },
   instructor: String,
   quota: Number,
   enrollment: Number,

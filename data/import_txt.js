@@ -1,6 +1,6 @@
 var fs = require('fs');
 var Lecture = require('../model/lecture')
-var updateLectures = require('./update_lectures')
+var updateLectures = require('./update_lectures').insert_course
 
 if (process.argv.length != 4) {
 	console.log("Invalid arguments")

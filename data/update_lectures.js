@@ -32,6 +32,30 @@ function timeAndPlaceToJson(timesString, locationsString) {
   return classes
 }
 
+function timeJsonToMask(timeJson) {
+  var bitTable2D = []
+  for (var i = 0; i < 6; i++)
+    bitTable2D.push(_.fill(new Array(26), 0))
+
+  timeJson.forEach(function(lecture, lectureIdx) {
+    var dayIdx = lecture.day
+    for (var i = lecture.start * 2; i < (lecture.start + lecture.len)*2; i++)
+      bitTable2D[dayIdx][i] = 1
+  })
+
+  var timeMasks = [];
+  for (var i = 0; i < 6; i++) {
+    var mask = 0
+    for (var j = 0; j < 25; j++) {
+      if (bitTable2D[i][j] === 1)
+        mask = mask + 1
+      mask = mask << 1
+    }
+    timeMasks.push(mask)
+  }
+  return timeMasks
+}
+
 function insert_course(lines, year, semesterIndex, next)
 {
   var cnt = 0, err_cnt = 0;
@@ -47,6 +71,7 @@ function insert_course(lines, year, semesterIndex, next)
       callback();
       return;
     }
+    var timeJson = timeAndPlaceToJson(components[7], components[8])
     var lecture = new Lecture({
       year: Number(year),
       semester: semesterIndex,
@@ -58,7 +83,8 @@ function insert_course(lines, year, semesterIndex, next)
       course_title: components[5],
       credit: Number(components[6]),
       class_time: components[7],
-      class_time_json: timeAndPlaceToJson(components[7], components[8]),
+      class_time_json: timeJson,
+      class_time_mask: timeJsonToMask(timeJson),
       instructor: components[9],
       quota: Number(components[10]),
       enrollment: Number(components[11]),
@@ -83,4 +109,4 @@ function insert_course(lines, year, semesterIndex, next)
   })
 }
 
-module.exports = insert_course;
+module.exports = { insert_course, timeAndPlaceToJson, timeJsonToMask }
