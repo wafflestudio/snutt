@@ -5,7 +5,7 @@ var Lecture = require('./lecture.js');
 var TimetableSchema = mongoose.Schema({
 	user_id : { type: Schema.Types.ObjectId, ref: 'User' },
   year : {type : Number, required : true },
-  semester : {type : String, required : true },
+  semester : {type : Number, required : true },
   title : {type : String, required : true },
 	lecture_list: [Lecture]
 });
