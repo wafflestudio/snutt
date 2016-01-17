@@ -3,4 +3,5 @@ node_modules
 config/secretKey.js
 .vscode/
 .idea
+*.log
 data/xls/*
