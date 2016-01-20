@@ -4,7 +4,7 @@ var router = express.Router();
 var Timetable = require('../../model/timetable');
 
 router.get('/', function(req, res, next) { //timetable list
-  Timetable.find({'user_id' : req.user._id}).select('year semester title')
+  Timetable.find({'user_id' : req.user._id}).select('year semester title _id')
   .exec(function(err, timetables) {
     if(err) return next(err);
     res.json(timetables);
@@ -90,12 +90,12 @@ router.put('/:id/lecture', function(req, res, next) {
 });
 
 /*
- * PUT /timetable/:id/lecture
+ * DELETE /timetable/:id/lecture
  * delete a lecture from a timetable
  * param ===================================
  * lecture : json object of lecture to delete
  */
-router.put('/:id/lecture', function(req, res, next) {
+router.delete('/:id/lecture', function(req, res, next) {
   Timetable.findOne({'user_id': req.user_id, '_id' : req.params.id})
     .exec(function(err, timetable){
       if(err) return next(err);
@@ -123,7 +123,7 @@ router.delete('/:id', function(req, res, next) { // delete
  * POST /timetable/:id/copy
  * copy a timetable
  */
-router.put('/:id/copy', function(req, res, next) {
+router.post('/:id/copy', function(req, res, next) {
   Timetable.findOne({'user_id': req.user_id, '_id' : req.params.id})
     .exec(function(err, timetable){
       if(err) return next(err);
