@@ -12,7 +12,7 @@ router.post('/login_local', function(req, res, next) {
       if(!user) {
         res.json({success : false, message : 'Authentication failed. User not found.'});
       } else if (user) {
-        user.verifyPassword(req.body.password, function(err, isMatch) {
+        user.verify_password(req.body.password, function(err, isMatch) {
           if(!isMatch) {
             res.json({success : false, message : 'Authentication failed. Wrong password.'})
           } else {
