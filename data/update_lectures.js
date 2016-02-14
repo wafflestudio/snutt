@@ -20,12 +20,17 @@ function timeAndPlaceToJson(timesString, locationsString) {
     }
   });
 
-  //merge if splitted (eg: 목(9-2)/목(11-2) && 220-317/220-317 => 목(9-4) && 220-317)
+  //merge if splitted
+  //(eg: 목(9-2)/목(11-2) && 220-317/220-317 => 목(9-4) '220-317')
+  //(eg2: 금(3-2)/금(3-2) && 020-103/020-104 => 금(3-2) && '020-103/020-104')
   for (var i = 1; i < classes.length; i++) {
     var prev = classes[i-1];
     var curr = classes[i];
-    if (prev.day === curr.day && prev.place == curr.place && curr.start === (prev.start + prev.len)) {
+    if (prev.day == curr.day && prev.place == curr.place && curr.start == (prev.start + prev.len)) {
       prev.len += curr.len;
+      classes.splice(i--, 1)
+    } else if (prev.day == curr.day && prev.start == curr.start && prev.len == curr.len) {
+      prev.place += '/' + curr.place
       classes.splice(i--, 1)
     }
   }
