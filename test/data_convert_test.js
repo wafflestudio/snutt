@@ -36,6 +36,16 @@ describe('TimeConverter', function() {
         timeAndPlaceToJson('목(9-2)/목(11-2)', '220-317/220-317'))
     })
   })
+  describe('course held in two classroom', function() {
+    it('should be merged', function() {
+      assert.deepEqual([
+        {day: 0, start: 3, len: 1.5, place: '500-L302'},
+        {day: 2, start: 3, len: 1.5, place: '500-L302'},
+        {day: 4, start: 3, len: 2, place: '020-103/020-104'}
+      ],
+        timeAndPlaceToJson('월(3-1.5)/수(3-1.5)/금(3-2)/금(3-2)', '500-L302/500-L302/020-103/020-104'))
+    })
+  })
 })
 
 describe('TimeMaskConverter', function() {
