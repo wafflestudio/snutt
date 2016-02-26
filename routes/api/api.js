@@ -9,6 +9,7 @@ var secretKey = require('../../config/secretKey');
 var authRouter = require('./auth');
 var timetableRouter = require('./timetable');
 var searchQueryRouter = require('./searchQuery');
+var tagsRouter = require('./tags');
 
 router.get('/course_books', function(req, res, next) {
   CourseBook.find({},'year semester', {sort : {year : -1, semester : -1 }}, function (err, courseBooks) {
@@ -17,6 +18,8 @@ router.get('/course_books', function(req, res, next) {
 });
 
 router.use('/search_query', searchQueryRouter);
+
+router.use('/tags', tagsRouter);
 
 router.get('/app_version', function(req, res, next) {
    //FIXME : check for app_version and return the version
@@ -34,7 +37,7 @@ router.use(function(req, res, next) {
     // verifies secret and checks exp
     jwt.verify(token, secretKey.jwtSecret, function(err, decoded) {
       if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
+        return res.status(403).json({ success: false, message: 'Failed to authenticate token.' });
       } else {
         // if everything is good, save to request for use in other routes
         req.user = decoded;
@@ -47,7 +50,7 @@ router.use(function(req, res, next) {
 
     // if there is no token
     // return an error
-    return res.send({
+    return res.status(401).send({
         success: false,
         message: 'No token provided.'
     });

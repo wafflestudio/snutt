@@ -2,6 +2,7 @@ var _ = require('lodash');
 var assert = require('assert');
 var async = require('async');
 var Lecture = require('../model/lecture');
+var TagList = require('../model/tagList');
 
 function timeAndPlaceToJson(timesString, locationsString) {
   if (timesString == '')
@@ -71,13 +72,38 @@ function insert_course(lines, year, semesterIndex, next)
     funcEverythingIsDone
     )
   */
+  var tags = [];
   async.each(lines, function(line, callback) {
     var components = line.split(";");
     if (components.length == 1) {
       callback();
       return;
     }
-    var timeJson = timeAndPlaceToJson(components[7], components[8])
+
+    /*
+     * 태그 목록 작성
+     * classification
+     * department
+     * academic_year
+     * credit
+     * instructor
+     */
+    var new_tags = [components[0], components[1], components[2], components[6]+'학점', components[9]];
+    for (var i=0; i<new_tags.length; i++) {
+      var existing_tag = undefined;
+      for (var j=0; j<tags.length; j++) {
+        if (tags[j] == new_tags[i]){
+          existing_tag = new_tags[i];
+          break;
+        }
+      }
+      if (existing_tag == undefined) {
+        process.stdout.write(new_tags[i]+"-------------------------\r");
+        tags.push(new_tags[i]);
+      }
+    }
+
+    var timeJson = timeAndPlaceToJson(components[7], components[8]);
     var lecture = new Lecture({
       year: Number(year),
       semester: semesterIndex,
@@ -106,12 +132,21 @@ function insert_course(lines, year, semesterIndex, next)
         console.log(err);
         err_cnt++
       }
-      process.stdout.write("Inserting " + cnt + "th course\r");
+      process.stdout.write("Inserting " + cnt + "th course-------------------------\r");
       callback();
-    })
+    });
   }, function(err) {
-    console.log("INSERT COMPLETE with " + eval(cnt-err_cnt) + " success and "+ err_cnt + " errors");
-    next();
+    var tagList = new TagList({
+      year: Number(year),
+      semester: semesterIndex,
+      tags: tags,
+      updated_at: Date.now()
+    });
+    tagList.save(function (err, docs) {
+      console.log("\nInserted "+tags.length+" tags");
+      console.log("INSERT COMPLETE with " + eval(cnt-err_cnt) + " success and "+ err_cnt + " errors");
+      next();
+    });
   })
 }
 
