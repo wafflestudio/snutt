@@ -98,7 +98,7 @@ function insert_course(lines, year, semesterIndex, next)
         }
       }
       if (existing_tag == undefined) {
-        process.stdout.write(new_tags[i]+"-------------------------\r");
+        if (new_tags[i].length < 2) continue;
         tags.push(new_tags[i]);
       }
     }
@@ -132,7 +132,7 @@ function insert_course(lines, year, semesterIndex, next)
         console.log(err);
         err_cnt++
       }
-      process.stdout.write("Inserting " + cnt + "th course-------------------------\r");
+      process.stdout.write("Inserting " + cnt + "th course\r");
       callback();
     });
   }, function(err) {
@@ -143,8 +143,8 @@ function insert_course(lines, year, semesterIndex, next)
       updated_at: Date.now()
     });
     tagList.save(function (err, docs) {
-      console.log("\nInserted "+tags.length+" tags");
       console.log("INSERT COMPLETE with " + eval(cnt-err_cnt) + " success and "+ err_cnt + " errors");
+      console.log("Inserted "+tags.length+" tags");
       next();
     });
   })
