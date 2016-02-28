@@ -27,13 +27,13 @@ module.exports = router.post('/', function(req, res, next) {
   var query = {}
   query.year = req.body.year
   query.semester = req.body.semester
-  if (req.body.title)
+  if (req.body.title && req.body.title != [])
     query.course_title = { $regex: like(req.body.title), $options: 'i' }
-  if (req.body.credit)
+  if (req.body.credit && req.body.credit != [])
     query.credit = { $in: req.body.credit }
-  if (req.body.professor)
+  if (req.body.professor && req.body.professor != [])
     query.instructor = like(req.body.professor)
-  if (req.body.department) { // in this case result should be sorted by departments
+  if (req.body.department && req.body.department != []) { // in this case result should be sorted by departments
     var orRegex = '(' +
       req.body.department.map(function(dep, idx) {
         return like(dep)
@@ -41,7 +41,7 @@ module.exports = router.post('/', function(req, res, next) {
       + ')'
     query.department = { $regex: orRegex, $options: 'i'}
   }
-  if (req.body.time) {
+  if (req.body.time && req.body.time != []) {
     var conditions = timeRangesToBinaryConditions(req.body.time)
     conditions.forEach(function(condition, idx) {
       query['class_time_mask.' + idx] = condition
