@@ -28,9 +28,8 @@ router.post('/', function(req, res, next) { //create
     title : req.body.title,
     lecture_list : []
   });
-  // TODO : Check if a timetable with same title exists!
   timetable.save(function(err) {
-    if(err) return res.json({success: false, message : 'Timetable save failed'});
+    if(err) return res.status(500).json({success: false, message : 'Timetable save failed'});
     res.json({success : true, timetable : timetable});
   });
 });
@@ -128,8 +127,10 @@ router.post('/:id/copy', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      var copied = timetable.copy();
-      res.json({success : true, timetable : copied});
+      timetable.copy(timetable.title, function(err, doc) {
+        if(err) return next(err);
+        else res.json({success : true, timetable : doc});
+      });
     })
 });
 

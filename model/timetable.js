@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var Lecture = require('./lecture.js');
+var Lecture = require('./lecture');
+var Util = require('../util/util');
 
 var TimetableSchema = mongoose.Schema({
 	user_id : { type: Schema.Types.ObjectId, ref: 'User' },
@@ -11,16 +12,36 @@ var TimetableSchema = mongoose.Schema({
 });
 
 /*
+ * No timetable with same title in the same semester
+ */
+TimetableSchema.pre('save', function(next) {
+  this.model('Timetable').find(
+    {
+      user_id : this.user_id,
+      year : this.year,
+      semester: this.semester,
+      title: this.title
+    }, function (err, docs) {
+      if (err || docs != []) {
+        var new_err = new Error('A timetable with the same title already exists');
+        next(new_err);
+      } else {
+        next();
+      }
+    });
+});
+
+/*
  * Timetable.add_lecture(lecture, callback)
  * param =======================================
- * title : Optional. New title.
+ * new_title : New title.
  * callback : callback for timetable.save()
  */
-TimetableSchema.methods.copy = function(title, callback) {
-  // TODO : Copy
-  var copied;
-  copied.save(callback);
-  return copied;
+TimetableSchema.methods.copy = function(new_title, callback) {
+  Util.object_new_id(this);
+  if (new_title == this.title) this.title += "(copy)";
+  else this.title = new_title;
+  this.save(callback);
 };
 
 /*
