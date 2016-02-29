@@ -40,6 +40,7 @@ TimetableSchema.pre('save', function(next) {
  */
 TimetableSchema.methods.copy = function(new_title, callback) {
   Util.object_new_id(this);
+  // TODO : 인텔리하게 이름짓기 - 현재는 같은 테이블 두번 복사하면 에러
   if (new_title == this.title) this.title += "(copy)";
   else this.title = new_title;
   this.save(callback);
@@ -49,11 +50,18 @@ TimetableSchema.methods.copy = function(new_title, callback) {
  * Timetable.add_lecture(lecture, callback)
  * param =======================================
  * lecture : a Lecture to merge.
- *            If a same lecture already exist, skip.
+ *            If a same lecture already exist, error.
  * callback : callback for timetable.save()
  */
 TimetableSchema.methods.add_lecture = function(lecture, callback) {
-  // TODO : Check duplicate and merge!
+  for (var i = 0; i<this.lecture_list.length; i++){
+    if (lecture.is_equal(this.lecture_list[i])) {
+      var err = new Error("Same lecture already exists in the timetable.");
+      next(err);
+      return;
+    }
+  }
+  this.lecture_list.push(lecture);
   this.save(callback);
 };
 
@@ -65,7 +73,14 @@ TimetableSchema.methods.add_lecture = function(lecture, callback) {
  * callback : callback for timetable.save()
  */
 TimetableSchema.methods.add_lectures = function(lectures, callback) {
-  // TODO : Check duplicates and merge!
+  for (var i = 0; i<lectures.length; i++){
+    for (var j = 0; j<this.lecture_list.length; j++){
+      if (lectures[i].is_equal(this.lecture_list[j])) {
+        break;
+      }
+    }
+    this.lecture_list.push(lectures[i]);
+  }
   this.save(callback);
 };
 
@@ -73,24 +88,39 @@ TimetableSchema.methods.add_lectures = function(lectures, callback) {
  * Timetable.update_lecture(lecture, callback)
  * param =======================================
  * lecture : a Lecture to merge.
- *            If a same lecture doesn't exist, skip.
+ *            If a same lecture doesn't exist, error.
  * callback : callback for timetable.save()
  */
 TimetableSchema.methods.update_lecture = function(lecture, callback) {
-  // TODO : Check and update!
-  this.save(callback);
+  for (var i = 0; i<this.lecture_list.length; i++){
+    if (lecture.is_equal(this.lecture_list[i])) {
+      // TODO : 이렇게 그냥 대입해도 되나??
+      this.lecture_list[i] = lecture;
+      this.save(callback);
+      return;
+    }
+  }
+  var err = new Error("The lecture doesn't exist in the timetable.");
+  next(err);
 };
 
 /*
  * Timetable.delete_lecture(lecture, callback)
  * param =======================================
  * lecture : a Lecture to delete.
- *            If a same lecture doesn't exist, skip.
+ *            If a same lecture doesn't exist, error.
  * callback : callback for timetable.save()
  */
 TimetableSchema.methods.delete_lecture = function(lecture, callback) {
-  // TODO : Check and update!
-  this.save(callback);
+  for (var i = 0; i<this.lecture_list.length; i++){
+    if (lecture.is_equal(this.lecture_list[i])) {
+      this.lecture_list.splice(i,1);
+      this.save(callback);
+      return;
+    }
+  }
+  var err = new Error("The lecture doesn't exist in the timetable.");
+  next(err);
 };
 
 module.exports = mongoose.model('Timetable', TimetableSchema);

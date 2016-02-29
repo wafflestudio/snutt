@@ -24,6 +24,19 @@ var LectureSchema = mongoose.Schema({
   updated_at: Date
 });
 
+/*
+ * Lecture.add_lecture(lecture)
+ * 연도, 학기, 교과목 번호와 강좌 번호를 비교하여 같은 강좌인지 판단.
+ * param =======================================
+ * lecture : target for comparison
+ */
+LectureSchema.methods.is_equal = function(lecture) {
+  return (this.year == lecture.year &&
+      this.semester == lecture.semester &&
+      this.course_number == lecture.course_number &&
+      this.lecture_number == lecture.lecture_number);
+};
+
 LectureSchema.index({ year: 1, semester: 1, classification: 1 });
 LectureSchema.index({ year: 1, semester: 1, department: 1 });
 LectureSchema.index({ year: 1, semester: 1, course_title: 1 });
