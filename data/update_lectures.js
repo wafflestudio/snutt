@@ -72,7 +72,13 @@ function insert_course(lines, year, semesterIndex, next)
     funcEverythingIsDone
     )
   */
-  var tags = [];
+  var tags = {
+    classification : [],
+    department : [],
+    academic_year : [],
+    credit : [],
+    instructor : []
+  };
   async.each(lines, function(line, callback) {
     var components = line.split(";");
     if (components.length == 1) {
@@ -88,18 +94,27 @@ function insert_course(lines, year, semesterIndex, next)
      * credit
      * instructor
      */
-    var new_tags = [components[0], components[1], components[2], components[6]+'학점', components[9]];
-    for (var i=0; i<new_tags.length; i++) {
-      var existing_tag = undefined;
-      for (var j=0; j<tags.length; j++) {
-        if (tags[j] == new_tags[i]){
-          existing_tag = new_tags[i];
-          break;
+    var new_tags = {
+      classification : components[0],
+      department : components[1],
+      academic_year : components[2],
+      credit : components[6]+'학점',
+      instructor : components[9]
+    };
+
+    for (var key in tags) {
+      if (tags.hasOwnProperty(key)){
+        var existing_tag = undefined;
+        for (var i=0; i<tags[key].length; i++) {
+          if (tags[key][i] == new_tags[key]){
+            existing_tag = new_tags[key];
+            break;
+          }
         }
-      }
-      if (existing_tag == undefined) {
-        if (new_tags[i].length < 2) continue;
-        tags.push(new_tags[i]);
+        if (existing_tag == undefined) {
+          if (new_tags[key].length < 2) continue;
+          tags[key].push(new_tags[key]);
+        }
       }
     }
 
@@ -136,6 +151,12 @@ function insert_course(lines, year, semesterIndex, next)
       callback();
     });
   }, function(err) {
+    console.log("INSERT COMPLETE with " + eval(cnt-err_cnt) + " success and "+ err_cnt + " errors");
+    for (var key in tags) {
+      if (tags.hasOwnProperty(key)){
+        tags[key].sort();
+      }
+    }
     var tagList = new TagList({
       year: Number(year),
       semester: semesterIndex,
@@ -143,8 +164,7 @@ function insert_course(lines, year, semesterIndex, next)
       updated_at: Date.now()
     });
     tagList.save(function (err, docs) {
-      console.log("INSERT COMPLETE with " + eval(cnt-err_cnt) + " success and "+ err_cnt + " errors");
-      console.log("Inserted "+tags.length+" tags");
+      if (!err) console.log("TAGS INSERTED");
       next();
     });
   })

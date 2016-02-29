@@ -7,7 +7,13 @@ var TagListSchema = mongoose.Schema({
   year: { type: Number, required: true },
   semester: { type: Number, required: true },
   updated_at : {type: Date, default: Date.now()},
-  tags : {type: [String], required: true }
+  tags : {
+    classification: {type: [String]},
+    department: {type: [String]},
+    academic_year: {type: [String]},
+    credit: {type: [String]},
+    instructor: {type: [String]}
+  }
 });
 
 module.exports = mongoose.model('TagList', TagListSchema);
