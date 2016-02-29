@@ -49,8 +49,7 @@ module.exports = router.post('/', function(req, res, next) {
   }
 
   Lecture.find(query).sort('course_number').lean().exec(function (err, lectures) {
-    if (err)
-      console.log(err)
+    if (err) next(err);
     return res.json(lectures);
   })
 })

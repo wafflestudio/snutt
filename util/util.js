@@ -1,6 +1,3 @@
-/**
- * Created by north on 16. 2. 29.
- */
 var mongoose = require('mongoose');
 
   /*

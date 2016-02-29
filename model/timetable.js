@@ -22,7 +22,8 @@ TimetableSchema.pre('save', function(next) {
       semester: this.semester,
       title: this.title
     }, function (err, docs) {
-      if (err || docs != []) {
+      if (err) next(err);
+      if (docs != []) {
         var new_err = new Error('A timetable with the same title already exists');
         next(new_err);
       } else {
