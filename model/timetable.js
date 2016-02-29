@@ -74,12 +74,14 @@ TimetableSchema.methods.add_lecture = function(lecture, callback) {
  */
 TimetableSchema.methods.add_lectures = function(lectures, callback) {
   for (var i = 0; i<lectures.length; i++){
+    var is_exist = false;
     for (var j = 0; j<this.lecture_list.length; j++){
       if (lectures[i].is_equal(this.lecture_list[j])) {
+        is_exist = true;
         break;
       }
     }
-    this.lecture_list.push(lectures[i]);
+    if (!is_exist) this.lecture_list.push(lectures[i]);
   }
   this.save(callback);
 };
