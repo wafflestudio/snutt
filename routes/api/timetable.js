@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var Timetable = require('../../model/timetable');
+var Lecture = require('../../model/lecture');
 
 router.get('/', function(req, res, next) { //timetable list
   Timetable.find({'user_id' : req.user._id}).select('year semester title _id')
@@ -45,9 +46,12 @@ router.post('/:id/lecture', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      timetable.add_lecture(req.body.lecture, function(err){
-        if(err) return next(err);
-        res.json({success : true });
+      var lecture = new Lecture(JSON.parse(req.body['lecture']));
+      lecture.save(function(err, doc){
+        timetable.add_lecture(doc, function(err){
+          if(err) return next(err);
+          res.json({success : true });
+        });
       });
     })
 });
@@ -63,7 +67,13 @@ router.post('/:id/lectures', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      timetable.add_lectures(req.body.lectures, function(err){
+      var lectures = [];
+      var lectures_raw = JSON.parse(req.body['lectures']);
+      for (var lecture_raw in lectures_raw) {
+        var lecture = new Lecture(lecture_raw);
+        lectures.push(lecture);
+      }
+      timetable.add_lectures(lectures, function(err){
         if(err) return next(err);
         res.json({success : true });
       });
@@ -81,7 +91,8 @@ router.put('/:id/lecture', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      timetable.update_lecture(req.body.lecture, function(err){
+      var lecture_raw = JSON.parse(req.body['lecture']);
+      timetable.update_lecture(lecture_raw, function(err){
         if(err) return next(err);
         res.json({success : true });
       });
@@ -92,14 +103,14 @@ router.put('/:id/lecture', function(req, res, next) {
  * DELETE /timetable/:id/lecture
  * delete a lecture from a timetable
  * param ===================================
- * lecture : json object of lecture to delete
+ * lecture_id :id of lecture to delete
  */
 router.delete('/:id/lecture', function(req, res, next) {
   Timetable.findOne({'user_id': req.user_id, '_id' : req.params.id})
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      timetable.delete_lecture(req.body.lecture, function(err){
+      timetable.delete_lecture(req.body.lecture_id, function(err){
         if(err) return next(err);
         res.json({success : true });
       });

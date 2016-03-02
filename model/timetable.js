@@ -8,7 +8,7 @@ var TimetableSchema = mongoose.Schema({
   year : {type : Number, required : true },
   semester : {type : Number, required : true },
   title : {type : String, required : true },
-	lecture_list: [Lecture]
+	lecture_list: [Lecture.schema]
 });
 
 /*
@@ -23,7 +23,7 @@ TimetableSchema.pre('save', function(next) {
       title: this.title
     }, function (err, docs) {
       if (err) next(err);
-      if (docs != []) {
+      if (docs != [] && docs._id != this._id) {
         var new_err = new Error('A timetable with the same title already exists');
         next(new_err);
       } else {
@@ -38,12 +38,12 @@ TimetableSchema.pre('save', function(next) {
  * new_title : New title.
  * callback : callback for timetable.save()
  */
-TimetableSchema.methods.copy = function(new_title, callback) {
+TimetableSchema.methods.copy = function(new_title, next) {
   Util.object_new_id(this);
   // TODO : 인텔리하게 이름짓기 - 현재는 같은 테이블 두번 복사하면 에러
   if (new_title == this.title) this.title += "(copy)";
   else this.title = new_title;
-  this.save(callback);
+  this.save(next);
 };
 
 /*
@@ -53,7 +53,7 @@ TimetableSchema.methods.copy = function(new_title, callback) {
  *            If a same lecture already exist, error.
  * callback : callback for timetable.save()
  */
-TimetableSchema.methods.add_lecture = function(lecture, callback) {
+TimetableSchema.methods.add_lecture = function(lecture, next) {
   for (var i = 0; i<this.lecture_list.length; i++){
     if (lecture.is_equal(this.lecture_list[i])) {
       var err = new Error("Same lecture already exists in the timetable.");
@@ -62,7 +62,7 @@ TimetableSchema.methods.add_lecture = function(lecture, callback) {
     }
   }
   this.lecture_list.push(lecture);
-  this.save(callback);
+  this.save(next);
 };
 
 /*
@@ -72,7 +72,7 @@ TimetableSchema.methods.add_lecture = function(lecture, callback) {
  *            If a same lecture already exist, skip it.
  * callback : callback for timetable.save()
  */
-TimetableSchema.methods.add_lectures = function(lectures, callback) {
+TimetableSchema.methods.add_lectures = function(lectures, next) {
   for (var i = 0; i<lectures.length; i++){
     var is_exist = false;
     for (var j = 0; j<this.lecture_list.length; j++){
@@ -81,24 +81,26 @@ TimetableSchema.methods.add_lectures = function(lectures, callback) {
         break;
       }
     }
-    if (!is_exist) this.lecture_list.push(lectures[i]);
+    if (!is_exist) this.lecture_list.push(lectures);
   }
-  this.save(callback);
+  this.save(next);
 };
 
 /*
- * Timetable.update_lecture(lecture, callback)
+ * Timetable.update_lecture(lecture_raw, callback)
  * param =======================================
- * lecture : a Lecture to merge.
+ * lecture : a partial update for lecture.
  *            If a same lecture doesn't exist, error.
- * callback : callback for timetable.save()
+ * callback : callback for timetable.update(err, numAffected)
  */
-TimetableSchema.methods.update_lecture = function(lecture, callback) {
+TimetableSchema.methods.update_lecture = function(lecture_raw, next) {
   for (var i = 0; i<this.lecture_list.length; i++){
-    if (lecture.is_equal(this.lecture_list[i])) {
-      // TODO : 이렇게 그냥 대입해도 되나??
-      this.lecture_list[i] = lecture;
-      this.save(callback);
+    if (Lecture.is_equal(this.lecture_list[i], lecture_raw)) {
+      var update_set = {};
+      for (var field in lecture_raw) {
+        update_set['lecture_list.'+i+'.' + field] = lecture_raw[field];
+      }
+      this.update({$set: update_set}, next);
       return;
     }
   }
@@ -107,22 +109,15 @@ TimetableSchema.methods.update_lecture = function(lecture, callback) {
 };
 
 /*
- * Timetable.delete_lecture(lecture, callback)
+ * Timetable.delete_lecture(lecture_id, callback)
  * param =======================================
- * lecture : a Lecture to delete.
- *            If a same lecture doesn't exist, error.
+ * lecture : a Lecture._id to delete.
+ *            If a lecture doesn't exist, skip.
  * callback : callback for timetable.save()
  */
-TimetableSchema.methods.delete_lecture = function(lecture, callback) {
-  for (var i = 0; i<this.lecture_list.length; i++){
-    if (lecture.is_equal(this.lecture_list[i])) {
-      this.lecture_list.splice(i,1);
-      this.save(callback);
-      return;
-    }
-  }
-  var err = new Error("The lecture doesn't exist in the timetable.");
-  next(err);
+TimetableSchema.methods.delete_lecture = function(lecture_id, next) {
+  this.lecture_list.pull({_id : lecture_id});
+  this.save(next);
 };
 
 module.exports = mongoose.model('Timetable', TimetableSchema);

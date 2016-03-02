@@ -37,6 +37,13 @@ LectureSchema.methods.is_equal = function(lecture) {
       this.lecture_number == lecture.lecture_number);
 };
 
+LectureSchema.statics.is_equal = function(lecture1, lecture2) {
+  return (lecture1.year == lecture2.year &&
+  lecture1.semester == lecture2.semester &&
+  lecture1.course_number == lecture2.course_number &&
+  lecture1.lecture_number == lecture2.lecture_number);
+};
+
 LectureSchema.index({ year: 1, semester: 1, classification: 1 });
 LectureSchema.index({ year: 1, semester: 1, department: 1 });
 LectureSchema.index({ year: 1, semester: 1, course_title: 1 });
