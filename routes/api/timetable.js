@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+var timeJsonToMask = require('../../data/update_lectures.js').timeJsonToMask
+
 var Timetable = require('../../model/timetable');
 var Lecture = require('../../model/lecture');
 
@@ -46,7 +48,10 @@ router.post('/:id/lecture', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      var lecture = new Lecture(JSON.parse(req.body['lecture']));
+      var json = req.body['lecture']
+      json.class_time_mask = timeJsonToMask(json.class_time_json)
+      console.log(json)
+      var lecture = new Lecture(json);
       lecture.save(function(err, doc){
         timetable.add_lecture(doc, function(err){
           if(err) return next(err);
@@ -68,7 +73,7 @@ router.post('/:id/lectures', function(req, res, next) {
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
       var lectures = [];
-      var lectures_raw = JSON.parse(req.body['lectures']);
+      var lectures_raw = req.body['lectures'];
       for (var lecture_raw in lectures_raw) {
         var lecture = new Lecture(lecture_raw);
         lectures.push(lecture);
@@ -91,7 +96,7 @@ router.put('/:id/lecture', function(req, res, next) {
     .exec(function(err, timetable){
       if(err) return next(err);
       if(!timetable) return res.json({success : false});
-      var lecture_raw = JSON.parse(req.body['lecture']);
+      var lecture_raw = req.body['lecture'];
       timetable.update_lecture(lecture_raw, function(err){
         if(err) return next(err);
         res.json({success : true });
