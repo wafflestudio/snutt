@@ -22,7 +22,9 @@ jobs:
     - name: Create snutt.yml
       run: |
         pwd
-        cat ${{ secrets.SNUTT_YML }} > ./snutt.yml
+        echo ${{ secrets.SNUTT_YML }} > ./snutt.yml
+        ls
+        cat ./snutt.yml
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
