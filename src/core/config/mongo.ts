@@ -12,4 +12,5 @@ mongoose.connect(property.get('core.mongo.uri'), function(err) {
     logger.error(err);
     return;
   }
+  logger.info('MongoDB connected');
 });
