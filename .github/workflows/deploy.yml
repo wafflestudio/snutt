@@ -19,6 +19,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Create snutt.yml
+      run: |
+        pwd
+        cat ${{ secrets.SNUTT_YML }} > ./snutt.yml
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
