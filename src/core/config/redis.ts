@@ -5,9 +5,7 @@ import RedisUtil = require('@app/core/redis/RedisUtil');
 let logger = winston.loggers.get('default');
 
 let client = redis.createClient({
-    host: property.get('core.redis.host'),
-    port: property.get('core.redis.port'),
-    db: property.get('core.redis.db')
+    url: property.get('core.redis.url')
 });
 
 client.on('connect', async function() {
