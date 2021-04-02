@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ feature/docker-node-8 ]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: latest
+      BUILD_NUMBER: ${{ github.run_number }}
+      ECR_REGISTRY: 405906814034.dkr.ecr.ap-northeast-2.amazonaws.com
+      ECR_REPOSITORY: snutt/snutt-server
+      S3_BUCKET_NAME: snutt-build
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Upload Dockerrun.aws.json to S3
+      run: |
+        zip deploy.zip Dockerrun.aws.json
+        aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/deploy.zip
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Docker Build, tag, and push image to ECR
+      id: build-image
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Delete untagged images in ECR
+      run: |
+        UNTAGGED_IMAGES=$( aws ecr list-images --repository-name $ECR_REPOSITORY --filter "tagStatus=UNTAGGED" --query 'imageIds[*]' --output json )
+        aws ecr batch-delete-image --repository-name $ECR_REPOSITORY --image-ids "$UNTAGGED_IMAGES" || true
+
+    - name: Deploy to ElasticBeanstalk
+      run: |
+        aws elasticbeanstalk create-application-version \
+          --application-name snutt-server \
+          --version-label $BUILD_NUMBER \
+          --description $BUILD_NUMBER \
+          --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key='deploy.zip'
+        aws elasticbeanstalk update-environment \
+          --environment-name snutt-server-prod \
+          --version-label $BUILD_NUMBER
