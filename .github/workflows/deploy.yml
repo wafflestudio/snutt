@@ -60,3 +60,13 @@ jobs:
         aws elasticbeanstalk update-environment \
           --environment-name snutt-server-production \
           --version-label $BUILD_NUMBER
+
+    - name: Slack Notify
+      uses: rtCamp/action-slack-notify@v2.1.2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_TITLE: NEW RELEASE
+        SLACK_USERNAME: snutt-server
+        SLACK_ICON: https://user-images.githubusercontent.com/35535636/103177470-2237cb00-48be-11eb-9211-3ffa567c8ac3.png
+        SLACK_MESSAGE: Check <https://ap-northeast-2.console.aws.amazon.com/elasticbeanstalk/home?region=ap-northeast-2#/environment/dashboard?applicationName=snutt-server&environmentId=e-mxa4zqcg5f|EB> for updated environment
+        SLACK_FOOTER: https://snutt.wafflestudio.com
