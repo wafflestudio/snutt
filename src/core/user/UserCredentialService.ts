@@ -12,6 +12,8 @@ import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import AlreadyRegisteredFbIdError from '@app/core/user/error/AlreadyRegisteredFbIdError';
 import InvalidFbIdOrTokenError from '@app/core/facebook/error/InvalidFbIdOrTokenError';
 import NotLocalAccountError from './error/NotLocalAccountError';
+import winston = require('winston');
+var logger = winston.loggers.get('default');
 
 let secretKey = property.get('core.secretKey');
 
@@ -133,9 +135,9 @@ export async function makeFbCredential(fbId: string, fbToken: string): Promise<U
     if (await UserService.getByFb(fbId)) {
         throw new AlreadyRegisteredFbIdError(fbId);
     }
-
+    logger.info("Trying to get fb info: fbId - " + fbId + " / fbToken - " + fbToken);
     let fbInfo = await FacebookService.getFbInfo(fbId, fbToken);
-
+    logger.info("Got fb info: " + fbInfo);
     return {
         fbId: fbInfo.fbId,
         fbName: fbInfo.fbName
