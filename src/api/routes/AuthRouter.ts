@@ -74,16 +74,16 @@ restPost(router, '/login_fb')(async function(context, req) {
       }
     } else {
       let credential = await UserCredentialService.makeFbCredential(req.body.fb_id, req.body.fb_token);
-      logger.info("Made fb credential: " + credential);
+      logger.info("Made fb credential: " + JSON.stringify(credential));
       let credentialHash = await UserCredentialService.makeCredentialHmac(credential);
       let newUser: User = {
         credential: credential,
         credentialHash: credentialHash,
         email: req.body.email
       }
-      logger.info("New user info: " + newUser);
+      logger.info("New user info: " + JSON.stringify(newUser));
       let inserted = await UserService.add(newUser);
-      logger.info("Inserted new user: " + inserted);
+      logger.info("Inserted new user: " + JSON.stringify(inserted));
       return {token: inserted.credentialHash, user_id: inserted._id};
     }
   } catch (err) {

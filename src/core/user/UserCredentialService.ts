@@ -137,7 +137,7 @@ export async function makeFbCredential(fbId: string, fbToken: string): Promise<U
     }
     logger.info("Trying to get fb info: fbId - " + fbId + " / fbToken - " + fbToken);
     let fbInfo = await FacebookService.getFbInfo(fbId, fbToken);
-    logger.info("Got fb info: " + fbInfo);
+    logger.info("Got fb info: " + JSON.stringify(fbInfo));
     return {
         fbId: fbInfo.fbId,
         fbName: fbInfo.fbName
