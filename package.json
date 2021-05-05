@@ -47,7 +47,7 @@
     "mongoose": "^5.0.18",
     "morgan": "^1.9.1",
     "pem-jwk": "^2.0.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request": "^2.74.0",
     "request-promise-native": "~1.0.5",
     "rewire": "^4.0.1",
