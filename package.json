@@ -43,7 +43,7 @@
     "jsonwebtoken": "~5.5.0",
     "mocha": "~5.2.0",
     "module-alias": "^2.0.6",
-    "mongodb": "~3.0.10",
+    "mongodb": "~3.1.13",
     "mongoose": "^5.0.18",
     "morgan": "^1.9.1",
     "pem-jwk": "^2.0.0",
