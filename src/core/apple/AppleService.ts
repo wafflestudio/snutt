@@ -11,6 +11,7 @@ import request = require("request");
 import AppleApiError from "@app/core/apple/error/AppleApiError";
 import pemjwk = require("pem-jwk");
 import JwtHeader from "@app/core/apple/model/JwtHeader";
+import InvalidAppleTokenError from "@app/core/apple/error/InvalidAppleTokenError";
 
 async function getMatchedKeyBy(kid: string, alg: string): Promise<AppleJWK> {
     try {
@@ -37,10 +38,15 @@ export async function verifyAndDecodeAppleToken(identityToken: string): Promise<
     const headerOfIdentityToken: JwtHeader = JSON.parse(Buffer.from(identityToken.substr(0, identityToken.indexOf('.')), 'base64').toString());
     const appleJwk: AppleJWK = await getMatchedKeyBy(headerOfIdentityToken.kid, headerOfIdentityToken.alg);
     const publicKey: string = pemjwk.jwk2pem(appleJwk);
-    jwt.verify(identityToken, publicKey, {
-        algorithms: [appleJwk.alg],
-        issuer: "https://appleid.apple.com",
-        audience: "com.wafflestudio.snutt"
-    });
+    try {
+        jwt.verify(identityToken, publicKey, {
+            algorithms: [appleJwk.alg],
+            issuer: "https://appleid.apple.com",
+            audience: "com.wafflestudio.snutt"
+        });
+    }
+    catch (err) {
+        throw new InvalidAppleTokenError(identityToken);
+    }
     return <AppleUserInfo>jwt.decode(identityToken)
 }
