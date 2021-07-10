@@ -13,6 +13,8 @@ core:
     repo:
       owner: wafflestudio
       name: snutt-feedbacks
+  snuttev:
+    url: http://localhost:8080
 
 api:
   host: localhost

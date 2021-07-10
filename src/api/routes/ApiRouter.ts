@@ -9,6 +9,7 @@ import TimetableRouter = require('./TimetableRouter');
 import SearchQueryRouter = require('./SearchQueryRouter');
 import TagListRouter = require('./TagListRouter');
 import NotificationRouter = require('./NotificationRouter');
+import EvaluationRouter = require('./EvaluationRouter')
 import UserRouter = require('./UserRouter');
 import AdminRouter = require('./AdminRouter');
 import FeedbackService = require('@app/core/feedback/FeedbackService');
@@ -61,6 +62,8 @@ restPost(router, '/feedback')(async function(context, req) {
   await FeedbackService.add(req.body.email, req.body.message, context.platform);
   return {message:"ok"};
 });
+
+router.use('/evaluation', EvaluationRouter)
 
 router.use('/auth', AuthRouter);
 
