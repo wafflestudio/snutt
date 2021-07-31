@@ -7,6 +7,8 @@ import TimetableNotFoundError from './error/TimetableNotFoundError';
 import UserLectureNotFoundError from './error/UserLectureNotFoundError';
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 
+export const NUMBER_OF_THEME = 6
+
 let userLectureSchema = new mongoose.Schema({
   classification: String,                           // 교과 구분
   department: String,                               // 학부
@@ -38,7 +40,7 @@ let TimetableSchema = new mongoose.Schema({
   title: {type: String, required: true},
   lecture_list: [userLectureSchema],
   updated_at: Date,
-  theme: {type: Number, required: true, default: 0}
+  theme: {type: Number, required: true, default: 0, min: 0, max:NUMBER_OF_THEME-1}
 });
 
 TimetableSchema.index({user_id: 1})

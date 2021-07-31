@@ -24,6 +24,7 @@ import { restGet, restPost } from '../decorator/RestDecorator';
 import ApiError from '../error/ApiError';
 import ErrorCode from '../enum/ErrorCode';
 import UserAuthorizeMiddleware from '../middleware/UserAuthorizeMiddleware';
+import {NUMBER_OF_THEME} from "@app/core/timetable/TimetableRepository";
 let logger = winston.loggers.get('default');
 
 router.use(UserAuthorizeMiddleware);
@@ -311,7 +312,12 @@ router.put('/:id', async function(req, res, next) {
 router.put('/:id/theme', async function(req, res, next) {
   let context: RequestContext = req['context'];
   let user:User = context.user;
-  if (!req.body.theme) return res.status(400).json({errcode: ErrorCode.NO_TIMETABLE_TITLE, message:"should provide title"});
+  if (!req.body.theme) {
+    return res.status(400).json({errcode: ErrorCode.NO_TIMETABLE_THEME, message:"should provide theme number"});
+  }
+  if (!(req.body.theme instanceof Number) || req.body.theme >= NUMBER_OF_THEME || req.body.theme < 0) {
+    return res.status(400).json({errcode: ErrorCode.INPUT_OUT_OF_RANGE, message: `theme should be between 0 and ${NUMBER_OF_THEME-1}`});
+  }
 
   try {
     await TimetableService.modifyTheme(req.params.id, user._id, req.body.theme);
