@@ -79,31 +79,31 @@ export async function findBySemester(year: number, semester: number): Promise<Ti
 
 export async function findAbstractListByUserId(userId: string): Promise<AbstractTimetable[]> {
   const docs = await mongooseModel.aggregate([{
-    $match: {user_id: userId}
-  }, {
-    $unwind: {
-      path: "$lecture_list",
-      preserveNullAndEmptyArrays: true
-    }
-  }, {
-    $group: {
-      _id: "$_id",
-      year: {$first: "$year"},
-      semester: {$first: "$semester"},
-      title: {$first: "$title"},
-      updated_at: {$first: "$updated_at"},
-      total_credit: {
-        $sum: {
-          $cond: [{
-            $and: [{$not: "$lecture_list"},
-              {$not: "$lecture_list.credit"}
-            ]
-          }, "$lecture_list.credit", 0]
+    $match: {'user_id': userId}
+    }, {
+      $unwind: {
+        path: "$lecture_list",
+        preserveNullAndEmptyArrays: true
+      }
+    }, {
+      $group: {
+        _id: "$_id",
+        year: {$first: "$year"},
+        semester: {$first: "$semester"},
+        title: {$first: "$title"},
+        updated_at: {$first: "$updated_at"},
+        total_credit: {
+          $sum: {
+            $cond: [{
+              $or: [{$not: "$lecture_list"},
+                {$not: "$lecture_list.credit"}
+              ]
+            }, 0, "$lecture_list.credit"]
+          }
         }
       }
-    }
-  },
-    {$sort: {_id:1}}
+    },
+      {$sort: {_id:1}}
   ]).exec()
   return docs
 }
