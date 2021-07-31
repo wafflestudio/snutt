@@ -315,7 +315,7 @@ router.put('/:id/theme', async function(req, res, next) {
   if (!req.body.theme) {
     return res.status(400).json({errcode: ErrorCode.NO_TIMETABLE_THEME, message:"should provide theme number"});
   }
-  if (!(req.body.theme instanceof Number) || req.body.theme >= NUMBER_OF_THEME || req.body.theme < 0) {
+  if (isNaN(req.body.theme) || parseInt(req.body.theme) >= NUMBER_OF_THEME || parseInt(req.body.theme) < 0) {
     return res.status(400).json({errcode: ErrorCode.INPUT_OUT_OF_RANGE, message: `theme should be between 0 and ${NUMBER_OF_THEME-1}`});
   }
 
