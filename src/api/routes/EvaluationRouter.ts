@@ -10,13 +10,14 @@ let router = ExpressPromiseRouter();
 router.use(UserAuthorizeMiddleware)
 
 router.all('/', async function (req, res, next) {
+    const snuttevDefaultRoutingUrl = property.get('api.snuttev.url') + '/api/v1/evaluation'
     const evaluationServerHeader = {
         'Snutt-User-Id': req['context'].user._id
     }
     try {
         return request({
             method: req.method,
-            uri: property.get('core.snuttev.url') + '/api/v1/evaluation' + req.url,
+            uri: snuttevDefaultRoutingUrl + req.url,
             headers: evaluationServerHeader,
             body: req.body,
             json: true

@@ -16,7 +16,7 @@ export async function getUserName(): Promise<string> {
         headers: apiHeader,
         json: true
     })
-    
+
     return result.login;
 }
 
