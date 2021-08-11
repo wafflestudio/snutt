@@ -13,12 +13,12 @@ core:
     repo:
       owner: wafflestudio
       name: snutt-feedbacks
-  snuttev:
-    url: http://localhost:8080
 
 api:
   host: localhost
   port: 3000
+  snuttev:
+    url: http://localhost:5000
   winston:
     path: './snutt-api.log'
     datePattern: 'YYYY-MM-DD'
