@@ -63,7 +63,7 @@ restPost(router, '/feedback')(async function(context, req) {
   return {message:"ok"};
 });
 
-router.use('/evaluation', EvaluationRouter)
+router.use('/ev-service', EvaluationRouter)
 
 router.use('/auth', AuthRouter);
 
