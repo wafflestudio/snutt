@@ -7,6 +7,6 @@ export default interface Timetable {
     semester: number;
     title: string;
     lecture_list: UserLecture[];
+    theme: number;
     updated_at: number;
 };
-  

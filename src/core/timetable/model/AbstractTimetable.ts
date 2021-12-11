@@ -3,6 +3,6 @@ export default interface AbstractTimetable {
     year: number;
     semester: number;
     title: string;
+    total_credit: number;
     updated_at: Date;
 };
-    

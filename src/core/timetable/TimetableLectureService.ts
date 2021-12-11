@@ -33,7 +33,7 @@ export async function addRefLecture(timetable: Timetable, lectureId: string): Pr
   let userLecture = fromRefLecture(lecture, colorIndex);
   await addLecture(timetable, userLecture);
 }
-  
+
 export async function addLecture(timetable: Timetable, lecture: UserLecture): Promise<void> {
   ObjectUtil.deleteObjectId(lecture);
 
@@ -64,7 +64,7 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
   /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
-  
+
   if (!isCustomLecture(lecture)) throw new NotCustomLectureError(lecture);
 
   if (!lecture.color && !lecture.colorIndex) {
@@ -153,7 +153,7 @@ function getOverlappingLectureIds(table: Timetable, lecture: UserLecture): strin
     var tableLecture:any = table.lecture_list[i];
     for (var j=0; j<tableLecture.class_time_mask.length; j++) {
       if ((tableLecture.class_time_mask[j] & lecture.class_time_mask[j]) != 0) {
-        lectureIds.push(tableLecture._id); 
+        lectureIds.push(tableLecture._id);
         break;
       }
     }

@@ -5,6 +5,9 @@ SNU Timetable API 서버
 
 서울대학교 수강편람 검색 및 시간표 관리를 위한 애플리케이션입니다.
 
+### [snutt-ev](https://github.com/wafflestudio/snutt-ev)
+MSA를 적용해 강의평 서버를 분리시켰습니다. 
+
 ## Contributing
 PR is welcome!
 
@@ -18,8 +21,9 @@ PR is welcome!
 * Redis 4.0.12
 
 ## Documentation
-[깃헙 위키](https://github.com/wafflestudio/snutt/wiki/Deploying-2.0.0)
-[Notion](https://www.notion.so/SNUTT-f5c63e408e2c4275af4682112abd6af7)
+- [깃헙 위키](https://github.com/wafflestudio/snutt/wiki/Deploying-2.0.0)
+- [Notion](https://www.notion.so/SNUTT-f5c63e408e2c4275af4682112abd6af7)
+- [Feedback](https://github.com/wafflestudio/snutt-feedbacks/)
 
 ## Front-end Clients
 * [Web Client](https://github.com/wafflestudio/snutt-webclient/)

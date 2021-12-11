@@ -45,7 +45,7 @@ export async function getRefLectureList(year: number, semester: number): Promise
 /**
  * 수강스누 2.0부터는 없는 학기의 편람 엑셀 URL을 호출해도
  * 결과가 응답되고, 강좌 데이터가 들어 있다
- * 
+ *
  * 따라서 수강 편람 존재 여부를 확인하기 위해
  * 검색 조건 API를 호출하여, 현재 수강 학기와 비교한다.
  */
@@ -81,8 +81,8 @@ async function isCoursebookOpened(year: number, semester: number): Promise<boole
             }
 
             return Promise.resolve(
-                (year < latestYear) ||
-                (year == latestYear && semester <= latestSemester)
+              (year < latestYear) ||
+              (year == latestYear && semester <= latestSemester)
             );
         });
     }, {
@@ -152,18 +152,33 @@ function getCoursebookExcelFileForCategory(year: number, semester: number, lectu
 const SUGANG_SNU_BASEPATH = "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action?";
 function makeCoursebookExcelFileUrl(year: number, semester: number, lectureCategory: number): string {
     let params = {
-        workType: "EX",
+        // pageNo: 1,
+        seeMore: "더보기",
+        srchBdNo: "",
+        srchCamp: "",
+        srchCptnCorsFg: "",
+        srchCurrPage: 1,
+        srchExcept: "",
+        // 추가됨
+        srchGenrlRemoteLtYn: "",
+        srchIsEngSbjt: "",
+        // 추가됨
+        srchIsPendingCourse: "",
+        srchLanguage: "ko",
+        srchLsnProgType: "",
+        srchMrksApprMthdChgPosbYn: "",
+        srchMrksGvMthd: "",
+        srchOpenUpDeptCd: "",
+        srchOpenMjCd: "",
+        srchOpenPntMax: "",
+        srchOpenPntMin: "",
+        srchOpenSbjtDayNm: "",
+        srchOpenSbjtNm: "",
+        srchOpenSbjtTm: "",
+        srchOpenSbjtTmNm: "",
         srchOpenSchyy: year,
         srchOpenShtm: semesterQueryString[semester],
-        srchSbjtNm: "",
-        srchSbjtCd: "",
-        seeMore: "더보기",
-        srchCptnCorsFg: "",
         srchOpenShyr: "",
-        srchOpenUpSbjtFldCd: "", 
-        srchOpenUpDeptCd: "",
-        srchOpenDeptCd: "",
-        srchOpenMjCd: "",
         srchOpenSubmattCorsFg: "",
         srchOpenSubmattFgCd1: "",
         srchOpenSubmattFgCd2: "",
@@ -173,28 +188,20 @@ function makeCoursebookExcelFileUrl(year: number, semester: number, lectureCateg
         srchOpenSubmattFgCd6: "",
         srchOpenSubmattFgCd7: "",
         srchOpenSubmattFgCd8: "",
-        srchExcept: "",
-        srchOpenPntMin: "", 
-        srchOpenPntMax: "",
-        srchCamp: "",
-        srchBdNo: "",
-        srchProfNm: "",
-        srchOpenSbjtTmNm: "", 
-        srchOpenSbjtDayNm: "",
-        srchOpenSbjtTm: "",
-        srchOpenSbjtNm: "",
-        srchTlsnAplyCapaCntMin: "", 
-        srchTlsnAplyCapaCntMax: "",
-        srchLsnProgType: "",
-        srchTlsnRcntMin: "",
-        srchTlsnRcntMax: "",
-        srchMrksGvMthd: "",
-        srchIsEngSbjt: "",
-        srchIsAplyAvailable: "",
-        srchMrksApprMthdChgPosbYn: "", 
-        srchLanguage: "ko",
-        srchCurrPage: 1,
+        // 추가됨
+        srchOpenSubmattFgCd9: "",
+        srchOpenDeptCd: "",
+        srchOpenUpSbjtFldCd: "",
         srchPageSize: 9999,
+        srchProfNm: "",
+        srchSbjtCd: "",
+        srchSbjtNm: "",
+        srchTlsnAplyCapaCntMax: "",
+        srchTlsnAplyCapaCntMin: "",
+        srchTlsnRcntMax: "",
+        srchTlsnRcntMin: "",
+        workType: "EX",
+        // srchIsAplyAvailable: "", // 사라짐
     }
 
     if (lectureCategory === null) {
@@ -205,7 +212,7 @@ function makeCoursebookExcelFileUrl(year: number, semester: number, lectureCateg
         params["srchOpenSbjtFldCd"] = lectureCategory;
         logger.info("Fetching " + SugangSnuLectureCategoryService.getLectureCategoryString(lectureCategory));
     }
-    
+
     let retarr = [];
     for (let key in params) {
         retarr.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));

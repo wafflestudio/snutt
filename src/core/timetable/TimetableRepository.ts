@@ -7,17 +7,19 @@ import TimetableNotFoundError from './error/TimetableNotFoundError';
 import UserLectureNotFoundError from './error/UserLectureNotFoundError';
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 
+export const NUMBER_OF_THEME = 6
+
 let userLectureSchema = new mongoose.Schema({
   classification: String,                           // 교과 구분
   department: String,                               // 학부
   academic_year: String,                            // 학년
-  course_title: { type: String, required: true },   // 과목명
+  course_title: {type: String, required: true},   // 과목명
   credit: Number,                                   // 학점
   class_time: String,
   class_time_json: [
-    { day : Number, start: Number, len: Number, place : String }
+    {day: Number, start: Number, len: Number, place: String}
   ],
-  class_time_mask: { type: [ Number ], required: true, default: [0,0,0,0,0,0,0] },
+  class_time_mask: {type: [Number], required: true, default: [0, 0, 0, 0, 0, 0, 0]},
   instructor: String,                               // 강사
   quota: Number,                                    // 정원
   enrollment: Number,                               // 신청인원
@@ -27,22 +29,23 @@ let userLectureSchema = new mongoose.Schema({
   lecture_number: String,
   created_at: Date,
   updated_at: Date,
-  color: {fg : String, bg : String},
-  colorIndex: { type: Number, required: true, default: 0 }
+  color: {fg: String, bg: String},
+  colorIndex: {type: Number, required: true, default: 0}
 });
 
 let TimetableSchema = new mongoose.Schema({
-  user_id : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  year : {type : Number, required : true },
-  semester : {type : Number, required : true, min:1, max:4 },
-  title : {type : String, required : true },
+  user_id: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+  year: {type: Number, required: true},
+  semester: {type: Number, required: true, min: 1, max: 4},
+  title: {type: String, required: true},
   lecture_list: [userLectureSchema],
-  updated_at : Date
+  updated_at: Date,
+  theme: {type: Number, required: true, default: 0, min: 0, max:NUMBER_OF_THEME-1}
 });
 
-TimetableSchema.index({ user_id: 1 })
+TimetableSchema.index({user_id: 1})
 
-TimetableSchema.pre('save', function(next) {
+TimetableSchema.pre('save', function (next) {
   this.updated_at = Date.now();
   next();
 });
@@ -51,16 +54,16 @@ let mongooseModel = mongoose.model('Timetable', TimetableSchema, 'timetables');
 
 export async function findByUserIdAndSemesterAndTitle(userId: string, year: number, semester: number, title: string): Promise<Timetable> {
   let doc = await mongooseModel.findOne({
-    user_id : userId,
-    year : year,
+    user_id: userId,
+    year: year,
     semester: semester,
     title: title
-    }).exec();
+  }).exec();
   return fromMongoose(doc);
 }
 
 export async function findByUserIdAndMongooseId(userId: string, mongooseId: string): Promise<Timetable> {
-  var doc = await mongooseModel.findOne({'user_id': userId, '_id' : mongooseId}).exec();
+  var doc = await mongooseModel.findOne({'user_id': userId, '_id': mongooseId}).exec();
   return fromMongoose(doc);
 }
 
@@ -74,9 +77,35 @@ export async function findBySemester(year: number, semester: number): Promise<Ti
   return docs.map(fromMongoose);
 }
 
-export function findAbstractListByUserId(userId: string): Promise<AbstractTimetable[]> {
-  let query:any = mongooseModel.where('user_id', userId).select('year semester title _id updated_at').lean();
-  return query.exec();
+export async function findAbstractListByUserId(userId: string): Promise<AbstractTimetable[]> {
+  const docs = await mongooseModel.aggregate([{
+    $match: {'user_id': userId}
+    }, {
+      $unwind: {
+        path: "$lecture_list",
+        preserveNullAndEmptyArrays: true
+      }
+    }, {
+      $group: {
+        _id: "$_id",
+        year: {$first: "$year"},
+        semester: {$first: "$semester"},
+        title: {$first: "$title"},
+        updated_at: {$first: "$updated_at"},
+        total_credit: {
+          $sum: {
+            $cond: [{
+              $or: [{$not: "$lecture_list"},
+                {$not: "$lecture_list.credit"}
+              ]
+            }, 0, "$lecture_list.credit"]
+          }
+        }
+      }
+    },
+      {$sort: {_id:1}}
+  ]).exec()
+  return docs
 }
 
 export async function findHavingLecture(year: number, semester: number, courseNumber: string, lectureNumber: string): Promise<Timetable[]> {
@@ -85,7 +114,7 @@ export async function findHavingLecture(year: number, semester: number, courseNu
       year: year,
       semester: semester,
       lecture_list: {
-        $elemMatch : {
+        $elemMatch: {
           course_number: courseNumber,
           lecture_number: lectureNumber
         }
@@ -96,7 +125,7 @@ export async function findHavingLecture(year: number, semester: number, courseNu
 }
 
 export async function findRecentByUserId(userId: string): Promise<Timetable> {
-  let doc = await mongooseModel.findOne({'user_id': userId}).sort({updated_at : -1}).exec();
+  let doc = await mongooseModel.findOne({'user_id': userId}).sort({updated_at: -1}).exec();
   return fromMongoose(doc);
 }
 
@@ -107,7 +136,7 @@ function makeUserLecturePartialUpdateQuery(lecture: any) {
   for (var field in lectureCopy) {
     updateMap['lecture_list.$.' + field] = lectureCopy[field];
   }
-  return{
+  return {
     $set: updateMap
   };
 }
@@ -118,7 +147,7 @@ export async function partialUpdateUserLecture(tableId: string, lecture: any): P
   }
   let updateQuery = makeUserLecturePartialUpdateQuery(lecture);
   let newMongooseDocument: any = await mongooseModel.findOneAndUpdate(
-    { "_id" : tableId, "lecture_list._id" : lecture._id},
+    {"_id": tableId, "lecture_list._id": lecture._id},
     updateQuery,
     {new: true}).exec();
 
@@ -129,37 +158,45 @@ export async function partialUpdateUserLecture(tableId: string, lecture: any): P
 
 export async function deleteLectureWithUserId(userId: string, tableId: string, lectureId: string): Promise<void> {
   let document = await mongooseModel.findOneAndUpdate(
-    {'_id' : tableId, 'user_id' : userId},
-    { $pull: {lecture_list : {_id: lectureId} } }, {new: true})
+    {'_id': tableId, 'user_id': userId},
+    {$pull: {lecture_list: {_id: lectureId}}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
 }
 
 export async function deleteLecture(tableId: string, lectureId: string): Promise<void> {
   let document = await mongooseModel.findOneAndUpdate(
-    {'_id' : tableId},
-    { $pull: {lecture_list : {_id: lectureId} } }, {new: true})
+    {'_id': tableId},
+    {$pull: {lecture_list: {_id: lectureId}}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
 }
 
 export async function deleteLectureByCourseNumber(tableId: string, courseNumber: string, lectureNumber: string): Promise<void> {
   let document = await mongooseModel.findOneAndUpdate(
-    {'_id' : tableId},
-    { $pull: {lecture_list : {course_number: courseNumber, lecture_number: lectureNumber} } }, {new: true})
+    {'_id': tableId},
+    {$pull: {lecture_list: {course_number: courseNumber, lecture_number: lectureNumber}}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
 }
 
 export async function deleteByUserIdAndMongooseId(userId: string, tableId: string): Promise<void> {
-  let document = await mongooseModel.findOneAndRemove({'user_id': userId, '_id' : tableId}).lean().exec();
+  let document = await mongooseModel.findOneAndRemove({'user_id': userId, '_id': tableId}).lean().exec();
   if (!document) throw new TimetableNotFoundError();
 }
 
 export async function updateTitleByUserId(tableId: string, userId: string, title: string): Promise<void> {
   let document = await mongooseModel.findOneAndUpdate(
-    {'_id' : tableId, 'user_id': userId},
-    { $set: {title: title} }, {new: true})
+    {'_id': tableId, 'user_id': userId},
+    {$set: {title: title}}, {new: true})
+    .exec();
+  if (!document) throw new TimetableNotFoundError();
+}
+
+export async function updateThemeByUserId(tableId: string, userId: string, theme: number): Promise<void> {
+  let document = await mongooseModel.findOneAndUpdate(
+    {'_id': tableId, 'user_id': userId},
+    {$set: {theme: theme}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
 }
@@ -179,15 +216,15 @@ export async function insert(table: Timetable): Promise<Timetable> {
 
 export async function insertUserLecture(tableId: string, lecture: UserLecture): Promise<void> {
   ObjectUtil.deleteObjectId(lecture);
-  let document = await mongooseModel.findOne({'_id' : tableId}).exec();
+  let document = await mongooseModel.findOne({'_id': tableId}).exec();
   document['lecture_list'].push(lecture);
   await document.save();
 }
 
 export async function updateUpdatedAt(tableId: string, updatedAt: number): Promise<void> {
   let document = await mongooseModel.findOneAndUpdate(
-    {'_id' : tableId},
-    { $set: {updated_at: updatedAt} }, {new: true})
+    {'_id': tableId},
+    {$set: {updated_at: updatedAt}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
 }
@@ -198,7 +235,7 @@ function fromMongoose(mongooseDoc): Timetable {
   let lecture_list = undefined;
   if (mongooseDoc.lecture_list) {
     lecture_list = [];
-    for (let i=0; i<mongooseDoc.lecture_list.length; i++) {
+    for (let i = 0; i < mongooseDoc.lecture_list.length; i++) {
       lecture_list.push(lectureFromMongoose(mongooseDoc.lecture_list[i]));
     }
   }
@@ -210,6 +247,7 @@ function fromMongoose(mongooseDoc): Timetable {
     semester: mongooseDoc.semester,
     title: mongooseDoc.title,
     lecture_list: lecture_list,
+    theme: mongooseDoc.theme,
     updated_at: mongooseDoc.updated_at
   }
 }
