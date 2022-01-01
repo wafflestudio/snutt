@@ -12,7 +12,8 @@ export async function replaceAllUserId2UserInfo(body) {
                     if (key === 'user_id') {
                         return new Promise(
                             async (resolve, reject) => {
-                                o[key] = UserService.getUserInfo(await UserService.getByMongooseId(o[key]))
+                                o['user'] = UserService.getUserInfo(await UserService.getByMongooseId(o[key]))
+                                delete o[key]
                                 resolve('next')
                             }
                         );
