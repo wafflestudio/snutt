@@ -31,6 +31,8 @@ export default interface SugangSnuLecture {
     location: string;
     // 주담당교수
     instructor: string;
+    // 장바구니 신청
+    pre_booking: string;
     // 정원
     quota: string;
     // 수강신청인원

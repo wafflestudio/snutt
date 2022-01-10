@@ -166,7 +166,7 @@ function getSugangSnuLectureFromSheetRow(sheetWrap: ExcelSheetWrapper, rowIndex:
         // 주담당교수
         instructor: sheetWrap.getCell(rowIndex, 15),
         // 장바구니 신청
-        quota: sheetWrap.getCell(rowIndex, 16),
+        pre_booking: sheetWrap.getCell(rowIndex, 16),
         // 정원
         quota: sheetWrap.getCell(rowIndex, 17),
         // 수강신청인원
