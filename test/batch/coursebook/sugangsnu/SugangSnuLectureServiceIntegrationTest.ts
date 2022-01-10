@@ -5,7 +5,7 @@ import SugangSnuLectureService = require('@app/batch/coursebook/sugangsnu/Sugang
 
 describe("SugangSnuLectureServiceIntegrationTest", function() {
     it("getRefLectureListFromExcelSheet__integration__success", async function() {
-        let file = fs.readFileSync("test/batch/coursebook/sugangsnu/SugangSnuTestExcel.xls");
+        let file = fs.readFileSync("test/batch/coursebook/sugangsnu/SugangSnuTestExcel.xlsx");
         let sheet = ExcelUtil.getFirstSheetFromBuffer(file);
         let lectureList = SugangSnuLectureService.getRefLectureListFromExcelSheet(sheet, 2018, 2, 54);
         assert.equal(lectureList.length, 9);
