@@ -4,6 +4,9 @@ import * as UserService from "@app/core/user/UserService";
 
 export async function replaceAllUserId2UserInfo(body) {
     async function recursivelyChangeUserId2UserInfo(o) {
+        if (o === null) {
+            return Promise.resolve('next')
+        }
         return Promise.all(
             Object.keys(o).map(function (key) {
                 if (typeof o[key] === 'object') {
