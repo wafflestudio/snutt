@@ -89,7 +89,7 @@ export async function findLecturesCourseNumberByUserIdAndSemesterIsIn(userId: st
     ])
     if (!docs) return []
     return docs.map((doc) => {
-        return {year: doc.year, semester: doc.semester, instructor: doc.instructor, courseNumber: doc.course_number}
+        return {year: doc.year, semester: doc.semester, instructor: doc.instructor, course_number: doc.course_number}
     });
 }
 
