@@ -6,6 +6,8 @@ import InvalidLectureUpdateRequestError from './error/InvalidLectureUpdateReques
 import TimetableNotFoundError from './error/TimetableNotFoundError';
 import UserLectureNotFoundError from './error/UserLectureNotFoundError';
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
+import CourseBook from "@app/core/coursebook/model/CourseBook";
+import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
 
 export const NUMBER_OF_THEME = 6
 
@@ -70,6 +72,25 @@ export async function findByUserIdAndMongooseId(userId: string, mongooseId: stri
 export async function findByUserIdAndSemester(userId: string, year: number, semester: number): Promise<Timetable[]> {
   let docs = await mongooseModel.find({'user_id': userId, 'year': year, 'semester': semester}).exec();
   return docs.map(fromMongoose);
+}
+
+export async function findLecturesCourseNumberByUserIdAndSemesterIsIn(userId: string, courseBooks: CourseBook[]): Promise<SnuttevLectureKey[]> {
+    let docs = await mongooseModel.aggregate([
+        {
+            $match: {
+                'user_id': userId,
+                $or: courseBooks.map((coursebook) => {
+                    return {"year": coursebook.year, "semester": coursebook.semester}
+                }),
+            }
+        },
+        {$unwind: "$lecture_list"},
+        {$project: {year: "$year", semester: "$semester", instructor: "$lecture_list.instructor", course_number: "$lecture_list.course_number"}}
+    ])
+    if (!docs) return []
+    return docs.map((doc) => {
+        return {year: doc.year, semester: doc.semester, instructor: doc.instructor, courseNumber: doc.course_number}
+    });
 }
 
 export async function findBySemester(year: number, semester: number): Promise<Timetable[]> {

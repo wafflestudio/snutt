@@ -2,10 +2,12 @@ import Timetable from "./model/Timetable";
 import DuplicateTimetableTitleError from "./error/DuplicateTimetableTitleError";
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 import TimetableRepository = require('./TimetableRepository');
+import * as CourseBookRepository from "@app/core/coursebook/CourseBookRepository";
 
 import AbstractTimetable from './model/AbstractTimetable';
 import TimetableNotEnoughParamError from './error/TimetableNotEnoughParamError';
 import ThemeTypeEnum from "@app/core/timetable/model/ThemeTypeEnum";
+import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
 
 //deprecated
 export async function copy(timetable: Timetable): Promise<void> {
@@ -146,4 +148,9 @@ export function getBySemester(year: number, semester: number): Promise<Timetable
 
 export function getByUserIdAndSemester(userId: string, year: number, semester: number): Promise<Timetable[]> {
   return TimetableRepository.findByUserIdAndSemester(userId, year, semester);
+}
+
+export async function getLecturesTakenByUserInLastSemesters(userId: string): Promise<SnuttevLectureKey[]> {
+  const lastCourseBooks = await CourseBookRepository.findLastTwoSemesters()
+  return TimetableRepository.findLecturesCourseNumberByUserIdAndSemesterIsIn(userId, lastCourseBooks)
 }

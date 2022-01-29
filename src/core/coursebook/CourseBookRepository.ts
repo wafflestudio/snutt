@@ -25,6 +25,16 @@ export async function findRecent(): Promise<CourseBook | null> {
     return fromMongoose(doc);
 }
 
+export async function findLastTwoSemesters(): Promise<CourseBook[] | null> {
+    let docs = await mongooseModel
+        .find({}, '-_id year semester updated_at')
+        .sort([["year", -1], ["semester", -1]])
+        .skip(1)
+        .limit(2)
+        .exec();
+    return docs.map(fromMongoose);
+}
+
 export async function findByYearAndSemester(year: number, semester: number): Promise<CourseBook | null> {
     let doc = await mongooseModel
         .findOne({year: year, semester: semester})
