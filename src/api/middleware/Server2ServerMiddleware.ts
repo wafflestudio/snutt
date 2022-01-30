@@ -14,7 +14,7 @@ export async function replaceAllUserId2UserInfo(body) {
                     if (key === 'user_id') {
                         return new Promise(
                             async (resolve, reject) => {
-                                o['user'] = UserService.getSnuttevUserInfo(await UserService.getByMongooseId(o[key]))
+                                o['user'] = UserService.getSnuttevUserInfo(await UserService.getByMongooseId(o[key]), o[key])
                                 delete o[key]
                                 resolve('next')
                             }

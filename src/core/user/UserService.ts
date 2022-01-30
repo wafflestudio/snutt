@@ -47,9 +47,9 @@ export function getUserInfo(user: User): UserInfo {
   }
 }
 
-export function getSnuttevUserInfo(user: User): SnuttevUserInfo {
+export function getSnuttevUserInfo(user: User, userId: string): SnuttevUserInfo {
   return {
-    id: user._id,
+    id: userId,
     email: user.email,
     local_id: user.credential.localId,
     fb_name: user.credential.fbName
