@@ -5,7 +5,7 @@ import CourseBookService = require('@app/core/coursebook/CourseBookService');
 
 import User from '@app/core/user/model/User';
 import UserInfo from '@app/core/user/model/UserInfo';
-import UserInfoAsSnakeCase from '@app/core/user/model/UserInfoAsSnakeCase';
+import SnuttevUserInfo from '@app/core/user/model/SnuttevUserInfo';
 
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
@@ -47,11 +47,9 @@ export function getUserInfo(user: User): UserInfo {
   }
 }
 
-export function getUserInfoAsSnakeCase(user: User): UserInfoAsSnakeCase {
+export function getSnuttevUserInfo(user: User): SnuttevUserInfo {
   return {
-    is_admin: user.isAdmin,
-    reg_date: user.regDate,
-    notification_checked_at: user.notificationCheckedAt,
+    id: user._id,
     email: user.email,
     local_id: user.credential.localId,
     fb_name: user.credential.fbName
