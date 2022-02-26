@@ -98,29 +98,6 @@ export async function findBySemester(year: number, semester: number): Promise<Ti
   return docs.map(fromMongoose);
 }
 
-function sortByTitle(array: AbstractTimetable[]): AbstractTimetable[] {
-  const regexp = / (\([0-9]+\))/;
-  const srcs = array.filter(item => (!regexp.test(item.title)));
-  const result = [];
-
-  for (let i = 0; i < srcs.length; i++) {
-    const clusters = [srcs[i], ...array.filter(item => isDuplicated(srcs[i].title, item.title))];
-    clusters.sort((former, latter) => sortTitle(former.title, latter.title));
-    result.push(...clusters);
-  }
-
-  return result;
-}
-
-function sortTitle(former: string, latter: string) {
-  if (latter > former) return -1;
-  else return 1;
-}
-
-function isDuplicated(srcTitle: string, dupTitle: string): Boolean {
-  return (dupTitle != srcTitle) && (srcTitle.split(' ')[0] == dupTitle.split(' ')[0]);
-}
-
 export async function findAbstractListByUserId(userId: string): Promise<AbstractTimetable[]> {
   const docs = await mongooseModel.aggregate([{
     $match: {'user_id': userId}
@@ -149,8 +126,7 @@ export async function findAbstractListByUserId(userId: string): Promise<Abstract
     },
       {$sort: {_id:1}}
   ]).exec()
-  const sortedDocs = sortByTitle(docs);
-  return sortedDocs
+  return sortByTitle(docs);
 }
 
 export async function findHavingLecture(year: number, semester: number, courseNumber: string, lectureNumber: string): Promise<Timetable[]> {
@@ -272,6 +248,29 @@ export async function updateUpdatedAt(tableId: string, updatedAt: number): Promi
     {$set: {updated_at: updatedAt}}, {new: true})
     .exec();
   if (!document) throw new TimetableNotFoundError();
+}
+
+function sortByTitle(array: AbstractTimetable[]): AbstractTimetable[] {
+  const regexp = / (\([0-9]+\))/;
+  const srcs = array.filter(item => (!regexp.test(item.title)));
+  const result = [];
+
+  for (let i = 0; i < srcs.length; i++) {
+    const clusters = [srcs[i], ...array.filter(item => isDuplicated(srcs[i].title, item.title))];
+    clusters.sort((former, latter) => sortTitle(former.title, latter.title));
+    result.push(...clusters);
+  }
+
+  return result;
+}
+
+function sortTitle(former: string, latter: string) {
+  if (latter > former) return -1;
+  else return 1;
+}
+
+function isDuplicated(srcTitle: string, dupTitle: string): Boolean {
+  return (dupTitle != srcTitle) && (srcTitle.split(' ')[0] == dupTitle.split(' ')[0]);
 }
 
 function fromMongoose(mongooseDoc): Timetable {
