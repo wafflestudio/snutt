@@ -103,18 +103,24 @@ restPost(router, '/')(async function(context, req) {
 restPost(router, '/:timetable_id/lecture/:lecture_id')(async function(context, req) {
   let user:User = context.user;
   try {
+    let isForced: boolean = !!req.body.is_forced
     let table = await TimetableService.getByMongooseId(user._id, req.params.timetable_id);
     if (!table) {
       throw new ApiError(404, ErrorCode.TIMETABLE_NOT_FOUND, "timetable not found");
     }
 
-    await TimetableLectureService.addRefLecture(table, req.params.lecture_id);
+    await TimetableLectureService.addRefLecture(table, req.params.lecture_id, isForced);
     return await TimetableService.getByMongooseId(user._id, req.params.timetable_id);
   } catch (err) {
     if (err instanceof DuplicateLectureError)
       throw new ApiError(403, ErrorCode.DUPLICATE_LECTURE, "duplicate lecture");
     else if (err instanceof LectureTimeOverlapError)
-      throw new ApiError(403, ErrorCode.LECTURE_TIME_OVERLAP, "lecture time overlap");
+      throw new ApiError(
+          403,
+          ErrorCode.LECTURE_TIME_OVERLAP,
+          "lecture time overlap",
+          {"confirm_message": err.confirmMessage}
+  );
     else if (err instanceof RefLectrureNotFoundError)
       throw new ApiError(404, ErrorCode.REF_LECTURE_NOT_FOUND, "ref lecture not found");
     else if (err instanceof WrongRefLectureSemesterError)
@@ -191,7 +197,7 @@ router.put('/:table_id/lecture/:lecture_id', async function(req, res, next) {
     if (err instanceof InvalidLectureTimeJsonError)
       return res.status(400).json({errcode: ErrorCode.INVALID_TIMEJSON, message:"invalid timejson"});
     if (err instanceof LectureTimeOverlapError)
-      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message:"lecture time overlapped"});
+      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message: "lecture time overlapped"});
     if (err instanceof InvalidLectureUpdateRequestError)
       return res.status(403).json({errcode: ErrorCode.ATTEMPT_TO_MODIFY_IDENTITY, message:"modifying identities forbidden"})
     if (err instanceof InvalidLectureColorError)

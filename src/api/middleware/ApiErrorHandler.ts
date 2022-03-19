@@ -10,7 +10,8 @@ export default function(err, req, res, next) {
     if (err instanceof ApiError) {
         res.status(err.statusCode).json({
             errcode: err.errorCode,
-            message: err.message
+            message: err.message,
+            ext: err.ext
         });
     } else {
         logger.error({

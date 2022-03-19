@@ -23,7 +23,7 @@ import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJson
 import winston = require('winston');
 let logger = winston.loggers.get('default');
 
-export async function addRefLecture(timetable: Timetable, lectureId: string): Promise<void> {
+export async function addRefLecture(timetable: Timetable, lectureId: string, isForced: boolean): Promise<void> {
   let lecture = await RefLectureService.getByMongooseId(lectureId);
   if (!lecture) throw new RefLectrureNotFoundError();
   if (lecture.year != timetable.year || lecture.semester != timetable.semester) {
@@ -31,17 +31,17 @@ export async function addRefLecture(timetable: Timetable, lectureId: string): Pr
   }
   let colorIndex = getAvailableColorIndex(timetable);
   let userLecture = fromRefLecture(lecture, colorIndex);
-  await addLecture(timetable, userLecture);
+  await addLecture(timetable, userLecture, isForced);
 }
 
-export async function addLecture(timetable: Timetable, lecture: UserLecture): Promise<void> {
+export async function addLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean = false): Promise<void> {
   ObjectUtil.deleteObjectId(lecture);
 
   if (lecture.credit && (typeof lecture.credit === 'string' || <any>lecture.credit instanceof String)) {
     lecture.credit = Number(lecture.credit);
   }
 
-  for (var i = 0; i< timetable.lecture_list.length; i++){
+  for (let i = 0; i< timetable.lecture_list.length; i++){
     if (isIdenticalCourseLecture(lecture, timetable.lecture_list[i])) {
       throw new DuplicateLectureError();
     }
@@ -50,6 +50,19 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture): Pr
   validateLectureTime(timetable, lecture);
 
   LectureColorService.validateLectureColor(lecture)
+
+  const overlappingLectures = getOverlappingLectures(timetable, lecture)
+  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+
+  if (isForced) {
+    await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
+  } else if (isOverlappingLecture(timetable, lecture)) {
+    const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
+    const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
+    const confirmMessage = `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
+
+    throw new LectureTimeOverlapError(confirmMessage);
+  }
 
   let creationDate = new Date();
   lecture.created_at = creationDate;
@@ -112,6 +125,10 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   }
 
   if (lecture['class_time_mask']) {
+    if (isOverlappingLecture(table, lecture)) {
+      throw new LectureTimeOverlapError()
+    }
+
     validateLectureTime(table, lecture);
   }
 
@@ -126,39 +143,36 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
 }
 
 function validateLectureTime(table: Timetable, lecture: UserLecture): void {
-  if (isOverlappingLecture(table, lecture)) {
-    throw new LectureTimeOverlapError();
-  }
-
   for (let i=0; i<lecture.class_time_json.length; i++) {
     validateLectureTimeJson(lecture.class_time_json[i]);
   }
 }
 
 function isOverlappingLecture(table: Timetable, lecture: UserLecture): boolean {
-  let overlappingLectureIds = getOverlappingLectureIds(table, lecture);
-  if (overlappingLectureIds.length == 0) {
+  let overlappingLectures = getOverlappingLectures(table, lecture);
+  if (overlappingLectures.length === 0) {
     return false;
-  } else if (overlappingLectureIds.length == 1 && String(overlappingLectureIds[0]) == String(lecture._id)) {
+  } else if (overlappingLectures.length === 1 && String(overlappingLectures[0]._id) === String(lecture._id)) {
     return false;
   } else {
-    logger.error("Lecture overlap: " + JSON.stringify(lecture._id) + " with " + JSON.stringify(overlappingLectureIds));
+    const overlappingLectureIds = overlappingLectures.map((lecture: UserLecture) => lecture._id)
+    logger.error("Lecture overlap: " + lecture._id + " with " + JSON.stringify(overlappingLectureIds));
     return true;
   }
 }
 
-function getOverlappingLectureIds(table: Timetable, lecture: UserLecture): string[] {
-  let lectureIds = [];
+function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLecture[] {
+  let lectures: UserLecture[] = [];
   for (var i=0; i<table.lecture_list.length; i++) {
     var tableLecture:any = table.lecture_list[i];
     for (var j=0; j<tableLecture.class_time_mask.length; j++) {
       if ((tableLecture.class_time_mask[j] & lecture.class_time_mask[j]) != 0) {
-        lectureIds.push(tableLecture._id);
+        lectures.push(tableLecture);
         break;
       }
     }
   }
-  return lectureIds;
+  return lectures;
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
