@@ -51,7 +51,15 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
   LectureColorService.validateLectureColor(lecture)
 
-  await resolveTimeConflict(timetable, lecture, isForced)
+  const overlappingLectures = getOverlappingLectures(timetable, lecture)
+  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+
+  if (isForced) {
+    await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
+  } else if (isOverlappingLecture(timetable, lecture)) {
+    const confirmMessage = makeOverwritingConfirmMessage(overlappingLectures)
+    throw new LectureTimeOverlapError(confirmMessage);
+  }
 
   let creationDate = new Date();
   lecture.created_at = creationDate;
@@ -112,17 +120,25 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
     lecture['class_time_mask'] = TimePlaceUtil.timeJsonToMask(lecture['class_time_json'], true);
   }
 
-  if (lecture['class_time_mask']) {
-
-    validateLectureTime(table, lecture);
-    resolveTimeConflict(table, lecture, isForced)
-  }
-
   if (lecture['color']) {
     LectureColorService.validateLectureColor(lecture);
   }
 
+  if (lecture['class_time_mask']) {
+    validateLectureTime(table, lecture);
+  }
+
   lecture.updated_at = Date.now();
+
+  const overlappingLectures = getOverlappingLectures(table, lecture)
+  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+
+  if (isForced) {
+    await TimetableRepository.deleteLectures(table._id, overlappingLectureIds);
+  } else if (isOverlappingLecture(table, lecture)) {
+    const confirmMessage = makeOverwritingConfirmMessage(overlappingLectures)
+    throw new LectureTimeOverlapError(confirmMessage);
+  }
 
   await TimetableRepository.partialUpdateUserLecture(table._id, lecture);
   await TimetableRepository.updateUpdatedAt(table._id, Date.now());
@@ -147,27 +163,17 @@ function isOverlappingLecture(table: Timetable, lecture: UserLecture): boolean {
   }
 }
 
-async function resolveTimeConflict(timetable, lecture, isForced) {
-  const overlappingLectures = getOverlappingLectures(timetable, lecture)
-  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
-
-  if (isForced) {
-    await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
-  } else if (isOverlappingLecture(timetable, lecture)) {
-    const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
-    const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
-    const confirmMessage = `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
-
-    throw new LectureTimeOverlapError(confirmMessage);
-  }
-
+function makeOverwritingConfirmMessage(overlappingLectures: UserLecture[]) {
+  const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
+  const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
+  return `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
 }
 
 function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLecture[] {
   let lectures: UserLecture[] = [];
-  for (var i=0; i<table.lecture_list.length; i++) {
-    var tableLecture:any = table.lecture_list[i];
-    for (var j=0; j<tableLecture.class_time_mask.length; j++) {
+  for (let i=0; i<table.lecture_list.length; i++) {
+    const tableLecture: any = table.lecture_list[i];
+    for (let j=0; j<tableLecture.class_time_mask.length; j++) {
       if ((tableLecture.class_time_mask[j] & lecture.class_time_mask[j]) != 0) {
         lectures.push(tableLecture);
         break;
