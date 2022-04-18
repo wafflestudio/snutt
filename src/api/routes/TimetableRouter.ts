@@ -139,11 +139,12 @@ restPost(router, '/:timetable_id/lecture/:lecture_id')(async function(context, r
 restPost(router, '/:id/lecture')(async function(context, req) {
   let user:User = context.user;
   try {
+    let isForced: boolean = !!req.body.is_forced
     let table = await TimetableService.getByMongooseId(user._id, req.params.id);
     if (!table) {
       throw new ApiError(404, ErrorCode.TIMETABLE_NOT_FOUND, "timetable not found");
     }
-    await TimetableLectureService.addCustomLecture(table, req.body);
+    await TimetableLectureService.addCustomLecture(table, req.body, isForced);
     return await TimetableService.getByMongooseId(user._id, req.params.id);
   } catch (err) {
     if (err instanceof InvalidLectureTimemaskError)
@@ -153,7 +154,8 @@ restPost(router, '/:id/lecture')(async function(context, req) {
     if (err instanceof DuplicateLectureError)
       throw new ApiError(403, ErrorCode.DUPLICATE_LECTURE, "duplicate lecture");
     if (err instanceof LectureTimeOverlapError)
-      throw new ApiError(403, ErrorCode.LECTURE_TIME_OVERLAP, "lecture time overlap");
+      throw new ApiError(403, ErrorCode.LECTURE_TIME_OVERLAP, "lecture time overlap",
+        {"confirm_message": err.confirmMessage});
     if (err instanceof InvalidLectureColorError)
       throw new ApiError(400, ErrorCode.INVALID_COLOR, "invalid color");
     if (err instanceof InvalidLectureColorIndexError)
@@ -185,11 +187,12 @@ router.put('/:table_id/lecture/:lecture_id', async function(req, res, next) {
     return res.status(400).json({errcode: ErrorCode.NO_LECTURE_ID, message:"need lecture_id"});
 
   try {
+    let isForced: boolean = !!req.body.is_forced
     let table = await TimetableService.getByMongooseId(user._id, req.params.table_id);
     if (!table) return res.status(404).json({errcode: ErrorCode.TIMETABLE_NOT_FOUND, message:"timetable not found"});
 
     rawLecture._id = req.params.lecture_id;
-    await TimetableLectureService.partialModifyUserLecture(user._id, table._id, rawLecture);
+    await TimetableLectureService.partialModifyUserLecture(user._id, table._id, rawLecture, isForced);
     res.json(await TimetableService.getByMongooseId(user._id, req.params.table_id));
   } catch (err) {
     if (err instanceof InvalidLectureTimemaskError)
@@ -197,7 +200,8 @@ router.put('/:table_id/lecture/:lecture_id', async function(req, res, next) {
     if (err instanceof InvalidLectureTimeJsonError)
       return res.status(400).json({errcode: ErrorCode.INVALID_TIMEJSON, message:"invalid timejson"});
     if (err instanceof LectureTimeOverlapError)
-      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message: "lecture time overlapped"});
+      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message: "lecture time overlapped"},
+        {"confirm_message": err.confirmMessage});
     if (err instanceof InvalidLectureUpdateRequestError)
       return res.status(403).json({errcode: ErrorCode.ATTEMPT_TO_MODIFY_IDENTITY, message:"modifying identities forbidden"})
     if (err instanceof InvalidLectureColorError)

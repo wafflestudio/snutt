@@ -51,18 +51,7 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
   LectureColorService.validateLectureColor(lecture)
 
-  const overlappingLectures = getOverlappingLectures(timetable, lecture)
-  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
-
-  if (isForced) {
-    await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
-  } else if (isOverlappingLecture(timetable, lecture)) {
-    const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
-    const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
-    const confirmMessage = `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
-
-    throw new LectureTimeOverlapError(confirmMessage);
-  }
+  await resolveTimeConflict(timetable, lecture, isForced)
 
   let creationDate = new Date();
   lecture.created_at = creationDate;
@@ -73,7 +62,7 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 
 
-export async function addCustomLecture(timetable: Timetable, lecture: UserLecture): Promise<void> {
+export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
   /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
@@ -84,9 +73,8 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
     lecture.colorIndex = getAvailableColorIndex(timetable);
   }
 
-  await addLecture(timetable, lecture);
+  await addLecture(timetable, lecture, isForced);
 }
-
 
 export async function resetLecture(userId:string, tableId: string, lectureId: string): Promise<void> {
   let table: Timetable = await TimetableService.getByMongooseId(userId, tableId);
@@ -108,7 +96,7 @@ export async function resetLecture(userId:string, tableId: string, lectureId: st
   await TimetableRepository.updateUpdatedAt(tableId, Date.now());
 }
 
-export async function partialModifyUserLecture(userId: string, tableId: string, lecture: any): Promise<void> {
+export async function partialModifyUserLecture(userId: string, tableId: string, lecture: any, isForced: boolean): Promise<void> {
   let table = await TimetableRepository.findByUserIdAndMongooseId(userId, tableId);
 
   if (!table) {
@@ -125,11 +113,9 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   }
 
   if (lecture['class_time_mask']) {
-    if (isOverlappingLecture(table, lecture)) {
-      throw new LectureTimeOverlapError()
-    }
 
     validateLectureTime(table, lecture);
+    resolveTimeConflict(table, lecture, isForced)
   }
 
   if (lecture['color']) {
@@ -159,6 +145,22 @@ function isOverlappingLecture(table: Timetable, lecture: UserLecture): boolean {
     logger.error("Lecture overlap: " + lecture._id + " with " + JSON.stringify(overlappingLectureIds));
     return true;
   }
+}
+
+async function resolveTimeConflict(timetable, lecture, isForced) {
+  const overlappingLectures = getOverlappingLectures(timetable, lecture)
+  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+
+  if (isForced) {
+    await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
+  } else if (isOverlappingLecture(timetable, lecture)) {
+    const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
+    const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
+    const confirmMessage = `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
+
+    throw new LectureTimeOverlapError(confirmMessage);
+  }
+
 }
 
 function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLecture[] {
