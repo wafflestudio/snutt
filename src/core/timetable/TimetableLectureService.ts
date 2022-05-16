@@ -126,19 +126,19 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
 
   if (lecture['class_time_mask']) {
     validateLectureTime(table, lecture);
+
+    const overlappingLectures = getOverlappingLectures(table, lecture)
+    const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+
+    if (isForced) {
+      await TimetableRepository.deleteLectures(table._id, overlappingLectureIds);
+    } else if (isOverlappingLecture(table, lecture)) {
+      const confirmMessage = makeOverwritingConfirmMessage(overlappingLectures)
+      throw new LectureTimeOverlapError(confirmMessage);
+    }
   }
 
   lecture.updated_at = Date.now();
-
-  const overlappingLectures = getOverlappingLectures(table, lecture)
-  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
-
-  if (isForced) {
-    await TimetableRepository.deleteLectures(table._id, overlappingLectureIds);
-  } else if (isOverlappingLecture(table, lecture)) {
-    const confirmMessage = makeOverwritingConfirmMessage(overlappingLectures)
-    throw new LectureTimeOverlapError(confirmMessage);
-  }
 
   await TimetableRepository.partialUpdateUserLecture(table._id, lecture);
   await TimetableRepository.updateUpdatedAt(table._id, Date.now());

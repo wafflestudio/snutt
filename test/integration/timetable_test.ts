@@ -652,7 +652,7 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
           {
             "day": 2,
             "start": 1.5,
-            "len": "2",
+            "len": 2,
             "place": "302-308"
           }]})
       .expect(403)
