@@ -17,7 +17,7 @@ export async function processUpdatedAndRemoved(year:number, semesterIndex:number
   let userIdNumRemovedMap: Map<string, number> = new Map();
 
   function incrementUpdated(userId: any) {
-    userId = (typeof userId == 'string') ? userId : String(userId); 
+    userId = (typeof userId == 'string') ? userId : String(userId);
     let oldValue = userIdNumUpdatedMap.get(userId);
     if (oldValue) {
       userIdNumUpdatedMap.set(userId, oldValue + 1);
@@ -27,7 +27,7 @@ export async function processUpdatedAndRemoved(year:number, semesterIndex:number
   }
 
   function incrementRemoved(userId: any) {
-    userId = (typeof userId == 'string') ? userId : String(userId); 
+    userId = (typeof userId == 'string') ? userId : String(userId);
     let oldValue = userIdNumRemovedMap.get(userId);
     if (oldValue) {
       userIdNumRemovedMap.set(userId, oldValue + 1);
@@ -54,7 +54,7 @@ export async function processUpdatedAndRemoved(year:number, semesterIndex:number
           timetable, course_number, lecture_number)._id;
         let userLecture = ObjectUtil.deepCopy(lectureDifference.difference);
         userLecture._id = userLectureId;
-        await TimetableLectureService.partialModifyUserLecture(timetable.user_id, timetable._id, userLecture);
+        await TimetableLectureService.partialModifyUserLecture(timetable.user_id, timetable._id, userLecture, false);
         incrementUpdated(timetable.user_id);
         await CoursebookUpdateNotificationService.addLectureUpdateNotification(timetable, lectureDifference);
       } catch (err) {

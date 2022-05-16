@@ -200,8 +200,8 @@ router.put('/:table_id/lecture/:lecture_id', async function(req, res, next) {
     if (err instanceof InvalidLectureTimeJsonError)
       return res.status(400).json({errcode: ErrorCode.INVALID_TIMEJSON, message:"invalid timejson"});
     if (err instanceof LectureTimeOverlapError)
-      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message: "lecture time overlapped"},
-        {"confirm_message": err.confirmMessage});
+      return res.status(403).json({errcode: ErrorCode.LECTURE_TIME_OVERLAP, message: "lecture time overlapped",
+        confirm_message: err.confirmMessage});
     if (err instanceof InvalidLectureUpdateRequestError)
       return res.status(403).json({errcode: ErrorCode.ATTEMPT_TO_MODIFY_IDENTITY, message:"modifying identities forbidden"})
     if (err instanceof InvalidLectureColorError)
