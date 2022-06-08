@@ -1,5 +1,3 @@
-import UserLecture from "@app/core/timetable/model/UserLecture";
-
 export default class LectureTimeOverlapError extends Error {
     confirmMessage: string
 
