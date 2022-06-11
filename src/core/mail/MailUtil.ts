@@ -2,7 +2,6 @@ import * as nodemailer from 'nodemailer';
 import * as AWS from "aws-sdk";
 import {error} from "util";
 
-// AWS.config.loadFromPath(__dirname + '/aws_config.json');
 AWS.config.update({
   region: 'ap-northeast-2'
 });
