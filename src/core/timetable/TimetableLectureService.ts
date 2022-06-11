@@ -127,8 +127,8 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   if (lecture['class_time_mask']) {
     validateLectureTime(table, lecture);
 
-    const overlappingLectures = getOverlappingLectures(table, lecture)
-    const overlappingLectureIds = overlappingLectures.map(eachLecture => eachLecture._id).filter(lectureId => lectureId !== lecture._id)
+    const overlappingLectures = getOverlappingLectures(table, lecture).filter(overlappingLecture => overlappingLecture._id != lecture._id)
+    const overlappingLectureIds = overlappingLectures.map(eachLecture => eachLecture._id)
 
     if (isForced) {
       await TimetableRepository.deleteLectures(table._id, overlappingLectureIds);
