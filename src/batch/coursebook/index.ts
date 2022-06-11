@@ -109,7 +109,7 @@ async function upsertRefLectureList(year: number, semester: number, fetched: Ref
   logger.info("Insert complete with " + inserted + " success and " + (fetched.length - inserted) + " errors");
 
   logger.info('Flushing all redis data');
-  await RedisUtil.flushall();
+  await RedisUtil.flushdb();
 }
 
 async function upsertTagList(year: number, semester: number, fetched: RefLecture[]) {

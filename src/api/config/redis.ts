@@ -5,7 +5,7 @@ let logger = winston.loggers.get('default');
 
 RedisUtil.pollRedisClient().then(function() {
   logger.info('Flushing all redis data');
-  RedisUtil.flushall();
+  RedisUtil.flushdb();
 }).catch(function(err) {
   logger.error("Failed to flush redis");
 });

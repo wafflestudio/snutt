@@ -1,18 +1,20 @@
 import ExpressPromiseRouter from 'express-promise-router';
-import winston = require('winston');
 
 import User from '@app/core/user/model/User';
 import InvalidLocalPasswordError from '@app/core/user/error/InvalidLocalPasswordError';
 import InvalidLocalIdError from '@app/core/user/error/InvalidLocalIdError';
-import UserCredentialService = require('@app/core/user/UserCredentialService');
-import UserService = require('@app/core/user/UserService');
-import UserDeviceService = require('@app/core/user/UserDeviceService');
 import AlreadyRegisteredFbIdError from '@app/core/user/error/AlreadyRegisteredFbIdError';
 import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import RequestContext from '../model/RequestContext';
 import ErrorCode from '../enum/ErrorCode';
-import { restGet, restPut } from '../decorator/RestDecorator';
+import {restGet, restPost, restPut} from '../decorator/RestDecorator';
 import UserAuthorizeMiddleware from '../middleware/UserAuthorizeMiddleware';
+import {isUserEmailVerified, sendVerificationCode, verifyEmail} from "@app/core/user/UserService";
+import winston = require('winston');
+import UserCredentialService = require('@app/core/user/UserCredentialService');
+import UserService = require('@app/core/user/UserService');
+import UserDeviceService = require('@app/core/user/UserDeviceService');
+
 var logger = winston.loggers.get('default');
 var router = ExpressPromiseRouter();
 
@@ -30,6 +32,23 @@ restPut(router, '/info')(async function (context, req) {
   }
   return {message:"ok"};
 });
+
+restPost(router, '/email/verification')(async function (context, req) {
+  const user: User = context.user;
+  await sendVerificationCode(user, req.body.email)
+  return {message:"ok"};
+})
+
+restPost(router, '/email/verification/code')(async function (context, req) {
+  const user: User = context.user;
+  const result = await verifyEmail(user, req.body.email, req.body.code)
+  return {is_user_email_verified: result}
+})
+
+restGet(router, '/email/verification')(async function (context, req) {
+  const user: User = context.user
+  return {is_user_email_verified: isUserEmailVerified(user)};
+})
 
 router.post('/password', async function (req, res, next) {
   let context: RequestContext = req['context'];

@@ -103,7 +103,7 @@ export async function processUpdatedAndRemoved(year:number, semesterIndex:number
   }
 
   logger.info('Flushing all redis data');
-  await RedisUtil.flushall();
+  await RedisUtil.flushdb();
 
   if (isFcmEnabled) {
     let users: Set<string> = new Set();

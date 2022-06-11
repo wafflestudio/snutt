@@ -8,6 +8,7 @@ export default interface User {
   regDate?: Date;
   notificationCheckedAt?: Date;
   email?: string;
+  isEmailVerified?: boolean;
   fcmKey?: string;
   active?: boolean;
   lastLoginTimestamp?: number;

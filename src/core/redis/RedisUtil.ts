@@ -1,7 +1,6 @@
 import redis = require('redis');
 import winston = require('winston');
 import RedisClientError from './error/RedisClientError';
-let logger = winston.loggers.get('default');
 
 let redisClient: redis.RedisClient = global['redisClient'];
 
@@ -63,10 +62,10 @@ export function configGet(key: string): Promise<string> {
     });
 }
 
-export function flushall(): Promise<string> {
+export function flushdb(): Promise<string> {
     checkRedisClient();
     return new Promise(function (resolve, reject) {
-        redisClient.flushall(function(err, value: string) {
+        redisClient.flushdb(function(err, value: string) {
             if (err) {
                 reject(err);
             } else {
@@ -100,6 +99,19 @@ export function set(key: string, value: string): Promise<void> {
             }
         })
     })
+}
+
+export function setex(key: string, seconds: number, value: string) {
+  checkRedisClient();
+  return new Promise(function (resolve, reject) {
+    redisClient.setex(key, seconds, value, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    })
+  })
 }
 
 export function mget(keyList: string[]): Promise<string[]> {

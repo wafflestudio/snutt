@@ -24,6 +24,7 @@ let UserSchema = new mongoose.Schema({
   lastLoginTimestamp: Number,                       // routes/api/api.ts의 토큰 인증에서 업데이트
   notificationCheckedAt: Date,                      // 새로운 알림이 있는지 확인하는 용도
   email: String,
+  isEmailVerified: Boolean,
   fcmKey: String,                                   // Firebase Message Key
 
   // if the user remove its account, active status becomes false
@@ -51,6 +52,7 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
     regDate: wrapper.regDate,
     notificationCheckedAt: wrapper.notificationCheckedAt,
     email: wrapper.email,
+    isEmailVerified: wrapper.isEmailVerified,
     fcmKey: wrapper.fcmKey,
     active: wrapper.active,
     lastLoginTimestamp: wrapper.lastLoginTimestamp
@@ -98,6 +100,7 @@ export function update(user: User): Promise<void> {
       userDocument.fcmKey = user.fcmKey;
       userDocument.active = user.active;
       userDocument.lastLoginTimestamp = user.lastLoginTimestamp;
+      userDocument.isEmailVerified = user.isEmailVerified;
       userDocument.save();
     })
 }
