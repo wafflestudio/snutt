@@ -11,6 +11,7 @@ import ErrorCode from "@app/api/enum/ErrorCode";
 import TimetableService = require('@app/core/timetable/TimetableService');
 import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
+import {sendMail} from "@app/core/mail/MailUtil";
 
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
@@ -80,7 +81,13 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
     code: code,
     count: existing && existing.count ? existing.count + 1 : 1
   }
-  await MailUtil.sendVerificationCodeMail(email, code)
+  const emailBody =
+    `<h2>인증번호 안내</h2><br/>` +
+    `안녕하세요. SNUTT입니다. <br/> ` +
+    `<b>아래의 인증번호 6자리를 진행 중인 화면에 입력하여 3분내에 인증을 완료해주세요.</b><br/><br/>` +
+    `<h3>인증번호</h3><h3>${code}</h3><br/><br/>` +
+    `인증번호는 이메일 발송 시점으로부터 3분 동안 유효합니다.`;
+  await sendMail(email, `[SNUTT] 인증번호 [${code}] 를 입력해주세요`, emailBody);
   await RedisUtil.setex(key, 180, JSON.stringify(value))
 }
 
