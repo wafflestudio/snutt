@@ -52,7 +52,7 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
   LectureColorService.validateLectureColor(lecture)
 
   const overlappingLectures = getOverlappingLectures(timetable, lecture)
-  const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+  const overlappingLectureIds = overlappingLectures.map(each => each._id).filter(lectureId => lectureId !== lecture._id)
 
   if (isForced) {
     await TimetableRepository.deleteLectures(timetable._id, overlappingLectureIds);
@@ -128,7 +128,7 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
     validateLectureTime(table, lecture);
 
     const overlappingLectures = getOverlappingLectures(table, lecture)
-    const overlappingLectureIds = overlappingLectures.map(lecture => lecture._id)
+    const overlappingLectureIds = overlappingLectures.map(eachLecture => eachLecture._id).filter(lectureId => lectureId !== lecture._id)
 
     if (isForced) {
       await TimetableRepository.deleteLectures(table._id, overlappingLectureIds);
