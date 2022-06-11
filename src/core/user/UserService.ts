@@ -4,14 +4,13 @@ import User from '@app/core/user/model/User';
 import UserInfo from '@app/core/user/model/UserInfo';
 import SnuttevUserInfo from '@app/core/user/model/SnuttevUserInfo';
 import * as RedisUtil from '@app/core/redis/RedisUtil';
-import * as MailUtil from '@app/core/mail/MailUtil';
+import {sendMail} from '@app/core/mail/MailUtil';
 import RedisVerificationValue from "@app/core/user/model/RedisVerificationValue";
 import ApiError from "@app/api/error/ApiError";
 import ErrorCode from "@app/api/enum/ErrorCode";
 import TimetableService = require('@app/core/timetable/TimetableService');
 import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
-import {sendMail} from "@app/core/mail/MailUtil";
 
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
@@ -67,14 +66,14 @@ export function isUserEmailVerified(user: User): boolean {
 }
 
 export async function sendVerificationCode(user: User, email: string): Promise<void> {
-  if(isUserEmailVerified(user)){
-    throw new ApiError(400, ErrorCode.USER_EMAIL_ALREADY_VERIFIED, "이미 메일인증이 완료된 유저입니다.")
+  if (isUserEmailVerified(user)) {
+    throw new ApiError(409, ErrorCode.USER_EMAIL_ALREADY_VERIFIED, "이미 메일인증이 완료된 유저입니다.")
   }
   const key = `verification-code-${user._id}`
   const existing: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
   const code = String(Math.floor(Math.random() * 1000000)).padStart(6, "0")
   if (existing && existing.count && existing.count > 4) {
-    throw new ApiError(400, ErrorCode.TOO_MANY_VERIFICATION_REQUEST, "너무 요청이 많습니다. 나중에 다시 시도해주세요")
+    throw new ApiError(429, ErrorCode.TOO_MANY_VERIFICATION_REQUEST, "너무 요청이 많습니다. 나중에 다시 시도해주세요")
   }
   const value: RedisVerificationValue = {
     email: email,
@@ -93,7 +92,7 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
 
 export async function verifyEmail(user: User, email: string, codeSubmitted: string): Promise<boolean> {
   const key = `verification-code-${user._id}`
-  const verificationValue:RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
+  const verificationValue: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
   if (verifyCode(verificationValue, codeSubmitted)) {
     user.email = verificationValue.email
     user.isEmailVerified = true
