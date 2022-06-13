@@ -45,7 +45,7 @@
     "mocha": "~5.2.0",
     "module-alias": "^2.0.6",
     "mongodb": "~3.0.10",
-    "mongoose": "^5.0.18",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
     "nodemailer": "^6.7.5",
     "pem-jwk": "^2.0.0",
