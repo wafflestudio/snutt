@@ -115,11 +115,6 @@ export function deactivate(user: User): Promise<void> {
   return UserRepository.update(user);
 }
 
-export function setUserInfo(user: User, email: string): Promise<void> {
-  user.email = email;
-  return UserRepository.update(user);
-}
-
 export function updateLastLoginTimestamp(user: User): void {
   return UserRepository.updateLastLoginTimestamp(user);
 }

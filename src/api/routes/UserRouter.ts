@@ -7,7 +7,7 @@ import AlreadyRegisteredFbIdError from '@app/core/user/error/AlreadyRegisteredFb
 import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import RequestContext from '../model/RequestContext';
 import ErrorCode from '../enum/ErrorCode';
-import {restGet, restPost, restPut} from '../decorator/RestDecorator';
+import {restGet, restPost} from '../decorator/RestDecorator';
 import UserAuthorizeMiddleware from '../middleware/UserAuthorizeMiddleware';
 import {isUserEmailVerified, sendVerificationCode, verifyEmail} from "@app/core/user/UserService";
 import winston = require('winston');
@@ -23,14 +23,6 @@ router.use(UserAuthorizeMiddleware);
 restGet(router, '/info')(async function (context, req) {
   let user: User = context.user;
   return UserService.getUserInfo(user);
-});
-
-restPut(router, '/info')(async function (context, req) {
-  let user: User = context.user;
-  if (req.body.email) {
-    await UserService.setUserInfo(user, req.body.email);
-  }
-  return {message: "ok"};
 });
 
 restPost(router, '/email/verification')(async function (context, req) {
