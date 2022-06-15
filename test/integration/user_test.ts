@@ -112,23 +112,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
       })
   })
 
-  it('Put user info', function(done) {
-    request.put('/user/info')
-      .set('x-access-token', token2)
-      .send({email:"abcd2@snutt.com"})
-      .expect(200)
-      .end(function(err, res) {
-        if (err) return done(err);
-        request.get('/user/info')
-          .set('x-access-token', token2)
-          .expect(200)
-          .end(function(err, res) {
-            assert.equal(res.body.email, "abcd2@snutt.com");
-            done(err);
-          });
-      })
-  })
-
   describe('password change', function(){
     it('succeeds', function(done) {
       request.put('/user/password')
