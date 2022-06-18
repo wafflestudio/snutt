@@ -9,7 +9,7 @@ import RequestContext from '../model/RequestContext';
 import ErrorCode from '../enum/ErrorCode';
 import {restGet, restPost, restPut} from '../decorator/RestDecorator';
 import UserAuthorizeMiddleware from '../middleware/UserAuthorizeMiddleware';
-import {isUserEmailVerified, sendVerificationCode, verifyEmail} from "@app/core/user/UserService";
+import {isUserEmailAlreadyVerified, sendVerificationCode, verifyEmail} from "@app/core/user/UserService";
 import winston = require('winston');
 import UserCredentialService = require('@app/core/user/UserCredentialService');
 import UserService = require('@app/core/user/UserService');
@@ -47,7 +47,7 @@ restPost(router, '/email/verification/code')(async function (context, req) {
 
 restGet(router, '/email/verification')(async function (context, req) {
   const user: User = context.user
-  return {is_email_verified: isUserEmailVerified(user)};
+  return {is_email_verified: isUserEmailAlreadyVerified(user)};
 })
 
 router.post('/password', async function (req, res, next) {

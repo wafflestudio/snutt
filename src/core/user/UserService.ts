@@ -12,6 +12,10 @@ import TimetableService = require('@app/core/timetable/TimetableService');
 import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
 
+export function getVerifiedByEmail(email: string): Promise<User> {
+  return UserRepository.findActiveByVerifiedEmail(email)
+}
+
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
 }

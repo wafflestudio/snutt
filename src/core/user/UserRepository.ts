@@ -58,6 +58,10 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
     lastLoginTimestamp: wrapper.lastLoginTimestamp
   }
 }
+export async function findActiveByVerifiedEmail(email:string) : Promise<User> {
+  let mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
+  return fromMongoose(mongooseDocument);
+}
 
 export async function findActiveByFb(fbId:string) : Promise<User> {
   let mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
