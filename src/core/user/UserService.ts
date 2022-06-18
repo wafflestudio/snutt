@@ -12,6 +12,10 @@ import TimetableService = require('@app/core/timetable/TimetableService');
 import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
 
+export function getVerifiedByEmail(email: string): Promise<User> {
+  return UserRepository.findActiveByVerifiedEmail(email)
+}
+
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
 }
@@ -61,13 +65,16 @@ export function getSnuttevUserInfo(user: User, userId: string): SnuttevUserInfo 
   }
 }
 
-export function isUserEmailVerified(user: User): boolean {
+export function isUserEmailAlreadyVerified(user: User): boolean {
   return user.isEmailVerified ? user.isEmailVerified : false;
 }
 
 export async function sendVerificationCode(user: User, email: string): Promise<void> {
-  if (isUserEmailVerified(user)) {
+  if (isUserEmailAlreadyVerified(user)) {
     throw new ApiError(409, ErrorCode.USER_EMAIL_ALREADY_VERIFIED, "이미 메일인증이 완료된 유저입니다.")
+  }
+  if (await isEmailAlreadyVerifiedByAnotherUser(email)) {
+    throw new ApiError(409, ErrorCode.EMAIL_ALREADY_VERIFIED_BY_ANOTHER_USER, "해당 메일로 인증된 다른 계정이 있습니다.")
   }
   const key = `verification-code-${user._id}`
   const existing: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
@@ -86,7 +93,7 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
     `<b>아래의 인증번호 6자리를 진행 중인 화면에 입력하여 3분내에 인증을 완료해주세요.</b><br/><br/>` +
     `<h3>인증번호</h3><h3>${code}</h3><br/><br/>` +
     `인증번호는 이메일 발송 시점으로부터 3분 동안 유효합니다.`;
-  await sendMail(email, `[SNUTT] 인증번호 [${code}] 를 입력해주세요`, emailBody);
+  sendMail(email, `[SNUTT] 인증번호 [${code}] 를 입력해주세요`, emailBody);
   await RedisUtil.setex(key, 180, JSON.stringify(value))
 }
 
@@ -138,4 +145,8 @@ export async function add(user: User): Promise<User> {
   let inserted = await UserRepository.insert(user);
   await createDefaultTimetable(inserted);
   return inserted;
+}
+
+async function isEmailAlreadyVerifiedByAnotherUser(email: string): Promise<boolean> {
+  return (await getVerifiedByEmail(email)) !== null
 }

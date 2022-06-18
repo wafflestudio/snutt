@@ -60,6 +60,7 @@ enum ErrorCode {
 
   /* 409 - Conflict */
   USER_EMAIL_ALREADY_VERIFIED = 0x9000,
+  EMAIL_ALREADY_VERIFIED_BY_ANOTHER_USER = 0x9001,
 
   /* 429 - Too many requests */
   TOO_MANY_VERIFICATION_REQUEST = 0xA000,
