@@ -38,7 +38,7 @@ restGet(router, '/v1/users/me/lectures/latest')(async function (context, req) {
 
 router.all('/*', async function (req, res, next) {
     const user = req['context'].user
-    if (isUserEmailVerified(user)) return res.status(403).json({
+    if (!isUserEmailVerified(user)) return res.status(403).json({
         errcode: ErrorCode.USER_EMAIL_IS_NOT_VERIFIED,
         message: "The user's email is not verified"
     });

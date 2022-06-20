@@ -93,7 +93,7 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
     `<b>아래의 인증번호 6자리를 진행 중인 화면에 입력하여 3분내에 인증을 완료해주세요.</b><br/><br/>` +
     `<h3>인증번호</h3><h3>${code}</h3><br/><br/>` +
     `인증번호는 이메일 발송 시점으로부터 3분 동안 유효합니다.`;
-  sendMail(email, `[SNUTT] 인증번호 [${code}] 를 입력해주세요`, emailBody);
+  await sendMail(email, `[SNUTT] 인증번호 [${code}] 를 입력해주세요`, emailBody);
   await RedisUtil.setex(key, 180, JSON.stringify(value))
 }
 
