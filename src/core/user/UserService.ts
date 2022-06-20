@@ -57,12 +57,11 @@ export function getUserInfo(user: User): UserInfo {
 }
 
 export function getSnuttevUserInfo(user: User, userId: string): SnuttevUserInfo {
-  return {
+  return user ? {
     id: userId,
     email: user.email,
     local_id: user.credential.localId,
-    fb_name: user.credential.fbName
-  }
+  } : null
 }
 
 export function isUserEmailVerified(user: User): boolean {
