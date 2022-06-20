@@ -65,12 +65,12 @@ export function getSnuttevUserInfo(user: User, userId: string): SnuttevUserInfo 
   }
 }
 
-export function isUserEmailAlreadyVerified(user: User): boolean {
+export function isUserEmailVerified(user: User): boolean {
   return user.isEmailVerified ? user.isEmailVerified : false;
 }
 
 export async function sendVerificationCode(user: User, email: string): Promise<void> {
-  if (isUserEmailAlreadyVerified(user)) {
+  if (isUserEmailVerified(user)) {
     throw new ApiError(409, ErrorCode.USER_EMAIL_ALREADY_VERIFIED, "이미 메일인증이 완료된 유저입니다.")
   }
   if (await isEmailAlreadyVerifiedByAnotherUser(email)) {

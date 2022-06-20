@@ -7,6 +7,8 @@ import {restGet} from "@app/api/decorator/RestDecorator";
 import User from "@app/core/user/model/User";
 import ApiError from "@app/api/error/ApiError";
 import * as TimetableService from "@app/core/timetable/TimetableService";
+import ErrorCode from "@app/api/enum/ErrorCode";
+import {isUserEmailVerified} from "@app/core/user/UserService";
 
 let router = ExpressPromiseRouter();
 
@@ -35,8 +37,13 @@ restGet(router, '/v1/users/me/lectures/latest')(async function (context, req) {
 })
 
 router.all('/*', async function (req, res, next) {
+    const user = req['context'].user
+    if (isUserEmailVerified(user)) return res.status(403).json({
+        errcode: ErrorCode.USER_EMAIL_IS_NOT_VERIFIED,
+        message: "The user's email is not verified"
+    });
     const evaluationServerHeader = {
-        'Snutt-User-Id': req['context'].user._id
+        'Snutt-User-Id': user._id
     }
     try {
         return request({
