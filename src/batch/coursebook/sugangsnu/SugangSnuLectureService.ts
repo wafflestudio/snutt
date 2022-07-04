@@ -47,7 +47,7 @@ function getRefLectureFromSugangSnuLecture(year: number, semester: number, lectu
 
     let credit = parseInt(sugangSnuLecture.credit);
     let quota = parseInt(sugangSnuLecture.quota.split(" ")[0]);
-    
+
     let parsedClassTime = parseClassTime(sugangSnuLecture.class_time);
     let timeJson = TimePlaceUtil.timeAndPlaceToJson(parsedClassTime, sugangSnuLecture.location);
     if (timeJson === null) {
@@ -72,7 +72,7 @@ function getRefLectureFromSugangSnuLecture(year: number, semester: number, lectu
     let lecture_number = sugangSnuLecture.lecture_number;
     let instructor = sugangSnuLecture.instructor;
     let remark = sugangSnuLecture.remark;
-    
+
     return {
         year: year,
         semester: semester,
@@ -109,19 +109,19 @@ function parseClassTime(times:string): string {
         logger.error("Parse error: " + classTime);
         continue;
       }
-  
+
       let weekOfDay   = matchResult[1];
       let startHour   = parseInt(matchResult[2])-8;
       let startMinute = parseInt(matchResult[3]);
       let endHour     = parseInt(matchResult[4])-8;
       let endMinute   = parseInt(matchResult[5]);
-  
+
       if (startMinute == 30) startHour += 0.5;
       else if (startMinute != 0) error = true;
       if (endMinute == 15 || endMinute == 20) endHour += 0.5;
       else if (endMinute == 45 || endMinute == 50) endHour += 1;
       else error = true;
-  
+
       if (error) {
         logger.error("Parse error: " + classTime);
         continue;
@@ -167,15 +167,19 @@ function getSugangSnuLectureFromSheetRow(sheetWrap: ExcelSheetWrapper, rowIndex:
         instructor: sheetWrap.getCell(rowIndex, 15),
         // 장바구니 신청
         pre_booking: sheetWrap.getCell(rowIndex, 16),
+        // 신입생 장바구니 신청
+        freshman_pre_booking: sheetWrap.getCell(rowIndex, 17),
+        // 재학생 장바구니 신청
+        existing_student_pre_booking: sheetWrap.getCell(rowIndex, 18),
         // 정원
-        quota: sheetWrap.getCell(rowIndex, 17),
+        quota: sheetWrap.getCell(rowIndex, 19),
         // 수강신청인원
-        enrollment: sheetWrap.getCell(rowIndex, 18),
+        enrollment: sheetWrap.getCell(rowIndex, 20),
         // 비고
-        remark: sheetWrap.getCell(rowIndex, 19),
+        remark: sheetWrap.getCell(rowIndex, 21),
         // 강의 언어
-        lecture_language: sheetWrap.getCell(rowIndex, 20),
+        lecture_language: sheetWrap.getCell(rowIndex, 22),
         // 개설 상태
-        lecture_status: sheetWrap.getCell(rowIndex, 21),
+        lecture_status: sheetWrap.getCell(rowIndex, 23),
     };
 }

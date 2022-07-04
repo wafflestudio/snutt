@@ -33,6 +33,10 @@ export default interface SugangSnuLecture {
     instructor: string;
     // 장바구니 신청
     pre_booking: string;
+    // 신입생 장바구니 신청
+    freshman_pre_booking: string;
+    // 재학생 장바구니 신청
+    existing_student_pre_booking: string;
     // 정원
     quota: string;
     // 수강신청인원
