@@ -13,7 +13,7 @@ export default async function(req, res) {
     let context: RequestContext = req['context'];
 
     if (osType !== undefined) {
-    if (osType === 'ios' || osType === 'android') {
+        if (osType === 'ios' || osType === 'android') {
             context.osType = osType;
         } else {
             throw new ApiError(400, ErrorCode.INVALID_OS_TYPE, `Invalid os type: ${osType}`);
