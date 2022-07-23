@@ -12,6 +12,7 @@ import NotificationRouter = require('./NotificationRouter');
 import EvaluationRouter = require('./EvaluationRouter')
 import UserRouter = require('./UserRouter');
 import AdminRouter = require('./AdminRouter');
+import PopupRouter = require('./PopupRouter');
 import FeedbackService = require('@app/core/feedback/FeedbackService');
 import LectureColorService = require('@app/core/timetable/LectureColorService');
 import SugangSnuSyllabusService = require('@app/core/coursebook/sugangsnu/SugangSnuSyllabusService')
@@ -21,9 +22,11 @@ import ErrorCode from '../enum/ErrorCode';
 import ApiError from '../error/ApiError';
 import ApiKeyAuthorizeMiddleware from '../middleware/ApiKeyAuthorizeMiddleware';
 import PublicApiCacheControlMiddleware from '../middleware/PublicApiCacheControlMiddleware';
+import NativeClientInfoMiddleware from '../middleware/NativeClientInfoMiddleware';
 
 router.use(ApiKeyAuthorizeMiddleware);
 router.use(PublicApiCacheControlMiddleware);
+router.use(NativeClientInfoMiddleware);
 
 restGet(router, '/course_books')(CourseBookService.getAll);
 
@@ -72,6 +75,8 @@ router.use('/tables', TimetableRouter);
 router.use('/user', UserRouter);
 
 router.use('/notification', NotificationRouter);
+
+router.use('/popups', PopupRouter);
 
 router.use('/admin', AdminRouter);
 

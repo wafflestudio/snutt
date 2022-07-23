@@ -4,5 +4,9 @@ export default interface RequestContext {
     method?: string,
     url?: string,
     user?: User,
-    platform?: string
+    platform?: string,
+    osType?: string,
+    osVersion?: string,
+    appType?: string,
+    appVersion?: string,
 }

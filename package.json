@@ -44,12 +44,12 @@
     "jsonwebtoken": "~5.5.0",
     "mocha": "~5.2.0",
     "module-alias": "^2.0.6",
-    "mongodb": "~3.0.10",
-    "mongoose": "^5.0.18",
+    "mongodb": "~3.1.13",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
     "nodemailer": "^6.7.5",
     "pem-jwk": "^2.0.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request": "^2.74.0",
     "request-promise-native": "~1.0.5",
     "rewire": "^4.0.1",
@@ -59,7 +59,7 @@
     "typescript": "2.9.1",
     "winston": "^3.2.0",
     "winston-daily-rotate-file": "^3.6.0",
-    "xlsx": "~0.13.0"
+    "xlsx": "~0.17.0"
   },
   "_moduleAliases": {
     "@app": "build/src",
