@@ -5,14 +5,9 @@ export async function getPopups(user: User, osType?: string, osVersion?: string,
   return {
     content: [
       {
-        "key": `test-popup-key-null (osType:${osType}/osVersion:${osVersion}/appType:${appType}/appVersion:${appVersion})`,
-        "image_url": "https://avatars.githubusercontent.com/u/35535636",
-        "hidden_days": null,
-      },
-      {
-        "key": `test-popup-key-1day (osType:${osType}/osVersion:${osVersion}/appType:${appType}/appVersion:${appVersion})`,
-        "image_url": "https://avatars.githubusercontent.com/u/48513130",
-        "hidden_days": 1,
+        "key": "snutt-ev-open",
+        "image_url": "https://snutt-asset.s3.ap-northeast-2.amazonaws.com/popup-images/snutt-ev-open.png",
+        "hidden_days": 7,
       },
     ],
   };
