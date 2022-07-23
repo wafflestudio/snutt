@@ -8,7 +8,7 @@ export default async function(req, res) {
     const osType = <string>req.headers['x-os-type'];
     const osVersion = <string>req.headers['x-os-version'];
     const appType = <string>req.headers['x-app-type'];
-    const appVersion = <string>req.headers['x-app-version'];
+    let appVersion = <string>req.headers['x-app-version'];
 
     let context: RequestContext = req['context'];
 
@@ -37,11 +37,18 @@ export default async function(req, res) {
     }
 
     if (appVersion !== undefined) {
-        if (appVersion.match(versionRegex)) {
-            context.appVersion = appVersion;
-        } else {
+
+        if (osType === 'android') {
+            if (!appVersion.split('-')[0].match(versionRegex)) {
+                throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
+            }
+        }
+
+        if (!appVersion.match(versionRegex)) {
             throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
         }
+
+        context.appVersion = appVersion;
     }
 
     return Promise.resolve('next');
