@@ -144,7 +144,7 @@ function makeMongoQueryFromLectureQuery(lquery:LectureQuery): LectureMongoQuery 
     }
   }
 
-  if (lquery.etc) {
+  if (lquery.etc && lquery.etc.length > 0) {
     mquery = {
       $and : [
         mquery,
