@@ -5,8 +5,8 @@ export async function getPopups(user: User, osType?: string, osVersion?: string,
     content: [
       {
         "key": "snutt-ev-open",
-        "image_url": "https://snutt-asset.s3.ap-northeast-2.amazonaws.com/popup-images/snutt-ev-open.png",
-        "hidden_days": 7,
+        "image_url": "https://snutt-asset.s3.ap-northeast-2.amazonaws.com/popup-images/snutt-ev-event-result.png",
+        "hidden_days": 1,
       },
     ],
   };
