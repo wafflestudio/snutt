@@ -68,6 +68,11 @@ export function isUserEmailVerified(user: User): boolean {
   return user.isEmailVerified ? user.isEmailVerified : false;
 }
 
+export async function resetEmailVerification(user: User): Promise<void> {
+  user.isEmailVerified = false
+  await modify(user);
+}
+
 export async function sendVerificationCode(user: User, email: string): Promise<void> {
   if (isUserEmailVerified(user)) {
     throw new ApiError(409, ErrorCode.USER_EMAIL_ALREADY_VERIFIED, "이미 메일인증이 완료된 유저입니다.")

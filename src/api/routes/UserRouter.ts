@@ -7,9 +7,14 @@ import AlreadyRegisteredFbIdError from '@app/core/user/error/AlreadyRegisteredFb
 import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import RequestContext from '../model/RequestContext';
 import ErrorCode from '../enum/ErrorCode';
-import {restGet, restPost} from '../decorator/RestDecorator';
+import {restDelete, restGet, restPost} from '../decorator/RestDecorator';
 import UserAuthorizeMiddleware from '../middleware/UserAuthorizeMiddleware';
-import {isUserEmailVerified, sendVerificationCode, verifyEmail} from "@app/core/user/UserService";
+import {
+  isUserEmailVerified,
+  resetEmailVerification,
+  sendVerificationCode,
+  verifyEmail
+} from "@app/core/user/UserService";
 import winston = require('winston');
 import UserCredentialService = require('@app/core/user/UserCredentialService');
 import UserService = require('@app/core/user/UserService');
@@ -24,6 +29,12 @@ restGet(router, '/info')(async function (context, req) {
   let user: User = context.user;
   return UserService.getUserInfo(user);
 });
+
+restDelete(router, '/email/verification')(async function (context, req) {
+  const user: User = context.user;
+  await resetEmailVerification(user)
+  return {message: "ok"}
+})
 
 restPost(router, '/email/verification')(async function (context, req) {
   const user: User = context.user;
