@@ -81,10 +81,8 @@ async function isCoursebookOpened(year: number, semester: number): Promise<boole
             }
 
             return Promise.resolve(
-              true
-              // 수강편람 이후에도 latestSemseter가 업데이트 되지 않는 경우가 있어 항상 엑셀을 fetch하도록 변경
-              // (year < latestYear) ||
-              // (year == latestYear && semester <= latestSemester)
+              (year < latestYear) ||
+              (year == latestYear && semester <= latestSemester)
             );
         });
     }, {
