@@ -24,7 +24,7 @@ export async function setLectureListCache(query: any, page: number, lectureList:
     let queryHash = makeMd5HashFromObject(query);
     let key = RedisKeyUtil.getLectureQueryKey(queryHash, page);
     let lectureListString = JSON.stringify(lectureList);
-    await RedisUtil.set(key, lectureListString);
+    await RedisUtil.setex(key, 60 * 60 * 24, lectureListString);
 }
 
 function makeMd5HashFromObject(object: any) {
