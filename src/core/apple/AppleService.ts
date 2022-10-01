@@ -34,7 +34,7 @@ async function getMatchedKeyBy(kid: string, alg: string): Promise<AppleJWK> {
     }
 }
 
-export async function verifyAndDecodeAppleToken(identityToken: string): Promise<AppleUserInfo> {
+export async function verifyAndDecodeAppleToken(identityToken: string, appVersion: string): Promise<AppleUserInfo> {
     const headerOfIdentityToken: JwtHeader = JSON.parse(Buffer.from(identityToken.substr(0, identityToken.indexOf('.')), 'base64').toString());
     const appleJwk: AppleJWK = await getMatchedKeyBy(headerOfIdentityToken.kid, headerOfIdentityToken.alg);
     const publicKey: string = pemjwk.jwk2pem(appleJwk);
@@ -42,7 +42,7 @@ export async function verifyAndDecodeAppleToken(identityToken: string): Promise<
         jwt.verify(identityToken, publicKey, {
             algorithms: [appleJwk.alg],
             issuer: "https://appleid.apple.com",
-            audience: "com.wafflestudio.snutt"
+            audience: appVersion.split(".")[0] === "3" ? "com.wafflestudio.snutt3" : "com.wafflestudio.snutt",
         });
     }
     catch (err) {
