@@ -41,8 +41,7 @@ export function modify(user: User): Promise<void> {
 }
 
 export function updateNotificationCheckDate(user: User): Promise<void> {
-  user.notificationCheckedAt = new Date();
-  return UserRepository.update(user);
+  return UserRepository.update({...user, notificationCheckedAt: new Date()});
 }
 
 export function getUserInfo(user: User): UserInfo {
@@ -66,6 +65,10 @@ export function getSnuttevUserInfo(user: User, userId: string): SnuttevUserInfo 
 
 export function isUserEmailVerified(user: User): boolean {
   return user.isEmailVerified ? user.isEmailVerified : false;
+}
+
+export async function resetEmailVerification(user: User): Promise<void> {
+  await modify({...user, isEmailVerified: false});
 }
 
 export async function sendVerificationCode(user: User, email: string): Promise<void> {
@@ -100,9 +103,7 @@ export async function verifyEmail(user: User, codeSubmitted: string): Promise<bo
   const key = `verification-code-${user._id}`
   const verificationValue: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
   if (verifyCode(verificationValue, codeSubmitted)) {
-    user.email = verificationValue.email
-    user.isEmailVerified = true
-    await modify(user);
+    await modify({...user, email: verificationValue.email, isEmailVerified: true});
     return true
   }
   throw new ApiError(400, ErrorCode.INVALID_VERIFICATION_CODE, "유효하지 않은 인증코드입니다.")
@@ -117,8 +118,7 @@ function verifyCode(verificationValue: RedisVerificationValue, codeSubmitted: st
 }
 
 export function deactivate(user: User): Promise<void> {
-  user.active = false;
-  return UserRepository.update(user);
+  return UserRepository.update({...user, active: false});
 }
 
 export function updateLastLoginTimestamp(user: User): void {

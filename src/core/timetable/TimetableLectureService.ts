@@ -198,7 +198,7 @@ function getAvailableColorIndices(table: Timetable): number[] {
 
   var ret:number[] = [];
   // colorIndex = 0 is custom color!
-  for (var i=1; i<LectureColorService.MAX_NUM_COLOR; i++) {
+  for (var i=1; i<=LectureColorService.MAX_NUM_COLOR; i++) {
     if (!checked[i]) ret.push(i);
   }
   return ret;
