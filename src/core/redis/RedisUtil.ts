@@ -88,10 +88,10 @@ export function get(key: string): Promise<string> {
     })
 }
 
-export function set(key: string, value: string): Promise<void> {
+export function setex(key: string, seconds: number, value: string): Promise<void> {
     checkRedisClient();
     return new Promise(function (resolve, reject) {
-        redisClient.set(key, value, function(err) {
+        redisClient.setex(key, seconds, value, function(err) {
             if (err) {
                 reject(err);
             } else {
@@ -99,19 +99,6 @@ export function set(key: string, value: string): Promise<void> {
             }
         })
     })
-}
-
-export function setex(key: string, seconds: number, value: string) {
-  checkRedisClient();
-  return new Promise(function (resolve, reject) {
-    redisClient.setex(key, seconds, value, function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    })
-  })
 }
 
 export function mget(keyList: string[]): Promise<string[]> {
