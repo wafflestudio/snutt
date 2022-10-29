@@ -89,6 +89,8 @@ describe('Integration Test', function() {
             "day": 1,
             "start": 13,
             "len": 1,
+            "start_time": "21:00",
+            "end_time": "22:00",
             "place": "302-308",
             "_id": "56fcd83c041742971bd20a88"
           },
@@ -96,6 +98,8 @@ describe('Integration Test', function() {
             "day": 3,
             "start": 13,
             "len": 1,
+            "start_time": "21:00",
+            "end_time": "22:00",
             "place": "302-308",
             "_id": "56fcd83c041742971bd20a87"
           }
