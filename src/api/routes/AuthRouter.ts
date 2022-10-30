@@ -72,7 +72,7 @@ restPost(router, '/login_apple')(async function (context, req) {
     const user = await UserService.getByApple(userInfo.email);
 
     if (user) {
-      if (userInfo.transfer_sub != undefined) {
+      if (userInfo.transfer_sub != undefined && user.credential.appleSub !== user.credential.appleTransferSub) {
         logger.info("Apple transfer try: " + userInfo.transfer_sub);
 
         if (userInfo.transfer_sub === user.credential.appleTransferSub) {
