@@ -12,7 +12,7 @@ export default async function(req, res) {
 
     let context: RequestContext = req['context'];
 
-    if (osType !== undefined) {
+    if (osType != undefined) {
         if (osType === 'ios' || osType === 'android') {
             context.osType = osType;
         } else {
@@ -20,7 +20,7 @@ export default async function(req, res) {
         }
     }
 
-    if (osVersion !== undefined) {
+    if (osVersion != undefined) {
         if (osVersion.match(versionRegex)) {
             context.osVersion = osVersion;
         } else {
@@ -28,7 +28,7 @@ export default async function(req, res) {
         }
     }
 
-    if (appType !== undefined) {
+    if (appType != undefined) {
         if (appType === 'release' || appType === 'debug') {
             context.appType = appType;
         } else {
@@ -36,12 +36,19 @@ export default async function(req, res) {
         }
     }
 
-    if (appVersion !== undefined) {
-        if (appVersion.match(versionRegex)) {
-            context.appVersion = appVersion;
-        } else {
+    if (appVersion != undefined) {
+
+        if (osType === 'android') {
+            if (!appVersion.split('-')[0].match(versionRegex)) {
+                throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
+            }
+        }
+
+        if (!appVersion.match(versionRegex)) {
             throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
         }
+
+        context.appVersion = appVersion;
     }
 
     return Promise.resolve('next');
