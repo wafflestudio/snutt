@@ -10,7 +10,7 @@ export default async function (req, res) {
   const appType = <string>req.headers['x-app-type'];
   const appVersion = <string>req.headers['x-app-version'];
 
-  let context: RequestContext = req['context'];
+  const context: RequestContext = req['context'];
 
   if (osType != undefined) {
     if (osType === 'ios' || osType === 'android') {
