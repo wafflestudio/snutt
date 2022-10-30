@@ -8,7 +8,7 @@ export default async function(req, res) {
     const osType = <string>req.headers['x-os-type'];
     const osVersion = <string>req.headers['x-os-version'];
     const appType = <string>req.headers['x-app-type'];
-    let appVersion = <string>req.headers['x-app-version'];
+    const appVersion = <string>req.headers['x-app-version'];
 
     let context: RequestContext = req['context'];
 
