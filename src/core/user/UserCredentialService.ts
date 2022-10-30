@@ -142,6 +142,11 @@ export async function makeAppleCredential(appleEmail: string, appleSub: string):
     }
 }
 
+export async function transferAppleCredential(user: User, appleTransferSub: string): Promise<void> {
+    user.credential.appleSub = appleTransferSub;
+    await modifyCredential(user);
+}
+
 export async function makeFbCredential(fbId: string, fbToken: string): Promise<UserCredential> {
     if (await UserService.getByFb(fbId)) {
         throw new AlreadyRegisteredFbIdError(fbId);

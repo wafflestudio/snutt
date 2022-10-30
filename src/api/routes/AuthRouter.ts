@@ -65,12 +65,25 @@ restPost(router, '/register_local')(async function (context, req) {
 
 restPost(router, '/login_apple')(async function (context, req) {
   if (!req.body.apple_token)
-    throw new ApiError(400, ErrorCode.NO_APPLE_ID_OR_TOKEN, 'apple_token required')
+    throw new ApiError(400, ErrorCode.NO_APPLE_ID_OR_TOKEN, 'apple_token required');
 
   try {
-    const userInfo = await AppleService.verifyAndDecodeAppleToken(req.body.apple_token)
-    const user = await UserService.getByApple(userInfo.email)
+    const userInfo = await AppleService.verifyAndDecodeAppleToken(req.body.apple_token);
+    const user = await UserService.getByApple(userInfo.email);
+
     if (user) {
+      if (userInfo.transfer_sub != undefined) {
+        logger.info("Apple transfer try: " + userInfo.transfer_sub);
+
+        if (userInfo.transfer_sub === user.credential.appleTransferSub) {
+          UserCredentialService.transferAppleCredential(user, userInfo.transfer_sub);
+          logger.info("Apple transfer success: " + userInfo.transfer_sub);
+        } else {
+          logger.error("Apple transfer failed: " + userInfo.transfer_sub + " !== " + user.credential.appleTransferSub);
+          throw new ApiError(403, ErrorCode.WRONG_APPLE_TOKEN, "Apple transfer failed");
+        }
+      }
+
       return {token: user.credentialHash, user_id: user._id}
     } else {
       const credential: UserCredential = await UserCredentialService.makeAppleCredential(userInfo.email, userInfo.sub);
