@@ -21,11 +21,15 @@ restGet(router, '/v1/users/me/lectures/latest')(async function (context, req) {
     const evaluationServerHeader = {
         'Snutt-User-Id': user._id
     }
-    let snuttLectureInfo: string = JSON.stringify(await TimetableService.getLecturesTakenByUserInLastSemesters(user._id))
+    const snuttLectureInfo: string = JSON.stringify(await TimetableService.getLecturesTakenByUserInLastSemesters(user._id))
+
+    req.query.snutt_lecture_info = encodeURI(snuttLectureInfo)
+    let requestUri = snuttevDefaultRoutingUrl + req.path
+    requestUri += '?' + Object.keys(req.query).map(key => key + '=' + req.query[key]).join('&')
 
     return request({
         method: req.method,
-        uri: `${snuttevDefaultRoutingUrl}${req.path}?snutt_lecture_info=${encodeURI(snuttLectureInfo)}`,
+        uri: requestUri,
         headers: evaluationServerHeader,
         body: req.body,
         json: true
