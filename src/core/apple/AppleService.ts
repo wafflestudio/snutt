@@ -41,8 +41,8 @@ export async function verifyAndDecodeAppleToken(identityToken: string, appType: 
     try {
         jwt.verify(identityToken, publicKey, {
             algorithms: [appleJwk.alg],
-            issuer: "https://appleid.apple.com",
-            audience: appType === "release" ? "com.wafflestudio.snutt" : "com.wafflestudio.snutt.dev",
+            issuer: 'https://appleid.apple.com',
+            audience: appType === 'release' ? 'com.wafflestudio.snutt' : 'com.wafflestudio.snutt.dev',
         });
     }
     catch (err) {
