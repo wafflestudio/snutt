@@ -68,7 +68,7 @@ restPost(router, '/login_apple')(async function (context, req) {
     throw new ApiError(400, ErrorCode.NO_APPLE_ID_OR_TOKEN, 'apple_token required')
 
   try {
-    const userInfo = await AppleService.verifyAndDecodeAppleToken(req.body.apple_token, context.appVersion)
+    const userInfo = await AppleService.verifyAndDecodeAppleToken(req.body.apple_token, context.appType)
     const user = await UserService.getByApple(userInfo.email)
     if (user) {
       return {token: user.credentialHash, user_id: user._id}
