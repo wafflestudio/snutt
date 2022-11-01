@@ -77,9 +77,9 @@ restPost(router, '/login_apple')(async function (context, req) {
 
       if (user) {
         if (user.credential.appleSub !== userInfo.sub) {
-          logger.info("Apple transfer try: " + user.credential);
+          logger.info("Apple transfer try: " + JSON.stringify(user.credential));
           UserCredentialService.transferAppleCredential(user, userInfo.sub, userInfo.email);
-          logger.info("Apple transfer success: " + user.credential);
+          logger.info("Apple transfer success: " + JSON.stringify(user.credential));
         }
         return {token: user.credentialHash, user_id: user._id};
       } else {
