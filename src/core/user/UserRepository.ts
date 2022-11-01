@@ -65,22 +65,22 @@ export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
 }
 
 export async function findActiveByFb(fbId: string) : Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
+  const mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
 }
 
 export async function findActiveByAppleEmail(appleEmail: string) : Promise<User> {
   const mongooseDocument = await MongooseUserModel.findOne({'credential.appleEmail' : appleEmail, 'active' : true}).exec();
-  return fromMongoose(mongooseDocument)
+  return fromMongoose(mongooseDocument);
 }
 
 export async function findActiveByAppleTransferSub(appleTransferSub: string) : Promise<User> {
   const mongooseDocument = await MongooseUserModel.findOne({'credential.appleTransferSub' : appleTransferSub, 'active' : true}).exec();
-  return fromMongoose(mongooseDocument)
+  return fromMongoose(mongooseDocument);
 }
 
 export async function findActiveByCredentialHash(hash: string): Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'credentialHash' : hash, 'active' : true }).exec();
+  const mongooseDocument = await MongooseUserModel.findOne({'credentialHash' : hash, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
 }
 
