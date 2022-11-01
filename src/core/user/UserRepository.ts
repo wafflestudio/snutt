@@ -60,7 +60,7 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
   }
 }
 export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
+  const mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
   return fromMongoose(mongooseDocument);
 }
 
