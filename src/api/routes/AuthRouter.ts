@@ -69,36 +69,42 @@ restPost(router, '/login_apple')(async function (context, req) {
 
   try {
     const userInfo = await AppleService.verifyAndDecodeAppleToken(req.body.apple_token, context.appType);
-    const user = await UserService.getByApple(userInfo.email);
 
-    if (user) {
-      if (userInfo.transfer_sub != undefined && user.credential.appleSub !== user.credential.appleTransferSub) {
-        logger.info("Apple transfer try: " + userInfo.transfer_sub);
+    let credential: UserCredential;
+    if (userInfo.transfer_sub != undefined) {
+      logger.info("Apple transfer sub exists: " + userInfo.transfer_sub);
+      const user = await UserService.getByAppleTransferSub(userInfo.transfer_sub);
 
-        if (userInfo.transfer_sub === user.credential.appleTransferSub) {
-          UserCredentialService.transferAppleCredential(user, userInfo.transfer_sub);
-          logger.info("Apple transfer success: " + userInfo.transfer_sub);
-        } else {
-          logger.error("Apple transfer failed: " + userInfo.transfer_sub + " !== " + user.credential.appleTransferSub);
-          throw new ApiError(403, ErrorCode.WRONG_APPLE_TOKEN, "Apple transfer failed");
-        }
+      if (user) {
+        UserCredentialService.transferAppleCredential(user, userInfo.sub, userInfo.email);
+        logger.info("Apple transfer success: " + userInfo.transfer_sub);
+        return {token: user.credentialHash, user_id: user._id};
+      } else {
+        credential = await UserCredentialService.makeAppleCredential(userInfo.email, userInfo.sub, userInfo.transfer_sub);
+        logger.info("Made apple credential with transfer sub: " + JSON.stringify(credential));
       }
-
-      return {token: user.credentialHash, user_id: user._id}
     } else {
-      const credential: UserCredential = await UserCredentialService.makeAppleCredential(userInfo.email, userInfo.sub);
-      logger.info("Made apple credential: " + JSON.stringify(credential));
-      const credentialHash: string = await UserCredentialService.makeCredentialHmac(credential);
-      const newUser: User = {
-        credential: credential,
-        credentialHash: credentialHash,
-        email: userInfo.email
+      logger.info("Apple transfer sub doesn't exist");
+      const user = await UserService.getByAppleEmail(userInfo.email);
+
+      if (user) {
+        return {token: user.credentialHash, user_id: user._id};
+      } else {
+        credential = await UserCredentialService.makeAppleCredential(userInfo.email, userInfo.sub);
+        logger.info("Made apple credential: " + JSON.stringify(credential));
       }
-      logger.info("New user info: " + JSON.stringify(newUser));
-      const inserted: User = await UserService.add(newUser);
-      logger.info("Inserted new user: " + JSON.stringify(inserted));
-      return {token: inserted.credentialHash, user_id: inserted._id};
     }
+      
+    const credentialHash: string = UserCredentialService.makeCredentialHmac(credential);
+    const newUser: User = {
+      credential: credential,
+      credentialHash: credentialHash,
+      email: userInfo.email
+    }
+    logger.info("New user info: " + JSON.stringify(newUser));
+    const inserted: User = await UserService.add(newUser);
+    logger.info("Inserted new user: " + JSON.stringify(inserted));
+    return {token: inserted.credentialHash, user_id: inserted._id};
   } catch (err) {
     if (err instanceof InvalidAppleTokenError) {
       throw new ApiError(403, ErrorCode.WRONG_APPLE_TOKEN, "wrong apple token");

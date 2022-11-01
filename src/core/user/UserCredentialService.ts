@@ -132,18 +132,20 @@ export async function makeLocalCredential(id: string, password: string): Promise
     }
 }
 
-export async function makeAppleCredential(appleEmail: string, appleSub: string): Promise<UserCredential> {
-    if (await UserService.getByApple(appleEmail)) {
+export async function makeAppleCredential(appleEmail: string, appleSub: string, appleTransferSub?: string): Promise<UserCredential> {
+    if (await UserService.getByAppleEmail(appleEmail)) {
         throw new AlreadyRegisteredAppleEmailError(appleEmail);
     }
     return {
         appleEmail: appleEmail,
-        appleSub: appleSub
+        appleSub: appleSub,
+        appleTransferSub: appleTransferSub
     }
 }
 
-export async function transferAppleCredential(user: User, appleTransferSub: string): Promise<void> {
-    user.credential.appleSub = appleTransferSub;
+export async function transferAppleCredential(user: User, appleSub: string, appleEmail: string): Promise<void> {
+    user.credential.appleSub = appleSub;
+    user.credential.appleEmail = appleEmail;
     await modifyCredential(user);
 }
 
