@@ -13,6 +13,7 @@ let UserSchema = new mongoose.Schema({
     fbId: {type: String, default: null},
     appleEmail: {type: String, default: null},
     appleSub: {type: String, default: null},
+    appleTransferSub: {type: String, default: null},
 
     // 위 항목이 없어도 unique credentialHash을 생성할 수 있도록
     tempDate: {type: Date, default: null},          // 임시 가입 날짜
@@ -58,23 +59,28 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
     lastLoginTimestamp: wrapper.lastLoginTimestamp
   }
 }
-export async function findActiveByVerifiedEmail(email:string) : Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
+export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
+  const mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
   return fromMongoose(mongooseDocument);
 }
 
-export async function findActiveByFb(fbId:string) : Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
+export async function findActiveByFb(fbId: string) : Promise<User> {
+  const mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
 }
 
-export async function findActiveByApple(appleEmail:string) : Promise<User> {
-  const mongooseDocument = await MongooseUserModel.findOne({'credential.appleEmail' : appleEmail, 'active' : true}).exec();
-  return fromMongoose(mongooseDocument)
+export async function findActiveByAppleSub(appleSub: string) : Promise<User> {
+  const mongooseDocument = await MongooseUserModel.findOne({'credential.appleSub' : appleSub, 'active' : true}).exec();
+  return fromMongoose(mongooseDocument);
+}
+
+export async function findActiveByAppleTransferSub(appleTransferSub: string) : Promise<User> {
+  const mongooseDocument = await MongooseUserModel.findOne({'credential.appleTransferSub' : appleTransferSub, 'active' : true}).exec();
+  return fromMongoose(mongooseDocument);
 }
 
 export async function findActiveByCredentialHash(hash: string): Promise<User> {
-  let mongooseDocument = await MongooseUserModel.findOne({'credentialHash' : hash, 'active' : true }).exec();
+  const mongooseDocument = await MongooseUserModel.findOne({'credentialHash' : hash, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
 }
 

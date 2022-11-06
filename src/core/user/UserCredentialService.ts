@@ -13,7 +13,7 @@ import AlreadyRegisteredFbIdError from '@app/core/user/error/AlreadyRegisteredFb
 import InvalidFbIdOrTokenError from '@app/core/facebook/error/InvalidFbIdOrTokenError';
 import NotLocalAccountError from './error/NotLocalAccountError';
 import winston = require('winston');
-import AlreadyRegisteredAppleEmailError from "@app/core/user/error/AlreadyRegisteredAppleEmailError";
+import AlreadyRegisteredAppleSubError from "@app/core/user/error/AlreadyRegisteredAppleSubError";
 var logger = winston.loggers.get('default');
 
 let secretKey = property.get('core.secretKey');
@@ -132,14 +132,21 @@ export async function makeLocalCredential(id: string, password: string): Promise
     }
 }
 
-export async function makeAppleCredential(appleEmail: string, appleSub: string): Promise<UserCredential> {
-    if (await UserService.getByApple(appleEmail)) {
-        throw new AlreadyRegisteredAppleEmailError(appleEmail);
+export async function makeAppleCredential(appleEmail: string, appleSub: string, appleTransferSub?: string): Promise<UserCredential> {
+    if (await UserService.getByAppleSub(appleSub)) {
+        throw new AlreadyRegisteredAppleSubError(appleSub);
     }
     return {
+        appleSub: appleSub,
         appleEmail: appleEmail,
-        appleSub: appleSub
+        appleTransferSub: appleTransferSub
     }
+}
+
+export async function transferAppleCredential(user: User, appleSub: string, appleEmail: string): Promise<void> {
+    user.credential.appleSub = appleSub;
+    user.credential.appleEmail = appleEmail;
+    await modifyCredential(user);
 }
 
 export async function makeFbCredential(fbId: string, fbToken: string): Promise<UserCredential> {

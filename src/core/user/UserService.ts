@@ -13,7 +13,7 @@ import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
 
 export function getVerifiedByEmail(email: string): Promise<User> {
-  return UserRepository.findActiveByVerifiedEmail(email)
+  return UserRepository.findActiveByVerifiedEmail(email);
 }
 
 export function getByMongooseId(mongooseId: string): Promise<User> {
@@ -25,11 +25,15 @@ export function getByLocalId(localId: string): Promise<User> {
 }
 
 export function getByFb(fbId: string): Promise<User> {
-  return UserRepository.findActiveByFb(fbId)
+  return UserRepository.findActiveByFb(fbId);
 }
 
-export function getByApple(appleEmail: string): Promise<User> {
-  return UserRepository.findActiveByApple(appleEmail);
+export function getByAppleSub(appleSub: string): Promise<User> {
+  return UserRepository.findActiveByAppleSub(appleSub);
+}
+
+export function getByAppleTransferSub(appleTransferSub: string): Promise<User> {
+  return UserRepository.findActiveByAppleTransferSub(appleTransferSub);
 }
 
 export function getByCredentialHash(credentialHash: string): Promise<User> {

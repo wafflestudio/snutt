@@ -5,6 +5,7 @@ export default interface UserCredential {
   fbId?: string;
   appleEmail?: string;
   appleSub?: string;
+  appleTransferSub?: string;
   tempDate?: Date;
   tempSeed?: number;
 };
