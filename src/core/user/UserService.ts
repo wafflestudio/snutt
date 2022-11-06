@@ -28,8 +28,8 @@ export function getByFb(fbId: string): Promise<User> {
   return UserRepository.findActiveByFb(fbId);
 }
 
-export function getByAppleEmail(appleEmail: string): Promise<User> {
-  return UserRepository.findActiveByAppleEmail(appleEmail);
+export function getByAppleSub(appleSub: string): Promise<User> {
+  return UserRepository.findActiveByAppleSub(appleSub);
 }
 
 export function getByAppleTransferSub(appleTransferSub: string): Promise<User> {

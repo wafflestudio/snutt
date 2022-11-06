@@ -88,7 +88,7 @@ restPost(router, '/login_apple')(async function (context, req) {
       }
     } else {
       logger.info("Apple transfer sub doesn't exist");
-      const user = await UserService.getByAppleEmail(userInfo.email);
+      const user = await UserService.getByAppleSub(userInfo.sub);
 
       if (user) {
         return {token: user.credentialHash, user_id: user._id};
