@@ -34,7 +34,7 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string,
 
         let classes = times.map((time, idx) => {
             let timeSplitted = time.split('-');
-            const parsedRealTimes = realTimes[idx].match("\d{2}:\d{2}")
+            const parsedRealTimes = realTimes[idx].match(/\d{2}:\d{2}/g)
             const startTime = parsedRealTimes[0]
             const endTime = parsedRealTimes[1]
             let day = ['월', '화', '수', '목', '금', '토', '일'].indexOf(timeSplitted[0].charAt(0));
@@ -69,11 +69,13 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string,
 
         // Merge same time with different location
         // Merge continuous time with same location
+        // TODO: 연속된 강의 머지기능 유지 논의
         for (let i = 1; i < classes.length; i++) {
             let prev = classes[i-1];
             let curr = classes[i];
             if (prev.day == curr.day && prev.place == curr.place && curr.start == (prev.start + prev.len)) {
                 prev.len += curr.len;
+                prev.end_time = curr.end_time
                 classes.splice(i--, 1);
             } else if (prev.day == curr.day && prev.start == curr.start && prev.len == curr.len) {
                 prev.place += '/' + curr.place;
@@ -83,7 +85,7 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string,
         return classes;
     } catch (err) {
         logger.error(err);
-        logger.error("Failed to parse timePlace (times: " + timesString + ", locations: " + locationsString + ")");
+        logger.error("Failed to parse timePlace (times: " + timesString + ", locations: " + locationsString + ", realTime: " + realTimesString + ")");
         return [];
     }
 }

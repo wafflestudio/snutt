@@ -39,7 +39,7 @@ describe("SugangSnuLectureServiceIntegrationTest", function() {
             course_title: '그린리더십 인턴십',
             credit: 3,
             class_time: '금(6-3)',
-            class_time_json: [ { day: 4, start: 6, len: 3, place: '220-202' } ],
+            class_time_json: [ { day: 4, start: 6, len: 3, place: '220-202', start_time: '14:00', end_time: '16:50' } ],
             class_time_mask: [ 0, 0, 0, 0, 258048, 0, 0 ],
             instructor: '류재명',
             quota: 40,
