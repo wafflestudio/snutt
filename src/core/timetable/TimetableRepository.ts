@@ -291,7 +291,7 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     course_title: mongooseDoc.course_title,   // 과목명
     credit: mongooseDoc.credit,                                   // 학점
     class_time: mongooseDoc.class_time,
-    real_class_time: mongooseDoc.class_time,
+    real_class_time: mongooseDoc.real_class_time,
     class_time_json: mongooseDoc.class_time_json,
     class_time_mask: mongooseDoc.class_time_mask,
     instructor: mongooseDoc.instructor,                               // 강사
