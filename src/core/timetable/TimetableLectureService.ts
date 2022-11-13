@@ -257,6 +257,7 @@ function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture
     course_title: refLecture.course_title,   // 과목명
     credit: refLecture.credit,                                   // 학점
     class_time: refLecture.class_time,
+    real_class_time: refLecture.real_class_time,
     class_time_json: refLecture.class_time_json,
     class_time_mask: refLecture.class_time_mask,
     instructor: refLecture.instructor,                               // 강사

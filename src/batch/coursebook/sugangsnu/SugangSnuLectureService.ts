@@ -85,6 +85,7 @@ function getRefLectureFromSugangSnuLecture(year: number, semester: number, lectu
         course_title: course_title,
         credit: credit,
         class_time: parsedClassTime,
+        real_class_time: realClassTime,
         class_time_json: timeJson,
         class_time_mask: class_time_mask,
         instructor: instructor,

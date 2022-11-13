@@ -21,13 +21,14 @@ describe("SugangSnuLectureServiceIntegrationTest", function() {
             course_title: '사회봉사 1',
             credit: 1,
             class_time: '',
+            real_class_time: '',
             class_time_json: [],
             class_time_mask: [ 0, 0, 0, 0, 0, 0, 0 ],
             instructor: '김의영',
             quota: 20,
             remark: '아동/청소년, 장애인, 노인, 시민단체 등 연계기관에서 활동',
             category: '대학과 리더쉽' });
-       
+
         assert.deepEqual(lectureList[8], {
             year: 2018,
             semester: 2,
@@ -39,6 +40,7 @@ describe("SugangSnuLectureServiceIntegrationTest", function() {
             course_title: '그린리더십 인턴십',
             credit: 3,
             class_time: '금(6-3)',
+            real_class_time: '금(14:00~16:50)',
             class_time_json: [ { day: 4, start: 6, len: 3, place: '220-202', start_time: '14:00', end_time: '16:50' } ],
             class_time_mask: [ 0, 0, 0, 0, 258048, 0, 0 ],
             instructor: '류재명',

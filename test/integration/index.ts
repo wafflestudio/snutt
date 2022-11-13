@@ -66,6 +66,7 @@ describe('Integration Test', function() {
         "course_title": "공학연구의 실습 1",
         "credit": 1,
         "class_time": "화(13-1)/목(13-1)",
+        "real_class_time": "화(21:00~21:50)/목(21:00~21:50)",
         "instructor": "이제희",
         "quota": 15,
         "enrollment": 0,
