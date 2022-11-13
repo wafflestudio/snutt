@@ -44,11 +44,6 @@ describe('TimePlaceUtilUnitTest', function () {
       TimePlaceUtil.timeAndPlaceToJson('화(3-1)/목(3-1)/목(11-2)', '302-208/302-208/302-310-2', '화(11:00~11:50)/목(11:00~11:50)/목(19:00~20:50)'));
   })
 
-  it("timeAndPlaceToJson__success__mergeContinuousCourse", async function () {
-    assert.deepEqual([{day: 3, start: 9, len: 4, place: '220-317', start_time: '17:00', end_time: '20:50'}],
-      TimePlaceUtil.timeAndPlaceToJson('목(9-2)/목(11-2)', '220-317/220-317', '목(17:00~18:50)/목(19:00~20:50)'));
-  })
-
   it("timeAndPlaceToJson__success__doNotMergeContinuousCourseButDiffLocation", async function () {
     assert.deepEqual([
         {day: 3, start: 9, len: 2, place: '220-317', start_time: '17:00', end_time: '18:50'},
