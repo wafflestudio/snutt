@@ -19,7 +19,7 @@ let userLectureSchema = new mongoose.Schema({
   credit: Number,                                   // 학점
   class_time: String,
   class_time_json: [
-    {day: Number, start: Number, len: Number, place: String}
+    {day: Number, start: Number, len: Number, place: String, start_time: String, end_time: String}
   ],
   class_time_mask: {type: [Number], required: true, default: [0, 0, 0, 0, 0, 0, 0]},
   instructor: String,                               // 강사
