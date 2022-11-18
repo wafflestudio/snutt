@@ -195,7 +195,7 @@ function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLec
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
-  if (!ObjectUtil.isNumber(timePlace.day)) {
+  if (!ObjectUtil.isNumber(timePlace.day) || !ObjectUtil.isNumber(timePlace.len) || !ObjectUtil.isNumber(timePlace.start)) {
     throw new InvalidLectureTimeJsonError();
   }
 }
