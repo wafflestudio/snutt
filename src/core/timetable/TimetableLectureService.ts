@@ -21,6 +21,7 @@ import Timetable from './model/Timetable';
 import TimePlace from './model/TimePlace';
 import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJsonError';
 import winston = require('winston');
+import {Time} from "@app/core/timetable/model/Time";
 let logger = winston.loggers.get('default');
 
 export async function addRefLecture(timetable: Timetable, lectureId: string, isForced: boolean): Promise<void> {
@@ -72,6 +73,16 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
   /* If no time json is found, mask is invalid */
+
+  lecture.class_time_json.forEach(it => {
+    if(it.start_time == null && it.start == null || it.end_time == null && it.len == null) throw new InvalidLectureTimeJsonError()
+    it.start_time = it.start_time ? it.start_time : new Time((it.start + 8) * 60).toHourMinuteFormat()
+    it.end_time = it.end_time ? it.end_time : new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
+    const startTime = Time.fromHourMinuteString(it.end_time)
+    const endTime = Time.fromHourMinuteString(it.end_time)
+    it.len = it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60)
+    it.start = it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
+  })
   LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
 
@@ -184,7 +195,7 @@ function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLec
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
-  if (!ObjectUtil.isNumber(timePlace.day) || !ObjectUtil.isNumber(timePlace.len) || !ObjectUtil.isNumber(timePlace.start)) {
+  if (!ObjectUtil.isNumber(timePlace.day)) {
     throw new InvalidLectureTimeJsonError();
   }
 }
