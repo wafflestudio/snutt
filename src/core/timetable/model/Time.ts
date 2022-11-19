@@ -1,4 +1,24 @@
-export class Time {
+export interface Time {
+  subtract(other: Time): Time;
+
+  addMinute(minute: number);
+
+  addHour(hour: number);
+
+  subtractMinute(minute: number);
+
+  subtractHour(hour: number);
+
+  toHourMinuteFormat();
+
+  getHour(): number;
+
+  getMinute(): number;
+
+  getDecimalHour(): number;
+}
+
+export class Time implements Time {
   minute: number;
 
   constructor(minute: number) {
@@ -39,14 +59,16 @@ export class Time {
   getHour(): number {
     return Math.trunc(this.minute / 60)
   }
+
   getMinute(): number {
     return Math.trunc(this.minute % 60)
   }
 
-  getDecimalHour(): number{
+  getDecimalHour(): number {
     return this.minute / 60
   }
 
 }
 
-export class HourMinuteFormatException{}
+export class HourMinuteFormatException {
+}

@@ -22,7 +22,10 @@ import TimePlace from './model/TimePlace';
 import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJsonError';
 import winston = require('winston');
 import {Time} from "@app/core/timetable/model/Time";
+import Lecture from "@app/core/lecture/model/Lecture";
 let logger = winston.loggers.get('default');
+
+const ZERO_PERIOD_START_HOUR = 8
 
 export async function addRefLecture(timetable: Timetable, lectureId: string, isForced: boolean): Promise<void> {
   let lecture = await RefLectureService.getByMongooseId(lectureId);
@@ -71,18 +74,11 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 
 
-export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
-  /* If no time json is found, mask is invalid */
+export async function addCustomLecture(timetable: Timetable, lectureInput: UserLecture, isForced: boolean): Promise<void> {
+  if(isInvalidClassTime(lectureInput)) throw new InvalidLectureTimeJsonError()
+  const lecture = syncRealTimeWithPeriod(lectureInput)
 
-  lecture.class_time_json.forEach(it => {
-    if(it.start_time == null && it.start == null || it.end_time == null && it.len == null) throw new InvalidLectureTimeJsonError()
-    it.start_time = it.start_time ? it.start_time : new Time((it.start + 8) * 60).toHourMinuteFormat()
-    it.end_time = it.end_time ? it.end_time : new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
-    const startTime = Time.fromHourMinuteString(it.end_time)
-    const endTime = Time.fromHourMinuteString(it.end_time)
-    it.len = it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60)
-    it.start = it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
-  })
+  /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
 
@@ -115,8 +111,10 @@ export async function resetLecture(userId:string, tableId: string, lectureId: st
   await TimetableRepository.updateUpdatedAt(tableId, Date.now());
 }
 
-export async function partialModifyUserLecture(userId: string, tableId: string, lecture: any, isForced: boolean): Promise<void> {
+export async function partialModifyUserLecture(userId: string, tableId: string, lectureInput: any, isForced: boolean): Promise<void> {
   let table = await TimetableRepository.findByUserIdAndMongooseId(userId, tableId);
+  if(isInvalidClassTime(lectureInput)) throw new InvalidLectureTimeJsonError()
+  const lecture = syncRealTimeWithPeriod(lectureInput)
 
   if (!table) {
     throw new TimetableNotFoundError();
@@ -248,6 +246,30 @@ export function getUserLectureFromTimetableByCourseNumber(table: Timetable, cour
     }
   }
   return null;
+}
+
+function syncRealTimeWithPeriod(lecture: any): any  {
+  return {
+    ...lecture,
+    class_time_json: lecture.class_time_json.map(it => {
+      const startTime = Time.fromHourMinuteString(it.end_time);
+      const endTime = Time.fromHourMinuteString(it.end_time);
+
+      return {
+        ...it,
+        start_time: it.start_time || new Time((it.start + ZERO_PERIOD_START_HOUR) * 60).toHourMinuteFormat(),
+        end_time: it.end_time || new Time((it.start + it.len + ZERO_PERIOD_START_HOUR) * 60).toHourMinuteFormat(),
+        len: it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60),
+        start: it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
+      }
+    }),
+  }
+}
+
+function isInvalidClassTime(lecture: Lecture): boolean {
+  return lecture.class_time_json.some(
+    it => it.start_time == null && it.start == null || it.end_time == null && it.len == null
+  );
 }
 
 function isCustomLecture(lecture: UserLecture): boolean {
