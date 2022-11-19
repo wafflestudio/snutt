@@ -74,9 +74,9 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 
 
-export async function addCustomLecture(timetable: Timetable, lectureInput: UserLecture, isForced: boolean): Promise<void> {
-  if(isInvalidClassTime(lectureInput)) throw new InvalidLectureTimeJsonError()
-  const lecture = syncRealTimeWithPeriod(lectureInput)
+export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
+  if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
+  syncRealTimeWithPeriod(lecture)
 
   /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
@@ -111,10 +111,8 @@ export async function resetLecture(userId:string, tableId: string, lectureId: st
   await TimetableRepository.updateUpdatedAt(tableId, Date.now());
 }
 
-export async function partialModifyUserLecture(userId: string, tableId: string, lectureInput: any, isForced: boolean): Promise<void> {
+export async function partialModifyUserLecture(userId: string, tableId: string, lecture: any, isForced: boolean): Promise<void> {
   let table = await TimetableRepository.findByUserIdAndMongooseId(userId, tableId);
-  if(isInvalidClassTime(lectureInput)) throw new InvalidLectureTimeJsonError()
-  const lecture = syncRealTimeWithPeriod(lectureInput)
 
   if (!table) {
     throw new TimetableNotFoundError();
@@ -125,6 +123,8 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   }
 
   if (lecture['class_time_json']) {
+    if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
+    syncRealTimeWithPeriod(lecture)
     LectureService.setTimemask(lecture);
     lecture['class_time_mask'] = TimePlaceUtil.timeJsonToMask(lecture['class_time_json'], true);
   }
@@ -248,22 +248,15 @@ export function getUserLectureFromTimetableByCourseNumber(table: Timetable, cour
   return null;
 }
 
-function syncRealTimeWithPeriod(lecture: any): any  {
-  return {
-    ...lecture,
-    class_time_json: lecture.class_time_json.map(it => {
-      const startTime = Time.fromHourMinuteString(it.end_time);
-      const endTime = Time.fromHourMinuteString(it.end_time);
-
-      return {
-        ...it,
-        start_time: it.start_time || new Time((it.start + ZERO_PERIOD_START_HOUR) * 60).toHourMinuteFormat(),
-        end_time: it.end_time || new Time((it.start + it.len + ZERO_PERIOD_START_HOUR) * 60).toHourMinuteFormat(),
-        len: it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60),
-        start: it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
-      }
-    }),
-  }
+function syncRealTimeWithPeriod(lecture: any): void  {
+  lecture.class_time_json.forEach(it => {
+    it.start_time = it.start_time || new Time((it.start + 8) * 60).toHourMinuteFormat()
+    it.end_time = it.end_time || new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
+    const startTime = Time.fromHourMinuteString(it.start_time)
+    const endTime = Time.fromHourMinuteString(it.end_time)
+    it.len = it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60)
+    it.start = it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
+  })
 }
 
 function isInvalidClassTime(lecture: Lecture): boolean {
