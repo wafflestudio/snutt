@@ -254,7 +254,7 @@ function syncRealTimeWithPeriod(lecture: any): void  {
     it.end_time = it.end_time || new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
     const startTime = Time.fromHourMinuteString(it.start_time)
     const endTime = Time.fromHourMinuteString(it.end_time)
-    it.len = it.len ? Number(it.len) : (endTime.subtract(startTime).getMinute() / 60)
+    it.len = it.len ? Number(it.len) : Math.ceil(endTime.subtract(startTime).minute / 30) / 2
     it.start = it.start ? Number(it.start) : startTime.subtractHour(8).getDecimalHour()
   })
 }
