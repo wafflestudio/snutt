@@ -26,6 +26,7 @@ restGet(router, '/v1/users/me/lectures/latest')(async function (context, req) {
     req.query.snutt_lecture_info = encodeURI(snuttLectureInfo)
     let requestUri = snuttevDefaultRoutingUrl + req.path
     requestUri += '?' + Object.keys(req.query).map(key => key + '=' + req.query[key]).join('&')
+    console.log(requestUri)
 
     return request({
         method: req.method,
