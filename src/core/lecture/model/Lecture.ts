@@ -8,6 +8,7 @@ export default interface Lecture {
     course_title: string,   // 과목명
     credit: number,                                   // 학점
     class_time: string,
+    real_class_time: string,
     class_time_json: TimePlace[],
     class_time_mask: number[],
     instructor: string,                               // 강사

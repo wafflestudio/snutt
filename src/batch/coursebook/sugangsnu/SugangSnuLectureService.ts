@@ -49,7 +49,8 @@ function getRefLectureFromSugangSnuLecture(year: number, semester: number, lectu
     let quota = parseInt(sugangSnuLecture.quota.split(" ")[0]);
 
     let parsedClassTime = parseClassTime(sugangSnuLecture.class_time);
-    let timeJson = TimePlaceUtil.timeAndPlaceToJson(parsedClassTime, sugangSnuLecture.location);
+    const realClassTime = sugangSnuLecture.class_time
+    let timeJson = TimePlaceUtil.timeAndPlaceToJson(parsedClassTime, sugangSnuLecture.location, realClassTime);
     if (timeJson === null) {
         logger.warn("timeJson not found from (" + sugangSnuLecture.class_time + ", " + sugangSnuLecture.location + ")");
     }
@@ -84,6 +85,7 @@ function getRefLectureFromSugangSnuLecture(year: number, semester: number, lectu
         course_title: course_title,
         credit: credit,
         class_time: parsedClassTime,
+        real_class_time: realClassTime,
         class_time_json: timeJson,
         class_time_mask: class_time_mask,
         instructor: instructor,

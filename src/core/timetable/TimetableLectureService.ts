@@ -21,7 +21,11 @@ import Timetable from './model/Timetable';
 import TimePlace from './model/TimePlace';
 import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJsonError';
 import winston = require('winston');
+import {Time} from "@app/core/timetable/model/Time";
+import Lecture from "@app/core/lecture/model/Lecture";
 let logger = winston.loggers.get('default');
+
+const ZERO_PERIOD_START_HOUR = 8
 
 export async function addRefLecture(timetable: Timetable, lectureId: string, isForced: boolean): Promise<void> {
   let lecture = await RefLectureService.getByMongooseId(lectureId);
@@ -71,6 +75,9 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 
 export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
+  if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
+  syncRealTimeWithPeriod(lecture)
+
   /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
@@ -116,6 +123,8 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   }
 
   if (lecture['class_time_json']) {
+    if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
+    syncRealTimeWithPeriod(lecture)
     LectureService.setTimemask(lecture);
     lecture['class_time_mask'] = TimePlaceUtil.timeJsonToMask(lecture['class_time_json'], true);
   }
@@ -170,17 +179,7 @@ function makeOverwritingConfirmMessage(overlappingLectures: UserLecture[]) {
 }
 
 function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLecture[] {
-  let lectures: UserLecture[] = [];
-  for (let i=0; i<table.lecture_list.length; i++) {
-    const tableLecture: any = table.lecture_list[i];
-    for (let j=0; j<tableLecture.class_time_mask.length; j++) {
-      if ((tableLecture.class_time_mask[j] & lecture.class_time_mask[j]) != 0) {
-        lectures.push(tableLecture);
-        break;
-      }
-    }
-  }
-  return lectures;
+  return table.lecture_list.filter(existingLecture => twoLecturesOverlap(existingLecture, lecture) )
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
@@ -239,6 +238,35 @@ export function getUserLectureFromTimetableByCourseNumber(table: Timetable, cour
   return null;
 }
 
+function twoLecturesOverlap(lectureA: Lecture, lectureB: Lecture): boolean {
+  return lectureA.class_time_json.some(classTimeA =>
+    lectureB.class_time_json.some(classTimeB => timesOverlap(classTimeA, classTimeB))
+  )
+}
+
+function timesOverlap(time1:TimePlace, time2: TimePlace): boolean {
+  return time1.day === time2.day
+    && (Time.fromHourMinuteString(time1.start_time).minute < Time.fromHourMinuteString(time2.end_time).minute)
+    && (Time.fromHourMinuteString(time1.end_time).minute > Time.fromHourMinuteString(time2.start_time).minute)
+}
+
+function syncRealTimeWithPeriod(lecture: any): void  {
+  lecture.class_time_json.forEach(it => {
+    it.start_time = it.start_time || new Time((it.start + 8) * 60).toHourMinuteFormat()
+    it.end_time = it.end_time || new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
+    const startTime = Time.fromHourMinuteString(it.start_time)
+    const endTime = Time.fromHourMinuteString(it.end_time)
+    it.len = it.len ? Number(it.len) : Math.ceil(endTime.subtract(startTime).minute / 30) / 2
+    it.start = it.start ? Number(it.start) : Math.floor(startTime.subtractHour(8).minute / 30) / 2
+  })
+}
+
+function isInvalidClassTime(lecture: Lecture): boolean {
+  return lecture.class_time_json.some(
+    it => it.start_time == null && it.start == null || it.end_time == null && it.len == null
+  );
+}
+
 function isCustomLecture(lecture: UserLecture): boolean {
   return !lecture.course_number && !lecture.lecture_number;
 }
@@ -257,6 +285,7 @@ function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture
     course_title: refLecture.course_title,   // 과목명
     credit: refLecture.credit,                                   // 학점
     class_time: refLecture.class_time,
+    real_class_time: refLecture.real_class_time,
     class_time_json: refLecture.class_time_json,
     class_time_mask: refLecture.class_time_mask,
     instructor: refLecture.instructor,                               // 강사

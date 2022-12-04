@@ -15,8 +15,9 @@ let refLectureSchema = new mongoose.Schema({
   course_title: { type: String, required: true },   // 과목명
   credit: Number,                                   // 학점
   class_time: String,
+  real_class_time: String,
   class_time_json: [
-    { day : Number, start: Number, len: Number, place : String }
+    { day : Number, start: Number, len: Number, place : String, start_time: String, end_time: String }
   ],
   class_time_mask: { type: [ Number ], required: true, default: [0,0,0,0,0,0,0] },
   instructor: String,                               // 강사
@@ -168,6 +169,7 @@ function fromMongoose(mongooseDoc): RefLecture {
     course_title: mongooseDoc.course_title,   // 과목명
     credit: mongooseDoc.credit,                                   // 학점
     class_time: mongooseDoc.class_time,
+    real_class_time: mongooseDoc.real_class_time,
     class_time_json: mongooseDoc.class_time_json,
     class_time_mask: mongooseDoc.class_time_mask,
     instructor: mongooseDoc.instructor,                               // 강사

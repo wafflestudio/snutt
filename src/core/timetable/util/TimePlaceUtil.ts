@@ -6,7 +6,7 @@ import InvalidLectureTimeJsonError from '../../lecture/error/InvalidLectureTimeJ
 
 var logger = winston.loggers.get('default');
 
-export function timeAndPlaceToJson(timesString: string, locationsString: string): TimePlace[] {
+export function timeAndPlaceToJson(timesString: string, locationsString: string, realTimesString: string): TimePlace[] {
     try {
         // 시간 정보가 없다면 빈 정보를 반환한다.
         if (timesString === '') {
@@ -15,6 +15,7 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string)
 
         let locations = locationsString.split('/');
         let times = timesString.split('/');
+        let realTimes = realTimesString.split('/')
 
         // 만약 강의실이 하나 뿐이거나 없다면, 시간에 맞춰서 강의 장소를 추가해준다.
         if (locations.length != times.length) {
@@ -31,8 +32,11 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string)
             }
         }
 
-        let classes = times.map((time, idx) => { 
+        let classes = times.map((time, idx) => {
             let timeSplitted = time.split('-');
+            const parsedRealTimes = realTimes[idx].match(/\d{2}:\d{2}/g)
+            const startTime = parsedRealTimes[0]
+            const endTime = parsedRealTimes[1]
             let day = ['월', '화', '수', '목', '금', '토', '일'].indexOf(timeSplitted[0].charAt(0));
             let start = Number(timeSplitted[0].slice(2));
             let len = Number(timeSplitted[1].slice(0, -1));
@@ -40,6 +44,8 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string)
             return {
                 day,
                 start,
+                start_time: startTime,
+                end_time: endTime,
                 len,
                 place
             };
@@ -62,14 +68,10 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string)
         })
 
         // Merge same time with different location
-        // Merge continuous time with same location
         for (let i = 1; i < classes.length; i++) {
             let prev = classes[i-1];
             let curr = classes[i];
-            if (prev.day == curr.day && prev.place == curr.place && curr.start == (prev.start + prev.len)) {
-                prev.len += curr.len;
-                classes.splice(i--, 1);
-            } else if (prev.day == curr.day && prev.start == curr.start && prev.len == curr.len) {
+            if (prev.day == curr.day && prev.start == curr.start && prev.len == curr.len) {
                 prev.place += '/' + curr.place;
                 classes.splice(i--, 1);
             }
@@ -77,7 +79,7 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string)
         return classes;
     } catch (err) {
         logger.error(err);
-        logger.error("Failed to parse timePlace (times: " + timesString + ", locations: " + locationsString + ")");
+        logger.error("Failed to parse timePlace (times: " + timesString + ", locations: " + locationsString + ", realTime: " + realTimesString + ")");
         return [];
     }
 }
