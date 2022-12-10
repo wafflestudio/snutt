@@ -1,0 +1,5 @@
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY . /app
+RUN ./gradlew :batch:bootJar
+CMD java $JAVA_OPTS -jar batch/build/libs/snuttev-batch.jar --job.names=${JOB_NAMES}
