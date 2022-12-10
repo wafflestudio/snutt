@@ -1,0 +1,27 @@
+spring:
+  config:
+    import: application-common.yml
+  jpa:
+    show-sql: true
+  batch:
+    job:
+      names: ${job.name:EMPTY}
+  main:
+    web-application-type: none
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri:
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      uri:

@@ -1,0 +1,1 @@
+operation::ping[snippets='curl-request,http-request,http-response']

@@ -1,0 +1,25 @@
+package com.wafflestudio.snu4t.router
+
+import com.wafflestudio.snu4t.handler.TimeTableHandler
+import org.springframework.context.annotation.Bean
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.server.RouterFunction
+import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import org.springframework.web.reactive.function.server.coRouter
+
+
+@Component
+class MainRouter(
+        private val timeTableHandler: TimeTableHandler,
+) {
+    @Bean
+    fun route(): RouterFunction<ServerResponse> = coRouter {
+        GET("/ping") { ServerResponse.ok().bodyValueAndAwait("pong") }
+        "/v1".nest {
+            "/timetables".nest {
+                GET("", timeTableHandler::getTimeTables)
+            }
+        }
+    }
+}
