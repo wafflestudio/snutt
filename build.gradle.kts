@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.0.0" apply false
     id("io.spring.dependency-management") version "1.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     kotlin("jvm") version "1.7.21"
     kotlin("plugin.spring") version "1.7.21"
 }
@@ -20,6 +21,7 @@ allprojects {
 subprojects {
     apply {
         plugin("kotlin")
+        plugin("org.jlleitschuh.gradle.ktlint")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("io.spring.dependency-management")
         plugin("kotlin-spring")
@@ -48,7 +50,6 @@ subprojects {
         testImplementation("io.kotest:kotest-runner-junit5:5.5.4")
         testImplementation("io.kotest:kotest-assertions-core:5.5.4")
     }
-
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {

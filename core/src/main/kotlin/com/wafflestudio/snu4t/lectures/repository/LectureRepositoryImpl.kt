@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 
 class LectureRepositoryImpl(
-        private val reactiveMongoTemplate: ReactiveMongoTemplate,
+    private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureRepositoryCustom {
     override suspend fun searchLectures(): Page<Lecture> {
         // TODO: 예시로 그냥 써둔거라 변경해야함

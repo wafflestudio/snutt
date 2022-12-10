@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(private val userRepository: UserRepository) {
-    suspend fun getUserByCredentialHash(credentialHash: String): User = userRepository.getUserByCredentialHash(credentialHash)
-            ?: throw AuthException
+    suspend fun getUserByCredentialHash(credentialHash: String): User =
+        userRepository.getUserByCredentialHash(credentialHash) ?: throw AuthException
 }

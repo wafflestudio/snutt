@@ -14,7 +14,7 @@ class ErrorHandler() {
 
         return when (throwable) {
             is Snu4tException -> ServerResponse.status(HttpStatus.BAD_GATEWAY)
-                    .bodyValueAndAwait(makeErrorBody(throwable))
+                .bodyValueAndAwait(makeErrorBody(throwable))
 
             else -> {
                 logger.error(throwable.message)
@@ -24,11 +24,10 @@ class ErrorHandler() {
     }
 
     private fun makeErrorBody(
-            exception: Snu4tException,
+        exception: Snu4tException,
     ): ErrorBody {
         return ErrorBody(exception.error.errorCode, exception.errorMessage, exception.displayMessage)
     }
-
 }
 
 data class ErrorBody(val errorCode: Long, val message: String, val displayMessage: String)

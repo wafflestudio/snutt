@@ -6,16 +6,16 @@ import java.time.LocalDateTime
 
 @Document("users")
 data class User(
-        @Id
-        var id: String? = null,
-        var active: Boolean,
-        var credential: Credential,
-        var email: String?,
-        var isAdmin: Boolean,
-        var notificationCheckedAt: LocalDateTime,
-        var regDate: LocalDateTime,
-        var fcmKey: String?,
-        var isEmailVerified: Boolean?,
-        var lastLoginTimestamp: Long,
-        var credentialHash: String,
+    @Id
+    var id: String? = null,
+    var active: Boolean,
+    var credential: Credential,
+    var email: String?,
+    var isAdmin: Boolean,
+    var notificationCheckedAt: LocalDateTime,
+    var regDate: LocalDateTime,
+    var fcmKey: String?,
+    var isEmailVerified: Boolean?,
+    var lastLoginTimestamp: Long,
+    var credentialHash: String,
 )

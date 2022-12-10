@@ -8,10 +8,9 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import org.springframework.web.reactive.function.server.coRouter
 
-
 @Component
 class MainRouter(
-        private val timeTableHandler: TimeTableHandler,
+    private val timeTableHandler: TimeTableHandler,
 ) {
     @Bean
     fun route(): RouterFunction<ServerResponse> = coRouter {
