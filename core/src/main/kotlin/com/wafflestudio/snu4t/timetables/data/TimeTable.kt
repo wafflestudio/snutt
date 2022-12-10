@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.LocalDateTime
 
 @Document("timetables")
-class TimeTable(
+data class TimeTable(
         @Id
         var id: String? = null,
         @Field("user_id", targetType = FieldType.OBJECT_ID)

@@ -1,5 +1,6 @@
 plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("org.springframework.boot")
 }
 
 val snippetsDir by extra { file("build/generated-snippets") }
@@ -29,6 +30,7 @@ tasks.asciidoctor {
 }
 
 tasks.bootJar {
+    archiveFileName.set("api.jar")
     dependsOn(tasks.asciidoctor)
     from("src/main/resources/static/docs") {
         into("static/docs")

@@ -3,7 +3,7 @@ package com.wafflestudio.snu4t.lectures.data
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
-class ClassTime(
+data class ClassTime(
         @Id
         var id: String,
         var day: Double,

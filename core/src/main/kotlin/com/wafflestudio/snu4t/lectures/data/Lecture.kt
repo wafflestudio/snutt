@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document("lectures")
-class Lecture(
+data class Lecture(
         @Id
         var id: String? = null,
         @Field("academic_year")

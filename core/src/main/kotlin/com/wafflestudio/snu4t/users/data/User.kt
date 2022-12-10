@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
 @Document("users")
-class User(
+data class User(
         @Id
         var id: String? = null,
         var active: Boolean,

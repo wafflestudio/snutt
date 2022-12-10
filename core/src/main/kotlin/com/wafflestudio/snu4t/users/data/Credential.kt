@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.users.data
 
-class Credential(
+data class Credential(
         var appleEmail: String?,
         var appleSub: String?,
         var appleTransferSub: String?,

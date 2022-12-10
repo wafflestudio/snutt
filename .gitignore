@@ -274,4 +274,9 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### Custom ###
+
+# docs html,css
+src/main/resources/static/docs
+
 # End of https://www.toptal.com/developers/gitignore/api/java,kotlin,intellij,vim,macos,windows,linux,gradle

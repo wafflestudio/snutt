@@ -4,7 +4,7 @@ import com.wafflestudio.snu4t.lectures.data.ClassTime
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
-class TimeTableLecture(
+data class TimeTableLecture(
         @Id
         var id: String? = null,
         @Field("academic_year")
