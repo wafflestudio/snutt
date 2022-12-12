@@ -161,4 +161,41 @@ restPost(router, '/logout')(async function(contedt, req) {
   return {message: "ok"};
 });
 
+restPost(router, '/reset_password')(async function (context, req) {
+  let userId = req.body.user_id
+  if (!userId) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "Local id required")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(403, ErrorCode.WRONG_ID, "wrong id");
+  }
+  
+  if (!user.isEmailVerified) {
+    throw new ApiError(403, ErrorCode.USER_EMAIL_IS_NOT_VERIFIED, "No verified email")
+  }
+
+  await UserService.sendResetPasswordCode(user)
+  
+  return {message: "ok"}
+});
+
+restPost(router, '/verify_password_reset_code')(async function(context, req) {
+  let userId = req.body.user_id
+  let codeSubmitted = req.body.code
+  if (!userId || !codeSubmitted) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID_OR_CODE, "Local id and code are both required")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(403, ErrorCode.WRONG_ID, "wrong id");
+  }
+
+  if (UserService.verifyResetPasswordCode(user, codeSubmitted)) {
+    return {message: "ok"}
+  }
+});
+
 export = router;

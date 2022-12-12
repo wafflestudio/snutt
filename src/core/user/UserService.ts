@@ -1,3 +1,5 @@
+import crypto = require('crypto');
+
 import Timetable from '@app/core/timetable/model/Timetable';
 
 import User from '@app/core/user/model/User';
@@ -152,4 +154,38 @@ export async function add(user: User): Promise<User> {
 
 async function isEmailAlreadyVerifiedByAnotherUser(email: string): Promise<boolean> {
   return (await getVerifiedByEmail(email)) !== null
+}
+
+export async function sendResetPasswordCode(user: User): Promise<void> {
+
+  let passwordResetCode = crypto.randomBytes(6).toString('base64')
+  let updatedUser = await UserRepository.updateTempPasswordResetCode(user, passwordResetCode)
+
+  const emailBody =
+    `<h2>비밀번호 재설정 안내</h2><br/>` +
+    `안녕하세요. SNUTT입니다. <br/> ` +
+    `<b>아래의 인증코드를 진행 중인 화면에 입력하여 비밀번호 재설정을 완료해주세요.</b><br/><br/>` +
+    `<h3>인증코드</h3><h3>${passwordResetCode}</h3><br/><br/>` +
+    `인증코드는 이메일 발송 시점으로부터 5분 동안 유효합니다.`;
+  sendMail(user.email, `[SNUTT] 인증코드 [${passwordResetCode}] 를 입력해주세요`, emailBody);
+
+}
+
+export function verifyResetPasswordCode(user: User, codeSubmitted: string): boolean {
+  let userCode = user.tempPasswordResetCode.code
+  let codeCreationTimestamp = user.tempPasswordResetCode.createdAtTimestamp
+
+  if (!userCode) {
+    throw new ApiError(409, ErrorCode.NO_PASSWORD_RESET_REQUEST, "비밀번호 재설정을 다시 시도해주세요.")
+  }
+  
+  if (userCode != codeSubmitted) {
+    throw new ApiError(401, ErrorCode.WRONG_PASSWORD_RESET_CODE, "잘못된 인증코드입니다.")
+  }
+
+  if (Date.now() - codeCreationTimestamp > 5 * 60 * 1000) {
+    throw new ApiError(401, ErrorCode.EXPIRED_PASSWORD_RESET_CODE, "만료된 인증코드입니다.")
+  }
+
+  return true
 }
