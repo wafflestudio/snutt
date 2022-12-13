@@ -1,6 +1,5 @@
 package com.wafflestudio.snu4t
 
-import com.wafflestudio.snu4t.router.MainRouter
 import io.kotest.core.spec.style.WordSpec
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.restdocs.ManualRestDocumentation
@@ -12,9 +11,9 @@ import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation
 import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest
-class ExampleIntegTest(val mainRouter: MainRouter) : WordSpec({
+class ExampleIntegTest(val app: Snu4tApplication) : WordSpec({
     val restDocumentation = ManualRestDocumentation()
-    val webTestClient = WebTestClient.bindToRouterFunction(mainRouter.route())
+    val webTestClient = WebTestClient.bindToRouterFunction(app.pingpong())
         .configureClient()
         .filter(documentationConfiguration(restDocumentation))
         .build()
