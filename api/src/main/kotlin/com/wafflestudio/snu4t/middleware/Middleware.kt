@@ -12,12 +12,12 @@ abstract class BaseMiddleware(
     val func: suspend (req: ServerRequest, context: RequestContext) -> RequestContext,
 ) : Middleware {
     override fun chain(middleware: Middleware): Middleware =
-        SimpleMiddleware { req: ServerRequest, context: RequestContext -> func(req, middleware.invoke(req, context)) }
+        DefaultMiddleware { req: ServerRequest, context: RequestContext -> func(req, middleware.invoke(req, context)) }
 
     override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext = func(req, context)
 }
 
-class SimpleMiddleware(
+class DefaultMiddleware(
     func: suspend (req: ServerRequest, context: RequestContext) -> RequestContext =
         { _: ServerRequest, context: RequestContext -> context },
 ) : BaseMiddleware(func)
