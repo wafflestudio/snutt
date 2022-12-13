@@ -19,6 +19,6 @@ fun ServerRequest.getContext(): RequestContext {
     return this.attributes().getOrPut(CONTEXT_ATTRIBUTE_KEY) { RequestContext() } as RequestContext
 }
 
-fun ServerRequest.setContext(value : RequestContext) {
+fun ServerRequest.setContext(value: RequestContext) {
     this.attributes()[CONTEXT_ATTRIBUTE_KEY] = value
 }
