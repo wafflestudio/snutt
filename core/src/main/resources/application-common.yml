@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    active: local
+  data:
+    mongodb:
+      uri: mongodb://snutt-mongo-dev.wafflestudio.com:27017/snutt
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri:
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      uri:
