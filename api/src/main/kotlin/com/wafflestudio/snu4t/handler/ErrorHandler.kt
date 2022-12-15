@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.bodyValueAndAwait
 
 @Component
 class ErrorHandler() {
-    private val logger = LoggerFactory.getLogger(ErrorHandler::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
     suspend fun handle(throwable: Throwable): ServerResponse {
 
         return when (throwable) {

@@ -10,7 +10,7 @@ interface UserService {
 }
 
 @Service
-class UserServiceImpl(private val userRepository: UserRepository): UserService {
+class UserServiceImpl(private val userRepository: UserRepository) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
         userRepository.getUserByCredentialHash(credentialHash) ?: throw AuthException
 }
