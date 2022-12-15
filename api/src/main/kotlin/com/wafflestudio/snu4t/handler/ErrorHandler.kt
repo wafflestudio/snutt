@@ -13,7 +13,7 @@ class ErrorHandler() {
     suspend fun handle(throwable: Throwable): ServerResponse {
 
         return when (throwable) {
-            is Snu4tException -> ServerResponse.status(HttpStatus.BAD_GATEWAY)
+            is Snu4tException -> ServerResponse.status(throwable.error.httpStatus)
                 .bodyValueAndAwait(makeErrorBody(throwable))
 
             else -> {
