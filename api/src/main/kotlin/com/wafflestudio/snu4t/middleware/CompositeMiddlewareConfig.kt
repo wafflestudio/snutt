@@ -9,5 +9,5 @@ class CompositeMiddlewareConfig {
     fun snuttRestApiDefaultMiddleware(
         nativeClientInfoMiddleware: NativeClientInfoMiddleware,
         userAuthrizeMiddleware: UserAuthrizeMiddleware,
-    ): Middleware = userAuthrizeMiddleware.chain(nativeClientInfoMiddleware)
+    ): Middleware = userAuthrizeMiddleware chain nativeClientInfoMiddleware
 }

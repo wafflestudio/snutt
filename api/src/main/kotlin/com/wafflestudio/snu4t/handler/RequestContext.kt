@@ -1,18 +1,14 @@
 package com.wafflestudio.snu4t.handler
 
-import com.wafflestudio.snu4t.common.exception.AppType
-import com.wafflestudio.snu4t.common.exception.OsType
+import com.wafflestudio.snu4t.common.client.ClientInfo
 import com.wafflestudio.snu4t.users.data.User
 import org.springframework.web.reactive.function.server.ServerRequest
 
 const val CONTEXT_ATTRIBUTE_KEY = "context"
 
 data class RequestContext(
-    var user: User? = null,
-    var osType: OsType = OsType.UNKNOWN,
-    var osVersion: String? = null,
-    var appType: AppType? = null,
-    var appVersion: String? = null,
+    val user: User? = null,
+    val clientInfo: ClientInfo? = null,
 )
 
 fun ServerRequest.getContext(): RequestContext {

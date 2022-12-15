@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.exception
+package com.wafflestudio.snu4t.common.client
 
 enum class AppType {
     RELEASE,
