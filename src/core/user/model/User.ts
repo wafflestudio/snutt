@@ -1,5 +1,4 @@
 import UserCredential from '@app/core/user/model/UserCredential';
-import TempPasswordResetCode from './TempPasswordResetCode';
 
 export default interface User {
   _id?: string;
@@ -13,5 +12,4 @@ export default interface User {
   fcmKey?: string;
   active?: boolean;
   lastLoginTimestamp?: number;
-  tempPasswordResetCode?: TempPasswordResetCode;
 }

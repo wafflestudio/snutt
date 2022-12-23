@@ -193,7 +193,9 @@ restPost(router, '/verify_password_reset_code')(async function(context, req) {
     throw new ApiError(403, ErrorCode.WRONG_ID, "wrong id");
   }
 
-  if (UserService.verifyResetPasswordCode(user, codeSubmitted)) {
+  let codeVerified = await UserService.verifyResetPasswordCode(user, codeSubmitted)
+
+  if (codeVerified) {
     return {message: "ok"}
   }
 });

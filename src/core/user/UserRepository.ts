@@ -2,7 +2,6 @@ import mongoose = require('mongoose');
 import winston = require('winston');
 
 import User from '@app/core/user/model/User';
-import TempPasswordResetCode from './model/TempPasswordResetCode';
 
 var logger = winston.loggers.get('default');
 
@@ -29,12 +28,6 @@ let UserSchema = new mongoose.Schema({
   email: String,
   isEmailVerified: Boolean,
   fcmKey: String,                                   // Firebase Message Key
-
-  // 비밀번호 까먹었을 시 사용
-  tempPasswordResetCode: {
-    code: {type: String, default: null},
-    createdAtTimestamp: {type: Number, default: null}
-  },
 
   // if the user remove its account, active status becomes false
   // Should not remove user object, because we must preserve the user data and its related objects
@@ -65,7 +58,6 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
     fcmKey: wrapper.fcmKey,
     active: wrapper.active,
     lastLoginTimestamp: wrapper.lastLoginTimestamp,
-    tempPasswordResetCode: wrapper.tempPasswordResetCode
   }
 }
 export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
