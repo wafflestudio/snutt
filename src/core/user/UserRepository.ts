@@ -65,6 +65,11 @@ export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
   return fromMongoose(mongooseDocument);
 }
 
+export async function findActiveByEmail(email: string) : Promise<User> {
+const mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true }).exec();
+  return fromMongoose(mongooseDocument);
+}
+
 export async function findActiveByFb(fbId: string) : Promise<User> {
   const mongooseDocument = await MongooseUserModel.findOne({'credential.fbId' : fbId, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
@@ -131,10 +136,4 @@ export function updateLastLoginTimestamp(user: User): void {
       logger.error(err);
     });
   user.lastLoginTimestamp = timestamp;
-}
-
-export async function updateTempPasswordResetCode(user: User, passwordResetCode: string): Promise<User> {
-  let createdAt = Date.now()
-  let mongooseDocument = await MongooseUserModel.findOneAndUpdate({'_id': user._id}, { $set: { 'tempPasswordResetCode.code': passwordResetCode, 'tempPasswordResetCode.createdAtTimestamp': createdAt} }, { new: true })
-  return fromMongoose(mongooseDocument);
 }

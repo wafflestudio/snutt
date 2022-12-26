@@ -26,6 +26,7 @@ enum ErrorCode {
   NO_LOCAL_ID = 0x1015,
   NO_PASSWORD_RESET_CODE = 0x1016,
   NO_LOCAL_ID_OR_CODE = 0x1017,
+  NO_EMAIL = 0x1018,
   
   /* 401, 403 - Authorization-related */
   WRONG_API_KEY = 0x2000,

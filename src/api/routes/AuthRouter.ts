@@ -200,4 +200,25 @@ restPost(router, '/verify_password_reset_code')(async function(context, req) {
   }
 });
 
+restPost(router, '/find_id')(async function(context, req) {
+  
+  const email = req.body.email
+
+  if (!email) {
+    throw new ApiError(400, ErrorCode.NO_EMAIL, "이메일을 입력해주세요.")
+  }
+
+  if (!UserService.checkValidEmail(email)) {
+    throw new ApiError(400, ErrorCode.INVALID_EMAIL, "올바른 이메일을 입력해주세요.")
+  }
+
+  const user = await UserService.getByEmail(email)
+
+  if (!user || !user.email || !user.credential.localId ) {
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 가입된 사용자가 없습니다.");
+  }
+
+  return { user_id : user.credential.localId }
+});
+
 export = router;

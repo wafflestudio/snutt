@@ -18,6 +18,11 @@ export function getVerifiedByEmail(email: string): Promise<User> {
   return UserRepository.findActiveByVerifiedEmail(email);
 }
 
+export function getByEmail(email: string): Promise<User> {
+  return UserRepository.findActiveByEmail(email)
+}
+
+
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
 }
@@ -199,4 +204,9 @@ export async function verifyResetPasswordCode(user: User, codeSubmitted: string)
   } 
 
   return true
+}
+
+export function checkValidEmail(email: string): boolean {
+  const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+  return email.match(regExp) != null
 }
