@@ -218,7 +218,9 @@ restPost(router, '/find_id')(async function(context, req) {
     throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 가입된 사용자가 없습니다.");
   }
 
-  return { user_id : user.credential.localId }
+  UserService.sendLocalId(user)
+  
+  return { message : "ok" }
 });
 
 export = router;

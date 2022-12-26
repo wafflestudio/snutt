@@ -210,3 +210,14 @@ export function checkValidEmail(email: string): boolean {
   const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
   return email.match(regExp) != null
 }
+
+export async function sendLocalId(user: User): Promise<void> {
+
+  const emailBody =
+    `<h2>아이디 찾기 안내</h2><br/>` +
+    `안녕하세요. SNUTT입니다. <br/> ` +
+    `<b>${user.email}로 가입된 아이디는 다음과 같습니다.</b><br/><br/>` +
+    `<h3>아이디</h3><h3>${user.credential.localId}</h3><br/><br/>`;
+
+  sendMail(user.email, `[SNUTT] 아이디를 찾았습니다`, emailBody);
+}
