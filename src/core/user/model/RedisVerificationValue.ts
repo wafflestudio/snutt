@@ -1,5 +1,6 @@
 export default interface RedisVerificationValue {
   email: string,
   code: string,
-  count: number
+  count: number, 
+  createdAtTimestamp: number
 }

@@ -164,21 +164,21 @@ restPost(router, '/logout')(async function(contedt, req) {
 restPost(router, '/reset_password')(async function (context, req) {
   let userId = req.body.user_id
   if (!userId) {
-    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "Local id required")
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
   }
 
   let user = await UserService.getByLocalId(req.body.user_id);
   if (!user) {
-    throw new ApiError(403, ErrorCode.WRONG_ID, "wrong id");
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 아이디로 가입된 사용자가 없습니다.");
   }
-  
-  if (!user.isEmailVerified) {
-    throw new ApiError(403, ErrorCode.USER_EMAIL_IS_NOT_VERIFIED, "No verified email")
+
+  if (!user.email) {
+    throw new ApiError(404, ErrorCode.EMAIL_NOT_FOUND, "등록된 이메일이 없습니다.")
   }
 
   await UserService.sendResetPasswordCode(user)
   
-  return {message: "ok"}
+  return { email : user.email }
 });
 
 restPost(router, '/verify_password_reset_code')(async function(context, req) {

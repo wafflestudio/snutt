@@ -98,7 +98,8 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
   const value: RedisVerificationValue = {
     email: email,
     code: code,
-    count: existing && existing.count ? existing.count + 1 : 1
+    count: existing && existing.count ? existing.count + 1 : 1,
+    createdAtTimestamp: Date.now()
   }
   const emailBody =
     `<h2>인증번호 안내</h2><br/>` +
@@ -174,7 +175,8 @@ export async function sendResetPasswordCode(user: User): Promise<void> {
   const value: RedisVerificationValue = {
     email: user.email,
     code: code,
-    count: existing && existing.count ? existing.count + 1 : 1
+    count: existing && existing.count ? existing.count + 1 : 1, 
+    createdAtTimestamp: Date.now()
   }
 
   const emailBody =
@@ -186,17 +188,20 @@ export async function sendResetPasswordCode(user: User): Promise<void> {
 
   sendMail(user.email, `[SNUTT] 인증코드 [${code}] 를 입력해주세요`, emailBody);
 
-  await RedisUtil.setex(key, 300, JSON.stringify(value))
+  await RedisUtil.setex(key, 60 * 60, JSON.stringify(value))
 }
 
 export async function verifyResetPasswordCode(user: User, codeSubmitted: string): Promise<boolean> {
   
   const key = `reset-password-code-${user._id}`
   const verificationValue: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
- 
 
   if (!verificationValue) {
     throw new ApiError(409, ErrorCode.NO_PASSWORD_RESET_REQUEST, "비밀번호 재설정을 다시 시도해주세요.")
+  }
+
+  if (Date.now() - verificationValue.createdAtTimestamp > 60 * 5 * 1000) {
+    throw new ApiError(401, ErrorCode.EXPIRED_PASSWORD_RESET_CODE, "만료된 인증코드입니다.")
   }
 
   if (!verifyCode(verificationValue, codeSubmitted)) {
