@@ -11,7 +11,7 @@ import winston = require('winston');
 import InvalidLocalPasswordError from '@app/core/user/error/InvalidLocalPasswordError';
 import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import InvalidFbIdOrTokenError from '@app/core/facebook/error/InvalidFbIdOrTokenError';
-import { restPost } from '../decorator/RestDecorator';
+import { restPost, restPut } from '../decorator/RestDecorator';
 import ApiError from '../error/ApiError';
 import ErrorCode from '../enum/ErrorCode';
 import InvalidAppleTokenError from "@app/core/apple/error/InvalidAppleTokenError";
@@ -162,7 +162,7 @@ restPost(router, '/logout')(async function(contedt, req) {
 });
 
 
-restPost(router, '/password/reset/check_email')(async function (context, req) {
+restPost(router, '/password/reset/email/check')(async function (context, req) {
   let userId = req.body.user_id
   if (!userId) {
     throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
@@ -180,7 +180,7 @@ restPost(router, '/password/reset/check_email')(async function (context, req) {
   return { email : user.email }
 });
 
-restPost(router, '/password/reset/find_email')(async function(context, req) {
+restPost(router, '/password/reset/email/send')(async function(context, req) {
   let email = req.body.user_email
 
   if (!email) {
@@ -200,7 +200,7 @@ restPost(router, '/password/reset/find_email')(async function(context, req) {
   }
 });
 
-restPost(router, '/password/reset/verify')(async function(context, req) {
+restPost(router, '/password/reset/verification')(async function(context, req) {
   let userId = req.body.user_id
   let codeSubmitted = req.body.code
   if (!userId || !codeSubmitted) {
@@ -219,7 +219,7 @@ restPost(router, '/password/reset/verify')(async function(context, req) {
   }
 });
 
-restPost(router, '/find_id')(async function(context, req) {
+restPost(router, '/id/find')(async function(context, req) {
   
   const email = req.body.email
 
