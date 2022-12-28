@@ -17,6 +17,6 @@ class TimeTableHandler(
     suspend fun getTimeTables(req: ServerRequest): ServerResponse = handle(req) {
         val context = req.getContext()
         val user = context.user ?: throw AuthException
-        timeTableService.getTimeTablesOfUser(user).toResponse()
+        timeTableService.getTimeTablesOfUser(user)
     }
 }
