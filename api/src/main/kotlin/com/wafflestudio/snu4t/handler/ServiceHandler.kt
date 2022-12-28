@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.middleware.Middleware
 import com.wafflestudio.snu4t.middleware.NoOpMiddleWare
+import com.wafflestudio.snu4t.middleware.plus
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -16,7 +17,7 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = NoOpMiddleWare
         additionalMiddleware: Middleware = NoOpMiddleWare,
         function: suspend () -> ServerResponse,
     ): ServerResponse {
-        req.setContext(handlerMiddleware.chain(additionalMiddleware).invoke(req, req.getContext()))
+        req.setContext((handlerMiddleware + additionalMiddleware).invoke(req, req.getContext()))
         return try {
             function()
         } catch (e: RuntimeException) {

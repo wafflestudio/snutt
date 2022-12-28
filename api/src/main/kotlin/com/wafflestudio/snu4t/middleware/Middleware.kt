@@ -3,22 +3,13 @@ package com.wafflestudio.snu4t.middleware
 import com.wafflestudio.snu4t.handler.RequestContext
 import org.springframework.web.reactive.function.server.ServerRequest
 
-interface Middleware {
-    infix fun chain(middleware: Middleware): Middleware
+fun interface Middleware {
     suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext
 }
 
-abstract class BaseMiddleware(
-    val func: suspend (req: ServerRequest, context: RequestContext) -> RequestContext,
-) : Middleware {
-    override infix fun chain(middleware: Middleware): Middleware =
-        DefaultMiddleware { req, context -> func(req, middleware.invoke(req, context)) }
+operator fun Middleware.plus(other: Middleware): Middleware =
+    Middleware { req, context -> this.invoke(req, context).let { other.invoke(req, it) } }
 
-    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext = func(req, context)
+object NoOpMiddleWare : Middleware {
+    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext = context
 }
-
-class DefaultMiddleware(
-    func: suspend (req: ServerRequest, context: RequestContext) -> RequestContext,
-) : BaseMiddleware(func)
-
-object NoOpMiddleWare : BaseMiddleware({ _, context -> context })

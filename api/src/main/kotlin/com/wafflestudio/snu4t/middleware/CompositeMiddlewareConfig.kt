@@ -8,6 +8,6 @@ class CompositeMiddlewareConfig {
     @Bean("snuttRestApiDefaultMiddleware")
     fun snuttRestApiDefaultMiddleware(
         nativeClientInfoMiddleware: NativeClientInfoMiddleware,
-        userAuthrizeMiddleware: UserAuthrizeMiddleware,
-    ): Middleware = userAuthrizeMiddleware chain nativeClientInfoMiddleware
+        userAuthorizeMiddleware: UserAuthorizeMiddleware,
+    ): Middleware = userAuthorizeMiddleware + nativeClientInfoMiddleware
 }
