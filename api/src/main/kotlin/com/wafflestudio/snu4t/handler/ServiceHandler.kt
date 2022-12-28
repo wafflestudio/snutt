@@ -7,25 +7,26 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.buildAndAwait
 
 abstract class ServiceHandler(val handlerMiddleware: Middleware = NoOpMiddleWare) {
     @Autowired
     lateinit var errorHandler: ErrorHandler
 
-    protected suspend fun handle(
+    protected suspend fun <T : Any> handle(
         req: ServerRequest,
         additionalMiddleware: Middleware = NoOpMiddleWare,
-        function: suspend () -> ServerResponse,
+        function: suspend () -> T?,
     ): ServerResponse {
         req.setContext((handlerMiddleware + additionalMiddleware).invoke(req, req.getContext()))
         return try {
-            function()
+            function()?.toResponse() ?: ServerResponse.ok().buildAndAwait()
         } catch (e: RuntimeException) {
             errorHandler.handle(e)
         }
     }
 
-    protected suspend fun <T : Any> T.toResponse(): ServerResponse {
+    private suspend fun <T : Any> T.toResponse(): ServerResponse {
         return ServerResponse.ok().bodyValue(this).awaitSingle()
     }
 }
