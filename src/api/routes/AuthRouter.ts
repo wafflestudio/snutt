@@ -219,6 +219,31 @@ restPost(router, '/password/reset/verification')(async function(context, req) {
   }
 });
 
+router.post('/password/reset', async function (req, context) {
+ 
+  let userId = req.body.user_id
+let passwordSubmitted = req.body.password
+
+  if (!userId) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
+  }
+
+  if (!passwordSubmitted) {
+    throw new ApiError(400, ErrorCode.NO_PASSWORD, "비밀번호를 입력해주세요.")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(403, ErrorCode.WRONG_ID, "존재하지않는 사용자입니다.");
+  }
+
+  await UserCredentialService.changeLocalPassword(user, passwordSubmitted);
+
+  return {
+    message: "ok"
+  }
+});
+
 restPost(router, '/id/find')(async function(context, req) {
   
   const email = req.body.email
