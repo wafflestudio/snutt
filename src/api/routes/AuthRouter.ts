@@ -222,7 +222,7 @@ restPost(router, '/password/reset/verification')(async function(context, req) {
 router.post('/password/reset', async function (req, context) {
  
   let userId = req.body.user_id
-let passwordSubmitted = req.body.password
+  let passwordSubmitted = req.body.password
 
   if (!userId) {
     throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
