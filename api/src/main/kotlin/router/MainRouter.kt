@@ -15,7 +15,7 @@ class MainRouter(
     @Bean
     fun route(): RouterFunction<ServerResponse> = coRouter {
         GET("/ping") { ServerResponse.ok().bodyValueAndAwait("pong") }
-        "/tables".nest {
+        "/v1/tables".nest {
             GET("", timeTableHandler::getBriefs)
         }
     }
