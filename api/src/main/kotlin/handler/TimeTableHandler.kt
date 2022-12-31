@@ -14,9 +14,9 @@ class TimeTableHandler(
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
 ) {
-    suspend fun getTimeTables(req: ServerRequest): ServerResponse = handle(req) {
-        val context = req.getContext()
-        val user = context.user ?: throw AuthException
-        timeTableService.getTimeTablesOfUser(user)
+    suspend fun getBriefs(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.getContext().user?.id ?: throw AuthException
+
+        timeTableService.getBriefs(userId = userId)
     }
 }
