@@ -18,6 +18,7 @@ let UserSchema = new mongoose.Schema({
     // 위 항목이 없어도 unique credentialHash을 생성할 수 있도록
     tempDate: {type: Date, default: null},          // 임시 가입 날짜
     tempSeed: {type: Number, default: null}         // 랜덤 seed
+
   },
   credentialHash : {type: String, default: null},   // credential이 변경될 때 마다 SHA 해싱 (model/user.ts 참조)
   isAdmin: {type: Boolean, default: false},         // admin 항목 접근 권한
@@ -56,11 +57,16 @@ function fromMongoose(mongooseDocument: mongoose.MongooseDocument): User {
     isEmailVerified: wrapper.isEmailVerified,
     fcmKey: wrapper.fcmKey,
     active: wrapper.active,
-    lastLoginTimestamp: wrapper.lastLoginTimestamp
+    lastLoginTimestamp: wrapper.lastLoginTimestamp,
   }
 }
 export async function findActiveByVerifiedEmail(email: string) : Promise<User> {
   const mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true , 'isEmailVerified': true}).exec();
+  return fromMongoose(mongooseDocument);
+}
+
+export async function findActiveByEmail(email: string) : Promise<User> {
+const mongooseDocument = await MongooseUserModel.findOne({'email' : email, 'active' : true }).exec();
   return fromMongoose(mongooseDocument);
 }
 

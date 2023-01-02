@@ -1,3 +1,5 @@
+import crypto = require('crypto');
+
 import Timetable from '@app/core/timetable/model/Timetable';
 
 import User from '@app/core/user/model/User';
@@ -15,6 +17,11 @@ import CourseBookService = require('@app/core/coursebook/CourseBookService');
 export function getVerifiedByEmail(email: string): Promise<User> {
   return UserRepository.findActiveByVerifiedEmail(email);
 }
+
+export function getByEmail(email: string): Promise<User> {
+  return UserRepository.findActiveByEmail(email)
+}
+
 
 export function getByMongooseId(mongooseId: string): Promise<User> {
   return UserRepository.findActiveByMongooseId(mongooseId);
@@ -91,7 +98,8 @@ export async function sendVerificationCode(user: User, email: string): Promise<v
   const value: RedisVerificationValue = {
     email: email,
     code: code,
-    count: existing && existing.count ? existing.count + 1 : 1
+    count: existing && existing.count ? existing.count + 1 : 1,
+    createdAtTimestamp: Date.now()
   }
   const emailBody =
     `<h2>인증번호 안내</h2><br/>` +
@@ -152,4 +160,69 @@ export async function add(user: User): Promise<User> {
 
 async function isEmailAlreadyVerifiedByAnotherUser(email: string): Promise<boolean> {
   return (await getVerifiedByEmail(email)) !== null
+}
+
+export async function sendResetPasswordCode(user: User): Promise<void> {
+
+  const key = `reset-password-code-${user._id}`
+  const existing: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
+  const code = crypto.randomBytes(6).toString('base64')
+
+  if (existing && existing.count && existing.count > 4) {
+    throw new ApiError(429, ErrorCode.TOO_MANY_VERIFICATION_REQUEST, "너무 요청이 많습니다. 나중에 다시 시도해주세요")
+  }
+
+  const value: RedisVerificationValue = {
+    email: user.email,
+    code: code,
+    count: existing && existing.count ? existing.count + 1 : 1, 
+    createdAtTimestamp: Date.now()
+  }
+
+  const emailBody =
+    `<h2>비밀번호 재설정 안내</h2><br/>` +
+    `안녕하세요. SNUTT입니다. <br/> ` +
+    `<b>아래의 인증코드를 진행 중인 화면에 입력하여 비밀번호 재설정을 완료해주세요.</b><br/><br/>` +
+    `<h3>인증코드</h3><h3>${code}</h3><br/><br/>` +
+    `인증코드는 이메일 발송 시점으로부터 3분 동안 유효합니다.`;
+
+  sendMail(user.email, `[SNUTT] 인증코드 [${code}] 를 입력해주세요`, emailBody);
+
+  await RedisUtil.setex(key, 60 * 60, JSON.stringify(value))
+}
+
+export async function verifyResetPasswordCode(user: User, codeSubmitted: string): Promise<boolean> {
+  
+  const key = `reset-password-code-${user._id}`
+  const verificationValue: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
+
+  if (!verificationValue) {
+    throw new ApiError(409, ErrorCode.RESET_PASSWORD_NO_REQUEST, "비밀번호 재설정을 다시 시도해주세요.")
+  }
+
+  if (Date.now() - verificationValue.createdAtTimestamp > 60 * 3 * 1000) {
+    throw new ApiError(401, ErrorCode.RESET_PASSWORD_CODE_EXPIRED, "만료된 인증코드입니다.")
+  }
+
+  if (!verifyCode(verificationValue, codeSubmitted)) {
+    throw new ApiError(401, ErrorCode.RESET_PASSWORD_WRONG_CODE, "잘못된 인증코드입니다.")
+  } 
+
+  return true
+}
+
+export function checkValidEmail(email: string): boolean {
+  const regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+  return email.match(regExp) != null
+}
+
+export async function sendLocalId(user: User): Promise<void> {
+
+  const emailBody =
+    `<h2>아이디 찾기 안내</h2><br/>` +
+    `안녕하세요. SNUTT입니다. <br/> ` +
+    `<b>${user.email}로 가입된 아이디는 다음과 같습니다.</b><br/><br/>` +
+    `<h3>아이디</h3><h3>${user.credential.localId}</h3><br/><br/>`;
+
+  sendMail(user.email, `[SNUTT] 아이디를 찾았습니다`, emailBody);
 }
