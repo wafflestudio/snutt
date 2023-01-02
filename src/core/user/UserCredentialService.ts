@@ -61,6 +61,7 @@ function makePasswordHash(password: string): Promise<string> {
 }
 
 export async function changeLocalPassword(user: User, password: string): Promise<void> {
+    
     validatePassword(password);
     let passwordHash = await makePasswordHash(password);
     user.credential.localPw = passwordHash;

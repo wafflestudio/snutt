@@ -219,7 +219,7 @@ restPost(router, '/password/reset/verification/code')(async function(context, re
   }
 });
 
-router.post('/password/reset', async function (req, context) {
+restPost(router, '/password/reset')(async function(context, req) {
  
   let userId = req.body.user_id
   let passwordSubmitted = req.body.password
@@ -237,11 +237,17 @@ router.post('/password/reset', async function (req, context) {
     throw new ApiError(403, ErrorCode.WRONG_ID, "존재하지않는 사용자입니다.");
   }
 
-  await UserCredentialService.changeLocalPassword(user, passwordSubmitted);
-
-  return {
-    message: "ok"
+  try {
+    await UserCredentialService.changeLocalPassword(user, passwordSubmitted);
+  } catch (err) {
+    if (err instanceof InvalidLocalPasswordError) {
+      throw new ApiError(403, ErrorCode.INVALID_PASSWORD, "올바른 비밀번호를 입력해주세요.");
+    } else {
+      throw err;
+    } 
   }
+
+  return { message : "ok" }
 });
 
 restPost(router, '/id/find')(async function(context, req) {
