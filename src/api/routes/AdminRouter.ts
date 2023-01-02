@@ -98,7 +98,6 @@ restPost(router, '/change_pw')(async function (context, req) {
       throw new ApiError(403, ErrorCode.NOT_LOCAL_ACCOUNT, "not local account");
     }
     UserCredentialService.changeLocalPassword(user, toPassword);
-    
     return {
       message: "ok"
     }
