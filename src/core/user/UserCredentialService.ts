@@ -52,12 +52,8 @@ async function modifyCredential(user: User): Promise<void> {
 
 function validatePassword(password: string): void {
     if (!password || !password.match(/^(?=.*\d)(?=.*[a-z])\S{6,20}$/i)) {
-        console.log("INVALID ")
         throw new InvalidLocalPasswordError(password);
     }
-
-    console.log("VALID")
-    
 }
 
 function makePasswordHash(password: string): Promise<string> {
