@@ -11,7 +11,7 @@ import winston = require('winston');
 import InvalidLocalPasswordError from '@app/core/user/error/InvalidLocalPasswordError';
 import DuplicateLocalIdError from '@app/core/user/error/DuplicateLocalIdError';
 import InvalidFbIdOrTokenError from '@app/core/facebook/error/InvalidFbIdOrTokenError';
-import { restPost } from '../decorator/RestDecorator';
+import { restPost, restPut } from '../decorator/RestDecorator';
 import ApiError from '../error/ApiError';
 import ErrorCode from '../enum/ErrorCode';
 import InvalidAppleTokenError from "@app/core/apple/error/InvalidAppleTokenError";
@@ -159,6 +159,112 @@ restPost(router, '/logout')(async function(contedt, req) {
   }
   await UserDeviceService.detachDevice(user, registrationId);
   return {message: "ok"};
+});
+
+
+restPost(router, '/password/reset/email/check')(async function (context, req) {
+  let userId = req.body.user_id
+  if (!userId) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 아이디로 가입된 사용자가 없습니다.");
+  }
+
+  if (!user.email) {
+    throw new ApiError(404, ErrorCode.EMAIL_NOT_FOUND, "등록된 이메일이 없습니다.")
+  }
+
+  return { email : user.email }
+});
+
+restPost(router, '/password/reset/email/send')(async function(context, req) {
+  let email = req.body.user_email
+
+  if (!email) {
+    throw new ApiError(400, ErrorCode.NO_EMAIL, "이메일을 입력해주세요.")
+  }
+
+  let user = await UserService.getByEmail(email)
+
+  if (!user) {
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 가입된 사용자가 없습니다.");
+  }
+
+  await UserService.sendResetPasswordCode(user)
+
+  return {
+    message: "ok"
+  }
+});
+
+restPost(router, '/password/reset/verification/code')(async function(context, req) {
+  let userId = req.body.user_id
+  let codeSubmitted = req.body.code
+  if (!userId || !codeSubmitted) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID_OR_CODE, "아이디와 인증코드를 모두 입력해주세요.")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(403, ErrorCode.WRONG_ID, "존재하지않는 사용자입니다.");
+  }
+
+  let codeVerified = await UserService.verifyResetPasswordCode(user, codeSubmitted)
+
+  if (codeVerified) {
+    return {message: "ok"}
+  }
+});
+
+router.post('/password/reset', async function (req, context) {
+ 
+  let userId = req.body.user_id
+  let passwordSubmitted = req.body.password
+
+  if (!userId) {
+    throw new ApiError(400, ErrorCode.NO_LOCAL_ID, "아이디를 입력해주세요.")
+  }
+
+  if (!passwordSubmitted) {
+    throw new ApiError(400, ErrorCode.NO_PASSWORD, "비밀번호를 입력해주세요.")
+  }
+
+  let user = await UserService.getByLocalId(req.body.user_id);
+  if (!user) {
+    throw new ApiError(403, ErrorCode.WRONG_ID, "존재하지않는 사용자입니다.");
+  }
+
+  await UserCredentialService.changeLocalPassword(user, passwordSubmitted);
+
+  return {
+    message: "ok"
+  }
+});
+
+restPost(router, '/id/find')(async function(context, req) {
+  
+  const email = req.body.email
+
+  if (!email) {
+    throw new ApiError(400, ErrorCode.NO_EMAIL, "이메일을 입력해주세요.")
+  }
+
+  if (!UserService.checkValidEmail(email)) {
+    throw new ApiError(400, ErrorCode.INVALID_EMAIL, "올바른 이메일을 입력해주세요.")
+  }
+
+  const user = await UserService.getByEmail(email)
+
+  if (!user || !user.email || !user.credential.localId ) {
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 가입된 사용자가 없습니다.");
+  }
+
+  UserService.sendLocalId(user)
+  
+  return { message : "ok" }
 });
 
 export = router;
