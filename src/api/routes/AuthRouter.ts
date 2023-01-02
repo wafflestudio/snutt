@@ -242,7 +242,7 @@ restPost(router, '/password/reset')(async function(context, req) {
   } catch (err) {
     if (err instanceof InvalidLocalPasswordError) {
       throw new ApiError(403, ErrorCode.INVALID_PASSWORD, "올바른 비밀번호를 입력해주세요.");
-    } else if (err instanceof ApiError) {
+    } else {
       throw err;
     } 
   }
