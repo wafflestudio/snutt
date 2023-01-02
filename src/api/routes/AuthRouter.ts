@@ -200,7 +200,7 @@ restPost(router, '/password/reset/email/send')(async function(context, req) {
   }
 });
 
-restPost(router, '/password/reset/verification')(async function(context, req) {
+restPost(router, '/password/reset/verification/code')(async function(context, req) {
   let userId = req.body.user_id
   let codeSubmitted = req.body.code
   if (!userId || !codeSubmitted) {
