@@ -39,12 +39,8 @@ export default async function (req, res) {
   }
 
   if (appVersion != undefined) {
-    if (osType === 'android') {
-      if (!appVersion.split('-')[0].match(versionRegex)) {
-        throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
-      }
-    }
-    if (!appVersion.match(versionRegex)) {
+    let versionWithoutPostfix = (osType === 'android') ? appVersion.split('-')[0] : appVersion
+    if (!versionWithoutPostfix.match(versionRegex)) {
       throw new ApiError(400, ErrorCode.INVALID_APP_VERSION, `Invalid app version: ${appVersion}`);
     }
     context.appVersion = appVersion;
