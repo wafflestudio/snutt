@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Document("timetables")
 data class TimeTable(
@@ -20,5 +20,5 @@ data class TimeTable(
     var title: String,
     var theme: Int,
     @Field("updated_at")
-    var updatedAt: LocalDateTime,
+    var updatedAt: Instant,
 )

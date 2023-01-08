@@ -17,14 +17,14 @@ class TimeTableMigrations @Autowired constructor(
     @Test
     fun tables(): Unit = runBlocking {
         val expect = legacy.get()
-            .uri("/tables")
+            .uri("/v1/tables")
             .retrieve()
             .awaitBody<String>()
 
         println(expect)
 
         timetable.get()
-            .uri("/tables")
+            .uri("/v1/tables")
             .exchange()
             .expectStatus().isOk
             .expectBody()
