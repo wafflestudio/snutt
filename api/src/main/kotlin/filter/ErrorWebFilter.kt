@@ -56,27 +56,6 @@ class ErrorWebFilter(
                 )
             }
     }
-
-    suspend fun handle(throwable: Throwable): ServerResponse {
-
-        return when (throwable) {
-            is Snu4tException -> ServerResponse.status(throwable.error.httpStatus)
-                .bodyValueAndAwait(makeErrorBody(throwable))
-            is ResponseStatusException -> ServerResponse.status(throwable.statusCode)
-                .bodyValueAndAwait(
-                    makeErrorBody(
-                        Snu4tException(errorMessage = throwable.reason ?: ErrorType.DEFAULT_ERROR.errorMessage)
-                    )
-                )
-            else -> {
-                logger.error(throwable.message)
-                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValueAndAwait(
-                    makeErrorBody(Snu4tException())
-                )
-            }
-        }
-    }
-
     private fun makeErrorBody(
         exception: Snu4tException,
     ): ErrorBody {
