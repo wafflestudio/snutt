@@ -11,5 +11,5 @@ dependencies {
 }
 
 tasks.bootJar {
-    archiveFileName.set("batch.jar")
+    archiveFileName.set("snu4t-batch.jar")
 }

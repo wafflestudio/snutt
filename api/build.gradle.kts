@@ -35,7 +35,7 @@ tasks.asciidoctor {
 }
 
 tasks.bootJar {
-    archiveFileName.set("api.jar")
+    archiveFileName.set("snu4t-api.jar")
     dependsOn(tasks.asciidoctor)
     from("src/main/resources/static/docs") {
         into("static/docs")
