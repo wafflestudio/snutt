@@ -21,18 +21,17 @@ class ApiKeyMiddleware(
         "test" to "0",
     )
 
-    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext {
-        try {
+    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext =
+        runCatching {
             val apiKey = requireNotNull(req.headers().firstHeader("x-access-apikey"))
             val claims = jwtParser.parseClaimsJws(apiKey).body
 
             val string = claims["string"]!!.toString()
             val keyVersion = claims["key_version"]!!.toString()
             require(stringToKeyVersionMap[string] == keyVersion)
-        } catch (e: Exception) {
+
+            return@runCatching context
+        }.getOrElse {
             throw WrongApiKeyException
         }
-
-        return context
-    }
 }

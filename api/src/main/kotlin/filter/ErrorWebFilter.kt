@@ -54,6 +54,7 @@ class ErrorWebFilter(
                 )
             }
     }
+
     private fun makeErrorBody(
         exception: Snu4tException,
     ): ErrorBody {
@@ -61,7 +62,7 @@ class ErrorWebFilter(
     }
 }
 
-data class ErrorBody(
+private data class ErrorBody(
     val errcode: Long,
     val message: String,
     val displayMessage: String,
