@@ -31,3 +31,5 @@ spring:
   data:
     mongodb:
       uri:
+
+secret-names: prod/snutt-timetable
