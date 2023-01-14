@@ -1,5 +1,7 @@
 package com.wafflestudio.snu4t.bookmark.dto
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.bookmark.data.Bookmark
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -16,6 +18,7 @@ fun BookmarkResponse(bookmark: Bookmark): BookmarkResponse = BookmarkResponse(
     lectures = bookmark.lectures.map { BookmarkLectureResponse(it) },
 )
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 class BookmarkLectureResponse(
     val id: String? = null,
     val academicYear: String?,
@@ -31,8 +34,6 @@ class BookmarkLectureResponse(
     val lectureNumber: String?,
     val quota: Int?,
     val remark: String?,
-    val semester: Int,
-    val year: Int,
     val courseNumber: String?,
     val courseTitle: String?,
 )
@@ -52,8 +53,6 @@ fun BookmarkLectureResponse(lecture: Lecture): BookmarkLectureResponse = Bookmar
     lectureNumber = lecture.lectureNumber,
     quota = lecture.quota,
     remark = lecture.remark,
-    semester = lecture.semester.value,
-    year = lecture.year,
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
 )

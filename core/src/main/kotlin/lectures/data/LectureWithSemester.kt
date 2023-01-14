@@ -1,11 +1,12 @@
-package com.wafflestudio.snu4t.timetables.data
+package com.wafflestudio.snu4t.lectures.data
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.data.ClassTime
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-data class TimeTableLecture(
+@Document("lectures")
+data class LectureWithSemester(
     @Id
     var id: String? = null,
     @Field("academic_year")
@@ -28,11 +29,9 @@ data class TimeTableLecture(
     var quota: Int?,
     var remark: String?,
     var semester: Semester,
-    var year: Int?,
+    var year: Int,
     @Field("course_number")
     var courseNumber: String?,
     @Field("course_title")
     var courseTitle: String?,
-    var color: ColorSet?,
-    var colorIndex: Int?,
 )

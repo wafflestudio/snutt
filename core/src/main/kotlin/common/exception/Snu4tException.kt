@@ -13,3 +13,14 @@ object InvalidLocalIdException : Snu4tException(ErrorType.INVALID_LOCAL_ID)
 object InvalidPasswordException : Snu4tException(ErrorType.INVALID_PASSWORD)
 object InvalidEmailException : Snu4tException(ErrorType.INVALID_EMAIL)
 object DuplicateLocalIdException : Snu4tException(ErrorType.DUPLICATE_LOCAL_ID)
+
+object LectureNotFoundException : Snu4tException(ErrorType.LECTURE_NOT_FOUND)
+
+class MissingRequiredParameterException(private val fieldName: String) :
+    Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. (${fieldName})")
+
+class InvalidParameterException(private val fieldName: String) :
+    Snu4tException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (query parameter: ${fieldName})")
+
+class InvalidBodyFieldValueException(private val fieldName: String) :
+    Snu4tException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: ${fieldName})")
