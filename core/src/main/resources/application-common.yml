@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    active: local
+  data:
+    mongodb:
+      uri:
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+
+secret-names: dev/snutt-timetable
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri:
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      uri:
