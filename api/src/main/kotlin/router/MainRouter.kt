@@ -18,7 +18,7 @@ class MainRouter(
     fun route(): RouterFunction<ServerResponse> = coRouter {
         GET("/ping") { ServerResponse.ok().bodyValueAndAwait("pong") }
 
-        path("").or("/v1").nest {
+        path("/v1").or("").nest {
             "/tables".nest {
                 GET("", timeTableHandler::getBriefs)
             }
