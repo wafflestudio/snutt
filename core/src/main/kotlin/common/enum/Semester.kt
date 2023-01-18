@@ -19,7 +19,6 @@ enum class Semester(val value: Int) {
     }
 }
 
-//@Component
 @ReadingConverter
 @Component
 class SemesterReadConverter : Converter<Int, Semester> {

@@ -1,10 +1,11 @@
 package com.wafflestudio.snu4t.bookmark.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.bookmark.data.Bookmark
+import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.ClassTime
-import com.wafflestudio.snu4t.lectures.data.Lecture
 
 class BookmarkResponse(
     val year: Int,
@@ -23,8 +24,11 @@ class BookmarkLectureResponse(
     val id: String? = null,
     val academicYear: String?,
     val category: String?,
+    @JsonProperty("class_time")
     val classTimeText: String?,
+    @JsonProperty("real_class_time")
     val realClassTimeText: String?,
+    @JsonProperty("class_time_json")
     val classTime: List<ClassTime>,
     val classTimeMask: List<Int>,
     val classification: String?,
@@ -34,11 +38,11 @@ class BookmarkLectureResponse(
     val lectureNumber: String?,
     val quota: Int?,
     val remark: String?,
-    val courseNumber: String?,
-    val courseTitle: String?,
+    val courseNumber: String,
+    val courseTitle: String,
 )
 
-fun BookmarkLectureResponse(lecture: Lecture): BookmarkLectureResponse = BookmarkLectureResponse(
+fun BookmarkLectureResponse(lecture: BookmarkLecture): BookmarkLectureResponse = BookmarkLectureResponse(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,

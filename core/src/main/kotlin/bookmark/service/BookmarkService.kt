@@ -4,8 +4,8 @@ import com.wafflestudio.snu4t.bookmark.data.Bookmark
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.service.LectureWithSemesterService
+import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
+import com.wafflestudio.snu4t.lectures.service.LectureService
 import org.springframework.stereotype.Service
 
 interface BookmarkService {
@@ -16,7 +16,7 @@ interface BookmarkService {
 @Service
 class BookmarkServiceImpl(
     private val bookmarkRepository: BookmarkRepository,
-    private val lectureWithSemesterService: LectureWithSemesterService,
+    private val lectureService: LectureService,
 ) : BookmarkService {
     override suspend fun getBookmark(
         userId: String,
@@ -27,12 +27,12 @@ class BookmarkServiceImpl(
             ?: Bookmark(userId = userId, year = year, semester = semester)
 
     override suspend fun addLecture(userId: String, lectureId: String): Bookmark {
-        val lectureWithSemester = lectureWithSemesterService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
+        val lecture= lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
         return bookmarkRepository.findAndAddLectureByUserIdAndYearAndSemester(
             userId,
-            lectureWithSemester.year,
-            lectureWithSemester.semester,
-            Lecture(lectureWithSemester)
+            lecture.year,
+            lecture.semester,
+            BookmarkLecture(lecture)
         )
     }
 }

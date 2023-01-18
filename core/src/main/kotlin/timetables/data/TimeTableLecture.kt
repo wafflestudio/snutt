@@ -28,11 +28,11 @@ data class TimeTableLecture(
     var quota: Int?,
     var remark: String?,
     var semester: Semester,
-    var year: Int?,
+    var year: Int,
     @Field("course_number")
     var courseNumber: String?,
     @Field("course_title")
-    var courseTitle: String?,
+    var courseTitle: String,
     var color: ColorSet?,
     var colorIndex: Int?,
 )

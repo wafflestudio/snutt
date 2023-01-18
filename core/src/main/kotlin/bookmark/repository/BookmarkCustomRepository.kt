@@ -2,7 +2,7 @@ package com.wafflestudio.snu4t.bookmark.repository
 
 import com.wafflestudio.snu4t.bookmark.data.Bookmark
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -17,7 +17,7 @@ interface BookmarkCustomRepository {
         userId: String,
         year: Int,
         semester: Semester,
-        lecture: Lecture
+        lecture: BookmarkLecture
     ): Bookmark
 }
 
@@ -27,11 +27,11 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         userId: String,
         year: Int,
         semester: Semester,
-        lecture: Lecture
+        lecture: BookmarkLecture
     ): Bookmark {
         return reactiveMongoTemplate.findAndModify<Bookmark>(
             Query.query(
-                Criteria.where("userId").isEqualTo(userId)
+                Criteria.where("user_id").isEqualTo(userId)
                     .and("year").isEqualTo(year)
                     .and("semester").isEqualTo(semester)
             ),

@@ -39,15 +39,15 @@ class UserServiceImpl(
         val credential = authService.buildLocalCredential(localId, password)
         val credentialHash = authService.generateCredentialHash(credential)
 
-        val user = User(
-            id = localId,
-            email = email,
-            isEmailVerified = false,
-            credential = credential,
-            credentialHash = credentialHash,
-            fcmKey = null,
+        val user = userRepository.save(
+            User(
+                email = email,
+                isEmailVerified = false,
+                credential = credential,
+                credentialHash = credentialHash,
+                fcmKey = null,
+            )
         )
-        userRepository.save(user)
 
         return RegisterResponse(
             userId = user.id!!,

@@ -1,12 +1,9 @@
 package com.wafflestudio.snu4t.lectures.data
 
-import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document("lectures")
-data class Lecture(
+data class BookmarkLecture(
     @Id
     var id: String? = null,
     @Field("academic_year")
@@ -28,10 +25,27 @@ data class Lecture(
     var lectureNumber: String,
     var quota: Int?,
     var remark: String?,
-    var semester: Semester,
-    var year: Int,
     @Field("course_number")
     var courseNumber: String,
     @Field("course_title")
     var courseTitle: String,
+)
+
+fun BookmarkLecture(lecture: Lecture): BookmarkLecture = BookmarkLecture(
+    id = lecture.id,
+    academicYear = lecture.academicYear,
+    category = lecture.category,
+    classTimeText = lecture.classTimeText,
+    realClassTimeText = lecture.realClassTimeText,
+    classTime = lecture.classTime,
+    classTimeMask = lecture.classTimeMask,
+    classification = lecture.classification,
+    credit = lecture.credit,
+    department = lecture.department,
+    instructor = lecture.instructor,
+    quota = lecture.quota,
+    remark = lecture.remark,
+    lectureNumber = lecture.lectureNumber,
+    courseNumber = lecture.courseNumber,
+    courseTitle = lecture.courseTitle,
 )
