@@ -27,7 +27,7 @@ class BookmarkServiceImpl(
             ?: Bookmark(userId = userId, year = year, semester = semester)
 
     override suspend fun addLecture(userId: String, lectureId: String): Bookmark {
-        val lecture= lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
+        val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
         return bookmarkRepository.findAndAddLectureByUserIdAndYearAndSemester(
             userId,
             lecture.year,
