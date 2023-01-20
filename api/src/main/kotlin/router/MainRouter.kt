@@ -30,6 +30,7 @@ class MainRouter(
             "/bookmarks".nest {
                 GET("", bookmarkHandler::getBookmark)
                 POST("/lecture", bookmarkHandler::addLecture)
+                DELETE("/lecture", bookmarkHandler::deleteBookmark)
             }
         }
     }

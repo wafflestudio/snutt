@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 interface BookmarkService {
     suspend fun getBookmark(userId: String, year: Int, semester: Semester): Bookmark
     suspend fun addLecture(userId: String, lectureId: String): Bookmark
+    suspend fun deleteLecture(userId: String, lectureId: String): Bookmark
 }
 
 @Service
@@ -33,6 +34,16 @@ class BookmarkServiceImpl(
             lecture.year,
             lecture.semester,
             BookmarkLecture(lecture)
+        )
+    }
+
+    override suspend fun deleteLecture(userId: String, lectureId: String): Bookmark {
+        val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
+        return bookmarkRepository.findAndDeleteLectureByUserIdAndYearAndSemesterAndLectureId(
+            userId,
+            lecture.year,
+            lecture.semester,
+            lectureId
         )
     }
 }
