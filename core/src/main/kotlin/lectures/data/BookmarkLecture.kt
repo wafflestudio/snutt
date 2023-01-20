@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.lectures.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
@@ -10,10 +11,13 @@ data class BookmarkLecture(
     var academicYear: String?,
     var category: String?,
     @Field("class_time")
-    var classTimeText: String?,
+    @JsonProperty("class_time")
+    val classTimeText: String?,
     @Field("real_class_time")
+    @JsonProperty("real_class_time")
     var realClassTimeText: String?,
     @Field("class_time_json")
+    @JsonProperty("class_time_json")
     var classTime: List<ClassTime>,
     @Field("class_time_mask")
     var classTimeMask: List<Int>,

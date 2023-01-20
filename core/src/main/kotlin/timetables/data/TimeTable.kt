@@ -19,7 +19,7 @@ data class TimeTable(
     @Field("lecture_list")
     var lectures: List<BookmarkLecture>,
     var title: String,
-    var theme: Int,
+    var theme: Int?,
     @Field("updated_at")
     var updatedAt: Instant,
 )

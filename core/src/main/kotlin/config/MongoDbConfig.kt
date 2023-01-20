@@ -1,5 +1,7 @@
 package com.wafflestudio.snu4t.config
 
+import com.wafflestudio.snu4t.common.enum.DayOfWeekReadConverter
+import com.wafflestudio.snu4t.common.enum.DayOfWeekWriteConverter
 import com.wafflestudio.snu4t.common.enum.SemesterReadConverter
 import com.wafflestudio.snu4t.common.enum.SemesterWriteConverter
 import org.springframework.context.annotation.Bean
@@ -12,11 +14,16 @@ class MongoDbConfig {
     @Bean
     fun customConversions(
         semesterWriteConverter: SemesterWriteConverter,
-        semesterReadConverter: SemesterReadConverter
+        semesterReadConverter: SemesterReadConverter,
+        dayOfWeekWriteConverter: DayOfWeekWriteConverter,
+        dayOfWeekReadConverter: DayOfWeekReadConverter,
     ): MongoCustomConversions {
-        val converterList: MutableList<Converter<*, *>?> = ArrayList()
-        converterList.add(semesterWriteConverter)
-        converterList.add(semesterReadConverter)
+        val converterList: List<Converter<*, *>?> = listOf(
+            semesterWriteConverter,
+            semesterReadConverter,
+            dayOfWeekWriteConverter,
+            dayOfWeekReadConverter,
+        )
         return MongoCustomConversions(converterList)
     }
 }

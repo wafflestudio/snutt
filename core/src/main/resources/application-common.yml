@@ -23,6 +23,7 @@ spring:
   data:
     mongodb:
       uri:
+      auto-index-creation: true
 ---
 spring:
   config:
