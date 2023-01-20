@@ -1,10 +1,13 @@
 package com.wafflestudio.snu4t.timetables.data
 
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimeTableLecture(
     @Id
     var id: String? = null,
@@ -12,10 +15,13 @@ data class TimeTableLecture(
     var academicYear: String?,
     var category: String?,
     @Field("class_time")
+    @JsonProperty("class_time")
     var classTimeText: String?,
     @Field("real_class_time")
+    @JsonProperty("real_class_time")
     var realClassTimeText: String?,
     @Field("class_time_json")
+    @JsonProperty("class_time_json")
     var classTime: List<ClassTime>,
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
@@ -27,8 +33,6 @@ data class TimeTableLecture(
     var lectureNumber: String?,
     var quota: Int?,
     var remark: String?,
-    var semester: Semester,
-    var year: Int,
     @Field("course_number")
     var courseNumber: String?,
     @Field("course_title")

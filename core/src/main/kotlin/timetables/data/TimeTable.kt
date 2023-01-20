@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.timetables.data
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -17,7 +16,7 @@ data class TimeTable(
     var year: Int,
     var semester: Semester,
     @Field("lecture_list")
-    var lectures: List<BookmarkLecture>,
+    var lectures: List<TimeTableLecture>,
     var title: String,
     var theme: Int?,
     @Field("updated_at")
