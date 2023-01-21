@@ -3,18 +3,22 @@ package com.wafflestudio.snu4t.middleware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+class SnuttRestApiDefaultMiddleware(middleware: Middleware) : Middleware by middleware
+class SnuttRestApiNoAuthMiddleware(middleware: Middleware) : Middleware by middleware
+
 @Configuration
 class CompositeMiddlewareConfig {
-    @Bean("snuttRestApiDefaultMiddleware")
+    @Bean
     fun snuttRestApiDefaultMiddleware(
         apiKeyMiddleware: ApiKeyMiddleware,
         userAuthorizeMiddleware: UserAuthorizeMiddleware,
         nativeClientInfoMiddleware: NativeClientInfoMiddleware,
-    ): Middleware = apiKeyMiddleware + userAuthorizeMiddleware + nativeClientInfoMiddleware
+    ): SnuttRestApiDefaultMiddleware =
+        SnuttRestApiDefaultMiddleware(apiKeyMiddleware + userAuthorizeMiddleware + nativeClientInfoMiddleware)
 
-    @Bean("snuttRestApiNoAuthMiddleware")
+    @Bean
     fun snuttRestApiNoAuthMiddleware(
         apiKeyMiddleware: ApiKeyMiddleware,
         nativeClientInfoMiddleware: NativeClientInfoMiddleware,
-    ): Middleware = apiKeyMiddleware + nativeClientInfoMiddleware
+    ): SnuttRestApiNoAuthMiddleware = SnuttRestApiNoAuthMiddleware(apiKeyMiddleware + nativeClientInfoMiddleware)
 }

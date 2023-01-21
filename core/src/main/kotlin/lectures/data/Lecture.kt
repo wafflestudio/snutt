@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.lectures.data
 
+import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -24,13 +25,13 @@ data class Lecture(
     var department: String?,
     var instructor: String?,
     @Field("lecture_number")
-    var lectureNumber: String?,
+    var lectureNumber: String,
     var quota: Int?,
     var remark: String?,
-    var semester: Int?,
-    var year: Int?,
+    var semester: Semester,
+    var year: Int,
     @Field("course_number")
-    var courseNumber: String?,
+    var courseNumber: String,
     @Field("course_title")
-    var courseTitle: String?,
+    var courseTitle: String,
 )

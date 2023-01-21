@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
-import com.wafflestudio.snu4t.middleware.Middleware
+import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.service.UserService
 import org.springframework.stereotype.Component
@@ -12,7 +12,7 @@ import org.springframework.web.server.ServerWebInputException
 @Component
 class AuthHandler(
     private val userService: UserService,
-    snuttRestApiNoAuthMiddleware: Middleware,
+    snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(snuttRestApiNoAuthMiddleware) {
     suspend fun registerLocal(req: ServerRequest): ServerResponse = handle(req) {
         val localRegisterRequest: LocalRegisterRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")

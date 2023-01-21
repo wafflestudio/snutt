@@ -20,7 +20,7 @@ data class TimeTableBriefDto(
 fun TimeTableBriefDto(timeTable: TimeTable): TimeTableBriefDto = TimeTableBriefDto(
     id = timeTable.id.let(::requireNotNull),
     year = timeTable.year,
-    semester = timeTable.semester,
+    semester = timeTable.semester.value,
     title = timeTable.title,
     updatedAt = timeTable.updatedAt,
     totalCredit = timeTable.lectures.sumOf { it.credit }

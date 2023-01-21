@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.0.0" apply false
+    id("org.springframework.boot") version "3.0.1" apply false
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     kotlin("jvm") version "1.7.21"
@@ -29,7 +29,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.0.0")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.0.1")
         }
     }
 
@@ -46,6 +46,8 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("io.projectreactor:reactor-test")
         testImplementation("io.mockk:mockk:1.12.4")
+        testImplementation("io.mockk:mockk-agent-jvm:1.12.4")
+        testImplementation("com.ninja-squad:springmockk:4.0.0")
         testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
         testImplementation("io.kotest:kotest-runner-junit5:5.5.4")
         testImplementation("io.kotest:kotest-assertions-core:5.5.4")
