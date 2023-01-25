@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.timetables.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -10,6 +11,7 @@ import java.time.Instant
 @Document("timetables")
 data class TimeTable(
     @Id
+    @JsonProperty("_id")
     var id: String? = null,
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     var userId: String,

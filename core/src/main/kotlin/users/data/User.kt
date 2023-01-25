@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.users.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
@@ -7,6 +8,7 @@ import java.time.LocalDateTime
 @Document("users")
 data class User(
     @Id
+    @JsonProperty("_id")
     val id: String? = null,
     var email: String?,
     var isEmailVerified: Boolean?,

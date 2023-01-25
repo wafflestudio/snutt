@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimeTableLecture(
     @Id
+    @JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,
