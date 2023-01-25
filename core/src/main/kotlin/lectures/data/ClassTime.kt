@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class ClassTime(
     @Id
+    @JsonProperty("_id")
     var id: String,
     var day: DayOfWeek,
     var place: String,

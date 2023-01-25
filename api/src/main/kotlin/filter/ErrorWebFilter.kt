@@ -33,7 +33,7 @@ class ErrorWebFilter(
                     is ResponseStatusException -> {
                         httpStatusCode = throwable.statusCode
                         errorBody = makeErrorBody(
-                            Snu4tException(errorMessage = throwable.reason ?: ErrorType.DEFAULT_ERROR.errorMessage)
+                            Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage)
                         )
                     }
                     else -> {

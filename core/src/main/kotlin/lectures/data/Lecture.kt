@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.lectures.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document("lectures")
 data class Lecture(
     @Id
+    @JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,
