@@ -73,7 +73,7 @@ class SugangSnuFetchServiceImpl(
 
         return Lecture(
             classification = row.getCellByColumnName("교과구분"),
-            department = row.getCellByColumnName("개설학과")?.ifEmpty { row.getCellByColumnName("개설대학") },
+            department = row.getCellByColumnName("개설학과")!!.ifEmpty { row.getCellByColumnName("개설대학") },
             academicYear = row.getCellByColumnName("학년"),
             courseNumber = row.getCellByColumnName("교과목번호")!!,
             lectureNumber = row.getCellByColumnName("강좌번호")!!,
