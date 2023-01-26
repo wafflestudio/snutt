@@ -41,6 +41,7 @@ subprojects {
         implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
         implementation("org.springframework.boot:spring-boot-starter-log4j2")
+        implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
         // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")

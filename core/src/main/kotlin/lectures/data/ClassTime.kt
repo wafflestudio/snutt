@@ -11,17 +11,17 @@ import org.springframework.data.mongodb.core.mapping.Field
 data class ClassTime(
     @Id
     @JsonProperty("_id")
-    var id: String,
-    var day: DayOfWeek,
-    var place: String,
+    var id: String? = null,
+    val day: DayOfWeek,
+    val place: String,
     @Field("start_time")
-    var startTime: String,
+    val startTime: String,
     @Field("end_time")
-    var endTime: String,
+    val endTime: String,
     @Field("len")
     @JsonProperty("len")
-    var length: Double,
+    val periodLength: Double,
     @Field("start")
     @JsonProperty("start")
-    var startPeriod: Double,
+    val startPeriod: Double,
 )

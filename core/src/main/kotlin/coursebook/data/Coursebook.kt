@@ -11,9 +11,9 @@ import java.time.Instant
 class Coursebook(
     @Id
     @JsonProperty("_id")
-    val id: String? = null,
-    var year: Int,
-    var semester: Semester,
+    var id: String? = null,
+    val year: Int,
+    val semester: Semester,
     @Field("updated_at")
-    var updatedAt: Instant,
+    var updatedAt: Instant = Instant.now(),
 )

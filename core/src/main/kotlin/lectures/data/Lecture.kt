@@ -15,9 +15,9 @@ data class Lecture(
     var academicYear: String?,
     var category: String?,
     @Field("class_time")
-    var classTimeText: String?,
+    var periodText: String?,
     @Field("real_class_time")
-    var realClassTimeText: String?,
+    var classTimeText: String?,
     @Field("class_time_json")
     var classTime: List<ClassTime>,
     @Field("class_time_mask")
