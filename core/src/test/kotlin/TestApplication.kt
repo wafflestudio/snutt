@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t
 
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.internal.MongoClientImpl
+import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.timetables.data.TimeTable
 import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
 import io.kotest.core.config.AbstractProjectConfig
@@ -51,7 +52,7 @@ class TruncateCollectionsTest(
             val dummy = TimeTable(
                 userId = "63a1b97f42ed0d0010b4351d",
                 year = 2022,
-                semester = 1,
+                semester = Semester.AUTUMN,
                 lectures = listOf(),
                 title = "test",
                 theme = 0,
