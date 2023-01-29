@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.utils
 
 import com.wafflestudio.snu4t.common.enum.Semester
 

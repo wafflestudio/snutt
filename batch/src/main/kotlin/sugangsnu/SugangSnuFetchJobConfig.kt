@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.sugangsnu
 
+import com.wafflestudio.snu4t.lectures.service.LectureService
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -22,11 +23,16 @@ class SugangSnuFetchJobConfig {
     fun fetchSugangSnuStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
-        sugangSnuService: SugangSnuFetchService,
+        sugangSnuFetchService: SugangSnuFetchService,
+        lectureService: LectureService,
     ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet({ _, _ ->
         runBlocking {
-            val coursebook = sugangSnuService.getOrCreateLatestCoursebook()
-            sugangSnuService.getLectures(coursebook.year, coursebook.semester)
+            val coursebook = sugangSnuFetchService.getOrCreateLatestCoursebook()
+            val newLectures = sugangSnuFetchService.getLectures(coursebook.year, coursebook.semester)
+            val oldLectures = lectureService.getByYearAndSemseter(coursebook.year, coursebook.semester)
+            val compareResult = sugangSnuFetchService.compareLectures(newLectures, oldLectures)
+
+            lectureService.insertLectures(compareResult.created)
 
             RepeatStatus.FINISHED
         }

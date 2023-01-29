@@ -9,9 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class ClassTime(
-    @Id
-    @JsonProperty("_id")
-    var id: String? = null,
     val day: DayOfWeek,
     val place: String,
     @Field("start_time")
@@ -24,4 +21,8 @@ data class ClassTime(
     @Field("start")
     @JsonProperty("start")
     val startPeriod: Double,
-)
+) {
+    @Id
+    @JsonProperty("_id")
+    var id: String? = null
+}

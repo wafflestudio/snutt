@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.enum
 
 enum class LectureCategory(val parentCategory: String, val queryValue: Long, val koreanName: String) {
         NONE("", 0, ""),
@@ -24,6 +24,5 @@ enum class LectureCategory(val parentCategory: String, val queryValue: Long, val
         GENERAL_ART("06", 53, "예술실기"),
         GENERAL_COLLEGE("06", 54, "대학과 리더쉽"),
         GENERAL_CREATIVITY("06", 55, "창의와 융합"),
-        GENERAL_KOREAN("06", 56, " 한국의 이해");
-
+        GENERAL_KOREAN("06", 56, "한국의 이해");
 }

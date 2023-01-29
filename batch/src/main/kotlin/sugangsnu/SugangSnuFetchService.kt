@@ -5,7 +5,11 @@ import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
+import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuLectureCompareResult
+import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.utils.SugangSnuClassTimeUtils
+import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.slf4j.LoggerFactory
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service
 interface SugangSnuFetchService {
     suspend fun getOrCreateLatestCoursebook(): Coursebook
     suspend fun getLectures(year: Int, semester: Semester): List<Lecture>
+    fun compareLectures(newLectures: List<Lecture>, oldLectures: List<Lecture>): SugangSnuLectureCompareResult
 }
 
 @Service
@@ -38,7 +43,24 @@ class SugangSnuFetchServiceImpl(
             val columnNameIndex = sheet.getRow(2).associate { it.stringCellValue to it.columnIndex }
             sheet.filterIndexed { index, _ -> index > 2 }
                 .map { row -> convertSugangSnuRowToLecture(row, columnNameIndex, lectureCategory, year, semester) }
+                .also { lectureXlsx.release() }
         }
+    }
+
+    override fun compareLectures(
+        newLectures: List<Lecture>,
+        oldLectures: List<Lecture>
+    ): SugangSnuLectureCompareResult {
+        val newMap = newLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
+        val oldMap = oldLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
+
+        val created = (newMap.keys - oldMap.keys).map(newMap::getValue)
+        val updated = (newMap.keys intersect oldMap.keys)
+            .map { oldMap[it]!! to newMap[it]!! }
+            .filter { (old, new) -> old != new }
+        val deleted = (oldMap.keys - newMap.keys).map(oldMap::getValue)
+
+        return SugangSnuLectureCompareResult(created, deleted, updated)
     }
 
     /*
@@ -60,39 +82,50 @@ class SugangSnuFetchServiceImpl(
                 this.lastCellNum.toInt()
             })?.stringCellValue
 
-        val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)") ?: ""
-        val realClassTimeText = row.getCellByColumnName("수업교시") ?: ""
+        val classification = row.getCellByColumnName("교과구분")!!
+        val college = row.getCellByColumnName("개설대학")!!
+        val department = row.getCellByColumnName("개설학과")!!
+        val academicCourse = row.getCellByColumnName("이수과정")!!
+        val academicYear = row.getCellByColumnName("학년")!!
+        val courseNumber = row.getCellByColumnName("교과목번호")!!
+        val lectureNumber = row.getCellByColumnName("강좌번호")!!
+        val courseTitle = row.getCellByColumnName("교과목명")!!
+        val courseSubtitle = row.getCellByColumnName("부제명")!!
+        val credit = row.getCellByColumnName("학점")?.toInt()!!
+        val classTimeText = row.getCellByColumnName("수업교시")!!
+        val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")!!
+        val instructor = row.getCellByColumnName("주담당교수")!!
+        val quota = row.getCellByColumnName("정원")!!
+        val remark = row.getCellByColumnName("비고")!!
 
-        val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(realClassTimeText)
-        val classTime = SugangSnuClassTimeUtils.convertTextToClassTimeObject(realClassTimeText, location)
+        val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(classTimeText)
+        val classTime = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
         val classTimeMask = ClassTimeUtils.classTimeToBitmask(classTime)
 
-        val courseSubtitle = row.getCellByColumnName("부제명")
-        val courseTitle = row.getCellByColumnName("교과목명")
-        val courseFullTitle = if (courseSubtitle.isNullOrEmpty()) courseTitle else "$courseTitle (${courseSubtitle})"
+        val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle (${courseSubtitle})"
 
         return Lecture(
-            classification = row.getCellByColumnName("교과구분"),
-            department = row.getCellByColumnName("개설학과")!!.ifEmpty { row.getCellByColumnName("개설대학") },
-            academicYear = row.getCellByColumnName("학년"),
-            courseNumber = row.getCellByColumnName("교과목번호")!!,
-            lectureNumber = row.getCellByColumnName("강좌번호")!!,
-            courseTitle = courseFullTitle!!,
-            credit = row.getCellByColumnName("학점")?.toInt() ?: 0,
-            instructor = row.getCellByColumnName("주담당교수"),
-            remark = row.getCellByColumnName("비고"),
-            quota = row.getCellByColumnName("정원")?.split(" ")?.first()?.toInt() ?: 0,
+            classification = classification,
+            // null(과학교육계) 존재한다고 함 (old snutt에서 참고)
+            department = department.replace("null", "").ifEmpty { college },
+            academicYear = academicCourse.takeIf { academicCourse != "학사" } ?: academicYear,
+            courseNumber = courseNumber,
+            lectureNumber = lectureNumber,
+            courseTitle = courseFullTitle,
+            credit = credit,
+            instructor = instructor,
+            remark = remark,
+            quota = quota.split(" ").first().toInt(),
             year = year,
             semester = semester,
             category = category.koreanName,
-            classTimeText = row.getCellByColumnName("수업교시"),
+            classTimeText = classTimeText,
             periodText = periodText,
             classTime = classTime,
             classTimeMask = classTimeMask,
         )
 
     }
-
 
     private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean {
         return this.year == sugangSnuCoursebookCondition.latestYear &&

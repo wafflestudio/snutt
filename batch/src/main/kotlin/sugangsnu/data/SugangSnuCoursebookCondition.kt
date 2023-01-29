@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.data
 
 data class SugangSnuClassTime(
     val dayOfWeek: String,
@@ -7,8 +7,8 @@ data class SugangSnuClassTime(
     val endHour: String,
     val endMinute: String,
     val startPeriod: Double = when (startMinute) {
-        "00" -> startHour.toDouble()
-        "30" -> startHour.toDouble() + 0.5
+        "00" -> startHour.toDouble() - 8
+        "30" -> startHour.toDouble() - 7.5
         else -> throw RuntimeException()
     },
     val endPeriod: Double = when (endMinute) {

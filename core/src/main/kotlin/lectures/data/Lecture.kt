@@ -3,14 +3,14 @@ package com.wafflestudio.snu4t.lectures.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document("lectures")
+@CompoundIndex(def = "{'year': 1, 'semester': 1}")
+@CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }", unique = true)
 data class Lecture(
-    @Id
-    @JsonProperty("_id")
-    var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,
     var category: String?,
@@ -36,4 +36,8 @@ data class Lecture(
     var courseNumber: String,
     @Field("course_title")
     var courseTitle: String,
-)
+) {
+    @Id
+    @JsonProperty("_id")
+    var id: String? = null
+}
