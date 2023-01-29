@@ -76,11 +76,13 @@ class SugangSnuFetchServiceImpl(
         semester: Semester,
     ): Lecture {
         fun Row.getCellByColumnName(key: String): String? =
-            this.getCell(columnNameIndex.getOrElse(key) {
-                // TODO: slack 메시지로 보내기
-                logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
-                this.lastCellNum.toInt()
-            })?.stringCellValue
+            this.getCell(
+                columnNameIndex.getOrElse(key) {
+                    // TODO: slack 메시지로 보내기
+                    logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
+                    this.lastCellNum.toInt()
+                }
+            )?.stringCellValue
 
         val classification = row.getCellByColumnName("교과구분")!!
         val college = row.getCellByColumnName("개설대학")!!
@@ -102,7 +104,7 @@ class SugangSnuFetchServiceImpl(
         val classTime = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
         val classTimeMask = ClassTimeUtils.classTimeToBitmask(classTime)
 
-        val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle (${courseSubtitle})"
+        val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
 
         return Lecture(
             classification = classification,
@@ -124,13 +126,11 @@ class SugangSnuFetchServiceImpl(
             classTime = classTime,
             classTimeMask = classTimeMask,
         )
-
     }
 
-    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean {
-        return this.year == sugangSnuCoursebookCondition.latestYear &&
-                this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
-    }
+    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
+        this.year == sugangSnuCoursebookCondition.latestYear &&
+            this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
 
     private fun Coursebook.nextCoursebook(): Coursebook {
         return when (this.semester) {

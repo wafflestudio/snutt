@@ -56,7 +56,6 @@ object SugangSnuClassTimeUtils {
                 }
             }
 
-
     private fun parseSugangSnuClassTime(classTime: String): SugangSnuClassTime {
         return classTimeRegEx.find(classTime)!!.groups.let { matchResult ->
             SugangSnuClassTime(

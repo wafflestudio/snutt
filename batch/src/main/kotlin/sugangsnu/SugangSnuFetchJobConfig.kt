@@ -25,16 +25,19 @@ class SugangSnuFetchJobConfig {
         transactionManager: PlatformTransactionManager,
         sugangSnuFetchService: SugangSnuFetchService,
         lectureService: LectureService,
-    ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet({ _, _ ->
-        runBlocking {
-            val coursebook = sugangSnuFetchService.getOrCreateLatestCoursebook()
-            val newLectures = sugangSnuFetchService.getLectures(coursebook.year, coursebook.semester)
-            val oldLectures = lectureService.getByYearAndSemseter(coursebook.year, coursebook.semester)
-            val compareResult = sugangSnuFetchService.compareLectures(newLectures, oldLectures)
+    ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
+        { _, _ ->
+            runBlocking {
+                val coursebook = sugangSnuFetchService.getOrCreateLatestCoursebook()
+                val newLectures = sugangSnuFetchService.getLectures(coursebook.year, coursebook.semester)
+                val oldLectures = lectureService.getByYearAndSemseter(coursebook.year, coursebook.semester)
+                val compareResult = sugangSnuFetchService.compareLectures(newLectures, oldLectures)
 
-            lectureService.insertLectures(compareResult.created)
+                lectureService.insertLectures(compareResult.created)
 
-            RepeatStatus.FINISHED
-        }
-    }, transactionManager).build()
+                RepeatStatus.FINISHED
+            }
+        },
+        transactionManager
+    ).build()
 }
