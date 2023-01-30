@@ -10,6 +10,7 @@ interface LectureService {
     suspend fun getByIdOrNull(lectureId: String): Lecture?
     suspend fun getByYearAndSemseter(year: Int, semester: Semester): List<Lecture>
     suspend fun insertLectures(lectures: Iterable<Lecture>): List<Lecture>
+    suspend fun upsertLectures(lectures: Iterable<Lecture>): List<Lecture>
 }
 
 @Service
@@ -20,4 +21,8 @@ class LectureServiceImpl(private val lectureRepository: LectureRepository) : Lec
 
     override suspend fun insertLectures(lectures: Iterable<Lecture>): List<Lecture> =
         lectureRepository.saveAll(lectures).toList()
+
+    override suspend fun upsertLectures(lectures: Iterable<Lecture>): List<Lecture> {
+        return lectureRepository.upsertLectures(lectures)
+    }
 }

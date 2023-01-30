@@ -7,7 +7,6 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("com.h2database:h2")
-    runtimeOnly("mysql:mysql-connector-java")
 
     // excel
     implementation("org.apache.poi:poi-ooxml:5.2.3")

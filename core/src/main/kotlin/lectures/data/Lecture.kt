@@ -9,7 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 @Document("lectures")
 @CompoundIndex(def = "{'year': 1, 'semester': 1}")
-@CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }", unique = true)
+@CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }")
+@CompoundIndex(def = "{ 'year': 1, 'semester': 1,'course_number': 1, 'lecture_number': 1 }", unique = true)
 data class Lecture(
     @Field("academic_year")
     var academicYear: String?,
