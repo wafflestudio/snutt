@@ -16,7 +16,9 @@ function compareLecture(oldLecture: RefLecture, newLecture: RefLecture): Lecture
     'instructor',
     'quota',
     'remark',
-    'category'
+    'category',
+    'class_time',
+    'real_class_time'
     ];
   for (let key of keys) {
     if (oldLecture[key] != newLecture[key]) {
