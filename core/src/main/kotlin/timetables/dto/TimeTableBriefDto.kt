@@ -23,5 +23,5 @@ fun TimeTableBriefDto(timeTable: TimeTable): TimeTableBriefDto = TimeTableBriefD
     semester = timeTable.semester.value,
     title = timeTable.title,
     updatedAt = timeTable.updatedAt,
-    totalCredit = timeTable.lectures.sumOf { it.credit }
+    totalCredit = timeTable.lectures.sumOf { it.credit ?: 0 }
 )

@@ -27,7 +27,7 @@ data class TimeTableLecture(
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
     var classification: String?,
-    var credit: Int,
+    var credit: Int?,
     var department: String?,
     var instructor: String?,
     @Field("lecture_number")

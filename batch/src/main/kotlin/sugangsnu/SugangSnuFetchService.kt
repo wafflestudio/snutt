@@ -4,25 +4,39 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuLectureCompareResult
+import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
 import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.utils.SugangSnuClassTimeUtils
 import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
+import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flattenConcat
+import kotlinx.coroutines.flow.map
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import kotlin.reflect.full.memberProperties
 
 interface SugangSnuFetchService {
     suspend fun getOrCreateLatestCoursebook(): Coursebook
     suspend fun getLectures(year: Int, semester: Semester): List<Lecture>
-    fun compareLectures(newLectures: List<Lecture>, oldLectures: List<Lecture>): SugangSnuLectureCompareResult
+    fun compareLectures(newLectures: Iterable<Lecture>, oldLectures: Iterable<Lecture>): SugangSnuLectureCompareResult
+
+    suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult)
+    suspend fun sendUpdateNotification()
+    suspend fun userLectureIdChange()
 }
 
 @Service
 class SugangSnuFetchServiceImpl(
+    private val lectureService: LectureService,
+    private val timeTableRepository: TimeTableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
     private val coursebookRepository: CoursebookRepository
 ) : SugangSnuFetchService {
@@ -48,8 +62,8 @@ class SugangSnuFetchServiceImpl(
     }
 
     override fun compareLectures(
-        newLectures: List<Lecture>,
-        oldLectures: List<Lecture>
+        newLectures: Iterable<Lecture>,
+        oldLectures: Iterable<Lecture>
     ): SugangSnuLectureCompareResult {
         val newMap = newLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
         val oldMap = oldLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
@@ -58,9 +72,51 @@ class SugangSnuFetchServiceImpl(
         val updated = (newMap.keys intersect oldMap.keys)
             .map { oldMap[it]!! to newMap[it]!! }
             .filter { (old, new) -> old != new }
+            .map { (old, new) ->
+                UpdatedLecture(old, new, Lecture::class.memberProperties.filter { it.get(old) != it.get(new) })
+            }
         val deleted = (oldMap.keys - newMap.keys).map(oldMap::getValue)
 
         return SugangSnuLectureCompareResult(created, deleted, updated)
+    }
+
+    override suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
+        val updatedLectures = compareResult.updated.map { diff ->
+            diff.newData.apply { id = diff.oldData.id }
+        }
+
+        lectureService.upsertLectures(compareResult.created)
+        lectureService.upsertLectures(updatedLectures)
+        lectureService.deleteLectures(compareResult.deleted)
+    }
+
+    override suspend fun sendUpdateNotification() {
+        TODO("Not yet implemented")
+    }
+
+    @OptIn(FlowPreview::class)
+    override suspend fun userLectureIdChange() {
+        lectureService.findAll().map { lecture ->
+            timeTableRepository.findAllContainsLecture(
+                lecture.year,
+                lecture.semester,
+                lecture.courseNumber,
+                lecture.lectureNumber
+            )
+                .map { timetable ->
+                    timetable.copy (
+                        lectures = timetable.lectures.map {
+                            if (it.courseNumber == lecture.courseNumber && it.lectureNumber == lecture.lectureNumber) {
+                                it.copy(id = lecture.id)
+                            } else {
+                                it
+                            }
+                        }
+                    )
+                }
+        }.map {
+            timeTableRepository.saveAll(it)
+        }.flattenConcat().collect()
     }
 
     /*
@@ -75,30 +131,30 @@ class SugangSnuFetchServiceImpl(
         year: Int,
         semester: Semester,
     ): Lecture {
-        fun Row.getCellByColumnName(key: String): String? =
+        fun Row.getCellByColumnName(key: String): String =
             this.getCell(
                 columnNameIndex.getOrElse(key) {
                     // TODO: slack 메시지로 보내기
                     logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
                     this.lastCellNum.toInt()
                 }
-            )?.stringCellValue
+            )!!.stringCellValue
 
-        val classification = row.getCellByColumnName("교과구분")!!
-        val college = row.getCellByColumnName("개설대학")!!
-        val department = row.getCellByColumnName("개설학과")!!
-        val academicCourse = row.getCellByColumnName("이수과정")!!
-        val academicYear = row.getCellByColumnName("학년")!!
-        val courseNumber = row.getCellByColumnName("교과목번호")!!
-        val lectureNumber = row.getCellByColumnName("강좌번호")!!
-        val courseTitle = row.getCellByColumnName("교과목명")!!
-        val courseSubtitle = row.getCellByColumnName("부제명")!!
-        val credit = row.getCellByColumnName("학점")?.toInt()!!
-        val classTimeText = row.getCellByColumnName("수업교시")!!
-        val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")!!
-        val instructor = row.getCellByColumnName("주담당교수")!!
-        val quota = row.getCellByColumnName("정원")!!
-        val remark = row.getCellByColumnName("비고")!!
+        val classification = row.getCellByColumnName("교과구분")
+        val college = row.getCellByColumnName("개설대학")
+        val department = row.getCellByColumnName("개설학과")
+        val academicCourse = row.getCellByColumnName("이수과정")
+        val academicYear = row.getCellByColumnName("학년")
+        val courseNumber = row.getCellByColumnName("교과목번호")
+        val lectureNumber = row.getCellByColumnName("강좌번호")
+        val courseTitle = row.getCellByColumnName("교과목명")
+        val courseSubtitle = row.getCellByColumnName("부제명")
+        val credit = row.getCellByColumnName("학점").toInt()
+        val classTimeText = row.getCellByColumnName("수업교시")
+        val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
+        val instructor = row.getCellByColumnName("주담당교수")
+        val quota = row.getCellByColumnName("정원")
+        val remark = row.getCellByColumnName("비고")
 
         val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(classTimeText)
         val classTime = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)

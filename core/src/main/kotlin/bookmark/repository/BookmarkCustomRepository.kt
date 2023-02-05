@@ -5,7 +5,6 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import org.bson.types.ObjectId
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -41,9 +40,9 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         lecture: BookmarkLecture
     ): Bookmark =
         reactiveMongoTemplate.update<Bookmark>().matching(
-            Bookmark::userId isEqualTo ObjectId(userId) and
-                    Bookmark::year isEqualTo year and
-                    Bookmark::semester isEqualTo semester
+            Bookmark::userId isEqualTo userId and
+                Bookmark::year isEqualTo year and
+                Bookmark::semester isEqualTo semester
         ).apply(
             Update().addToSet(Bookmark::lectures.toDotPath(), lecture),
         ).withOptions(
@@ -57,10 +56,10 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         lectureId: String
     ): Bookmark =
         reactiveMongoTemplate.update<Bookmark>().matching(
-            Bookmark::userId isEqualTo ObjectId(userId) and
-                    Bookmark::year isEqualTo year and
-                    Bookmark::semester isEqualTo semester
+            Bookmark::userId isEqualTo userId and
+                Bookmark::year isEqualTo year and
+                Bookmark::semester isEqualTo semester
         ).apply(
-            Update().pull(Bookmark::lectures.toDotPath(), Query.query(Lecture::id isEqualTo ObjectId(lectureId))),
+            Update().pull(Bookmark::lectures.toDotPath(), Query.query(Lecture::id isEqualTo lectureId)),
         ).findModifyAndAwait()
 }
