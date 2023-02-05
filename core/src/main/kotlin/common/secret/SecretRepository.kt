@@ -10,8 +10,8 @@ interface SecretRepository {
 }
 
 @Repository
-class SecretRepositoryImpl: SecretRepository {
-    companion object{
+class SecretRepositoryImpl : SecretRepository {
+    companion object {
         val region: Region = Region.AP_NORTHEAST_2
     }
 

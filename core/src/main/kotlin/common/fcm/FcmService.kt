@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 interface PushNotificationService {
-    fun sendMessage(token: String, title:String, body: String)
+    fun sendMessage(token: String, title: String, body: String)
 }
 
 @Service
@@ -31,7 +31,7 @@ class FcmPushNotificationService(
         FirebaseApp.initializeApp(options)
     }
 
-    override fun sendMessage(token: String, title:String, body: String) {
+    override fun sendMessage(token: String, title: String, body: String) {
         val notification = Notification.builder().setTitle(title).setBody(body).build()
         val message: Message = Message.builder()
             .setNotification(notification)
