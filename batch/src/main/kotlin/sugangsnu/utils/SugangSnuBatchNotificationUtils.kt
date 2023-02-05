@@ -5,7 +5,7 @@ import com.wafflestudio.snu4t.timetables.data.TimeTable
 import kotlin.reflect.KProperty1
 
 object SugangSnuBatchNotificationUtils {
-    fun makeUpdateNotiString(timetable: TimeTable, properties: List<KProperty1<Lecture, *>>){
+    fun makeUpdateNotiString(timetable: TimeTable, properties: List<KProperty1<Lecture, *>>) {
         TODO()
     }
 

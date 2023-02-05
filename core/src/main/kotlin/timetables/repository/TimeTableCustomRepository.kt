@@ -48,7 +48,8 @@ class TimeTableCustomRepositoryImpl(
                     TimeTable::semester isEqualTo semester and
                     TimeTable::lectures elemMatch (
                     TimeTableLecture::courseNumber isEqualTo courseNumber and
-                        TimeTableLecture::lectureNumber isEqualTo lectureNumber)
+                        TimeTableLecture::lectureNumber isEqualTo lectureNumber
+                    )
             )
         ).asFlow()
     }

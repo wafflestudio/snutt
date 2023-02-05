@@ -104,7 +104,7 @@ class SugangSnuFetchServiceImpl(
                 lecture.lectureNumber
             )
                 .map { timetable ->
-                    timetable.copy (
+                    timetable.copy(
                         lectures = timetable.lectures.map {
                             if (it.courseNumber == lecture.courseNumber && it.lectureNumber == lecture.lectureNumber) {
                                 it.copy(id = lecture.id)
