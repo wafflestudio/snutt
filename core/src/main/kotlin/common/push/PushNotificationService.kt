@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.fcm
+package com.wafflestudio.snu4t.common.push
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
@@ -6,7 +6,6 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
-import com.wafflestudio.snu4t.common.push.await
 import com.wafflestudio.snu4t.common.secret.SecretRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -15,8 +14,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 interface PushNotificationService {
-    suspend fun sendMessage(pushMessage: PushMessage)
-    suspend fun sendMessages(pushMessages: List<PushMessage>)
+    suspend fun sendMessage(pushMessage: PushTargetMessage)
+    suspend fun sendMessages(pushMessages: List<PushTargetMessage>)
 }
 
 @Service
@@ -36,7 +35,7 @@ class FcmPushNotificationService(
         FirebaseApp.initializeApp(options)
     }
 
-    override suspend fun sendMessage(pushMessage: PushMessage) {
+    override suspend fun sendMessage(pushMessage: PushTargetMessage) {
         val notification = Notification.builder().setTitle(pushMessage.title).setBody(pushMessage.body).build()
         val message: Message = Message.builder()
             .setNotification(notification)
@@ -46,7 +45,7 @@ class FcmPushNotificationService(
     }
 
     // FCM api가 한번에 500개까지 받을 수 있으므로 500개씩 chunk
-    override suspend fun sendMessages(pushMessages: List<PushMessage>): Unit = coroutineScope {
+    override suspend fun sendMessages(pushMessages: List<PushTargetMessage>): Unit = coroutineScope {
         val messagingInstance = FirebaseMessaging.getInstance()
         pushMessages.map { pushMessage ->
             val notification = Notification.builder().setTitle(pushMessage.title).setBody(pushMessage.body).build()
@@ -61,7 +60,7 @@ class FcmPushNotificationService(
 
 }
 
-data class PushMessage(
+data class PushTargetMessage(
     val targetToken: String,
     val title: String,
     val body: String,
