@@ -48,7 +48,7 @@ class SugangSnuFetchJobConfig {
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
         sugangSnuFetchService: SugangSnuFetchService,
-    ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
+    ): Step = StepBuilder("userLectureIdChange", jobRepository).tasklet(
         { _, _ ->
             runBlocking {
                 sugangSnuFetchService.userLectureIdChange()
