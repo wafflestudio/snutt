@@ -6,10 +6,11 @@ import property = require('@app/core/config/property');
 let repoOwner = property.get('core.feedback2github.repo.owner');
 let repoName = property.get('core.feedback2github.repo.name');
 
-export async function add(email: string, message: string, platform: string): Promise<void> {
+export async function add(email: string, message: string, platform: string, version: string): Promise<void> {
   let feedback: Feedback = {
     email: email,
     message: message,
+    version: version,
     platform: platform,
     timestamp: Date.now()
   }
@@ -34,6 +35,9 @@ function feedbackToGithubIssue(feedback: Feedback): GithubIssue {
   }
   if (feedback.platform) {
     body += "Platform: " + feedback.platform + "\n";
+  }
+  if (feedback.version) {
+    body += "Version: " + feedback.version + "\n";
   }
   body += "\n";
   body += feedback.message;

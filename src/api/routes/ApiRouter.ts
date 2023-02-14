@@ -62,7 +62,7 @@ restGet(router, '/app_version')(async function() {
 });
 
 restPost(router, '/feedback')(async function(context, req) {
-  await FeedbackService.add(req.body.email, req.body.message, context.platform);
+  await FeedbackService.add(req.body.email, req.body.message, context.platform, context.appVersion);
   return {message:"ok"};
 });
 
