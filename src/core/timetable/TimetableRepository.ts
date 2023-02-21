@@ -33,7 +33,8 @@ let userLectureSchema = new mongoose.Schema({
   created_at: Date,
   updated_at: Date,
   color: {fg: String, bg: String},
-  colorIndex: {type: Number, required: true, default: 0}
+  colorIndex: {type: Number, required: true, default: 0},
+  lecture_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Lecture'},
 });
 
 let TimetableSchema = new mongoose.Schema({

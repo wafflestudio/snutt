@@ -296,6 +296,7 @@ function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture
     lecture_number: refLecture.lecture_number,  // 강좌 번호
     created_at: creationDate,
     updated_at: creationDate,
-    colorIndex: colorIndex
+    colorIndex: colorIndex,
+    lecture_id: refLecture._id
   }
 }
