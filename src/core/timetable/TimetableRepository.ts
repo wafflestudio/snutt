@@ -12,6 +12,7 @@ import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
 export const NUMBER_OF_THEME = 6
 
 let userLectureSchema = new mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId,
   classification: String,                           // 교과 구분
   department: String,                               // 학부
   academic_year: String,                            // 학년
@@ -245,7 +246,6 @@ export async function insert(table: Timetable): Promise<Timetable> {
 }
 
 export async function insertUserLecture(tableId: string, lecture: UserLecture): Promise<void> {
-  ObjectUtil.deleteObjectId(lecture);
   let document = await mongooseModel.findOne({'_id': tableId}).exec();
   document['lecture_list'].push(lecture);
   await document.save();
