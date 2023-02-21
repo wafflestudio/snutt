@@ -23,6 +23,7 @@ import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJson
 import winston = require('winston');
 import {Time} from "@app/core/timetable/model/Time";
 import Lecture from "@app/core/lecture/model/Lecture";
+import * as mongoose from "mongoose";
 let logger = winston.loggers.get('default');
 
 const ZERO_PERIOD_START_HOUR = 8
@@ -77,7 +78,6 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
   if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
-  ObjectUtil.deleteObjectId(lecture);
   syncRealTimeWithPeriod(lecture)
 
   /* If no time json is found, mask is invalid */
@@ -90,6 +90,8 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
     lecture.colorIndex = getAvailableColorIndex(timetable);
   }
 
+  ObjectUtil.deleteObjectId(lecture);
+  lecture._id = mongoose.Types.ObjectId().toHexString();
   await addLecture(timetable, lecture, isForced);
 }
 

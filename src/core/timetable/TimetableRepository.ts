@@ -8,6 +8,8 @@ import UserLectureNotFoundError from './error/UserLectureNotFoundError';
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 import CourseBook from "@app/core/coursebook/model/CourseBook";
 import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
+import {Types} from "mongoose";
+import {ObjectId} from "mongodb";
 
 export const NUMBER_OF_THEME = 6
 
