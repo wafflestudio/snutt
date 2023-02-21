@@ -344,10 +344,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         "category": "",
         "created_at": "2016-03-31T07:56:44.137Z",
         "updated_at": "2016-03-31T07:56:44.137Z",
-        /*
-         * See to it that the server removes _id fields correctly
-         */
-        "_id": "56fcd83c041742971bd20a86",
         "colorIndex": 5,
         "class_time_mask": [
           0,
@@ -404,9 +400,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         "category": "",
         "created_at": "2016-03-31T07:56:44.137Z",
         "updated_at": "2016-03-31T07:56:44.137Z",
-        /*
-         * See to it that the server removes _id fields correctly
-         */
         "_id": "56fcd83c041742971bd20a86",
         "class_time_json": [
           {
@@ -447,9 +440,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         "category": "",
         "created_at": "2016-03-31T07:56:44.137Z",
         "updated_at": "2016-03-31T07:56:44.137Z",
-        /*
-         * See to it that the server removes _id fields correctly
-         */
         "_id": "56fcd83c041742971bd20a86",
         "class_time_json": [
           {
@@ -494,9 +484,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
           "fg": "rgb(255, 255, 255)",
           "bg": "#555555"
         },
-        /*
-         * See to it that the server removes _id fields correctly
-         */
         "_id": "56fcd83c041742971bd20a86",
         "class_time_json": [
           {
@@ -542,9 +529,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         "category": "",
         "created_at": "2016-03-31T07:56:44.137Z",
         "updated_at": "2016-03-31T07:56:44.137Z",
-        /*
-         * See to it that the server removes _id fields correctly
-         */
         "_id": "56fcd83c041742971bd20a86",
         "class_time_json": [
           {
@@ -681,9 +665,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         "category": "",
         "created_at": "2016-03-31T07:56:44.137Z",
         "updated_at": "2016-03-31T07:56:44.137Z",
-        /*
-         * See to it that the server removes _id fields correctly
-         */
         "_id": "56fcd83c041742971bd20a86",
         "class_time_json": [
           {

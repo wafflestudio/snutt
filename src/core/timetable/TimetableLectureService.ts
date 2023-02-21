@@ -23,6 +23,7 @@ import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJson
 import winston = require('winston');
 import {Time} from "@app/core/timetable/model/Time";
 import Lecture from "@app/core/lecture/model/Lecture";
+import * as mongoose from "mongoose";
 let logger = winston.loggers.get('default');
 
 const ZERO_PERIOD_START_HOUR = 8
@@ -35,12 +36,13 @@ export async function addRefLecture(timetable: Timetable, lectureId: string, isF
   }
   let colorIndex = getAvailableColorIndex(timetable);
   let userLecture = fromRefLecture(lecture, colorIndex);
+
+  ObjectUtil.deleteObjectId(userLecture);
+  userLecture._id = lectureId;
   await addLecture(timetable, userLecture, isForced);
 }
 
 export async function addLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean = false): Promise<void> {
-  ObjectUtil.deleteObjectId(lecture);
-
   if (lecture.credit && (typeof lecture.credit === 'string' || <any>lecture.credit instanceof String)) {
     lecture.credit = Number(lecture.credit);
   }
@@ -88,6 +90,8 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
     lecture.colorIndex = getAvailableColorIndex(timetable);
   }
 
+  ObjectUtil.deleteObjectId(lecture);
+  lecture._id = mongoose.Types.ObjectId().toHexString();
   await addLecture(timetable, lecture, isForced);
 }
 
@@ -279,6 +283,7 @@ function isIdenticalCourseLecture(l1: UserLecture, l2: UserLecture): boolean {
 function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture {
   let creationDate = new Date();
   return {
+    _id: refLecture._id,
     classification: refLecture.classification,                           // 교과 구분
     department: refLecture.department,                               // 학부
     academic_year: refLecture.academic_year,                            // 학년
