@@ -8,13 +8,10 @@ import UserLectureNotFoundError from './error/UserLectureNotFoundError';
 import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 import CourseBook from "@app/core/coursebook/model/CourseBook";
 import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
-import {Types} from "mongoose";
-import {ObjectId} from "mongodb";
 
 export const NUMBER_OF_THEME = 6
 
 let userLectureSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   classification: String,                           // 교과 구분
   department: String,                               // 학부
   academic_year: String,                            // 학년
@@ -36,7 +33,8 @@ let userLectureSchema = new mongoose.Schema({
   created_at: Date,
   updated_at: Date,
   color: {fg: String, bg: String},
-  colorIndex: {type: Number, required: true, default: 0}
+  colorIndex: {type: Number, required: true, default: 0},
+  lecture_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Lecture'},
 });
 
 let TimetableSchema = new mongoose.Schema({
@@ -248,6 +246,7 @@ export async function insert(table: Timetable): Promise<Timetable> {
 }
 
 export async function insertUserLecture(tableId: string, lecture: UserLecture): Promise<void> {
+  ObjectUtil.deleteObjectId(lecture);
   let document = await mongooseModel.findOne({'_id': tableId}).exec();
   document['lecture_list'].push(lecture);
   await document.save();
