@@ -24,4 +24,6 @@ enum class ErrorType(
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
     INVALID_BODY_FIELD_VALUE(HttpStatus.BAD_REQUEST, 40002, "요청 바디 값 오류"),
+
+    TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable이 없습니다", "유효하지 않은 시간표입니다"),
 }
