@@ -18,6 +18,8 @@ object LectureNotFoundException : Snu4tException(ErrorType.LECTURE_NOT_FOUND)
 
 object TimeTableNotFoundException: Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 
+object SharedTimeTableNotFoundException: Snu4tException(ErrorType.SHARED_TIMETABLE_NOT_FOUND)
+
 class MissingRequiredParameterException(private val fieldName: String) :
     Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
 

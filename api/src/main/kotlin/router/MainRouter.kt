@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.router
 
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.SharedTimeTableHandler
 import com.wafflestudio.snu4t.handler.TimeTableHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
@@ -15,6 +16,7 @@ class MainRouter(
     private val timeTableHandler: TimeTableHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
+    private val sharedTimeTableHandler: SharedTimeTableHandler,
 ) {
     @Bean
     fun route(): RouterFunction<ServerResponse> = coRouter {
@@ -31,6 +33,12 @@ class MainRouter(
                 GET("", bookmarkHandler::getBookmark)
                 POST("/lecture", bookmarkHandler::addLecture)
                 DELETE("/lecture", bookmarkHandler::deleteBookmark)
+            }
+            "/shared_timetables".nest {
+                GET("",sharedTimeTableHandler::getSharedTimeTables)
+                GET("/{id}", sharedTimeTableHandler::getSharedTimeTable)
+                POST("", sharedTimeTableHandler::addSharedTimeTable)
+                DELETE("/{id}", sharedTimeTableHandler::deleteSharedTimeTable)
             }
         }
     }
