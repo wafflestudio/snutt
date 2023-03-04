@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.awaitBody
 class SharedTimeTableHandler(
     private val sharedTimeTableService: SharedTimeTableService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
-): ServiceHandler(handlerMiddleware = snuttRestApiDefaultMiddleware) {
+) : ServiceHandler(handlerMiddleware = snuttRestApiDefaultMiddleware) {
     suspend fun getSharedTimeTables(req: ServerRequest) = handle(req) {
         val userId = req.userId
         sharedTimeTableService.getSharedTimeTables(userId)

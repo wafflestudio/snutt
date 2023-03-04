@@ -35,7 +35,7 @@ class MainRouter(
                 DELETE("/lecture", bookmarkHandler::deleteBookmark)
             }
             "/shared_timetables".nest {
-                GET("",sharedTimeTableHandler::getSharedTimeTables)
+                GET("", sharedTimeTableHandler::getSharedTimeTables)
                 GET("/{id}", sharedTimeTableHandler::getSharedTimeTable)
                 POST("", sharedTimeTableHandler::addSharedTimeTable)
                 DELETE("/{id}", sharedTimeTableHandler::deleteSharedTimeTable)

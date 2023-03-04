@@ -6,9 +6,7 @@ import com.wafflestudio.snu4t.sharedtimetable.data.SharedTimeTable
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimeTableDetailResponse
 import com.wafflestudio.snu4t.sharedtimetable.repository.SharedTimeTableRepository
 import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
-import com.wafflestudio.snu4t.timetables.service.TimeTableService
 import org.springframework.stereotype.Service
-import java.util.StringJoiner
 
 interface SharedTimeTableService {
     suspend fun getSharedTimeTables(userId: String): List<SharedTimeTable>
@@ -21,11 +19,11 @@ interface SharedTimeTableService {
 class SharedTimeTableServiceImpl(
     private val timeTableRepository: TimeTableRepository,
     private val sharedTimeTableRepository: SharedTimeTableRepository,
-): SharedTimeTableService {
+) : SharedTimeTableService {
     override suspend fun getSharedTimeTables(userId: String): List<SharedTimeTable> = sharedTimeTableRepository.findAllByUserId(userId)
     override suspend fun getSharedTimeTable(userId: String, sharedTimeTableId: String): SharedTimeTableDetailResponse {
-        val sharedTimeTable = sharedTimeTableRepository.findSharedTimeTableByUserIdAndId(userId, sharedTimeTableId)?: throw SharedTimeTableNotFoundException
-        val timetable = timeTableRepository.findById(sharedTimeTable.timetableId)?: throw TimeTableNotFoundException
+        val sharedTimeTable = sharedTimeTableRepository.findSharedTimeTableByUserIdAndId(userId, sharedTimeTableId) ?: throw SharedTimeTableNotFoundException
+        val timetable = timeTableRepository.findById(sharedTimeTable.timetableId) ?: throw TimeTableNotFoundException
         return SharedTimeTableDetailResponse(
             id = sharedTimeTableId,
             userId = sharedTimeTable.userId,
@@ -34,7 +32,7 @@ class SharedTimeTableServiceImpl(
         )
     }
     override suspend fun addSharedTimeTable(userId: String, title: String, timeTableId: String): SharedTimeTable {
-        val timeTable = timeTableRepository.findById(timeTableId)?: throw TimeTableNotFoundException
+        val timeTable = timeTableRepository.findById(timeTableId) ?: throw TimeTableNotFoundException
         return sharedTimeTableRepository.save(
             SharedTimeTable(
                 userId = userId,
