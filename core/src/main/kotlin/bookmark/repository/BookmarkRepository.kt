@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.bookmark.repository
 
 import com.wafflestudio.snu4t.bookmark.data.Bookmark
 import com.wafflestudio.snu4t.common.enum.Semester
+import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 

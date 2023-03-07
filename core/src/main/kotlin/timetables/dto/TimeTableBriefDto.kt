@@ -14,7 +14,7 @@ data class TimeTableBriefDto(
     val semester: Int,
     val title: String,
     val updatedAt: Instant,
-    val totalCredit: Int,
+    val totalCredit: Long,
 )
 
 fun TimeTableBriefDto(timeTable: TimeTable): TimeTableBriefDto = TimeTableBriefDto(
@@ -23,5 +23,5 @@ fun TimeTableBriefDto(timeTable: TimeTable): TimeTableBriefDto = TimeTableBriefD
     semester = timeTable.semester.value,
     title = timeTable.title,
     updatedAt = timeTable.updatedAt,
-    totalCredit = timeTable.lectures.sumOf { it.credit ?: 0 }
+    totalCredit = timeTable.lectures.sumOf { it.credit ?: 0L }
 )

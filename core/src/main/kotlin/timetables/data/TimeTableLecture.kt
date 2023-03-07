@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
+import org.springframework.data.mongodb.core.mapping.FieldType
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimeTableLecture(
@@ -17,17 +19,17 @@ data class TimeTableLecture(
     var category: String?,
     @Field("class_time")
     @JsonProperty("class_time")
-    var classTimeText: String?,
+    var periodText: String?,
     @Field("real_class_time")
     @JsonProperty("real_class_time")
-    var realClassTimeText: String?,
+    var classTimeText: String?,
     @Field("class_time_json")
     @JsonProperty("class_time_json")
     var classTime: List<ClassTime>,
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
     var classification: String?,
-    var credit: Int?,
+    var credit: Long?,
     var department: String?,
     var instructor: String?,
     @Field("lecture_number")
@@ -38,6 +40,10 @@ data class TimeTableLecture(
     var courseNumber: String?,
     @Field("course_title")
     var courseTitle: String,
-    var color: ColorSet?,
-    var colorIndex: Int?,
+    var color: ColorSet? = null,
+    var colorIndex: Int = 0,
+    @JsonProperty("lecture_id")
+    @Field("lecture_id", targetType = FieldType.OBJECT_ID)
+    @Indexed
+    var lectureId: String? = null,
 )

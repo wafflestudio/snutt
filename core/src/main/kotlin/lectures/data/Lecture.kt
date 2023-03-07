@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document("lectures")
-@CompoundIndex(def = "{'year': 1, 'semester': 1}")
+@CompoundIndex(def = "{ 'year': 1, 'semester': 1 }")
 @CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }")
 @CompoundIndex(def = "{ 'year': 1, 'semester': 1,'course_number': 1, 'lecture_number': 1 }", unique = true)
 data class Lecture(
@@ -24,12 +24,13 @@ data class Lecture(
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
     var classification: String?,
-    var credit: Int,
+    var credit: Long,
     var department: String?,
     var instructor: String?,
     @Field("lecture_number")
     var lectureNumber: String,
     var quota: Int?,
+    var quotaForFreshmen: Int? = null,
     var remark: String?,
     var semester: Semester,
     var year: Int,

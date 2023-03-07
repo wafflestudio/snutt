@@ -20,7 +20,7 @@ class SugangSnuRepository(
         const val DEFAULT_COURSEBOOK_PARAMS = "openUpDeptCd=&openDeptCd="
         const val SUGANG_SNU_LECTURE_PATH = "/sugang/cc/cc100InterfaceExcel.action"
         const val DEFAULT_LECTURE_PARAMS =
-            """seeMore=더보기&srchBdNo=&srchCamp=&srchOpenSbjtFldCd=&srchCptnCorsFg=&srchCurrPage=1&srchExcept=&srchGenrlRemoteLtYn=&srchIsEngSbjt=&srchIsPendingCourse=&srchLanguage=ko&srchLsnProgType=&srchMrksApprMthdChgPosbYn=&srchMrksGvMthd=&srchOpenUpDeptCd=&srchOpenMjCd=&srchOpenPntMax=&srchOpenPntMin=&srchOpenSbjtDayNm=&srchOpenSbjtNm=&srchOpenSbjtTm=&srchOpenSbjtTmNm=&srchOpenShyr=&srchOpenSubmattCorsFg=&srchOpenSubmattFgCd1=&srchOpenSubmattFgCd2=&srchOpenSubmattFgCd3=&srchOpenSubmattFgCd4=&srchOpenSubmattFgCd5=&srchOpenSubmattFgCd6=&srchOpenSubmattFgCd7=&srchOpenSubmattFgCd8=&srchOpenSubmattFgCd9=&srchOpenDeptCd=&srchOpenUpSbjtFldCd=&srchPageSize=9999&srchProfNm=&srchSbjtCd=&srchSbjtNm=&srchTlsnAplyCapaCntMax=&srchTlsnAplyCapaCntMin=&srchTlsnRcntMax=&srchTlsnRcntMin=&workType=EX"""
+            """seeMore=더보기&srchBdNo=&srchCamp=&srchOpenSbjtFldCd=&srchCptnCorsFg=&srchCurrPage=1&srchExcept=&srchGenrlRemoteLtYn=&srchIsEngSbjt=&srchIsPendingCourse=&srchLsnProgType=&srchMrksApprMthdChgPosbYn=&srchMrksGvMthd=&srchOpenUpDeptCd=&srchOpenMjCd=&srchOpenPntMax=&srchOpenPntMin=&srchOpenSbjtDayNm=&srchOpenSbjtNm=&srchOpenSbjtTm=&srchOpenSbjtTmNm=&srchOpenShyr=&srchOpenSubmattCorsFg=&srchOpenSubmattFgCd1=&srchOpenSubmattFgCd2=&srchOpenSubmattFgCd3=&srchOpenSubmattFgCd4=&srchOpenSubmattFgCd5=&srchOpenSubmattFgCd6=&srchOpenSubmattFgCd7=&srchOpenSubmattFgCd8=&srchOpenSubmattFgCd9=&srchOpenDeptCd=&srchOpenUpSbjtFldCd=&srchPageSize=9999&srchProfNm=&srchSbjtCd=&srchSbjtNm=&srchTlsnAplyCapaCntMax=&srchTlsnAplyCapaCntMin=&srchTlsnRcntMax=&srchTlsnRcntMin=&workType=EX"""
     }
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
@@ -33,12 +33,14 @@ class SugangSnuRepository(
     suspend fun getSugangSnuLectures(
         year: Int,
         semester: Semester,
-        lectureCategory: LectureCategory = LectureCategory.NONE
+        lectureCategory: LectureCategory = LectureCategory.NONE,
+        language: String = "ko",
     ): PooledDataBuffer =
         sugangSnuApi.get().uri { builder ->
             builder.run {
                 path(SUGANG_SNU_LECTURE_PATH)
                 query(DEFAULT_LECTURE_PARAMS)
+                queryParam("srchLanguage", language)
                 queryParam("srchOpenSchyy", year)
                 queryParam("srchOpenShtm", semester.toSugangSnuSearchString())
                 if (lectureCategory != LectureCategory.NONE) {

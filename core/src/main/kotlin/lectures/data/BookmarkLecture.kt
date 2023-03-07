@@ -16,17 +16,17 @@ data class BookmarkLecture(
     var category: String?,
     @Field("class_time")
     @JsonProperty("class_time")
-    val classTimeText: String?,
+    val periodText: String?,
     @Field("real_class_time")
     @JsonProperty("real_class_time")
-    var realClassTimeText: String?,
+    var classTimeText: String?,
     @Field("class_time_json")
     @JsonProperty("class_time_json")
     var classTime: List<ClassTime>,
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
     var classification: String?,
-    var credit: Int,
+    var credit: Long,
     var department: String?,
     var instructor: String?,
     @Field("lecture_number")
@@ -43,8 +43,8 @@ fun BookmarkLecture(lecture: Lecture): BookmarkLecture = BookmarkLecture(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    classTimeText = lecture.periodText,
-    realClassTimeText = lecture.classTimeText,
+    periodText = lecture.periodText,
+    classTimeText = lecture.classTimeText,
     classTime = lecture.classTime,
     classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
