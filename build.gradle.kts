@@ -45,7 +45,7 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
         implementation("org.springframework.boot:spring-boot-starter-log4j2")
 
-        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.0.0")
+        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.0.1")
 
         // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")
