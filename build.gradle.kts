@@ -85,9 +85,9 @@ fun RepositoryHandler.mavenCodeArtifact() {
                 exec {
                     commandLine = (
                         "aws codeartifact get-authorization-token " +
-                        "--domain wafflestudio --domain-owner 405906814034 " +
-                        "--query authorizationToken --region ap-northeast-1 --output text"
-                    ).split(" ")
+                            "--domain wafflestudio --domain-owner 405906814034 " +
+                            "--query authorizationToken --region ap-northeast-1 --output text"
+                        ).split(" ")
                     standardOutput = it
                 }
             }
