@@ -51,7 +51,6 @@ class SugangSnuSyncServiceImpl(
     private val sugangSnuRepository: SugangSnuRepository,
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
-    private val notificationRepository: NotificationRepository,
 ) : SugangSnuSyncService {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
@@ -76,7 +75,7 @@ class SugangSnuSyncServiceImpl(
             .map { oldMap[it]!! to newMap[it]!! }
             .filter { (old, new) -> old != new }
             .map { (old, new) ->
-                UpdatedLecture(old, new, Lecture::class.memberProperties.filter { it.get(old) != it.get(new) })
+                UpdatedLecture(old, new, Lecture::class.memberProperties.filter { it != Lecture::id && it.get(old) != it.get(new) })
             }
         val deleted = (oldMap.keys - newMap.keys).map(oldMap::getValue)
 
@@ -120,7 +119,7 @@ class SugangSnuSyncServiceImpl(
             bookmark.apply {
                 lectures = findAndUpdateBookmarkLectures(bookmark.lectures, updatedLecture.newData)
             }
-        }.also {
+        }.let {
             bookmarkRepository.saveAll(it)
         }.map { bookmark ->
             BookmarkLectureUpdateResult(

@@ -21,8 +21,4 @@ data class ClassTime(
     @Field("start")
     @JsonProperty("start")
     val startPeriod: Double,
-) {
-    @Id
-    @JsonProperty("_id")
-    var id: String? = null
-}
+)
