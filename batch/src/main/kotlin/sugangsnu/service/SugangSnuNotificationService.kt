@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.PushTargetMessage
+import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
@@ -18,6 +19,7 @@ import kotlin.reflect.KProperty1
 
 interface SugangSnuNotificationService {
     suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>)
+    suspend fun notifyCoursebookUpdate(coursebook: Coursebook)
 }
 
 @Service
@@ -59,6 +61,12 @@ class SugangSnuNotificationServiceImpl(
         tokenAndMessage.filterNot { (token, _) -> token.isNullOrBlank() }
             .map { (token, message) -> PushTargetMessage(targetToken = token!!, "수강편람 업데이트", message) }
             .let { pushNotificationService.sendMessages(it) }
+    }
+
+    override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
+        val message = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
+        notificationRepository.save(Notification(userId = null, message = message, type = NotificationType.COURSEBOOK))
+        pushNotificationService.sendGlobalMessage("신규 수강편람", message)
     }
 
     private fun KProperty1<Lecture, *>.koreanName() = when (this) {

@@ -16,7 +16,7 @@ data class Notification (
     @Indexed
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     @JsonProperty("user_id")
-    val userId: String,
+    val userId: String?,
     val message: String,
     val type: NotificationType,
     val link: String? = null,

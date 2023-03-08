@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service
 interface PushNotificationService {
     suspend fun sendMessage(pushMessage: PushTargetMessage)
     suspend fun sendMessages(pushMessages: List<PushTargetMessage>)
+    suspend fun sendGlobalMessage(title: String, body: String)
+    suspend fun sendTopicMessage(pushMessage: TopicMessage)
 }
 
 @Service
@@ -58,10 +60,29 @@ class FcmPushNotificationService(
         }.awaitAll()
     }
 
+    override suspend fun sendGlobalMessage(title: String, body: String) {
+        sendTopicMessage(TopicMessage("global", title, body))
+    }
+
+    override suspend fun sendTopicMessage(pushMessage: TopicMessage) {
+        val notification = Notification.builder().setTitle(pushMessage.title).setBody(pushMessage.body).build()
+        val message: Message = Message.builder()
+            .setNotification(notification)
+            .setTopic(pushMessage.topic)
+            .build()
+        FirebaseMessaging.getInstance().sendAsync(message).await()
+    }
+
 }
 
 data class PushTargetMessage(
     val targetToken: String,
+    val title: String,
+    val body: String,
+)
+
+data class TopicMessage(
+    val topic: String,
     val title: String,
     val body: String,
 )

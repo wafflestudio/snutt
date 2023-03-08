@@ -1,15 +1,11 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.notification.data.Notification
-import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.repository.NotificationRepository
 import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
@@ -22,26 +18,24 @@ import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
 import com.wafflestudio.snu4t.timetables.data.TimeTableLecture
 import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
-import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 
 interface SugangSnuSyncService {
-    suspend fun getOrCreateLatestCoursebook(): Coursebook
+    suspend fun getLatestCoursebook(): Coursebook
+    suspend fun saveCoursebook(coursebook: Coursebook): Coursebook
+    suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
     fun compareLectures(newLectures: Iterable<Lecture>, oldLectures: Iterable<Lecture>): SugangSnuLectureCompareResult
 
     suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult)
-    suspend fun syncSavedLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
+    suspend fun saveLectures(lectures: Iterable<Lecture>)
+    suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
 }
 
 @Service
@@ -55,12 +49,16 @@ class SugangSnuSyncServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
-    override suspend fun getOrCreateLatestCoursebook(): Coursebook {
-        val existingLatestCoursebook = coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
+    override suspend fun getLatestCoursebook(): Coursebook =
+        coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
+
+    override suspend fun saveCoursebook(coursebook: Coursebook): Coursebook = coursebookRepository.save(coursebook)
+
+
+
+    override suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean {
         val sugangSnuLatestCoursebook = sugangSnuRepository.getCoursebookCondition()
-        return if (!existingLatestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)) {
-            coursebookRepository.save(existingLatestCoursebook.nextCoursebook())
-        } else existingLatestCoursebook
+        return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
     }
 
     override fun compareLectures(
@@ -75,12 +73,17 @@ class SugangSnuSyncServiceImpl(
             .map { oldMap[it]!! to newMap[it]!! }
             .filter { (old, new) -> old != new }
             .map { (old, new) ->
-                UpdatedLecture(old, new, Lecture::class.memberProperties.filter { it != Lecture::id && it.get(old) != it.get(new) })
+                UpdatedLecture(
+                    old,
+                    new,
+                    Lecture::class.memberProperties.filter { it != Lecture::id && it.get(old) != it.get(new) })
             }
         val deleted = (oldMap.keys - newMap.keys).map(oldMap::getValue)
 
         return SugangSnuLectureCompareResult(created, deleted, updated)
     }
+
+    override suspend fun saveLectures(lectures: Iterable<Lecture>) = lectureService.upsertLectures(lectures)
 
     override suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
         val updatedLectures = compareResult.updatedLectureList.map { diff ->
@@ -92,7 +95,7 @@ class SugangSnuSyncServiceImpl(
         lectureService.deleteLectures(compareResult.deletedLectureList)
     }
 
-    override suspend fun syncSavedLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult> =
+    override suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult> =
         merge(
             syncTimetableLectures(compareResult),
             syncBookmarks(compareResult),
@@ -232,13 +235,4 @@ class SugangSnuSyncServiceImpl(
     private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
         this.year == sugangSnuCoursebookCondition.latestYear &&
             this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
-
-    private fun Coursebook.nextCoursebook(): Coursebook {
-        return when (this.semester) {
-            Semester.SPRING -> Coursebook(year = this.year, semester = Semester.SUMMER)
-            Semester.SUMMER -> Coursebook(year = this.year, semester = Semester.AUTUMN)
-            Semester.AUTUMN -> Coursebook(year = this.year, semester = Semester.WINTER)
-            Semester.WINTER -> Coursebook(year = this.year + 1, semester = Semester.SPRING)
-        }
-    }
 }

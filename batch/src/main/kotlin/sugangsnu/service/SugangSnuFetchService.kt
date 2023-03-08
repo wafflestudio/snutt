@@ -8,7 +8,6 @@ import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
