@@ -305,5 +305,6 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     updated_at: mongooseDoc.updated_at,
     color: mongooseDoc.color,
     colorIndex: mongooseDoc.colorIndex,
+    lecture_id: mongooseDoc.lecture_id,
   }
 }

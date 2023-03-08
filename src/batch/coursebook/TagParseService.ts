@@ -48,7 +48,11 @@ export function parseTagFromLectureList(lines:RefLecture[]): TagStruct {
 
   for (var key in tags) {
     if (tags.hasOwnProperty(key)) {
-      tags[key].sort();
+      if (key === 'credit') {
+        tags[key].sort((a, b) => parseInt(a) - parseInt(b));
+      } else {
+        tags[key].sort();
+      }
     }
   }
   return tags;
