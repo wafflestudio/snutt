@@ -1,7 +1,5 @@
 package com.wafflestudio.snu4t.sugangsnu
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuFetchService
 import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuNotificationService

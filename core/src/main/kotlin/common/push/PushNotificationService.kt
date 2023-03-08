@@ -72,7 +72,6 @@ class FcmPushNotificationService(
             .build()
         FirebaseMessaging.getInstance().sendAsync(message).await()
     }
-
 }
 
 data class PushTargetMessage(

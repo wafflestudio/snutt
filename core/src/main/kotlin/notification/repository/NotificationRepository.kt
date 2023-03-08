@@ -5,5 +5,4 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface NotificationRepository : CoroutineCrudRepository<Notification, String> {
-}
+interface NotificationRepository : CoroutineCrudRepository<Notification, String>

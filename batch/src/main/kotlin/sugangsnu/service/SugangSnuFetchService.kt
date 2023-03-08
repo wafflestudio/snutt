@@ -51,11 +51,13 @@ class SugangSnuFetchServiceImpl(
         semester: Semester,
     ): Lecture {
         fun List<Cell>.getCellByColumnName(key: String): String =
-            this[columnNameIndex.getOrElse(key) {
-                // TODO: slack 메시지로 보내기
-                logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
-                this.size
-            }].stringCellValue
+            this[
+                columnNameIndex.getOrElse(key) {
+                    // TODO: slack 메시지로 보내기
+                    logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
+                    this.size
+                }
+            ].stringCellValue
 
         val classification = row.getCellByColumnName("교과구분")
         val college = row.getCellByColumnName("개설대학")

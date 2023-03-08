@@ -55,7 +55,6 @@ class TruncateCollectionsTest(
                 semester = Semester.AUTUMN,
                 lectures = listOf(),
                 title = "test",
-                theme = 0,
                 updatedAt = Instant.now()
             )
 

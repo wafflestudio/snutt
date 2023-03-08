@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.LocalDateTime
 
 @Document("notifications")
-data class Notification (
+data class Notification(
     @Id
     @JsonProperty("_id")
     val id: String? = null,

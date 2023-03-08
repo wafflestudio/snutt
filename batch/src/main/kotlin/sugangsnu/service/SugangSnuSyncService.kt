@@ -54,8 +54,6 @@ class SugangSnuSyncServiceImpl(
 
     override suspend fun saveCoursebook(coursebook: Coursebook): Coursebook = coursebookRepository.save(coursebook)
 
-
-
     override suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean {
         val sugangSnuLatestCoursebook = sugangSnuRepository.getCoursebookCondition()
         return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
@@ -76,9 +74,14 @@ class SugangSnuSyncServiceImpl(
                 UpdatedLecture(
                     old,
                     new,
-                    Lecture::class.memberProperties.filter { it != Lecture::id && it.get(old) != it.get(new) })
+                    Lecture::class.memberProperties.filter {
+                        it != Lecture::id && it.get(old) != it.get(new)
+                    }
+                )
             }
-        val deleted = (oldMap.keys - newMap.keys).map(oldMap::getValue)
+        val deleted = (oldMap.keys - newMap.keys).map(
+            oldMap::getValue
+        )
 
         return SugangSnuLectureCompareResult(created, deleted, updated)
     }

@@ -31,17 +31,24 @@ class SugangSnuNotificationServiceImpl(
 
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
         syncSavedLecturesResults.map {
-            val message = when(it) {
-                is TimetableLectureUpdateResult -> "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
-                    "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
-                    "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
-                is TimetableLectureDeleteResult -> "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
-                    "'${it.courseTitle}' 강의가 폐강되어 삭제되었습니다."
-                is BookmarkLectureUpdateResult ->"${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
-                    "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
-                    "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
-                is BookmarkLectureDeleteResult -> "${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
-                    "'${it.courseTitle}' 강의가 폐강되어 삭제되었습니다."
+            val message = when (it) {
+                is TimetableLectureUpdateResult ->
+                    "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
+                        "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
+                        "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
+
+                is TimetableLectureDeleteResult ->
+                    "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
+                        "'${it.courseTitle}' 강의가 폐강되어 삭제되었습니다."
+
+                is BookmarkLectureUpdateResult ->
+                    "${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
+                        "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
+                        "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
+
+                is BookmarkLectureDeleteResult ->
+                    "${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
+                        "'${it.courseTitle}' 강의가 폐강되어 삭제되었습니다."
             }
             Notification(userId = it.userId, message = message, type = NotificationType.LECTURE_UPDATE)
         }.let { notificationRepository.saveAll(it) }.collect()
@@ -53,7 +60,7 @@ class SugangSnuNotificationServiceImpl(
         val tokenAndMessage = (userUpdatedLectureCountMap.keys - userDeletedLectureCountMap.keys).map {
             userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되었습니다."
         } + (userUpdatedLectureCountMap.keys intersect userDeletedLectureCountMap.keys).map {
-            userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되고 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다.";
+            userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되고 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다."
         } + (userDeletedLectureCountMap.keys - userUpdatedLectureCountMap.keys).map {
             userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다."
         }

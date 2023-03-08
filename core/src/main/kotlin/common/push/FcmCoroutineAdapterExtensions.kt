@@ -18,14 +18,18 @@ suspend fun <F : Any, R : Any?> ApiFuture<F>.await(
     successHandler: (F) -> R,
 ): R {
     return suspendCoroutine { cont ->
-        ApiFutures.addCallback(this, object : ApiFutureCallback<F> {
-            override fun onFailure(t: Throwable?) {
-                cont.resumeWithException(t ?: IOException("Unknown error"))
-            }
+        ApiFutures.addCallback(
+            this,
+            object : ApiFutureCallback<F> {
+                override fun onFailure(t: Throwable?) {
+                    cont.resumeWithException(t ?: IOException("Unknown error"))
+                }
 
-            override fun onSuccess(result: F) {
-                cont.resume(successHandler(result))
-            }
-        }, Dispatchers.IO.asExecutor())
+                override fun onSuccess(result: F) {
+                    cont.resume(successHandler(result))
+                }
+            },
+            Dispatchers.IO.asExecutor()
+        )
     }
 }
