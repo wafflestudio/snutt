@@ -16,8 +16,8 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
-import com.wafflestudio.snu4t.timetables.data.TimeTableLecture
-import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
+import com.wafflestudio.snu4t.timetables.data.TimetableLecture
+import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -41,7 +41,7 @@ interface SugangSnuSyncService {
 @Service
 class SugangSnuSyncServiceImpl(
     private val lectureService: LectureService,
-    private val timeTableRepository: TimeTableRepository,
+    private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
@@ -212,7 +212,7 @@ class SugangSnuSyncServiceImpl(
             }
         }
 
-    private fun findAndUpdateTimetableLecture(lectures: List<TimeTableLecture>, newLecture: Lecture) =
+    private fun findAndUpdateTimetableLecture(lectures: List<TimetableLecture>, newLecture: Lecture) =
         lectures.map { lecture ->
             lecture.apply {
                 if (lecture.lectureId == newLecture.id) {

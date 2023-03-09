@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.Instant
 
 @Document("timetables")
-data class TimeTable(
+data class Timetable(
     @Id
     @JsonProperty("_id")
     var id: String? = null,
@@ -20,7 +20,7 @@ data class TimeTable(
     var year: Int,
     var semester: Semester,
     @Field("lecture_list")
-    var lectures: List<TimeTableLecture>,
+    var lectures: List<TimetableLecture>,
     var title: String,
     @Field("updated_at")
     var updatedAt: Instant,

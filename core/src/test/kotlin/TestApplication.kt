@@ -3,8 +3,8 @@ package com.wafflestudio.snu4t
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.internal.MongoClientImpl
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.timetables.data.TimeTable
-import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
+import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
@@ -44,12 +44,12 @@ class TestApplication(
 
 @SpringBootTest
 class TruncateCollectionsTest(
-    private val repository: TimeTableRepository,
+    private val repository: TimetableRepository,
 ) : BehaviorSpec() {
 
     init {
         Given("a dummy data") {
-            val dummy = TimeTable(
+            val dummy = Timetable(
                 userId = "63a1b97f42ed0d0010b4351d",
                 year = 2022,
                 semester = Semester.AUTUMN,

@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
-data class TimeTableLecture(
+data class TimetableLecture(
     @Id
     @JsonProperty("_id")
     var id: String? = null,
