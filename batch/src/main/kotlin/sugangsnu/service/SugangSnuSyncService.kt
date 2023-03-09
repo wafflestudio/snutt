@@ -112,7 +112,7 @@ class SugangSnuSyncServiceImpl(
             category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
         )
         val tagList = tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
-            ?.copy(tagCollection = tagCollection) ?: TagList(
+            ?.copy(tagCollection = tagCollection, updatedAt = Instant.now()) ?: TagList(
             year = coursebook.year,
             semester = coursebook.semester,
             tagCollection = tagCollection
