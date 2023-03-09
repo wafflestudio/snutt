@@ -12,6 +12,10 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+google:
+  firebase:
+    project-id:
+    service-account:
 
 secret-names: dev/snutt-timetable
 
@@ -24,6 +28,10 @@ spring:
     mongodb:
       uri:
       auto-index-creation: true
+google:
+  firebase:
+    project-id:
+    service-account:
 ---
 spring:
   config:
@@ -32,5 +40,9 @@ spring:
   data:
     mongodb:
       uri:
+google:
+  firebase:
+    project-id:
+    service-account:
 
 secret-names: prod/snutt-timetable

@@ -2,4 +2,4 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY . /app
 RUN ./gradlew :batch:bootJar
-ENTRYPOINT java $JAVA_OPTS -jar batch/build/libs/snu4t-batch.jar --job.names=${JOB_NAMES}
+ENTRYPOINT java $JAVA_OPTS -jar batch/build/libs/snu4t-batch.jar --job.name=${JOB_NAMES}

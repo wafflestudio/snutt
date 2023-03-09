@@ -8,12 +8,13 @@ import org.springframework.stereotype.Component
 
 enum class Semester(
     @JsonValue
-    val value: Int
+    val value: Int,
+    val fullName: String,
 ) {
-    SPRING(1),
-    SUMMER(2),
-    AUTUMN(3),
-    WINTER(4);
+    SPRING(1, "1학기"),
+    SUMMER(2, "여름학기"),
+    AUTUMN(3, "2학기"),
+    WINTER(4, "겨울학기");
 
     companion object {
         private val valueMap = values().associateBy { e -> e.value }
