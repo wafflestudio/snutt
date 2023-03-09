@@ -38,7 +38,7 @@ interface SugangSnuSyncService {
 
     suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult)
     suspend fun saveLectures(lectures: Iterable<Lecture>)
-    suspend fun syncTag(coursebook: Coursebook, lectures: Iterable<Lecture>)
+    suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>)
     suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
 }
 
@@ -92,7 +92,7 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun saveLectures(lectures: Iterable<Lecture>) = lectureService.upsertLectures(lectures)
-    override suspend fun syncTag(coursebook: Coursebook, lectures: Iterable<Lecture>) {
+    override suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>) {
         val parsedTag = lectures.fold(ParsedTags()) { collection, lecture ->
             collection.apply {
                 academicYear.add(lecture.academicYear)
@@ -164,8 +164,8 @@ class SugangSnuSyncServiceImpl(
                 bookmark.year,
                 bookmark.semester,
                 updatedLecture.oldData.courseTitle,
-                updatedLecture.oldData.id!!,
                 bookmark.userId,
+                updatedLecture.oldData.id!!,
                 updatedLecture.updatedField
             )
         }

@@ -49,13 +49,13 @@ class SugangSnuSyncJobConfig {
                     sugangSnuSyncService.syncLectures(compareResult)
                     val syncUserLecturesResults = sugangSnuSyncService.syncSavedUserLectures(compareResult)
                     sugangSnuNotificationService.notifyUserLectureChanges(syncUserLecturesResults)
-                    sugangSnuSyncService.syncTag(existingCoursebook, newLectures)
+                    sugangSnuSyncService.syncTagList(existingCoursebook, newLectures)
                     sugangSnuSyncService.saveCoursebook(existingCoursebook.apply { updatedAt = Instant.now() })
                 } else {
                     // 수강편람 첫 업데이트 시
                     sugangSnuSyncService.saveLectures(newLectures)
                     val newCoursebook = existingCoursebook.nextCoursebook()
-                    sugangSnuSyncService.syncTag(newCoursebook, newLectures)
+                    sugangSnuSyncService.syncTagList(newCoursebook, newLectures)
                     sugangSnuSyncService.saveCoursebook(newCoursebook)
                     sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                 }
