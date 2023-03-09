@@ -16,6 +16,9 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
+import com.wafflestudio.snu4t.tag.data.TagCollection
+import com.wafflestudio.snu4t.tag.data.TagList
+import com.wafflestudio.snu4t.tag.repository.TagListRepository
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +38,7 @@ interface SugangSnuSyncService {
 
     suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult)
     suspend fun saveLectures(lectures: Iterable<Lecture>)
+    suspend fun syncTag(coursebook: Coursebook, lectures: Iterable<Lecture>)
     suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
 }
 
@@ -45,6 +49,7 @@ class SugangSnuSyncServiceImpl(
     private val sugangSnuRepository: SugangSnuRepository,
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
+    private val tagListRepository: TagListRepository,
 ) : SugangSnuSyncService {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
@@ -87,6 +92,33 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun saveLectures(lectures: Iterable<Lecture>) = lectureService.upsertLectures(lectures)
+    override suspend fun syncTag(coursebook: Coursebook, lectures: Iterable<Lecture>) {
+        val parsedTag = lectures.fold(ParsedTags()) { collection, lecture ->
+            collection.apply {
+                academicYear.add(lecture.academicYear)
+                classification.add(lecture.classification)
+                department.add(lecture.department)
+                credit.add(lecture.credit)
+                instructor.add(lecture.instructor)
+                category.add(lecture.category)
+            }
+        }
+        val tagCollection = TagCollection(
+            academicYear = parsedTag.academicYear.filterNotNull().filter{it.length > 1}.sorted(),
+            classification = parsedTag.classification.filterNotNull().filter{it.isNotBlank()}.sorted(),
+            department = parsedTag.department.filterNotNull().filter{it.isNotBlank()}.sorted(),
+            credit = parsedTag.credit.sorted().map { "${it}학점" },
+            instructor = parsedTag.instructor.filterNotNull().filter{it.isNotBlank()}.sorted(),
+            category = parsedTag.category.filterNotNull().filter{it.isNotBlank()}.sorted(),
+        )
+        val tagList = tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
+            ?.copy(tagCollection = tagCollection) ?: TagList(
+            year = coursebook.year,
+            semester = coursebook.semester,
+            tagCollection = tagCollection
+        )
+        tagListRepository.save(tagList)
+    }
 
     override suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
         val updatedLectures = compareResult.updatedLectureList.map { diff ->
@@ -239,3 +271,13 @@ class SugangSnuSyncServiceImpl(
         this.year == sugangSnuCoursebookCondition.latestYear &&
             this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
 }
+
+data class ParsedTags(
+    val classification: MutableSet<String?> = mutableSetOf(),
+    val department: MutableSet<String?> = mutableSetOf(),
+    val academicYear: MutableSet<String?> = mutableSetOf(),
+    val credit: MutableSet<Long> = mutableSetOf(),
+    val instructor: MutableSet<String?> = mutableSetOf(),
+    val category: MutableSet<String?> = mutableSetOf(),
+    val etc: MutableSet<String?> = mutableSetOf(),
+)
