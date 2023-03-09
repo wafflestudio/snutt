@@ -12,7 +12,7 @@ data class BookmarkLectureUpdateResult(
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,
-    val updatedField: List<KProperty1<Lecture, *>>,
+    val updatedFields: List<KProperty1<Lecture, *>>,
 ) : UserLectureSyncResult(userId, lectureId)
 
 data class BookmarkLectureDeleteResult(
@@ -30,7 +30,7 @@ data class TimetableLectureUpdateResult(
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,
-    val updatedField: List<KProperty1<Lecture, *>>,
+    val updatedFields: List<KProperty1<Lecture, *>>,
 ) : UserLectureSyncResult(userId, lectureId)
 
 data class TimetableLectureDeleteResult(

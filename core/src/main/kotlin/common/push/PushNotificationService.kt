@@ -6,11 +6,11 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
-import com.wafflestudio.snu4t.common.secret.SecretRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 interface PushNotificationService {
@@ -21,16 +21,14 @@ interface PushNotificationService {
 }
 
 @Service
+@Profile("!test")
 class FcmPushNotificationService(
-    @Value("\${fcm.project-id}") val projectId: String,
-    @Value("\${fcm.secret-names}") val fcmSecretNames: String,
-    secretRepository: SecretRepository
+    @Value("\${google.firebase.project-id}") val projectId: String,
+    @Value("\${google.firebase.service-account}") val serviceAccountString: String,
 ) : PushNotificationService {
     init {
-        val googleAccountSecret = secretRepository.getSecretString(fcmSecretNames).byteInputStream()
-
         val options: FirebaseOptions = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(googleAccountSecret))
+            .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
             .setDatabaseUrl("https://$projectId.firebaseio.com/")
             .build()
 

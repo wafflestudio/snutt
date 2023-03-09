@@ -9,7 +9,3 @@ logging:
     com.mongodb: ERROR
 
 de.flapdoodle.mongodb.embedded.version: 5.0.5
-
-fcm:
-  project-id: snutt-1470373443173
-  secret-names: dev/snutt-timetable/google-service-account

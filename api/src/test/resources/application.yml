@@ -2,11 +2,3 @@ spring.profiles.active: test
 
 snutt:
   secret-key: test-secret-key
-
-fcm:
-  project-id: snutt-1470373443173
-  secret-names: dev/snutt-timetable/google-service-account
-
-fcm:
-  project-id: snutt-1470373443173
-  secret-names: dev/snutt-timetable/google-service-account

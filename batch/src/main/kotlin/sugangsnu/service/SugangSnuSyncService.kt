@@ -158,7 +158,7 @@ class SugangSnuSyncServiceImpl(
                 userId = timetable.userId,
                 timetableTitle = timetable.title,
                 courseTitle = updatedLecture.oldData.courseTitle,
-                updatedField = updatedLecture.updatedField
+                updatedFields = updatedLecture.updatedField
             )
         }
 

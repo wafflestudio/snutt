@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.sugangsnu.service
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
-import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
@@ -12,10 +11,10 @@ import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
+import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
-import kotlin.reflect.KProperty1
 
 interface SugangSnuNotificationService {
     suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>)
@@ -35,7 +34,7 @@ class SugangSnuNotificationServiceImpl(
                 is TimetableLectureUpdateResult ->
                     "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
                         "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
-                        "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
+                        "(항목: ${it.updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})"
 
                 is TimetableLectureDeleteResult ->
                     "${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의 " +
@@ -44,7 +43,7 @@ class SugangSnuNotificationServiceImpl(
                 is BookmarkLectureUpdateResult ->
                     "${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
                         "'${it.courseTitle}' 강의가 업데이트 되었습니다." +
-                        "(항목: ${it.updatedField.map { field -> field.koreanName() }.distinct().joinToString(",")})"
+                        "(항목: ${it.updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})"
 
                 is BookmarkLectureDeleteResult ->
                     "${it.year}-${it.semester.fullName} 관심강좌 목록의 " +
@@ -74,20 +73,6 @@ class SugangSnuNotificationServiceImpl(
         val message = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
         notificationRepository.save(Notification(userId = null, message = message, type = NotificationType.COURSEBOOK))
         pushNotificationService.sendGlobalMessage("신규 수강편람", message)
-    }
-
-    private fun KProperty1<Lecture, *>.koreanName() = when (this) {
-        Lecture::classification -> "교과 구분"
-        Lecture::department -> "학부"
-        Lecture::academicYear -> "학년"
-        Lecture::courseTitle -> "강의명"
-        Lecture::credit -> "학점"
-        Lecture::instructor -> "교수"
-        Lecture::quota -> "정원"
-        Lecture::remark -> "비고"
-        Lecture::category -> "교양 구분"
-        Lecture::classTime -> "강의 시간/장소"
-        else -> "기타"
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =
