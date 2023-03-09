@@ -104,12 +104,12 @@ class SugangSnuSyncServiceImpl(
             }
         }
         val tagCollection = TagCollection(
-            academicYear = parsedTag.academicYear.filterNotNull().filter{it.length > 1}.sorted(),
-            classification = parsedTag.classification.filterNotNull().filter{it.isNotBlank()}.sorted(),
-            department = parsedTag.department.filterNotNull().filter{it.isNotBlank()}.sorted(),
+            academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
+            classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
+            department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
             credit = parsedTag.credit.sorted().map { "${it}학점" },
-            instructor = parsedTag.instructor.filterNotNull().filter{it.isNotBlank()}.sorted(),
-            category = parsedTag.category.filterNotNull().filter{it.isNotBlank()}.sorted(),
+            instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
+            category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
         )
         val tagList = tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
             ?.copy(tagCollection = tagCollection) ?: TagList(

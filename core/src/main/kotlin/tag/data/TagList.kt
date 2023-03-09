@@ -9,7 +9,7 @@ import java.time.Instant
 
 @Document("taglists")
 @CompoundIndex(def = "{'year': 1, 'semester': 1}", unique = true)
-data class TagList (
+data class TagList(
     val year: Int,
     val semester: Semester,
     @Field("updated_at")
@@ -20,7 +20,7 @@ data class TagList (
     val tagCollection: TagCollection
 )
 
-data class TagCollection (
+data class TagCollection(
     val classification: List<String>,
     val department: List<String>,
     @Field("academic_year")
