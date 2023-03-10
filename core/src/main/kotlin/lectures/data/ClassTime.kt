@@ -4,24 +4,20 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class ClassTime(
-    @Id
-    @JsonProperty("_id")
-    var id: String,
-    var day: DayOfWeek,
-    var place: String,
+    val day: DayOfWeek,
+    val place: String,
     @Field("start_time")
-    var startTime: String,
+    val startTime: String,
     @Field("end_time")
-    var endTime: String,
+    val endTime: String,
     @Field("len")
     @JsonProperty("len")
-    var length: Double,
+    val periodLength: Double,
     @Field("start")
     @JsonProperty("start")
-    var startPeriod: Double,
+    val startPeriod: Double,
 )

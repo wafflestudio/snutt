@@ -8,6 +8,11 @@ logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
+google:
+  firebase:
+    project-id:
+    service-account:
+
 truffle:
   client:
     name: snutt-timetable
@@ -27,6 +32,11 @@ spring:
       uri:
       auto-index-creation: true
 
+google:
+  firebase:
+    project-id:
+    service-account:
+
 truffle:
   client:
     phase: dev
@@ -40,6 +50,11 @@ spring:
   data:
     mongodb:
       uri:
+
+google:
+  firebase:
+    project-id:
+    service-account:
 
 truffle:
   client:
