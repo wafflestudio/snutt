@@ -95,7 +95,7 @@ class SugangSnuFetchServiceImpl(
             instructor = instructor,
             remark = remark,
             quota = quota,
-            quotaForFreshmen = (quota - quotaForCurrentStudent).takeIf { it > 0 },
+            freshmanQuota = (quota - quotaForCurrentStudent).takeIf { it > 0 },
             year = year,
             semester = semester,
             category = category.koreanName,

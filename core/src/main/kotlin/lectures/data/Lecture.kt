@@ -29,7 +29,8 @@ data class Lecture(
     @Field("lecture_number")
     var lectureNumber: String,
     var quota: Int?,
-    var quotaForFreshmen: Int? = null,
+    @Field("freshman_quota")
+    var freshmanQuota: Int? = null,
     var remark: String?,
     var semester: Semester,
     var year: Int,

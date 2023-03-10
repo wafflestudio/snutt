@@ -93,24 +93,26 @@ class SugangSnuSyncServiceImpl(
 
     override suspend fun saveLectures(lectures: Iterable<Lecture>) = lectureService.upsertLectures(lectures)
     override suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>) {
-        val parsedTag = lectures.fold(ParsedTags()) { collection, lecture ->
-            collection.apply {
-                academicYear.add(lecture.academicYear)
-                classification.add(lecture.classification)
-                department.add(lecture.department)
-                credit.add(lecture.credit)
-                instructor.add(lecture.instructor)
-                category.add(lecture.category)
-            }
+        val tagCollection = lectures.fold(ParsedTags()) { acc, lecture ->
+            ParsedTags(
+                academicYear = acc.academicYear + lecture.academicYear,
+                classification = acc.classification + lecture.classification,
+                department = acc.department + lecture.department,
+                credit = acc.credit + lecture.credit,
+                instructor = acc.instructor + lecture.instructor,
+                category = acc.category + lecture.category,
+            )
+        }.let { parsedTag ->
+            TagCollection(
+                // 엑셀 academicYear 필드 '학년' 안 붙어 나오는 경우 제외
+                academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
+                classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                credit = parsedTag.credit.sorted().map { "${it}학점" },
+                instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
+            )
         }
-        val tagCollection = TagCollection(
-            academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
-            classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
-            department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
-            credit = parsedTag.credit.sorted().map { "${it}학점" },
-            instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
-            category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
-        )
         val tagList = tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
             ?.copy(tagCollection = tagCollection, updatedAt = Instant.now()) ?: TagList(
             year = coursebook.year,
@@ -155,7 +157,9 @@ class SugangSnuSyncServiceImpl(
             updatedLecture.oldData.id!!
         ).map { bookmark ->
             bookmark.apply {
-                lectures = findAndUpdateBookmarkLectures(bookmark.lectures, updatedLecture.newData)
+                lectures = lectures.map { lecture ->
+                    if(lecture.id == updatedLecture.newData.id) BookmarkLecture(updatedLecture.newData) else lecture
+                }
             }
         }.let {
             bookmarkRepository.saveAll(it)
@@ -177,7 +181,9 @@ class SugangSnuSyncServiceImpl(
             updatedLecture.oldData.id!!
         ).map { timetable ->
             timetable.apply {
-                lectures = findAndUpdateTimetableLecture(timetable.lectures, updatedLecture.newData)
+                lectures = lectures.map { lecture ->
+                    if(lecture.lectureId == updatedLecture.newData.id) TimetableLecture(updatedLecture.newData) else lecture
+                }
                 updatedAt = Instant.now()
             }
         }.let {
@@ -223,61 +229,17 @@ class SugangSnuSyncServiceImpl(
             )
         }
 
-    private fun findAndUpdateBookmarkLectures(lectures: List<BookmarkLecture>, newLecture: Lecture) =
-        lectures.map { lecture ->
-            lecture.apply {
-                if (lecture.id == newLecture.id) {
-                    academicYear = newLecture.academicYear
-                    category = newLecture.category
-                    classTime = newLecture.classTime
-                    classTimeMask = newLecture.classTimeMask
-                    classification = newLecture.classification
-                    credit = newLecture.credit
-                    department = newLecture.department
-                    instructor = newLecture.instructor
-                    lectureNumber = newLecture.lectureNumber
-                    quota = newLecture.quota
-                    remark = newLecture.remark
-                    courseNumber = newLecture.courseNumber
-                    courseTitle = newLecture.courseTitle
-                }
-            }
-        }
-
-    private fun findAndUpdateTimetableLecture(lectures: List<TimetableLecture>, newLecture: Lecture) =
-        lectures.map { lecture ->
-            lecture.apply {
-                if (lecture.lectureId == newLecture.id) {
-                    academicYear = newLecture.academicYear
-                    category = newLecture.category
-                    periodText = newLecture.periodText
-                    classTimeText = newLecture.classTimeText
-                    classTime = newLecture.classTime
-                    classTimeMask = newLecture.classTimeMask
-                    classification = newLecture.classification
-                    credit = newLecture.credit
-                    department = newLecture.department
-                    instructor = newLecture.instructor
-                    lectureNumber = newLecture.lectureNumber
-                    quota = newLecture.quota
-                    remark = newLecture.remark
-                    courseNumber = newLecture.courseNumber
-                    courseTitle = newLecture.courseTitle
-                }
-            }
-        }
-
     private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
         this.year == sugangSnuCoursebookCondition.latestYear &&
             this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
 }
 
 data class ParsedTags(
-    val classification: MutableSet<String?> = mutableSetOf(),
-    val department: MutableSet<String?> = mutableSetOf(),
-    val academicYear: MutableSet<String?> = mutableSetOf(),
-    val credit: MutableSet<Long> = mutableSetOf(),
-    val instructor: MutableSet<String?> = mutableSetOf(),
-    val category: MutableSet<String?> = mutableSetOf(),
-    val etc: MutableSet<String?> = mutableSetOf(),
+    val classification: Set<String?> = setOf(),
+    val department: Set<String?> = setOf(),
+    val academicYear: Set<String?> = setOf(),
+    val credit: Set<Long> = setOf(),
+    val instructor: Set<String?> = setOf(),
+    val category: Set<String?> = setOf(),
+    val etc: Set<String?> = setOf(),
 )
