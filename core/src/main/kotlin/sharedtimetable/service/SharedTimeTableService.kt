@@ -57,11 +57,13 @@ class SharedTimeTableServiceImpl(
         val sharedTimetable = sharedTimetableRepository.findSharedTimeTableByIdAndDeletedFalse(timetableId) ?: throw SharedTimeTableNotFoundException
         sharedTimetable.title = title
         sharedTimetable.updatedAt = LocalDateTime.now()
+        sharedTimetableRepository.save(sharedTimetable)
         return  sharedTimetable
     }
 
     override suspend fun delete(userId: String, timetableId: String) {
         val timetable = sharedTimetableRepository.findSharedTimeTableById(timetableId) ?: throw SharedTimeTableNotFoundException
         timetable.isDeleted = true
+        sharedTimetableRepository.save(timetable)
     }
 }
