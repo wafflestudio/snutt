@@ -9,6 +9,7 @@ import com.wafflestudio.snu4t.timetables.repository.TimeTableRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 interface SharedTimeTableService {
     suspend fun gets(userId: String): List<SharedTimeTable>
@@ -55,6 +56,7 @@ class SharedTimeTableServiceImpl(
     override suspend fun update(title: String, timetableId: String): SharedTimeTable {
         val sharedTimetable = sharedTimetableRepository.findSharedTimeTableByIdAndDeletedFalse(timetableId) ?: throw SharedTimeTableNotFoundException
         sharedTimetable.title = title
+        sharedTimetable.updatedAt = LocalDateTime.now()
         return  sharedTimetable
     }
 

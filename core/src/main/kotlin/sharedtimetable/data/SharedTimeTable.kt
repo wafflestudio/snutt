@@ -19,9 +19,7 @@ data class SharedTimeTable(
     val userId: String,
     var title: String,
     val timetableId: String,
-    @CreatedDate
-    val createdDate: LocalDateTime = LocalDateTime.now(),
-    @LastModifiedDate
-    val lastModifiedDate: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
     var isDeleted: Boolean = false,
 )
