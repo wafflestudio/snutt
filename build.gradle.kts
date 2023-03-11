@@ -81,7 +81,7 @@ subprojects {
 
 fun RepositoryHandler.mavenCodeArtifact() {
     maven {
-        val authToken = ByteArrayOutputStream().use {
+        val authToken = properties["codeArtifactAuthToken"] as String? ?: ByteArrayOutputStream().use {
             runCatching {
                 exec {
                     commandLine = (
