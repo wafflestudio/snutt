@@ -38,6 +38,7 @@ class MainRouter(
                 GET("", sharedTimeTableHandler::getSharedTimeTables)
                 GET("/{id}", sharedTimeTableHandler::getSharedTimeTable)
                 POST("", sharedTimeTableHandler::addSharedTimeTable)
+                PUT("/{id}", sharedTimeTableHandler::updateSharedTimetable)
                 DELETE("/{id}", sharedTimeTableHandler::deleteSharedTimeTable)
             }
         }

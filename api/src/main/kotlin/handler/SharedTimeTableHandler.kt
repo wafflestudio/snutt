@@ -14,26 +14,31 @@ class SharedTimeTableHandler(
 ) : ServiceHandler(handlerMiddleware = snuttRestApiDefaultMiddleware) {
     suspend fun getSharedTimeTables(req: ServerRequest) = handle(req) {
         val userId = req.userId
-        sharedTimeTableService.getSharedTimeTables(userId)
+        sharedTimeTableService.gets(userId)
     }
 
     suspend fun getSharedTimeTable(req: ServerRequest) = handle(req) {
         val userId = req.userId
         val timeTableId = req.pathVariable("id")
-        sharedTimeTableService.getSharedTimeTable(userId, timeTableId)
+        sharedTimeTableService.get(timeTableId)
     }
 
     suspend fun addSharedTimeTable(req: ServerRequest) = handle(req) {
         val userId = req.userId
         val requestBody = req.awaitBody<SharedTimeTableModifyRequest>()
-        sharedTimeTableService.addSharedTimeTable(userId, requestBody.title, requestBody.timetableId)
+        sharedTimeTableService.add(userId, requestBody.title, requestBody.timetableId)
         null
+    }
+
+    suspend fun updateSharedTimetable(req: ServerRequest) = handle(req) {
+        val requestBody = req.awaitBody<SharedTimeTableModifyRequest>()
+        sharedTimeTableService.update(requestBody.title, requestBody.timetableId)
     }
 
     suspend fun deleteSharedTimeTable(req: ServerRequest) = handle(req) {
         val userId = req.userId
         val timeTableId = req.pathVariable("id")
-        sharedTimeTableService.deleteSharedTimeTable(userId, timeTableId)
+        sharedTimeTableService.delete(userId, timeTableId)
         null
     }
 }
