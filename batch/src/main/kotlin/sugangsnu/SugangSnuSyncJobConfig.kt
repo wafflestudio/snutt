@@ -37,8 +37,7 @@ class SugangSnuSyncJobConfig {
         { _, _ ->
             runBlocking {
                 val existingCoursebook = sugangSnuSyncService.getLatestCoursebook()
-                val newLectures =
-                    sugangSnuFetchService.getLectures(existingCoursebook.year, existingCoursebook.semester)
+                val newLectures = sugangSnuFetchService.getLatestSugangSnuLectures()
                 if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
                     val oldLectures =
                         lectureService.getLecturesByYearAndSemesterAsFlow(
