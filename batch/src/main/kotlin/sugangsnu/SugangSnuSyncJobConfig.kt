@@ -16,6 +16,7 @@ import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
+import java.time.Instant
 
 @Configuration
 class SugangSnuSyncJobConfig {
@@ -48,10 +49,14 @@ class SugangSnuSyncJobConfig {
                     sugangSnuSyncService.syncLectures(compareResult)
                     val syncUserLecturesResults = sugangSnuSyncService.syncSavedUserLectures(compareResult)
                     sugangSnuNotificationService.notifyUserLectureChanges(syncUserLecturesResults)
+                    sugangSnuSyncService.syncTagList(existingCoursebook, newLectures)
+                    sugangSnuSyncService.saveCoursebook(existingCoursebook.apply { updatedAt = Instant.now() })
                 } else {
                     // 수강편람 첫 업데이트 시
                     sugangSnuSyncService.saveLectures(newLectures)
-                    val newCoursebook = sugangSnuSyncService.saveCoursebook(existingCoursebook.nextCoursebook())
+                    val newCoursebook = existingCoursebook.nextCoursebook()
+                    sugangSnuSyncService.syncTagList(newCoursebook, newLectures)
+                    sugangSnuSyncService.saveCoursebook(newCoursebook)
                     sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                 }
             }
