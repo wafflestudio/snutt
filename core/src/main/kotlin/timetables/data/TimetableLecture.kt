@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.timetables.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import org.springframework.data.annotation.Id
