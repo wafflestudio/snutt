@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -30,11 +30,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Docker Build, tag, and push image to ECR
-        id: build-image
+      - name: Get and save Auth Token for CodeArtifact
+        id: get-save-codeartifact-auth-token
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker build -f Dockerfile-batch -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG .
+          aws codeartifact get-authorization-token --domain wafflestudio --domain-owner 405906814034 --query authorizationToken --region ap-northeast-1 --output text > .codeartifact-auth-token
+
+      - name: Docker build, tag, and push image to ECR
+        id: build-push-image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token)
+          docker build -f Dockerfile-batch -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token)
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

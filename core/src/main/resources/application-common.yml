@@ -6,20 +6,23 @@ spring:
       uri:
 logging:
   level:
-    org:
-      springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
 google:
   firebase:
     project-id:
     service-account:
 
+truffle:
+  client:
+    name: snutt-timetable
+    phase: local
+    api-key:
+
 secret-names: dev/snutt-timetable
 
 ---
+
 spring:
   config:
     activate:
@@ -28,11 +31,18 @@ spring:
     mongodb:
       uri:
       auto-index-creation: true
+
 google:
   firebase:
     project-id:
     service-account:
+
+truffle:
+  client:
+    phase: dev
+
 ---
+
 spring:
   config:
     activate:
@@ -40,9 +50,14 @@ spring:
   data:
     mongodb:
       uri:
+
 google:
   firebase:
     project-id:
     service-account:
+
+truffle:
+  client:
+    phase: prod
 
 secret-names: prod/snutt-timetable
