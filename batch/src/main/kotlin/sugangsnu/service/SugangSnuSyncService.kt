@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
+import com.wafflestudio.snu4t.common.CacheRepository
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
@@ -39,6 +40,7 @@ interface SugangSnuSyncService {
     suspend fun saveLectures(lectures: Iterable<Lecture>)
     suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>)
     suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
+    suspend fun flushCache()
 }
 
 @Service
@@ -49,6 +51,7 @@ class SugangSnuSyncServiceImpl(
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val tagListRepository: TagListRepository,
+    private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
@@ -136,6 +139,10 @@ class SugangSnuSyncServiceImpl(
             syncTimetableLectures(compareResult),
             syncBookmarks(compareResult),
         ).toList()
+
+    override suspend fun flushCache() {
+        cacheRepository.flushDatabase()
+    }
 
     private fun syncTimetableLectures(compareResult: SugangSnuLectureCompareResult) =
         merge(

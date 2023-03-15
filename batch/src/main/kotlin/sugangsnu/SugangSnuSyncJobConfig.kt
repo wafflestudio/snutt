@@ -58,6 +58,7 @@ class SugangSnuSyncJobConfig {
                     sugangSnuSyncService.saveCoursebook(newCoursebook)
                     sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                 }
+                sugangSnuSyncService.flushCache()
             }
             RepeatStatus.FINISHED
         },

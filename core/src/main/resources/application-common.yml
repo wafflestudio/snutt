@@ -4,6 +4,10 @@ spring:
   data:
     mongodb:
       uri:
+    redis:
+      host:
+      port:
+      database:
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
@@ -31,6 +35,10 @@ spring:
     mongodb:
       uri:
       auto-index-creation: true
+    redis:
+      host:
+      port:
+      database:
 
 google:
   firebase:
@@ -50,6 +58,10 @@ spring:
   data:
     mongodb:
       uri:
+    redis:
+      host:
+      port:
+      database:
 
 google:
   firebase:
