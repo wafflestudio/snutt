@@ -12,11 +12,10 @@ class LectureFixture(private val lectureRepository: LectureRepository) {
     suspend fun saveTestLecture() {
         lectureRepository.save(
             Lecture(
-                id = "63c152573ef71d00162f65cf",
                 academicYear = "1",
                 category = "",
+                periodText = "",
                 classTimeText = "",
-                realClassTimeText = "",
                 classTime = listOf(),
                 classTimeMask = listOf(),
                 classification = "",

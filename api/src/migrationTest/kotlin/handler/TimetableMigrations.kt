@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.awaitBody
 
 @Migration
-class TimeTableMigrations @Autowired constructor(
+class TimetableMigrations @Autowired constructor(
     private val legacy: LegacyServer,
     private val timetable: TimetableServer,
 ) {

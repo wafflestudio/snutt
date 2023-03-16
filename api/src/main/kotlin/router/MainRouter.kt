@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.server.coRouter
 
 @Component
 class MainRouter(
-    private val timeTableHandler: TimeTableHandler,
+    private val timeTableHandler: TimetableHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
     private val sharedTimeTableHandler: SharedTimeTableHandler,
