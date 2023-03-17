@@ -290,6 +290,7 @@ function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture
     class_time_mask: refLecture.class_time_mask,
     instructor: refLecture.instructor,                               // 강사
     quota: refLecture.quota,                                    // 정원
+    freshmanQuota: refLecture.freshmanQuota,                     // 신입생정원
     remark: refLecture.remark,                                   // 비고
     category: refLecture.category,
     course_number: refLecture.course_number,   // 교과목 번호
