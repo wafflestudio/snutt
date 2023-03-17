@@ -6,7 +6,7 @@ spring:
       uri:
     redis:
       host:
-      port:
+      port: 6379
       database:
 logging:
   level:
@@ -37,7 +37,6 @@ spring:
       auto-index-creation: true
     redis:
       host:
-      port:
       database:
 
 google:
@@ -60,7 +59,6 @@ spring:
       uri:
     redis:
       host:
-      port:
       database:
 
 google:
