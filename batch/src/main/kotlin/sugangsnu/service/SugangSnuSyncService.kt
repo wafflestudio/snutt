@@ -15,7 +15,6 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
-import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
 import com.wafflestudio.snu4t.tag.data.TagCollection
 import com.wafflestudio.snu4t.tag.data.TagList
 import com.wafflestudio.snu4t.tag.repository.TagListRepository
@@ -230,8 +229,7 @@ class SugangSnuSyncServiceImpl(
         }
 
     private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
-        this.year == sugangSnuCoursebookCondition.latestYear &&
-            this.semester.toSugangSnuSearchString() == sugangSnuCoursebookCondition.latestSugangSnuSemester
+        this.year == sugangSnuCoursebookCondition.latestYear && this.semester == sugangSnuCoursebookCondition.latestSemester
 }
 
 data class ParsedTags(
