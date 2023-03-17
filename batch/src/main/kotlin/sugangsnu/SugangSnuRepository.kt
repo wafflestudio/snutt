@@ -8,6 +8,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
+import org.springframework.web.reactive.function.client.createExceptionAndAwait
 
 @Component
 class SugangSnuRepository(
@@ -26,7 +27,14 @@ class SugangSnuRepository(
             builder.path(SUGANG_SNU_COURSEBOOK_PATH)
                 .query(DEFAULT_COURSEBOOK_PARAMS)
                 .build()
-        }.awaitExchange { it.awaitBody() }
+        }.awaitExchange {
+            if (it.statusCode().is2xxSuccessful) {
+                it.awaitBody()
+            } else {
+                throw it.createExceptionAndAwait()
+            }
+        }
+
 
     suspend fun getSugangSnuLectures(
         coursebookCondition: SugangSnuCoursebookCondition,
@@ -46,9 +54,13 @@ class SugangSnuRepository(
                 }
                 build()
             }
+        }.accept(MediaType.TEXT_HTML).awaitExchange {
+            if (it.statusCode().is2xxSuccessful) {
+                it.awaitBody()
+            } else {
+                throw it.createExceptionAndAwait()
+            }
         }
-            .accept(MediaType.TEXT_HTML)
-            .awaitExchange { it.awaitBody() }
 
     // 기존 코드에 있었으나 필요없는 것으로 판단
     // TODO: 다음학기 정상작동 시 삭제
