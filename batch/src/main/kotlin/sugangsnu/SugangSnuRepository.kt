@@ -35,7 +35,6 @@ class SugangSnuRepository(
             }
         }
 
-
     suspend fun getSugangSnuLectures(
         coursebookCondition: SugangSnuCoursebookCondition,
         lectureCategory: LectureCategory = LectureCategory.NONE,
