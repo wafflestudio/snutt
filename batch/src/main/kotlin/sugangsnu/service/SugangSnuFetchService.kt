@@ -23,28 +23,30 @@ class SugangSnuFetchServiceImpl(
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
     override suspend fun getLatestSugangSnuLectures(): List<Lecture> {
-        val sugangSnuCoursebookCondition = sugangSnuRepository.getCoursebookCondition()
-        return LectureCategory.values().flatMap { lectureCategory ->
-            runCatching {
-                val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(sugangSnuCoursebookCondition, lectureCategory, "ko")
-                val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(sugangSnuCoursebookCondition, lectureCategory, "en")
-                val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
-                val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
-                val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
-                val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
-                fullSheet.filterIndexed { index, _ -> index > 2 }
-                    .map { row ->
-                        convertSugangSnuRowToLecture(
-                            row, columnNameIndex, lectureCategory,
-                            sugangSnuCoursebookCondition.latestYear,
-                            sugangSnuCoursebookCondition.latestSemester
-                        )
-                    }
-                    .also {
-                        koreanLectureXlsx.release()
-                        englishLectureXlsx.release()
-                    }
+        val coursebookCondition = sugangSnuRepository.getCoursebookCondition()
+        return LectureCategory.values().flatMap { category ->
+            val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(coursebookCondition, category, "ko")
+            val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(coursebookCondition, category, "en")
+            val koreanSheet = runCatching {
+                HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
             }.getOrDefault(listOf())
+            val englishSheet = runCatching {
+                HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
+            }.getOrDefault(listOf())
+            val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
+            val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
+            fullSheet.filterIndexed { index, _ -> index > 2 }
+                .map { row ->
+                    convertSugangSnuRowToLecture(
+                        row, columnNameIndex, category,
+                        coursebookCondition.latestYear,
+                        coursebookCondition.latestSemester
+                    )
+                }
+                .also {
+                    koreanLectureXlsx.release()
+                    englishLectureXlsx.release()
+                }
         }.distinctBy { it.courseNumber + it.lectureNumber }
     }
 

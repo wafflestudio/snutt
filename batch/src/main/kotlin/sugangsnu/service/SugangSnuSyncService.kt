@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
 import kotlin.reflect.full.memberProperties
@@ -53,9 +52,6 @@ class SugangSnuSyncServiceImpl(
     private val tagListRepository: TagListRepository,
     private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
-    private val logger = LoggerFactory.getLogger(javaClass)
-    private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
-
     override suspend fun getLatestCoursebook(): Coursebook =
         coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
 
