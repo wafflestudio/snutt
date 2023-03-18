@@ -26,27 +26,31 @@ class MainRouter(
 
     @Bean
     @AuthDocs
-    fun authRoute() = v1CoRouter(prefix = "/auth") {
-        POST("/register_local", authHandler::registerLocal)
+    fun authRoute() = v1CoRouter {
+        "/auth".nest {
+            POST("/register_local", authHandler::registerLocal)
+        }
     }
 
     @Bean
     @TableDocs
-    fun tableRoute() = v1CoRouter(prefix = "/tables") {
-        GET("", timeTableHandler::getBriefs)
+    fun tableRoute() = v1CoRouter {
+        "/tables".nest {
+            GET("", timeTableHandler::getBriefs)
+        }
     }
 
     @Bean
     @BookmarkDocs
-    fun bookmarkRoute() = v1CoRouter(prefix = "/bookmarks") {
-        GET("", bookmarkHandler::getBookmark)
-        POST("/lecture", bookmarkHandler::addLecture)
-        DELETE("/lecture", bookmarkHandler::deleteBookmark)
+    fun bookmarkRoute() = v1CoRouter {
+        "/bookmarks".nest {
+            GET("", bookmarkHandler::getBookmark)
+            POST("/lecture", bookmarkHandler::addLecture)
+            DELETE("/lecture", bookmarkHandler::deleteBookmark)
+        }
     }
 
-    private fun v1CoRouter(prefix: String = "", r: CoRouterFunctionDsl.() -> Unit) = coRouter {
-        path("/v1").or("").nest {
-            prefix.nest(r)
-        }
+    private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {
+        path("/v1").or("").nest(r)
     }
 }
