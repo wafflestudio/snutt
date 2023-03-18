@@ -52,6 +52,7 @@ class SharedTimetableServiceImpl(
         return sharedTimetableRepository.save(
             SharedTimetable(
                 userId = userId,
+                timetableOwnerId = timetable.userId,
                 title = title,
                 timetableId = timetableId,
             )

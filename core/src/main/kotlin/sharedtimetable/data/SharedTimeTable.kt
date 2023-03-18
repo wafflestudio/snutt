@@ -14,9 +14,15 @@ data class SharedTimetable(
     val id: String? = null,
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String,
+    @Field("timetable_owner_id", targetType = FieldType.OBJECT_ID)
+    val timetableOwnerId: String,
     var title: String,
+    @Field("timetable_id")
     val timetableId: String,
+    @Field("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Field("updated_at")
     var updatedAt: LocalDateTime = LocalDateTime.now(),
+    @Field("is_deleted")
     var isDeleted: Boolean = false,
 )
