@@ -25,11 +25,17 @@ export class Time implements Time {
     this.minute = minute
   }
 
-  static fromHourMinuteString(hourMinuteString: string) {
+  static fromHourMinuteString(hourMinuteString: string): Time {
     const hourMinute = hourMinuteString.split(":")
-    if (hourMinute.length !== 2) throw new HourMinuteFormatException()
-    const minute = Number(hourMinute[0]) * 60 + Number(hourMinute[1])
-    return new Time(minute);
+        .map((hourOrMinute) => parseInt(hourOrMinute, 10));
+    if (hourMinute.length !== 2) throw new HourMinuteFormatException();
+    const [hour, minute] = hourMinute;
+    const isInvalidHour = hour < 0 || hour > 23;
+    const isInvalidMinute = minute < 0 || minute > 59;
+    const containsNaN = Number.isNaN(hour) || Number.isNaN(minute)
+    if (isInvalidHour || isInvalidMinute || containsNaN) throw new HourMinuteFormatException();
+    const totalMinute = hour * 60 + minute;
+    return new Time(totalMinute);
   }
 
   subtract(other: Time): Time {

@@ -2,6 +2,11 @@ import LectureColorService = require('./LectureColorService');
 import TimePlaceUtil = require('@app/core/timetable/util/TimePlaceUtil');
 import LectureService = require('@app/core/lecture/LectureService');
 import RefLectureService = require('@app/core/lecture/RefLectureService');
+import ObjectUtil = require('@app/core/common/util/ObjectUtil');
+
+import TimetableRepository = require('./TimetableRepository');
+import TimetableService = require('./TimetableService');
+import winston = require('winston');
 import UserLecture from './model/UserLecture';
 import RefLectrureNotFoundError from "../lecture/error/RefLectureNotFoundError";
 import WrongRefLectureSemesterError from "./error/WrongRefLectureSemesterError";
@@ -12,17 +17,13 @@ import LectureTimeOverlapError from './error/LectureTimeOverlapError';
 import CustomLectureResetError from './error/CusromLectureResetError';
 import NotCustomLectureError from './error/NotCustomLectureError';
 import UserLectureNotFoundError from './error/UserLectureNotFoundError';
-import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 import RefLecture from '@app/core/lecture/model/RefLecture';
-
-import TimetableRepository = require('./TimetableRepository');
-import TimetableService = require('./TimetableService');
 import Timetable from './model/Timetable';
 import TimePlace from './model/TimePlace';
 import InvalidLectureTimeJsonError from '../lecture/error/InvalidLectureTimeJsonError';
-import winston = require('winston');
 import {Time} from "@app/core/timetable/model/Time";
 import Lecture from "@app/core/lecture/model/Lecture";
+
 let logger = winston.loggers.get('default');
 
 const ZERO_PERIOD_START_HOUR = 8
@@ -77,6 +78,9 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
   if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
   syncRealTimeWithPeriod(lecture)
+
+  // ios 3.1.3 UUID 넘겨주는 에러 hotfix
+  delete lecture.lecture_id
 
   /* If no time json is found, mask is invalid */
   LectureService.setTimemask(lecture);
@@ -183,7 +187,12 @@ function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLec
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
-  if (!ObjectUtil.isNumber(timePlace.day) || !ObjectUtil.isNumber(timePlace.len) || !ObjectUtil.isNumber(timePlace.start)) {
+  const startTime = Time.fromHourMinuteString(timePlace.start_time)
+  const endTime = Time.fromHourMinuteString(timePlace.end_time)
+  const endsTooLate = endTime.minute > Time.fromHourMinuteString("23:55").minute
+  const lectureTimeTooShort = (endTime.minute - startTime.minute) < 5
+  const hasInvalidNumbers = !ObjectUtil.isNumber(timePlace.day) || !ObjectUtil.isNumber(timePlace.len) || !ObjectUtil.isNumber(timePlace.start)
+  if (endsTooLate || lectureTimeTooShort || hasInvalidNumbers) {
     throw new InvalidLectureTimeJsonError();
   }
 }
