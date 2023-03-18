@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snu4t.common.CacheRepository
+import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
@@ -30,20 +30,16 @@ import java.time.Instant
 import kotlin.reflect.full.memberProperties
 
 interface SugangSnuSyncService {
-    suspend fun getLatestCoursebook(): Coursebook
-    suspend fun saveCoursebook(coursebook: Coursebook): Coursebook
+    suspend fun updateCoursebook(coursebook: Coursebook)
+    suspend fun addCoursebook(coursebook: Coursebook)
     suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
-    fun compareLectures(newLectures: Iterable<Lecture>, oldLectures: Iterable<Lecture>): SugangSnuLectureCompareResult
-
-    suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult)
-    suspend fun saveLectures(lectures: Iterable<Lecture>)
-    suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>)
-    suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult>
     suspend fun flushCache()
 }
 
 @Service
 class SugangSnuSyncServiceImpl(
+    private val sugangSnuFetchService: SugangSnuFetchService,
+    private val sugangSnuNotificationService: SugangSnuNotificationService,
     private val lectureService: LectureService,
     private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -52,17 +48,37 @@ class SugangSnuSyncServiceImpl(
     private val tagListRepository: TagListRepository,
     private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
-    override suspend fun getLatestCoursebook(): Coursebook =
-        coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
+    override suspend fun updateCoursebook(coursebook: Coursebook) {
+        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        val oldLectures =
+            lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
+        val compareResult = compareLectures(newLectures, oldLectures)
 
-    override suspend fun saveCoursebook(coursebook: Coursebook): Coursebook = coursebookRepository.save(coursebook)
+        syncLectures(compareResult)
+        val syncUserLecturesResults = syncSavedUserLectures(compareResult)
+        syncTagList(coursebook, newLectures)
+
+        coursebookRepository.save(coursebook.apply { updatedAt = Instant.now() })
+        sugangSnuNotificationService.notifyUserLectureChanges(syncUserLecturesResults)
+    }
+
+    override suspend fun addCoursebook(coursebook: Coursebook) {
+        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        lectureService.upsertLectures(newLectures)
+        syncTagList(coursebook, newLectures)
+
+        coursebookRepository.save(coursebook)
+        sugangSnuNotificationService.notifyCoursebookUpdate(coursebook)
+    }
 
     override suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean {
         val sugangSnuLatestCoursebook = sugangSnuRepository.getCoursebookCondition()
         return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
     }
 
-    override fun compareLectures(
+    override suspend fun flushCache() = cacheRepository.flushDatabase()
+
+    private fun compareLectures(
         newLectures: Iterable<Lecture>,
         oldLectures: Iterable<Lecture>
     ): SugangSnuLectureCompareResult {
@@ -75,8 +91,7 @@ class SugangSnuSyncServiceImpl(
             .filter { (old, new) -> old != new }
             .map { (old, new) ->
                 UpdatedLecture(
-                    old,
-                    new,
+                    old, new,
                     Lecture::class.memberProperties.filter {
                         it != Lecture::id && it.get(old) != it.get(new)
                     }
@@ -89,8 +104,7 @@ class SugangSnuSyncServiceImpl(
         return SugangSnuLectureCompareResult(created, deleted, updated)
     }
 
-    override suspend fun saveLectures(lectures: Iterable<Lecture>) = lectureService.upsertLectures(lectures)
-    override suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>) {
+    private suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>) {
         val tagCollection = lectures.fold(ParsedTags()) { acc, lecture ->
             ParsedTags(
                 academicYear = acc.academicYear + lecture.academicYear,
@@ -120,7 +134,7 @@ class SugangSnuSyncServiceImpl(
         tagListRepository.save(tagList)
     }
 
-    override suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
+    private suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
         val updatedLectures = compareResult.updatedLectureList.map { diff ->
             diff.newData.apply { id = diff.oldData.id }
         }
@@ -130,15 +144,11 @@ class SugangSnuSyncServiceImpl(
         lectureService.deleteLectures(compareResult.deletedLectureList)
     }
 
-    override suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult> =
+    private suspend fun syncSavedUserLectures(compareResult: SugangSnuLectureCompareResult): List<UserLectureSyncResult> =
         merge(
             syncTimetableLectures(compareResult),
             syncBookmarks(compareResult),
         ).toList()
-
-    override suspend fun flushCache() {
-        cacheRepository.flushDatabase()
-    }
 
     private fun syncTimetableLectures(compareResult: SugangSnuLectureCompareResult) =
         merge(

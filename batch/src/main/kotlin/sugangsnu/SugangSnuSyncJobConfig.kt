@@ -1,11 +1,8 @@
 package com.wafflestudio.snu4t.sugangsnu
 
-import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuFetchService
-import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuNotificationService
+import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuSyncService
 import com.wafflestudio.snu4t.sugangsnu.utils.nextCoursebook
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -16,7 +13,6 @@ import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
-import java.time.Instant
 
 @Configuration
 class SugangSnuSyncJobConfig {
@@ -29,34 +25,17 @@ class SugangSnuSyncJobConfig {
     fun fetchSugangSnuStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
-        sugangSnuFetchService: SugangSnuFetchService,
         sugangSnuSyncService: SugangSnuSyncService,
-        sugangSnuNotificationService: SugangSnuNotificationService,
-        lectureService: LectureService,
+        coursebookService: CoursebookService,
     ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
         { _, _ ->
             runBlocking {
-                val existingCoursebook = sugangSnuSyncService.getLatestCoursebook()
-                val newLectures = sugangSnuFetchService.getLatestSugangSnuLectures()
+                val existingCoursebook = coursebookService.getLatestCoursebook()
                 if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
-                    val oldLectures =
-                        lectureService.getLecturesByYearAndSemesterAsFlow(
-                            existingCoursebook.year, existingCoursebook.semester
-                        ).toList()
-                    val compareResult = sugangSnuSyncService.compareLectures(newLectures, oldLectures)
-
-                    sugangSnuSyncService.syncLectures(compareResult)
-                    val syncUserLecturesResults = sugangSnuSyncService.syncSavedUserLectures(compareResult)
-                    sugangSnuNotificationService.notifyUserLectureChanges(syncUserLecturesResults)
-                    sugangSnuSyncService.syncTagList(existingCoursebook, newLectures)
-                    sugangSnuSyncService.saveCoursebook(existingCoursebook.apply { updatedAt = Instant.now() })
+                    sugangSnuSyncService.updateCoursebook(existingCoursebook)
                 } else {
-                    // 수강편람 첫 업데이트 시
-                    sugangSnuSyncService.saveLectures(newLectures)
                     val newCoursebook = existingCoursebook.nextCoursebook()
-                    sugangSnuSyncService.syncTagList(newCoursebook, newLectures)
-                    sugangSnuSyncService.saveCoursebook(newCoursebook)
-                    sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
+                    sugangSnuSyncService.addCoursebook(newCoursebook)
                 }
                 sugangSnuSyncService.flushCache()
             }
