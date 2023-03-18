@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.timetables.data.Timetable
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
-data class SharedTimetableDetailResponse(
+data class SharedTimetableDetailDto(
     val id: String,
     val userId: String,
     val title: String,
