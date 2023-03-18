@@ -32,7 +32,7 @@ class MainRouter(
 
     @Bean
     @TableDocs
-    fun tableRoute() = v1CoRouter(prefix = "/table") {
+    fun tableRoute() = v1CoRouter(prefix = "/tables") {
         GET("", timeTableHandler::getBriefs)
     }
 
