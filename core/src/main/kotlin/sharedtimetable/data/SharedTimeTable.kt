@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.LocalDateTime
 
 @Document("shared_timetables")
-data class SharedTimeTable(
+data class SharedTimetable(
     @Id
     @JsonProperty("_id")
     val id: String? = null,
