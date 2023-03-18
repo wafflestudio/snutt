@@ -36,12 +36,3 @@ fun Coursebook.nextCoursebook(): Coursebook {
         Semester.WINTER -> Coursebook(year = this.year + 1, semester = Semester.SPRING)
     }
 }
-
-fun Coursebook.prevCoursebook(): Coursebook {
-    return when (this.semester) {
-        Semester.SPRING -> Coursebook(year = this.year - 1, semester = Semester.WINTER)
-        Semester.SUMMER -> Coursebook(year = this.year, semester = Semester.SPRING)
-        Semester.AUTUMN -> Coursebook(year = this.year, semester = Semester.SUMMER)
-        Semester.WINTER -> Coursebook(year = this.year, semester = Semester.AUTUMN)
-    }
-}
