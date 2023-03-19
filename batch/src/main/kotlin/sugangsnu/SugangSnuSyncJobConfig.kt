@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu
 
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
+import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuNotificationService
 import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuSyncService
 import com.wafflestudio.snu4t.sugangsnu.utils.nextCoursebook
 import kotlinx.coroutines.runBlocking
@@ -27,15 +28,18 @@ class SugangSnuSyncJobConfig {
         transactionManager: PlatformTransactionManager,
         sugangSnuSyncService: SugangSnuSyncService,
         coursebookService: CoursebookService,
+        sugangSnuNotificationService: SugangSnuNotificationService,
     ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
         { _, _ ->
             runBlocking {
                 val existingCoursebook = coursebookService.getLatestCoursebook()
                 if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
-                    sugangSnuSyncService.updateCoursebook(existingCoursebook)
+                    val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
+                    sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
                 } else {
                     val newCoursebook = existingCoursebook.nextCoursebook()
                     sugangSnuSyncService.addCoursebook(newCoursebook)
+                    sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                 }
                 sugangSnuSyncService.flushCache()
             }

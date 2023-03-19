@@ -29,7 +29,7 @@ import java.time.Instant
 import kotlin.reflect.full.memberProperties
 
 interface SugangSnuSyncService {
-    suspend fun updateCoursebook(coursebook: Coursebook)
+    suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult>
     suspend fun addCoursebook(coursebook: Coursebook)
     suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
     suspend fun flushCache()
@@ -38,7 +38,6 @@ interface SugangSnuSyncService {
 @Service
 class SugangSnuSyncServiceImpl(
     private val sugangSnuFetchService: SugangSnuFetchService,
-    private val sugangSnuNotificationService: SugangSnuNotificationService,
     private val lectureService: LectureService,
     private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -47,7 +46,7 @@ class SugangSnuSyncServiceImpl(
     private val tagListRepository: TagListRepository,
     private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
-    override suspend fun updateCoursebook(coursebook: Coursebook) {
+    override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
@@ -56,9 +55,9 @@ class SugangSnuSyncServiceImpl(
         syncLectures(compareResult)
         val syncUserLecturesResults = syncSavedUserLectures(compareResult)
         syncTagList(coursebook, newLectures)
-
         coursebookRepository.save(coursebook.apply { updatedAt = Instant.now() })
-        sugangSnuNotificationService.notifyUserLectureChanges(syncUserLecturesResults)
+
+        return syncUserLecturesResults
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
@@ -67,7 +66,6 @@ class SugangSnuSyncServiceImpl(
         syncTagList(coursebook, newLectures)
 
         coursebookRepository.save(coursebook)
-        sugangSnuNotificationService.notifyCoursebookUpdate(coursebook)
     }
 
     override suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean {
