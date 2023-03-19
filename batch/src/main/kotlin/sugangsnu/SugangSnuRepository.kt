@@ -1,8 +1,10 @@
 package com.wafflestudio.snu4t.sugangsnu
 
+import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.sugangsnu.api.SugangSnuApi
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
+import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -36,7 +38,8 @@ class SugangSnuRepository(
         }
 
     suspend fun getSugangSnuLectures(
-        coursebookCondition: SugangSnuCoursebookCondition,
+        year: Int,
+        semester: Semester,
         lectureCategory: LectureCategory = LectureCategory.NONE,
         language: String = "ko",
     ): PooledDataBuffer =
@@ -45,8 +48,8 @@ class SugangSnuRepository(
                 path(SUGANG_SNU_LECTURE_PATH)
                 query(DEFAULT_LECTURE_PARAMS)
                 queryParam("srchLanguage", language)
-                queryParam("srchOpenSchyy", coursebookCondition.latestYear)
-                queryParam("srchOpenShtm", coursebookCondition.latestSugangSnuSemester)
+                queryParam("srchOpenSchyy", year)
+                queryParam("srchOpenShtm", semester.toSugangSnuSearchString())
                 if (lectureCategory != LectureCategory.NONE) {
                     replaceQueryParam("srchOpenSbjtFldCd", lectureCategory.queryValue)
                     replaceQueryParam("srchOpenUpSbjtFldCd", lectureCategory.parentCategory)

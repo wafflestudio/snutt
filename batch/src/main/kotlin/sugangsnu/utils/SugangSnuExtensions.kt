@@ -5,6 +5,15 @@ import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
+fun Semester.toSugangSnuSearchString(): String {
+    return when (this) {
+        Semester.SPRING -> "U000200001U000300001"
+        Semester.SUMMER -> "U000200001U000300002"
+        Semester.AUTUMN -> "U000200002U000300001"
+        Semester.WINTER -> "U000200002U000300002"
+    }
+}
+
 fun KProperty1<Lecture, *>.toKoreanFieldName(): String = when (this) {
     Lecture::classification -> "교과 구분"
     Lecture::department -> "학부"
