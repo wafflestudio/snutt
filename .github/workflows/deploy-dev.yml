@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy-dev
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: ${{ github.run_number }}
