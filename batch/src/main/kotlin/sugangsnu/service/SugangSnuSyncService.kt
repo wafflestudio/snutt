@@ -194,9 +194,24 @@ class SugangSnuSyncServiceImpl(
         ).map { timetable ->
             timetable.apply {
                 lectures = lectures.map { lecture ->
-                    if (lecture.lectureId == updatedLecture.newData.id)
-                        TimetableLecture(updatedLecture.newData).apply { id = lecture.id }
-                    else lecture
+                    if (lecture.lectureId == updatedLecture.newData.id) lecture.apply {
+                        academicYear = updatedLecture.newData.academicYear
+                        category = updatedLecture.newData.category
+                        periodText = updatedLecture.newData.periodText
+                        classTimeText = updatedLecture.newData.classTimeText
+                        classTime = updatedLecture.newData.classTime
+                        classTimeMask = updatedLecture.newData.classTimeMask
+                        classification = updatedLecture.newData.classification
+                        credit = updatedLecture.newData.credit
+                        department = updatedLecture.newData.department
+                        instructor = updatedLecture.newData.instructor
+                        lectureNumber = updatedLecture.newData.lectureNumber
+                        quota = updatedLecture.newData.quota
+                        freshmanQuota = updatedLecture.newData.freshmanQuota
+                        remark = updatedLecture.newData.remark
+                        courseNumber = updatedLecture.newData.courseNumber
+                        courseTitle = updatedLecture.newData.courseTitle
+                    } else lecture
                 }
                 updatedAt = Instant.now()
             }

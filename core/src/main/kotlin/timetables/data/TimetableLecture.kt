@@ -36,6 +36,7 @@ data class TimetableLecture(
     @Field("lecture_number")
     var lectureNumber: String?,
     var quota: Int?,
+    var freshmanQuota: Int?,
     var remark: String?,
     @Field("course_number")
     var courseNumber: String?,
@@ -47,23 +48,4 @@ data class TimetableLecture(
     @Field("lecture_id", targetType = FieldType.OBJECT_ID)
     @Indexed
     var lectureId: String? = null,
-)
-
-fun TimetableLecture(lecture: Lecture): TimetableLecture = TimetableLecture(
-    academicYear = lecture.academicYear,
-    category = lecture.category,
-    periodText = lecture.periodText,
-    classTimeText = lecture.classTimeText,
-    classTime = lecture.classTime,
-    classTimeMask = lecture.classTimeMask,
-    classification = lecture.classification,
-    credit = lecture.credit,
-    department = lecture.department,
-    instructor = lecture.instructor,
-    lectureNumber = lecture.lectureNumber,
-    quota = lecture.quota,
-    remark = lecture.remark,
-    courseNumber = lecture.courseNumber,
-    courseTitle = lecture.courseTitle,
-    lectureId = lecture.id,
 )
