@@ -19,7 +19,6 @@ import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.tag.data.TagCollection
 import com.wafflestudio.snu4t.tag.data.TagList
 import com.wafflestudio.snu4t.tag.repository.TagListRepository
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
