@@ -19,5 +19,5 @@ class Bookmark(
     val userId: String,
     val year: Int,
     val semester: Semester,
-    val lectures: List<BookmarkLecture> = listOf(),
+    var lectures: List<BookmarkLecture> = listOf(),
 )

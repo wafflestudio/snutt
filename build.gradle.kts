@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.springframework.boot") version "3.0.1" apply false
+    id("org.springframework.boot") version "3.0.2" apply false
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     kotlin("jvm") version "1.7.21"
@@ -15,6 +16,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 allprojects {
     repositories {
         mavenCentral()
+        mavenCodeArtifact()
+        mavenLocal()
     }
 }
 
@@ -29,7 +32,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.0.1")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.0.2")
         }
     }
 
@@ -41,6 +44,14 @@ subprojects {
         implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
         implementation("org.springframework.boot:spring-boot-starter-log4j2")
+        implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+
+        implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.0.1")
+
+        // spring docs
+        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
 
         // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -69,6 +80,29 @@ subprojects {
             exclude(module = "spring-boot-starter-logging")
             exclude(module = "logback-core")
             exclude(module = "logback-classic")
+        }
+    }
+}
+
+fun RepositoryHandler.mavenCodeArtifact() {
+    maven {
+        val authToken = properties["codeArtifactAuthToken"] as String? ?: ByteArrayOutputStream().use {
+            runCatching {
+                exec {
+                    commandLine = (
+                        "aws codeartifact get-authorization-token " +
+                            "--domain wafflestudio --domain-owner 405906814034 " +
+                            "--query authorizationToken --region ap-northeast-1 --output text"
+                        ).split(" ")
+                    standardOutput = it
+                }
+            }
+            it.toString()
+        }
+        url = uri("https://wafflestudio-405906814034.d.codeartifact.ap-northeast-1.amazonaws.com/maven/truffle-kotlin/")
+        credentials {
+            username = "aws"
+            password = authToken
         }
     }
 }
