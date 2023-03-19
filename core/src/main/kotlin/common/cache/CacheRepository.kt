@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common
+package com.wafflestudio.snu4t.common.cache
 
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.redis.core.ReactiveRedisTemplate
