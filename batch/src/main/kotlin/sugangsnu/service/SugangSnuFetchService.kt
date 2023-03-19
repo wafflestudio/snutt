@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 interface SugangSnuFetchService {
-    suspend fun getLectures(year: Int, semester: Semester): List<Lecture>
+    suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture>
 }
 
 @Service
@@ -22,21 +22,24 @@ class SugangSnuFetchServiceImpl(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
-    override suspend fun getLectures(year: Int, semester: Semester): List<Lecture> =
-        LectureCategory.values().flatMap { lectureCategory ->
-            val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, lectureCategory, "ko")
-            val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, lectureCategory, "en")
-            val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
-            val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
-            val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
-            val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
-            fullSheet.filterIndexed { index, _ -> index > 2 }
-                .map { row -> convertSugangSnuRowToLecture(row, columnNameIndex, lectureCategory, year, semester) }
-                .also {
-                    koreanLectureXlsx.release()
-                    englishLectureXlsx.release()
-                }
-        }
+    override suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture> =
+        LectureCategory.values().flatMap { category ->
+            val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, category, "ko")
+            val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, category, "en")
+            runCatching {
+                val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
+                val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
+                val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
+                val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
+                fullSheet.filterIndexed { index, _ -> index > 2 }
+                    .map { row ->
+                        convertSugangSnuRowToLecture(row, columnNameIndex, category, year, semester)
+                    }
+            }.getOrDefault(listOf()).also {
+                koreanLectureXlsx.release()
+                englishLectureXlsx.release()
+            }
+        }.distinctBy { it.courseNumber + it.lectureNumber }
 
     /*
     엑셀 항목 (2023/01/26): 교과구분, 개설대학, 개설학과, 이수과정, 학년, 교과목번호, 강좌번호, 교과목명,

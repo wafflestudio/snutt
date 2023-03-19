@@ -46,7 +46,12 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-log4j2")
         implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
+        implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
         implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.0.1")
+
+        // spring docs
+        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
 
         // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")
