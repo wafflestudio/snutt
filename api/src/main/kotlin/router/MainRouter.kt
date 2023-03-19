@@ -31,7 +31,7 @@ class MainRouter(
                 POST("/lecture", bookmarkHandler::addLecture)
                 DELETE("/lecture", bookmarkHandler::deleteBookmark)
             }
-            "/shared_timetables".nest {
+            "/shared-tables".nest {
                 GET("", sharedTimetableHandler::getSharedTimetables)
                 GET("/{id}", sharedTimetableHandler::getSharedTimetable)
                 POST("", sharedTimetableHandler::addSharedTimetable)
