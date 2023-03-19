@@ -6,6 +6,7 @@ import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
@@ -53,6 +54,7 @@ class MainRouter(
     }
 
     @Bean
+    @SharedTimetableDocs
     fun sharedTimetableRoute() = v1CoRouter {
         "/shared-tables".nest {
             GET("", sharedTimetableHandler::getSharedTimetables)
