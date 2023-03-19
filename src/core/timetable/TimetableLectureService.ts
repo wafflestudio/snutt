@@ -82,8 +82,6 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
   // ios 3.1.3 UUID 넘겨주는 에러 hotfix
   delete lecture.lecture_id
 
-  /* If no time json is found, mask is invalid */
-  LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
 
   if (!isCustomLecture(lecture)) throw new NotCustomLectureError(lecture);
