@@ -194,7 +194,9 @@ class SugangSnuSyncServiceImpl(
         ).map { timetable ->
             timetable.apply {
                 lectures = lectures.map { lecture ->
-                    if (lecture.lectureId == updatedLecture.newData.id) TimetableLecture(updatedLecture.newData) else lecture
+                    if (lecture.lectureId == updatedLecture.newData.id)
+                        TimetableLecture(updatedLecture.newData).apply { id = lecture.id }
+                    else lecture
                 }
                 updatedAt = Instant.now()
             }
