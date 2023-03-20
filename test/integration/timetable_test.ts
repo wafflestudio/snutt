@@ -423,9 +423,9 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
           }
         ]
       })
-      .expect(403)
+      .expect(400)
       .end(function(err, res) {
-        assert.equal(res.body.errcode, ErrorCode.LECTURE_TIME_OVERLAP);
+        assert.equal(res.body.errcode, ErrorCode.INVALID_TIMEJSON);
         done(err);
       });
   });
@@ -466,9 +466,9 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
           }
         ]
       })
-      .expect(400)
+      .expect(403)
       .end(function(err, res) {
-        assert.equal(res.body.errcode, ErrorCode.INVALID_TIMEJSON);
+        assert.equal(res.body.errcode, ErrorCode.LECTURE_TIME_OVERLAP);
         done(err);
       });
   });
