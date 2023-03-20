@@ -160,7 +160,7 @@ function validateLectureTime(lecture: UserLecture): void {
     validateLectureTimeJson(lecture.class_time_json[i]);
     for (let j = i + 1; j < lecture.class_time_json.length; j++) {
       if(timesOverlap(lecture.class_time_json[i], lecture.class_time_json[j]))
-        throw new LectureTimeOverlapError();
+        throw new InvalidLectureTimeJsonError();
     }
   }
 }
