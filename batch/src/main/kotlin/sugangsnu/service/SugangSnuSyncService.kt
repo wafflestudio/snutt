@@ -167,7 +167,7 @@ class SugangSnuSyncServiceImpl(
         ).map { bookmark ->
             bookmark.apply {
                 lectures = lectures.map { lecture ->
-                    if (lecture.id == updatedLecture.newData.id) BookmarkLecture(updatedLecture.newData) else lecture
+                    if (lecture.id == updatedLecture.oldData.id) BookmarkLecture(updatedLecture.newData) else lecture
                 }
             }
         }.let {
@@ -191,7 +191,7 @@ class SugangSnuSyncServiceImpl(
         ).map { timetable ->
             timetable.apply {
                 lectures = lectures.map { lecture ->
-                    if (lecture.lectureId == updatedLecture.newData.id) lecture.apply {
+                    if (lecture.lectureId == updatedLecture.oldData.id) lecture.apply {
                         academicYear = updatedLecture.newData.academicYear
                         category = updatedLecture.newData.category
                         periodText = updatedLecture.newData.periodText
