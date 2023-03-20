@@ -2,9 +2,11 @@ package com.wafflestudio.snu4t.router
 
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
@@ -18,6 +20,7 @@ class MainRouter(
     private val timeTableHandler: TimetableHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
+    private val sharedTimetableHandler: SharedTimetableHandler,
 ) {
     @Bean
     fun ping() = coRouter {
@@ -47,6 +50,18 @@ class MainRouter(
             GET("", bookmarkHandler::getBookmark)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
+        }
+    }
+
+    @Bean
+    @SharedTimetableDocs
+    fun sharedTimetableRoute() = v1CoRouter {
+        "/shared-tables".nest {
+            GET("", sharedTimetableHandler::getSharedTimetables)
+            GET("/{id}", sharedTimetableHandler::getSharedTimetable)
+            POST("", sharedTimetableHandler::addSharedTimetable)
+            PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
+            DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
         }
     }
 
