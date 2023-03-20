@@ -177,7 +177,7 @@ function isOverlappingLecture(table: Timetable, lecture: UserLecture): boolean {
 }
 
 function makeOverwritingConfirmMessage(overlappingLectures: UserLecture[]) {
-  const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
+  const overlappingLectureTitles = overlappingLectures.map(lecture => `'${lecture.course_title}'`).slice(0,2).join(", ")
   const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
   return `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
 }
