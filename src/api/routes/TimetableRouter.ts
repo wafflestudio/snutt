@@ -4,6 +4,7 @@ var router = ExpressPromiseRouter();
 
 import TimetableService = require('@app/core/timetable/TimetableService');
 import TimetableLectureService = require('@app/core/timetable/TimetableLectureService');
+import ObjectUtil = require('@app/core/common/util/ObjectUtil');
 import User from '@app/core/user/model/User';
 import winston = require('winston');
 import DuplicateTimetableTitleError from '@app/core/timetable/error/DuplicateTimetableTitleError';
@@ -191,6 +192,7 @@ router.put('/:table_id/lecture/:lecture_id', async function(req, res, next) {
     let table = await TimetableService.getByMongooseId(user._id, req.params.table_id);
     if (!table) return res.status(404).json({errcode: ErrorCode.TIMETABLE_NOT_FOUND, message: "timetable not found"});
 
+    ObjectUtil.deleteObjectId(rawLecture)
     rawLecture._id = req.params.lecture_id;
     await TimetableLectureService.partialModifyUserLecture(user._id, table._id, rawLecture, isForced);
     res.json(await TimetableService.getByMongooseId(user._id, req.params.table_id));

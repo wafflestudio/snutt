@@ -52,7 +52,7 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
     }
   }
 
-  validateLectureTime(timetable, lecture);
+  validateLectureTime(lecture);
 
   LectureColorService.validateLectureColor(lecture)
 
@@ -82,8 +82,6 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
   // ios 3.1.3 UUID 넘겨주는 에러 hotfix
   delete lecture.lecture_id
 
-  /* If no time json is found, mask is invalid */
-  LectureService.setTimemask(lecture);
   if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
 
   if (!isCustomLecture(lecture)) throw new NotCustomLectureError(lecture);
@@ -126,19 +124,14 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
     throw new InvalidLectureUpdateRequestError(lecture);
   }
 
+  if (lecture['color']) {
+    LectureColorService.validateLectureColor(lecture);
+  }
   if (lecture['class_time_json']) {
     if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
     syncRealTimeWithPeriod(lecture)
     LectureService.setTimemask(lecture);
-    lecture['class_time_mask'] = TimePlaceUtil.timeJsonToMask(lecture['class_time_json'], true);
-  }
-
-  if (lecture['color']) {
-    LectureColorService.validateLectureColor(lecture);
-  }
-
-  if (lecture['class_time_mask']) {
-    validateLectureTime(table, lecture);
+    validateLectureTime(lecture);
 
     const overlappingLectures = getOverlappingLectures(table, lecture).filter(overlappingLecture => overlappingLecture._id != lecture._id)
     const overlappingLectureIds = overlappingLectures.map(eachLecture => eachLecture._id)
@@ -157,9 +150,13 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   await TimetableRepository.updateUpdatedAt(table._id, Date.now());
 }
 
-function validateLectureTime(table: Timetable, lecture: UserLecture): void {
+function validateLectureTime(lecture: UserLecture): void {
   for (let i=0; i<lecture.class_time_json.length; i++) {
     validateLectureTimeJson(lecture.class_time_json[i]);
+    for (let j = i + 1; j < lecture.class_time_json.length; j++) {
+      if(timesOverlap(lecture.class_time_json[i], lecture.class_time_json[j]))
+        throw new InvalidLectureTimeJsonError();
+    }
   }
 }
 
@@ -177,7 +174,7 @@ function isOverlappingLecture(table: Timetable, lecture: UserLecture): boolean {
 }
 
 function makeOverwritingConfirmMessage(overlappingLectures: UserLecture[]) {
-  const overlappingLectureTitles = overlappingLectures.map(lecture => lecture.course_title).slice(0,2).join(", ")
+  const overlappingLectureTitles = overlappingLectures.map(lecture => `'${lecture.course_title}'`).slice(0,2).join(", ")
   const shortFormOfTitles = overlappingLectures.length < 3 ? "" : `외 ${overlappingLectures.length - 2}개의 `
   return `${overlappingLectureTitles} ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?`
 }
@@ -299,6 +296,7 @@ function fromRefLecture(refLecture: RefLecture, colorIndex: number): UserLecture
     class_time_mask: refLecture.class_time_mask,
     instructor: refLecture.instructor,                               // 강사
     quota: refLecture.quota,                                    // 정원
+    freshmanQuota: refLecture.freshmanQuota,                     // 신입생정원
     remark: refLecture.remark,                                   // 비고
     category: refLecture.category,
     course_number: refLecture.course_number,   // 교과목 번호

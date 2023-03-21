@@ -22,6 +22,7 @@ let refLectureSchema = new mongoose.Schema({
   class_time_mask: { type: [ Number ], required: true, default: [0,0,0,0,0,0,0] },
   instructor: String,                               // 강사
   quota: Number,                                    // 정원
+  freshmanQuota: Number,                            // 신입생정원
   enrollment: Number,                               // 신청인원
   remark: String,                                   // 비고
   category: String,
@@ -174,6 +175,7 @@ function fromMongoose(mongooseDoc): RefLecture {
     class_time_mask: mongooseDoc.class_time_mask,
     instructor: mongooseDoc.instructor,                               // 강사
     quota: mongooseDoc.quota,                                    // 정원
+    freshmanQuota: mongooseDoc.freshmanQuota,                    // 신입생정원
     remark: mongooseDoc.remark,                                   // 비고
     category: mongooseDoc.category,
     year: mongooseDoc.year,           // 연도

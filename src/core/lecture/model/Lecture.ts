@@ -13,6 +13,7 @@ export default interface Lecture {
     class_time_mask: number[],
     instructor: string,                               // 강사
     quota: number,                                    // 정원
+    freshmanQuota?: number,                            // 신입생정원
     remark: string,                                   // 비고
     category: string,
 }
