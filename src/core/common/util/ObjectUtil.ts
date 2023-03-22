@@ -34,12 +34,12 @@ function deleteObjectIdRecur(obj: any, stack: List<object>) {
     } else {
       delete obj._id;
       Object.keys(obj).forEach(function(key) {
-        if (obj[key] && obj[key]._id) deleteObjectIdRecur(obj[key], stack.push(obj)); //recursive del calls on object elements
+        if (obj[key]) deleteObjectIdRecur(obj[key], stack.push(obj)); //recursive del calls on object elements
       });
     }
   }
 }
-  
+
   /**
    * Delete '_id' prop of the object and its sub-object recursively
    * This is for copying mongo objects or sanitizing json objects by removing all _id properties
