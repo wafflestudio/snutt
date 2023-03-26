@@ -7,7 +7,6 @@ import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkRequest
 import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkResponse
 import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkSimplePayload
 import com.wafflestudio.snu4t.dynamiclink.data.IosInfo
-import com.wafflestudio.snu4t.dynamiclink.data.fullLink
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
