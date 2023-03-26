@@ -12,10 +12,10 @@ interface TimetableService {
 
 @Service
 class TimetableServiceImpl(
-    private val timeTableRepository: TimetableRepository,
+    private val timetableRepository: TimetableRepository,
 ) : TimetableService {
     override suspend fun getBriefs(userId: String): List<TimetableBriefDto> =
-        timeTableRepository.findAllByUserId(userId)
+        timetableRepository.findAllByUserId(userId)
             .map(::TimetableBriefDto)
             .toList()
 }
