@@ -16,12 +16,24 @@ google:
   firebase:
     project-id:
     service-account:
+    api-key:
 
 truffle:
   client:
     name: snutt-timetable
     phase: local
     api-key:
+    dynamic-link:
+      domain-uri-prefix:
+      android:
+        package-name:
+      ios:
+        bundle-id:
+        app-store-id:
+
+http:
+  responseTimeout: 3s
+
 
 secret-names: dev/snutt-timetable
 
@@ -43,6 +55,14 @@ google:
   firebase:
     project-id:
     service-account:
+    api-key:
+    dynamic-link:
+      domain-uri-prefix:
+      android:
+        package-name:
+      ios:
+        bundle-id:
+        app-store-id:
 
 truffle:
   client:
@@ -65,6 +85,14 @@ google:
   firebase:
     project-id:
     service-account:
+    api-key:
+    dynamic-link:
+      domain-uri-prefix:
+      android:
+        package-name:
+      ios:
+        bundle-id:
+        app-store-id:
 
 truffle:
   client:
