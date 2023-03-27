@@ -41,7 +41,6 @@ data class BookmarkLecture(
 )
 
 fun BookmarkLecture(lecture: Lecture): BookmarkLecture = BookmarkLecture(
-    id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
     periodText = lecture.periodText,

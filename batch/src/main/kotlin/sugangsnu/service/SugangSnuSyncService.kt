@@ -4,7 +4,6 @@ import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
 import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
-import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
@@ -167,7 +166,24 @@ class SugangSnuSyncServiceImpl(
         ).map { bookmark ->
             bookmark.apply {
                 lectures = lectures.map { lecture ->
-                    if (lecture.id == updatedLecture.oldData.id) BookmarkLecture(updatedLecture.newData) else lecture
+                    if (lecture.id == updatedLecture.oldData.id) lecture.apply {
+                        academicYear = updatedLecture.oldData.academicYear
+                        category = updatedLecture.oldData.category
+                        periodText = updatedLecture.oldData.periodText
+                        classTimeText = updatedLecture.oldData.classTimeText
+                        classTime = updatedLecture.oldData.classTime
+                        classTimeMask = updatedLecture.oldData.classTimeMask
+                        classification = updatedLecture.oldData.classification
+                        credit = updatedLecture.oldData.credit
+                        department = updatedLecture.oldData.department
+                        instructor = updatedLecture.oldData.instructor
+                        quota = updatedLecture.oldData.quota
+                        freshmanQuota = updatedLecture.oldData.freshmanQuota
+                        remark = updatedLecture.oldData.remark
+                        lectureNumber = updatedLecture.oldData.lectureNumber
+                        courseNumber = updatedLecture.oldData.courseNumber
+                        courseTitle = updatedLecture.oldData.courseTitle
+                    } else lecture
                 }
             }
         }.let {
