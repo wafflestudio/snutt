@@ -167,22 +167,22 @@ class SugangSnuSyncServiceImpl(
             bookmark.apply {
                 lectures = lectures.map { lecture ->
                     if (lecture.id == updatedLecture.oldData.id) lecture.apply {
-                        academicYear = updatedLecture.oldData.academicYear
-                        category = updatedLecture.oldData.category
-                        periodText = updatedLecture.oldData.periodText
-                        classTimeText = updatedLecture.oldData.classTimeText
-                        classTime = updatedLecture.oldData.classTime
-                        classTimeMask = updatedLecture.oldData.classTimeMask
-                        classification = updatedLecture.oldData.classification
-                        credit = updatedLecture.oldData.credit
-                        department = updatedLecture.oldData.department
-                        instructor = updatedLecture.oldData.instructor
-                        quota = updatedLecture.oldData.quota
-                        freshmanQuota = updatedLecture.oldData.freshmanQuota
-                        remark = updatedLecture.oldData.remark
-                        lectureNumber = updatedLecture.oldData.lectureNumber
-                        courseNumber = updatedLecture.oldData.courseNumber
-                        courseTitle = updatedLecture.oldData.courseTitle
+                        academicYear = updatedLecture.newData.academicYear
+                        category = updatedLecture.newData.category
+                        periodText = updatedLecture.newData.periodText
+                        classTimeText = updatedLecture.newData.classTimeText
+                        classTime = updatedLecture.newData.classTime
+                        classTimeMask = updatedLecture.newData.classTimeMask
+                        classification = updatedLecture.newData.classification
+                        credit = updatedLecture.newData.credit
+                        department = updatedLecture.newData.department
+                        instructor = updatedLecture.newData.instructor
+                        quota = updatedLecture.newData.quota
+                        freshmanQuota = updatedLecture.newData.freshmanQuota
+                        remark = updatedLecture.newData.remark
+                        lectureNumber = updatedLecture.newData.lectureNumber
+                        courseNumber = updatedLecture.newData.courseNumber
+                        courseTitle = updatedLecture.newData.courseTitle
                     } else lecture
                 }
             }
