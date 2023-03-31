@@ -3,6 +3,8 @@ package com.wafflestudio.snu4t.notification.service
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.dto.NotificationQuery
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
+import com.wafflestudio.snu4t.notification.repository.countUnreadNotifications
+import com.wafflestudio.snu4t.notification.repository.findNotifications
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.flow.toList
@@ -17,7 +19,7 @@ class NotificationService(
 ) {
     suspend fun getNotification(query: NotificationQuery): List<Notification> {
         val user = query.user
-        val notifications = repository.findAllByUserIdAndCreatedAtGreaterThan(
+        val notifications = repository.findNotifications(
             userId = user.id!!,
             createdAt = user.regDate,
             pageable = PageRequest.of(query.offset, query.limit)
@@ -31,6 +33,6 @@ class NotificationService(
     }
 
     suspend fun getUnreadCount(user: User): Long {
-        return repository.countByUserIdAndCreatedAtAfter(user.id!!, user.notificationCheckedAt)
+        return repository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
     }
 }
