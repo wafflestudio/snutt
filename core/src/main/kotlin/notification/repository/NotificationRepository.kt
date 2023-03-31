@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.notification.repository
 
 import com.wafflestudio.snu4t.notification.data.Notification
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
