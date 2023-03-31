@@ -28,7 +28,23 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
         parseQueryParam(name, convert)
             ?: throw MissingRequiredParameterException(name)
 
-    private fun <T> ServerRequest.parseQueryParam(name: String, convert: (String) -> T?): T? =
+    fun <T> ServerRequest.parseQueryParam(name: String, convert: (String) -> T?): T? =
         this.queryParamOrNull(name)?.runCatching { convert(this)!! }
             ?.getOrElse { throw InvalidParameterException(name) }
+
+    inline fun <reified T> ServerRequest.parseRequiredQueryParam(name: String): T =
+        parseQueryParam<T>(name)
+            ?: throw MissingRequiredParameterException(name)
+
+    inline fun <reified T> ServerRequest.parseQueryParam(name: String): T? {
+        return when (T::class) {
+            String::class -> this.parseQueryParam(name) { it } as T?
+            Int::class -> this.parseQueryParam(name) { it.toIntOrNull() } as T?
+            Long::class -> this.parseQueryParam(name) { it.toLongOrNull() } as T?
+            Float::class -> this.parseQueryParam(name) { it.toFloatOrNull() } as T?
+            Double::class -> this.parseQueryParam(name) { it.toDoubleOrNull() } as T?
+            Boolean::class -> this.parseQueryParam(name) { it.toBooleanStrictOrNull() } as T?
+            else -> null // throw IllegalArgumentException("Unsupported type: ${T::class}")
+        }
+    }
 }
