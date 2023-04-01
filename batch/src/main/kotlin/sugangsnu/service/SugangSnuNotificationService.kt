@@ -12,6 +12,8 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import common.enum.UrlScheme
+import common.push.dto.MessagePayload
 import common.push.dto.MessageReason
 import common.push.dto.PushTargetMessage
 import kotlinx.coroutines.flow.collect
@@ -66,14 +68,31 @@ class SugangSnuNotificationServiceImpl(
         }
 
         tokenAndMessage.filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(targetToken = token!!, "수강편람 업데이트", message) }
-            .let { pushNotificationService.sendMessages(it, reason = MessageReason("batch/coursebook", "lecture updated")) }
+            .map { (token, message) ->
+                PushTargetMessage(
+                    targetToken = token!!,
+                    payload = MessagePayload(
+                        title = "수강편람 업데이트",
+                        body = message,
+                        urlScheme = UrlScheme.NOTIFICATIONS
+                    )
+                )
+            }
+            .let { pushMessages ->
+                pushNotificationService.sendMessages(
+                    pushMessages = pushMessages,
+                    reason = MessageReason("batch/coursebook", "lecture updated")
+                )
+            }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
         val message = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
         notificationRepository.save(Notification(userId = null, message = message, type = NotificationType.COURSEBOOK))
-        pushNotificationService.sendGlobalMessage("신규 수강편람", message, reason = MessageReason("batch/coursebook", "new coursebook"))
+        pushNotificationService.sendGlobalMessage(
+            payload = MessagePayload("신규 수강편람", message),
+            reason = MessageReason("batch/coursebook", "new coursebook")
+        )
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =

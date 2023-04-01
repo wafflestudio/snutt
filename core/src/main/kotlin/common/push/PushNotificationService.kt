@@ -4,9 +4,8 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.Message
-import com.google.firebase.messaging.Notification
 import com.wafflestudio.snu4t.common.push.data.FcmLog
+import common.push.dto.MessagePayload
 import common.push.dto.MessageReason
 import common.push.dto.PushTargetMessage
 import common.push.dto.TopicMessage
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service
 interface PushNotificationService {
     suspend fun sendMessage(pushMessage: PushTargetMessage, reason: MessageReason)
     suspend fun sendMessages(pushMessages: List<PushTargetMessage>, reason: MessageReason)
-    suspend fun sendGlobalMessage(title: String, body: String, reason: MessageReason)
+    suspend fun sendGlobalMessage(payload: MessagePayload, reason: MessageReason)
     suspend fun sendTopicMessage(pushMessage: TopicMessage, reason: MessageReason)
 }
 
@@ -64,24 +63,19 @@ class FcmPushNotificationService(
             .let { pushLogger.log(it) }
     }
 
-    override suspend fun sendGlobalMessage(title: String, body: String, reason: MessageReason) {
-        sendTopicMessage(TopicMessage("global", title, body), reason)
+    override suspend fun sendGlobalMessage(payload: MessagePayload, reason: MessageReason) {
+        sendTopicMessage(TopicMessage("global", payload), reason)
     }
 
     override suspend fun sendTopicMessage(pushMessage: TopicMessage, reason: MessageReason) {
-        val notification = Notification.builder().setTitle(pushMessage.title).setBody(pushMessage.body).build()
-        val message: Message = Message.builder()
-            .setNotification(notification)
-            .setTopic(pushMessage.topic)
-            .build()
-
+        val message = pushMessage.toMessage()
         val response = FirebaseMessaging.getInstance().sendAsync(message).await()
         pushLogger.log(pushMessage.toLog(response, reason))
     }
 
     private fun PushTargetMessage.toLog(response: String, reason: MessageReason): FcmLog = FcmLog(
         to = targetToken,
-        message = "$title\n$body",
+        message = "${payload.title}\n${payload.body}",
         author = reason.author,
         cause = reason.cause,
         response = response,
@@ -89,7 +83,7 @@ class FcmPushNotificationService(
 
     private fun TopicMessage.toLog(response: String, reason: MessageReason): FcmLog = FcmLog(
         to = topic,
-        message = "$title\n$body",
+        message = "${payload.title}\n${payload.body}",
         author = reason.author,
         cause = reason.cause,
         response = response,
