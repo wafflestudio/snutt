@@ -23,3 +23,4 @@ suspend fun NotificationRepository.findNotifications(userId: String, createdAt: 
 
 suspend fun NotificationRepository.countUnreadNotifications(userId: String, createdAt: LocalDateTime): Long {
     return countByUserIdInAndCreatedAtAfter(listOf(userId, null), createdAt)
+}
