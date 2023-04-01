@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.common.push.PushNotificationService
-import com.wafflestudio.snu4t.common.push.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
@@ -13,6 +12,9 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import common.enum.UrlScheme
+import common.push.dto.MessagePayload
+import common.push.dto.PushTargetMessage
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 
@@ -79,14 +81,25 @@ class SugangSnuNotificationServiceImpl(
         }
 
         tokenAndMessage.filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(targetToken = token!!, "수강편람 업데이트", message) }
-            .let { pushNotificationService.sendMessages(it) }
+            .map { (token, message) ->
+                PushTargetMessage(
+                    targetToken = token!!,
+                    payload = MessagePayload(
+                        title = "수강편람 업데이트",
+                        body = message,
+                        urlScheme = UrlScheme.NONE // TODO
+                    )
+                )
+            }
+            .let { pushMessages ->
+                pushNotificationService.sendMessages(pushMessages)
+            }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
         val message = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
         notificationRepository.save(Notification(userId = null, message = message, type = NotificationType.COURSEBOOK))
-        pushNotificationService.sendGlobalMessage("신규 수강편람", message)
+        pushNotificationService.sendGlobalMessage(MessagePayload("신규 수강편람", message))
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =
