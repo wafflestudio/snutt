@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
+import com.wafflestudio.snu4t.common.enum.UrlScheme
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.MessagePayload
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
@@ -14,8 +15,6 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
-import common.push.dto.MessagePayload
-import common.push.dto.PushTargetMessage
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 
@@ -58,7 +57,7 @@ class SugangSnuNotificationServiceImpl(
 
         return tokenAndMessage
             .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message)) }
+            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
