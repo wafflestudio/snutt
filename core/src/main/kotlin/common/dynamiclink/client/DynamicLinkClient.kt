@@ -1,22 +1,22 @@
-package com.wafflestudio.snu4t.dynamiclink.client
+package com.wafflestudio.snu4t.common.dynamiclink.client
 
-import com.wafflestudio.snu4t.dynamiclink.api.FirebaseDynamicLinkApi
-import com.wafflestudio.snu4t.dynamiclink.data.AndroidInfo
-import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkInfo
-import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkRequest
-import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkResponse
-import com.wafflestudio.snu4t.dynamiclink.data.DynamicLinkSimplePayload
-import com.wafflestudio.snu4t.dynamiclink.data.IosInfo
+import com.wafflestudio.snu4t.common.dynamiclink.api.FirebaseDynamicLinkApi
+import com.wafflestudio.snu4t.common.dynamiclink.data.AndroidInfo
+import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkInfo
+import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkRequest
+import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.dynamiclink.data.IosInfo
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
+import java.net.URLEncoder
 
 interface DynamicLinkClient {
-    suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): String
-    suspend fun generateLink(link: String, mobileCtaLink: String): String
+    suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse
+    suspend fun generateLink(link: String, mobileCtaLink: String): DynamicLinkResponse
 }
 
 @Service
@@ -34,8 +34,8 @@ class FirebaseDynamicLinkClient(
         const val SHORT_LINK_PATH = "shortLinks"
     }
 
-    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): String {
-        val link = firebaseDynamicLinkApi
+    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse {
+        val response = firebaseDynamicLinkApi
             .post()
             .uri { builder ->
                 builder
@@ -53,10 +53,10 @@ class FirebaseDynamicLinkClient(
                 }
             }
 
-        return link.shortLink
+        return response
     }
 
-    override suspend fun generateLink(link: String, mobileCtaLink: String): String {
+    override suspend fun generateLink(link: String, mobileCtaLink: String): DynamicLinkResponse {
         val dynamicLinkRequest = DynamicLinkRequest(
             DynamicLinkInfo(
                 domainUriPrefix = domainUriPrefix,
@@ -72,4 +72,12 @@ class FirebaseDynamicLinkClient(
         )
         return generateLink(dynamicLinkRequest)
     }
+}
+
+data class DynamicLinkSimplePayload(
+    val link: String,
+    val mobileCtaLink: String,
+) {
+    val fullLink: String
+        get() = "$link?mobileCtaLink=${URLEncoder.encode(this.mobileCtaLink, "UTF-8")}"
 }

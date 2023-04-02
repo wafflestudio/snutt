@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.timetables.service
 
+import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
-import com.wafflestudio.snu4t.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
