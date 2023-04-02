@@ -8,6 +8,8 @@ open class Snu4tException(
 
 object WrongApiKeyException : Snu4tException(ErrorType.WRONG_API_KEY)
 object NoUserTokenException : Snu4tException(ErrorType.NO_USER_TOKEN)
+object UserNotAdminException : Snu4tException(ErrorType.USER_NOT_ADMIN)
+object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object WrongUserTokenException : Snu4tException(ErrorType.WRONG_USER_TOKEN)
 object InvalidLocalIdException : Snu4tException(ErrorType.INVALID_LOCAL_ID)
 object InvalidPasswordException : Snu4tException(ErrorType.INVALID_PASSWORD)

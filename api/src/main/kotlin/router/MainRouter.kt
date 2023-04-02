@@ -1,10 +1,12 @@
 package com.wafflestudio.snu4t.router
 
+import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
+import com.wafflestudio.snu4t.router.docs.AdminApi
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.NotificationApi
@@ -22,6 +24,7 @@ class MainRouter(
     private val timeTableHandler: TimetableHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
+    private val adminHandler: AdminHandler,
     private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
 ) {
@@ -73,6 +76,13 @@ class MainRouter(
         "/notification".nest {
             GET("", notificationHandler::getNotification)
             GET("/count", notificationHandler::getUnreadCounts)
+        }
+    }
+
+    @AdminApi
+    fun adminRoute() = v1CoRouter {
+        "/admin".nest {
+            POST("/insert_noti", adminHandler::insertNotification)
         }
     }
 
