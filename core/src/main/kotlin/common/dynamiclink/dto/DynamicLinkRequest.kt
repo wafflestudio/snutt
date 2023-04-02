@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.dynamiclink.data
+package com.wafflestudio.snu4t.common.dynamiclink.dto
 
 data class DynamicLinkRequest(
     val dynamicLinkInfo: DynamicLinkInfo,
