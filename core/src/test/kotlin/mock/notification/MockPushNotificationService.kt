@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.mock.notification
 
 import com.wafflestudio.snu4t.common.push.PushNotificationService
-import com.wafflestudio.snu4t.common.push.dto.MessagePayload
+import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
 import org.springframework.context.annotation.Profile
@@ -16,7 +16,7 @@ class MockPushNotificationService : PushNotificationService {
     override suspend fun sendMessages(pushMessages: List<PushTargetMessage>) {
     }
 
-    override suspend fun sendGlobalMessage(payload: MessagePayload) {
+    override suspend fun sendGlobalMessage(payload: PushMessage) {
     }
 
     override suspend fun sendTopicMessage(pushMessage: TopicMessage) {

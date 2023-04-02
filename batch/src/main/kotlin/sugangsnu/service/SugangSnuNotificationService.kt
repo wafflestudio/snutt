@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.sugangsnu.service
 
+import com.wafflestudio.snu4t.common.enum.UrlScheme
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.MessagePayload
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
@@ -14,8 +15,6 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
-import common.push.dto.MessagePayload
-import common.push.dto.PushTargetMessage
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 
@@ -34,7 +33,7 @@ class SugangSnuNotificationServiceImpl(
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
 
         syncSavedLecturesResults
-            .map { Notification(userId = it.userId, message = it.notificationMessage, type = NotificationType.LECTURE_UPDATE) }
+            .map { it.toNotification() }
             .let { notificationRepository.saveAll(it) }
             .collect()
 
@@ -58,7 +57,7 @@ class SugangSnuNotificationServiceImpl(
 
         return tokenAndMessage
             .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message)) }
+            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
@@ -71,32 +70,37 @@ class SugangSnuNotificationServiceImpl(
         this.map { result -> result.userId to result.lectureId }.distinct().groupingBy { it.first }.eachCount()
 
     // 도메인으로 내려도 될 것 같다.
-    private val UserLectureSyncResult.notificationMessage: String get() = when (this) {
-        is TimetableLectureUpdateResult -> {
-            """
-               $year-${semester.fullName} '$timetableTitle' 시간표의
-               '$courseTitle' 강의가 업데이트 되었습니다.
-               (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
-            """.trimIndent().replace("\n", "")
-        }
-
-        is TimetableLectureDeleteResult -> {
-            """
-                $year-${semester.fullName} '$timetableTitle' 시간표의 
-                '$courseTitle' 강의가 폐강되어 삭제되었습니다.
-            """.trimIndent().replace("\n", "")
-        }
-        is BookmarkLectureUpdateResult -> {
-            """
+    private fun UserLectureSyncResult.toNotification(): Notification {
+        val (message, notificationType) = when (this) {
+            // 업데이트 알림
+            is TimetableLectureUpdateResult -> {
+                """
+                   $year-${semester.fullName} '$timetableTitle' 시간표의
+                   '$courseTitle' 강의가 업데이트 되었습니다.
+                   (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_UPDATE
+            }
+            is BookmarkLectureUpdateResult -> {
+                """
                 $year-${semester.fullName} 관심강좌 목록의 '$courseTitle' 강의가 업데이트 되었습니다.
                 (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
-            """.trimIndent().replace("\n", "")
-        }
-        is BookmarkLectureDeleteResult -> {
-            """
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_UPDATE
+            }
+            // 폐강 알림
+            is TimetableLectureDeleteResult -> {
+                """
+                $year-${semester.fullName} '$timetableTitle' 시간표의 
+                '$courseTitle' 강의가 폐강되어 삭제되었습니다.
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+            }
+            is BookmarkLectureDeleteResult -> {
+                """
                 $year-${semester.fullName} 관심강좌 목록의 
                 '$courseTitle' 강의가 폐강되어 삭제되었습니다.
-            """.trimIndent().replace("\n", "")
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+            }
         }
+
+        return Notification(userId = userId, message = message, type = notificationType)
     }
 }
