@@ -17,12 +17,6 @@ google:
     project-id:
     service-account:
 
-truffle:
-  client:
-    name: snutt-timetable
-    phase: local
-    api-key:
-
 secret-names: dev/snutt-timetable
 
 ---
@@ -45,8 +39,7 @@ google:
     service-account:
 
 truffle:
-  client:
-    phase: dev
+  enabled: true
 
 ---
 
@@ -67,7 +60,6 @@ google:
     service-account:
 
 truffle:
-  client:
-    phase: prod
+  enabled: true
 
 secret-names: prod/snutt-timetable
