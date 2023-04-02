@@ -15,3 +15,11 @@ truffle:
     name: snutt-timetable
     phase: test
     api-key: test-api-key
+
+google:
+  firebase:
+    dynamic-link:
+      link-prefix: "https://snutt.page.link"
+
+http:
+  responseTimeout: 3s

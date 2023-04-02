@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.server.ServerResponse
 @Component
 class TimetableHandler(
     private val timeTableService: TimetableService,
-    private val dynamicLinkClient: DynamicLinkClient,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
