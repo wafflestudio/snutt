@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("test")
-class MockDynamicLinkClient: DynamicLinkClient {
+class MockDynamicLinkClient : DynamicLinkClient {
     override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse {
         return DynamicLinkResponse(
             "https://snuttdev.page.link/oySD",

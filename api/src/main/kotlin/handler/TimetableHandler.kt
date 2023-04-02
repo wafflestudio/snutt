@@ -1,6 +1,5 @@
 package com.wafflestudio.snu4t.handler
 
-import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import org.springframework.stereotype.Component
