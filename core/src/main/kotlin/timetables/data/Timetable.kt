@@ -20,8 +20,10 @@ data class Timetable(
     var year: Int,
     var semester: Semester,
     @Field("lecture_list")
+    @JsonProperty("lecture_list")
     var lectures: List<TimetableLecture>,
     var title: String,
     @Field("updated_at")
+    @JsonProperty("updated_at")
     var updatedAt: Instant,
 )
