@@ -12,6 +12,7 @@ import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import common.enum.UrlScheme
 import common.push.dto.MessagePayload
 import common.push.dto.MessageReason
 import common.push.dto.PushTargetMessage
@@ -56,7 +57,7 @@ class SugangSnuNotificationServiceImpl(
 
         return tokenAndMessage
             .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message)) }
+            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {

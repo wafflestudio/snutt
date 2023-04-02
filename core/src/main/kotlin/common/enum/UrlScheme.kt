@@ -3,6 +3,7 @@ package common.enum
 enum class UrlScheme(private val scheme: String) {
 
     NONE(""),
+    NOTIFICATIONS("snutt://notifications"),
     ;
 
     fun withReferrer(referrer: String?): String {
