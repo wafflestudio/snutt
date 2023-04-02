@@ -1,11 +1,11 @@
 package com.wafflestudio.snu4t.common.dynamiclink.client
 
 import com.wafflestudio.snu4t.common.dynamiclink.api.FirebaseDynamicLinkApi
-import com.wafflestudio.snu4t.common.dynamiclink.data.AndroidInfo
-import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkInfo
-import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkRequest
-import com.wafflestudio.snu4t.common.dynamiclink.data.DynamicLinkResponse
-import com.wafflestudio.snu4t.common.dynamiclink.data.IosInfo
+import com.wafflestudio.snu4t.common.dynamiclink.dto.AndroidInfo
+import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkInfo
+import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkRequest
+import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.dynamiclink.dto.IosInfo
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
