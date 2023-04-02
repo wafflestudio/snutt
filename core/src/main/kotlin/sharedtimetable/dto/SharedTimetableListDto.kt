@@ -2,8 +2,13 @@ package com.wafflestudio.snu4t.sharedtimetable.dto
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import com.wafflestudio.snu4t.common.enum.Semester
 import java.time.LocalDateTime
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
+data class SharedTimetableListDto(
+    val sharedTables: List<SharedTimetableBriefDto>
+)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class SharedTimetableBriefDto(
     val id: String,
@@ -11,4 +16,6 @@ data class SharedTimetableBriefDto(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val isValid: Boolean,
+    val year: Int,
+    val semester: Int,
 )
