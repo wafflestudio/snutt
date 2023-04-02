@@ -5,9 +5,16 @@ import common.enum.UrlScheme
 data class MessagePayload(
     val title: String,
     val body: String,
-    private val urlScheme: UrlScheme = UrlScheme.NONE,
-    private val referrer: String? = null,
-) {
-    val urlSchemeString: String
-        get() = urlScheme.withReferrer(referrer)
-}
+    val urlSchemeString: String,
+)
+
+fun MessagePayload(
+    title: String,
+    body: String,
+    urlScheme: UrlScheme = UrlScheme.NONE,
+    referrer: String? = null
+) = MessagePayload(
+    title = title,
+    body = body,
+    urlSchemeString = urlScheme.withReferrer(referrer)
+)

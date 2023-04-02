@@ -22,7 +22,7 @@ data class Notification(
     val userId: String?,
     val message: String,
     val type: NotificationType,
-    val link: String? = null,
+    val link: String? = null, // TODO 이 친구의 용도는 무엇?
     @Indexed(direction = IndexDirection.DESCENDING)
     @Field("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
