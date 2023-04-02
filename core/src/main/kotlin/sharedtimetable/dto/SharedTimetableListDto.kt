@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.sharedtimetable.dto
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.wafflestudio.snu4t.common.enum.Semester
 import java.time.LocalDateTime
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
