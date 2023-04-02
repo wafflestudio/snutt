@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.mock.notification
 
 import com.wafflestudio.snu4t.common.push.PushNotificationService
+import common.push.dto.MessagePayload
 import common.push.dto.MessageReason
 import common.push.dto.PushTargetMessage
 import common.push.dto.TopicMessage
@@ -17,7 +18,7 @@ class MockPushNotificationService : PushNotificationService {
     override suspend fun sendMessages(pushMessages: List<PushTargetMessage>, reason: MessageReason) {
     }
 
-    override suspend fun sendGlobalMessage(title: String, body: String, reason: MessageReason) {
+    override suspend fun sendGlobalMessage(payload: MessagePayload, reason: MessageReason) {
     }
 
     override suspend fun sendTopicMessage(pushMessage: TopicMessage, reason: MessageReason) {
