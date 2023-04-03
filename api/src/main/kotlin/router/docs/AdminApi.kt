@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod
 @Bean
 @RouterOperations(
     RouterOperation(
-        path = "/v1/admin/insert-noti", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/admin/insert_noti", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "insertNotification",
+            description = "어드민 권한으로 알림 보내기, 구버전 api 라서 snake case 사용",
             requestBody = RequestBody(
                 content = [Content(schema = Schema(implementation = InsertNotificationRequest::class))],
                 required = true,

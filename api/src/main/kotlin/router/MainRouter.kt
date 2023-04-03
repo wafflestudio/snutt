@@ -82,7 +82,7 @@ class MainRouter(
     @AdminApi
     fun adminRoute() = v1CoRouter {
         "/admin".nest {
-            POST("/insert-noti", adminHandler::insertNotification)
+            POST("/insert_noti", adminHandler::insertNotification)
         }
     }
 
