@@ -9,8 +9,7 @@ data class InsertNotificationRequest(
     val userId: String? = null,
     val title: String,
     val body: String,
-    val urlScheme: String,
     val insertFcm: Boolean = false,
     val type: NotificationType = NotificationType.NORMAL,
-    val detail: String? = null
+    val dataPayload: Map<String, String> = emptyMap()
 )

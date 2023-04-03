@@ -2,7 +2,7 @@ package com.wafflestudio.snu4t.sugangsnu.service
 
 import com.wafflestudio.snu4t.common.enum.UrlScheme
 import com.wafflestudio.snu4t.common.push.PushNotificationService
-import com.wafflestudio.snu4t.common.push.dto.MessagePayload
+import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
@@ -57,13 +57,13 @@ class SugangSnuNotificationServiceImpl(
 
         return tokenAndMessage
             .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, MessagePayload("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
+            .map { (token, message) -> PushTargetMessage(token!!, PushMessage("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
         val message = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
         notificationRepository.save(Notification(userId = null, message = message, type = NotificationType.COURSEBOOK))
-        pushNotificationService.sendGlobalMessage(MessagePayload("신규 수강편람", message))
+        pushNotificationService.sendGlobalMessage(PushMessage("신규 수강편람", message))
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =

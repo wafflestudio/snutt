@@ -24,5 +24,5 @@ class CompositeMiddlewareConfig(
 
     @Bean
     fun snuttRestAdminApiMiddleware(): SnuttRestAdminApiMiddleware =
-        SnuttRestAdminApiMiddleware(apiKeyMiddleware + adminApiMiddleware + nativeClientInfoMiddleware)
+        SnuttRestAdminApiMiddleware(apiKeyMiddleware + adminApiMiddleware)
 }

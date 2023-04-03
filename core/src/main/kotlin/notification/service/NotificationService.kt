@@ -35,7 +35,6 @@ class NotificationService(
         return repository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
     }
 
-    // TODO LINK_ADDR 타입 추가될 경우 detail 체크 필요
     suspend fun addNotification(notification: Notification): Notification {
         //  신규 추가되는 것인지 체크
         check(notification.id == null)

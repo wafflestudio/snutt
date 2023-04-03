@@ -5,7 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wafflestudio.snu4t.common.push.PushNotificationService
-import com.wafflestudio.snu4t.common.push.dto.MessagePayload
+import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
 import kotlinx.coroutines.async
@@ -57,7 +57,7 @@ class FcmPushNotificationService(
             .map { (message, response) -> logger.info("Message Request Sent: $message, response : $response") }
     }
 
-    override suspend fun sendGlobalMessage(payload: MessagePayload) {
+    override suspend fun sendGlobalMessage(payload: PushMessage) {
         sendTopicMessage(TopicMessage("global", payload))
     }
 
