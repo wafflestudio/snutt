@@ -31,7 +31,7 @@ class SugangSnuNotificationServiceImpl(
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
         syncSavedLecturesResults.map {
             when (it) {
-                is TimetableLectureUpdateResult ->{
+                is TimetableLectureUpdateResult -> {
                     val message = """
                        ${it.year}-${it.semester.fullName} '${it.timetableTitle}' 시간표의
                        '${it.courseTitle}' 강의가 업데이트 되었습니다.
