@@ -9,9 +9,3 @@ logging:
     com.mongodb: ERROR
 
 de.flapdoodle.mongodb.embedded.version: 5.0.5
-
-truffle:
-  client:
-    name: snutt-timetable
-    phase: test
-    api-key: test-api-key
