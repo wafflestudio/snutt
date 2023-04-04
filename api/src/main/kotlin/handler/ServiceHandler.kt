@@ -44,7 +44,7 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
             Float::class -> this.parseQueryParam(name) { it.toFloatOrNull() } as T?
             Double::class -> this.parseQueryParam(name) { it.toDoubleOrNull() } as T?
             Boolean::class -> this.parseQueryParam(name) { it.toBooleanStrictOrNull() } as T?
-            else -> null // throw IllegalArgumentException("Unsupported type: ${T::class}")
+            else -> throw IllegalArgumentException("파싱을 지원하지 않는 쿼리 파라미터 타입입니다. type: ${T::class}")
         }
     }
 }
