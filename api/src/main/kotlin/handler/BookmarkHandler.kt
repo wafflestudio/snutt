@@ -17,7 +17,7 @@ class BookmarkHandler(
 
     suspend fun getBookmark(req: ServerRequest) = handle(req) {
         val userId: String = req.userId
-        val year: Int = req.parseRequiredQueryParam("year") { it.toInt() }
+        val year: Int = req.parseRequiredQueryParam("year")
         val semester: Semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         bookmarkService.getBookmark(userId, year, semester).let(::BookmarkResponse)
     }

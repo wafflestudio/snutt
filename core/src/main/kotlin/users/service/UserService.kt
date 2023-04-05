@@ -15,6 +15,8 @@ interface UserService {
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
     suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): RegisterResponse
+
+    suspend fun update(user: User): User
 }
 
 @Service
@@ -53,5 +55,9 @@ class UserServiceImpl(
             userId = user.id!!,
             token = credentialHash,
         )
+    }
+
+    override suspend fun update(user: User): User {
+        return userRepository.save(user)
     }
 }
