@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class SharedTimetableListDto(
-    val sharedTables: List<SharedTimetableBriefDto>
+    val content: List<SharedTimetableBriefDto>
 )
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class SharedTimetableBriefDto(
