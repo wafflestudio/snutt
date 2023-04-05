@@ -29,4 +29,4 @@ class InvalidParameterException(private val fieldName: String) :
 class InvalidBodyFieldValueException(private val fieldName: String) :
     Snu4tException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: $fieldName)")
 
-object DynamicLinkGenerationFailedException: Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
+object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

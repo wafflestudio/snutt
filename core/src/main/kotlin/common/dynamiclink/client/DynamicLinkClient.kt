@@ -9,7 +9,6 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.IosInfo
 import com.wafflestudio.snu4t.common.exception.DynamicLinkGenerationFailedException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
 import java.net.URLEncoder
