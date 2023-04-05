@@ -40,7 +40,7 @@ truffle:
         app-store-id:
 
 http:
-  responseTimeout: 3s
+  response-timeout: 3s
 
 secret-names: dev/snutt-timetable
 

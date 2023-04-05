@@ -10,7 +10,7 @@ import java.time.Duration
 
 @Configuration
 class FirebaseDynamicLinkApiConfig(
-    @Value("\${http.responseTimeout}") private val responseTimeout: Duration,
+    @Value("\${http.response-timeout}") private val responseTimeout: Duration,
 ) {
     companion object {
         const val FIREBASE_DYNAMIC_LINK_BASE_URL = "https://firebasedynamiclinks.googleapis.com/v1/"
