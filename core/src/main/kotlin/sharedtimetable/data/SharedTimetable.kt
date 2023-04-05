@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.sharedtimetable.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -19,6 +20,8 @@ data class SharedTimetable(
     var title: String,
     @Field("timetable_id")
     val timetableId: String,
+    val year: Int,
+    val semester: Semester,
     @Field("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
     @Field("updated_at")
