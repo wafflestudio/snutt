@@ -6,12 +6,12 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkInfo
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkRequest
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snu4t.common.dynamiclink.dto.IosInfo
+import com.wafflestudio.snu4t.common.exception.DynamicLinkGenerationFailedException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
-import org.springframework.web.reactive.function.client.awaitExchange
-import org.springframework.web.reactive.function.client.createExceptionAndAwait
 import java.net.URLEncoder
 
 interface DynamicLinkClient {
@@ -20,7 +20,6 @@ interface DynamicLinkClient {
 }
 
 @Service
-@Profile("!test")
 class FirebaseDynamicLinkClient(
     val firebaseDynamicLinkApi: FirebaseDynamicLinkApi,
     @Value("\${google.firebase.api-key}") val apiKey: String,
@@ -30,12 +29,14 @@ class FirebaseDynamicLinkClient(
     @Value("\${google.firebase.dynamic-link.ios.app-store-id:#{null}}") val iosAppStoreId: String?,
 ) : DynamicLinkClient {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     companion object {
         const val SHORT_LINK_PATH = "shortLinks"
     }
 
-    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse {
-        val response = firebaseDynamicLinkApi
+    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse = runCatching {
+        firebaseDynamicLinkApi
             .post()
             .uri { builder ->
                 builder
@@ -44,16 +45,11 @@ class FirebaseDynamicLinkClient(
                     .build()
             }
             .bodyValue(dynamicLinkRequest)
-            .awaitExchange {
-                if (it.statusCode().is2xxSuccessful) {
-                    it.awaitBody(DynamicLinkResponse::class)
-                } else {
-                    // FIXME: 로깅
-                    throw it.createExceptionAndAwait()
-                }
-            }
-
-        return response
+            .retrieve()
+            .awaitBody<DynamicLinkResponse>()
+    }.getOrElse {
+        logger.error("링크 생성 실패 (payload: {}, error: {}", dynamicLinkRequest, it.message)
+        throw DynamicLinkGenerationFailedException
     }
 
     override suspend fun generateLink(link: String, mobileCtaLink: String): DynamicLinkResponse {
