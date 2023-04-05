@@ -43,17 +43,15 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-webflux")
         implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-        implementation("org.springframework.boot:spring-boot-starter-log4j2")
         implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.0.1")
+        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.1.0")
+        implementation("com.wafflestudio.truffle.sdk:truffle-logback:1.1.0")
 
-        // spring docs
         implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
 
-        // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("io.projectreactor:reactor-test")
         testImplementation("io.mockk:mockk:1.12.4")
@@ -73,14 +71,6 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
-    }
-
-    configurations {
-        all {
-            exclude(module = "spring-boot-starter-logging")
-            exclude(module = "logback-core")
-            exclude(module = "logback-classic")
-        }
     }
 }
 

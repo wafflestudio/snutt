@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/shared-tables", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getSharedTimetables",
-            parameters = [
-                Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true),
-            ],
+            parameters = [],
             responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = SharedTimetableBriefDto::class)))])]
         ),
     ),
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "getSharedTimetables",
             parameters = [
-                Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true),
                 Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)
             ],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = SharedTimetableDetailDto::class))])]
@@ -43,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/shared-tables", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "addSharedTimetable",
-            parameters = [Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true)],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = SharedTimetableCreateRequest::class))]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
         ),
@@ -53,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "updateSharedTimetables",
             parameters = [
-                Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true),
                 Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)
             ],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = SharedTimetableModifyRequest::class))]),
@@ -65,7 +60,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "deleteSharedTimetable",
             parameters = [
-                Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true),
                 Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)
             ],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]

@@ -42,7 +42,6 @@ truffle:
 http:
   responseTimeout: 3s
 
-
 secret-names: dev/snutt-timetable
 
 ---
@@ -74,8 +73,7 @@ google:
         app-store-id:
 
 truffle:
-  client:
-    phase: dev
+  enabled: true
 
 ---
 
@@ -105,7 +103,6 @@ google:
         app-store-id:
 
 truffle:
-  client:
-    phase: prod
+  enabled: true
 
 secret-names: prod/snutt-timetable

@@ -37,7 +37,7 @@ class ErrorWebFilter(
                         )
                     }
                     else -> {
-                        logger.error(throwable.message)
+                        logger.error(throwable.message, throwable)
                         httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
                         errorBody = makeErrorBody(Snu4tException())
                     }
