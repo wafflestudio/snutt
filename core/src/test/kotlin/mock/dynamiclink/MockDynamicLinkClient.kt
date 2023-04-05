@@ -5,7 +5,6 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkRequest
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
 @Service
