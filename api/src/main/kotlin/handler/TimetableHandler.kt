@@ -18,4 +18,9 @@ class TimetableHandler(
 
         timeTableService.getBriefs(userId = userId)
     }
+
+    suspend fun getLink(req: ServerRequest): ServerResponse = handle(req) {
+        val timetableId = req.pathVariable("id")
+        timeTableService.getLink(timetableId)
+    }
 }

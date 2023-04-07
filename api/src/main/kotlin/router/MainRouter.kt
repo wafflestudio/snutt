@@ -43,6 +43,7 @@ class MainRouter(
     fun tableRoute() = v1CoRouter {
         "/tables".nest {
             GET("", timeTableHandler::getBriefs)
+            GET("/{id}/links", timeTableHandler::getLink)
         }
     }
 

@@ -9,3 +9,26 @@ logging:
     com.mongodb: ERROR
 
 de.flapdoodle.mongodb.embedded.version: 5.0.5
+
+truffle:
+  client:
+    name: snutt-timetable
+    phase: test
+    api-key: test-api-key
+
+google:
+  firebase:
+    project-id:
+    service-account:
+    api-key:
+    dynamic-link:
+      domain-uri-prefix:
+      link-prefix: "https://snutt.page.link"
+      android:
+        package-name:
+      ios:
+        bundle-id:
+        app-store-id:
+
+http:
+  responseTimeout: 3s
