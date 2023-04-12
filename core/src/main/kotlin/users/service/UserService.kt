@@ -25,7 +25,7 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
 ) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
-        userRepository.findByCredentialHash(credentialHash) ?: throw WrongUserTokenException
+        userRepository.findByCredentialHashAndActive(credentialHash, true) ?: throw WrongUserTokenException
 
     override suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): RegisterResponse {
         val localId = localRegisterRequest.id
