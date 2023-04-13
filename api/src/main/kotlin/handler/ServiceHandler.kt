@@ -26,9 +26,25 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
 
     fun <T> ServerRequest.parseRequiredQueryParam(name: String, convert: (String) -> T?): T =
         parseQueryParam(name, convert)
-            ?: throw MissingRequiredParameterException("semester")
+            ?: throw MissingRequiredParameterException(name)
 
     fun <T> ServerRequest.parseQueryParam(name: String, convert: (String) -> T?): T? =
         this.queryParamOrNull(name)?.runCatching { convert(this)!! }
-            ?.getOrElse { throw InvalidParameterException("semester") }
+            ?.getOrElse { throw InvalidParameterException(name) }
+
+    inline fun <reified T> ServerRequest.parseRequiredQueryParam(name: String): T =
+        parseQueryParam<T>(name)
+            ?: throw MissingRequiredParameterException(name)
+
+    inline fun <reified T> ServerRequest.parseQueryParam(name: String): T? {
+        return when (T::class) {
+            String::class -> this.parseQueryParam(name) { it } as T?
+            Int::class -> this.parseQueryParam(name) { it.toIntOrNull() } as T?
+            Long::class -> this.parseQueryParam(name) { it.toLongOrNull() } as T?
+            Float::class -> this.parseQueryParam(name) { it.toFloatOrNull() } as T?
+            Double::class -> this.parseQueryParam(name) { it.toDoubleOrNull() } as T?
+            Boolean::class -> this.parseQueryParam(name) { it.toBooleanStrictOrNull() } as T?
+            else -> throw IllegalArgumentException("파싱을 지원하지 않는 쿼리 파라미터 타입입니다. type: ${T::class}")
+        }
+    }
 }

@@ -15,6 +15,8 @@ interface UserService {
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
     suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): RegisterResponse
+
+    suspend fun update(user: User): User
 }
 
 @Service
@@ -23,7 +25,7 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
 ) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
-        userRepository.findByCredentialHash(credentialHash) ?: throw WrongUserTokenException
+        userRepository.findByCredentialHashAndActive(credentialHash, true) ?: throw WrongUserTokenException
 
     override suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): RegisterResponse {
         val localId = localRegisterRequest.id
@@ -53,5 +55,9 @@ class UserServiceImpl(
             userId = user.id!!,
             token = credentialHash,
         )
+    }
+
+    override suspend fun update(user: User): User {
+        return userRepository.save(user)
     }
 }

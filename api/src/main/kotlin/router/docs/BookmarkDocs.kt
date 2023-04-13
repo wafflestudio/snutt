@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "getBookmark",
             parameters = [
-                Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true),
                 Parameter(`in` = ParameterIn.QUERY, name = "year", required = true),
                 Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
             ],
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/bookmarks/lecture", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "addLecture",
-            parameters = [Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true)],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = BookmarkLectureModifyRequest::class))]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
         ),
@@ -40,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/bookmarks/lecture", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteBookmark",
-            parameters = [Parameter(`in` = ParameterIn.HEADER, name = "userId", required = true)],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = BookmarkLectureModifyRequest::class))]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
         ),

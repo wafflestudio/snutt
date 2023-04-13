@@ -2,10 +2,12 @@ package com.wafflestudio.snu4t.router
 
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.NotificationApi
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import org.springframework.context.annotation.Bean
@@ -21,6 +23,7 @@ class MainRouter(
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
     private val sharedTimetableHandler: SharedTimetableHandler,
+    private val notificationHandler: NotificationHandler,
 ) {
     @Bean
     fun ping() = coRouter {
@@ -40,6 +43,7 @@ class MainRouter(
     fun tableRoute() = v1CoRouter {
         "/tables".nest {
             GET("", timeTableHandler::getBriefs)
+            GET("/{id}/links", timeTableHandler::getLink)
         }
     }
 
@@ -62,6 +66,14 @@ class MainRouter(
             POST("", sharedTimetableHandler::addSharedTimetable)
             PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
             DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
+        }
+    }
+
+    @NotificationApi
+    fun notificationRoute() = v1CoRouter {
+        "/notification".nest {
+            GET("", notificationHandler::getNotification)
+            GET("/count", notificationHandler::getUnreadCounts)
         }
     }
 
