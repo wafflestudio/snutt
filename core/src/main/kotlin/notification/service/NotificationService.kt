@@ -34,4 +34,10 @@ class NotificationService(
     suspend fun getUnreadCount(user: User): Long {
         return repository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
     }
+
+    suspend fun addNotification(notification: Notification): Notification {
+        //  신규 추가되는 것인지 체크
+        check(notification.id == null)
+        return repository.save(notification)
+    }
 }
