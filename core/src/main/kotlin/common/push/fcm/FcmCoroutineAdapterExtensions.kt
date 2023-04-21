@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.push
+package com.wafflestudio.snu4t.common.push.fcm
 
 import com.google.api.core.ApiFuture
 import com.google.api.core.ApiFutureCallback
