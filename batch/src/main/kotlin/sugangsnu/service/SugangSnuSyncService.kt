@@ -279,10 +279,10 @@ class SugangSnuSyncServiceImpl(
 
     fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
         updatedLecture.updatedField.contains(Lecture::classTimes) &&
-                timetable.lectures.any {
-                    it.lectureId != updatedLecture.oldData.id &&
-                            ClassTimeUtils.timesOverlap(it.classTimes, updatedLecture.newData.classTimes)
-                }
+            timetable.lectures.any {
+                it.lectureId != updatedLecture.oldData.id &&
+                    ClassTimeUtils.timesOverlap(it.classTimes, updatedLecture.newData.classTimes)
+            }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =
         bookmarkRepository.findAllContainsLectureId(

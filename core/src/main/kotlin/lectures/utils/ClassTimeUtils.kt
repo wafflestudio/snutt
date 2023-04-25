@@ -26,13 +26,13 @@ object ClassTimeUtils {
     fun timesOverlap(times1: List<ClassTime>, times2: List<ClassTime>) =
         times1.any { classTime1 ->
             times2.any { classTime2 ->
-                twoTimesOverlap( classTime1, classTime2 )
+                twoTimesOverlap(classTime1, classTime2)
             }
         }
 
     fun twoTimesOverlap(time1: ClassTime, time2: ClassTime) =
         time1.day == time2.day &&
-                time1.startTimeMinute < time2.endTimeMinute && time1.endTimeMinute > time2.startTimeMinute
+            time1.startTimeMinute < time2.endTimeMinute && time1.endTimeMinute > time2.startTimeMinute
 }
 
 val ClassTime.startTimeMinute: Int
