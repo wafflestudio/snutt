@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
@@ -97,6 +98,12 @@ class SugangSnuNotificationServiceImpl(
                 """
                 $year-${semester.fullName} 관심강좌 목록의 
                 '$courseTitle' 강의가 폐강되어 삭제되었습니다.
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+            }
+            is TimetableLectureDeleteByOverlapResult -> {
+                """
+                $year-${semester.fullName} '$timetableTitle' 시간표의 
+                '$courseTitle' 강의가 업데이트되었으나, 시간표가 겹쳐 삭제되었습니다.
                 """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
             }
         }

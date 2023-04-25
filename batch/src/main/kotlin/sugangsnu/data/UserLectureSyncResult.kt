@@ -41,3 +41,12 @@ data class TimetableLectureDeleteResult(
     override val userId: String,
     override val lectureId: String,
 ) : UserLectureSyncResult(userId, lectureId)
+
+data class TimetableLectureDeleteByOverlapResult(
+    val year: Int,
+    val semester: Semester,
+    val timetableTitle: String,
+    val courseTitle: String,
+    override val userId: String,
+    override val lectureId: String,
+) : UserLectureSyncResult(userId, lectureId)

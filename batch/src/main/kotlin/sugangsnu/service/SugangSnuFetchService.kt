@@ -81,8 +81,8 @@ class SugangSnuFetchServiceImpl(
         val remark = row.getCellByColumnName("비고")
 
         val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(classTimeText)
-        val classTime = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
-        val classTimeMask = ClassTimeUtils.classTimeToBitmask(classTime)
+        val classTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
+        val classTimeMask = ClassTimeUtils.classTimeToBitmask(classTimes)
 
         val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
 
@@ -104,7 +104,7 @@ class SugangSnuFetchServiceImpl(
             category = category.koreanName,
             classTimeText = classTimeText,
             periodText = periodText,
-            classTime = classTime,
+            classTimes = classTimes,
             classTimeMask = classTimeMask,
         )
     }
