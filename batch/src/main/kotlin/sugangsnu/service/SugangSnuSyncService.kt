@@ -209,11 +209,11 @@ class SugangSnuSyncServiceImpl(
         ).let { timetables ->
             merge(
                 updateTimetableLectures(
-                    timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                    timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
                     updatedLecture
                 ),
                 dropOverlappingLectures(
-                    timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                    timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
                     updatedLecture
                 )
             )

@@ -46,7 +46,8 @@ class SugangSnuNotificationServiceImpl(
         val userUpdatedLectureCountMap =
             syncSavedLecturesResults.filterIsInstance<TimetableLectureUpdateResult>().toCountMap()
         val userDeletedLectureCountMap =
-            syncSavedLecturesResults.filterIsInstance<TimetableLectureDeleteResult>().toCountMap()
+            syncSavedLecturesResults.filter { it is TimetableLectureDeleteResult || it is TimetableLectureDeleteByOverlapResult }
+                .toCountMap()
 
         val tokenAndMessage = (userUpdatedLectureCountMap.keys - userDeletedLectureCountMap.keys).map {
             userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되었습니다."
