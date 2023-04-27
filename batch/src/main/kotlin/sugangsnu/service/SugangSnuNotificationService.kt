@@ -104,7 +104,7 @@ class SugangSnuNotificationServiceImpl(
             is TimetableLectureDeleteByOverlapResult -> {
                 """
                 $year-${semester.fullName} '$timetableTitle' 시간표의 
-                '$courseTitle' 강의가 업데이트되었으나, 시간표가 겹쳐 삭제되었습니다.
+                '$courseTitle' 강의가 업데이트되었으나, 시간표의 다른 강의와 겹쳐 삭제되었습니다.
                 """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
             }
         }
