@@ -6,11 +6,13 @@ import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
+import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuLectureCompareResult
+import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
@@ -18,8 +20,10 @@ import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.tag.data.TagCollection
 import com.wafflestudio.snu4t.tag.data.TagList
 import com.wafflestudio.snu4t.tag.repository.TagListRepository
+import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
@@ -148,7 +152,7 @@ class SugangSnuSyncServiceImpl(
 
     private fun syncTimetableLectures(compareResult: SugangSnuLectureCompareResult) =
         merge(
-            compareResult.updatedLectureList.map { updateTimetableLectures(it) }.merge(),
+            compareResult.updatedLectureList.map { checkOverlapAndUpdateTimetableLectures(it) }.merge(),
             compareResult.deletedLectureList.map { deleteTimetableLectures(it) }.merge(),
         )
 
@@ -165,25 +169,23 @@ class SugangSnuSyncServiceImpl(
             updatedLecture.oldData.id!!
         ).map { bookmark ->
             bookmark.apply {
-                lectures = lectures.map { lecture ->
-                    if (lecture.id == updatedLecture.oldData.id) lecture.apply {
-                        academicYear = updatedLecture.newData.academicYear
-                        category = updatedLecture.newData.category
-                        periodText = updatedLecture.newData.periodText
-                        classTimeText = updatedLecture.newData.classTimeText
-                        classTime = updatedLecture.newData.classTime
-                        classTimeMask = updatedLecture.newData.classTimeMask
-                        classification = updatedLecture.newData.classification
-                        credit = updatedLecture.newData.credit
-                        department = updatedLecture.newData.department
-                        instructor = updatedLecture.newData.instructor
-                        quota = updatedLecture.newData.quota
-                        freshmanQuota = updatedLecture.newData.freshmanQuota
-                        remark = updatedLecture.newData.remark
-                        lectureNumber = updatedLecture.newData.lectureNumber
-                        courseNumber = updatedLecture.newData.courseNumber
-                        courseTitle = updatedLecture.newData.courseTitle
-                    } else lecture
+                lectures.find { it.id == updatedLecture.oldData.id }?.apply {
+                    academicYear = updatedLecture.newData.academicYear
+                    category = updatedLecture.newData.category
+                    periodText = updatedLecture.newData.periodText
+                    classTimeText = updatedLecture.newData.classTimeText
+                    classTimes = updatedLecture.newData.classTimes
+                    classTimeMask = updatedLecture.newData.classTimeMask
+                    classification = updatedLecture.newData.classification
+                    credit = updatedLecture.newData.credit
+                    department = updatedLecture.newData.department
+                    instructor = updatedLecture.newData.instructor
+                    quota = updatedLecture.newData.quota
+                    freshmanQuota = updatedLecture.newData.freshmanQuota
+                    remark = updatedLecture.newData.remark
+                    lectureNumber = updatedLecture.newData.lectureNumber
+                    courseNumber = updatedLecture.newData.courseNumber
+                    courseTitle = updatedLecture.newData.courseTitle
                 }
             }
         }.let {
@@ -199,32 +201,47 @@ class SugangSnuSyncServiceImpl(
             )
         }
 
-    private fun updateTimetableLectures(updatedLecture: UpdatedLecture): Flow<TimetableLectureUpdateResult> =
+    private fun checkOverlapAndUpdateTimetableLectures(updatedLecture: UpdatedLecture): Flow<UserLectureSyncResult> =
         timeTableRepository.findAllContainsLectureId(
             updatedLecture.oldData.year,
             updatedLecture.oldData.semester,
             updatedLecture.oldData.id!!
-        ).map { timetable ->
+        ).let { timetables ->
+            merge(
+                updateTimetableLectures(
+                    timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                    updatedLecture
+                ),
+                dropOverlappingLectures(
+                    timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                    updatedLecture
+                )
+            )
+        }
+
+    private fun updateTimetableLectures(
+        timetables: Flow<Timetable>,
+        updatedLecture: UpdatedLecture
+    ): Flow<TimetableLectureUpdateResult> =
+        timetables.map { timetable ->
             timetable.apply {
-                lectures = lectures.map { lecture ->
-                    if (lecture.lectureId == updatedLecture.oldData.id) lecture.apply {
-                        academicYear = updatedLecture.newData.academicYear
-                        category = updatedLecture.newData.category
-                        periodText = updatedLecture.newData.periodText
-                        classTimeText = updatedLecture.newData.classTimeText
-                        classTime = updatedLecture.newData.classTime
-                        classTimeMask = updatedLecture.newData.classTimeMask
-                        classification = updatedLecture.newData.classification
-                        credit = updatedLecture.newData.credit
-                        department = updatedLecture.newData.department
-                        instructor = updatedLecture.newData.instructor
-                        lectureNumber = updatedLecture.newData.lectureNumber
-                        quota = updatedLecture.newData.quota
-                        freshmanQuota = updatedLecture.newData.freshmanQuota
-                        remark = updatedLecture.newData.remark
-                        courseNumber = updatedLecture.newData.courseNumber
-                        courseTitle = updatedLecture.newData.courseTitle
-                    } else lecture
+                lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
+                    academicYear = updatedLecture.newData.academicYear
+                    category = updatedLecture.newData.category
+                    periodText = updatedLecture.newData.periodText
+                    classTimeText = updatedLecture.newData.classTimeText
+                    classTimes = updatedLecture.newData.classTimes
+                    classTimeMask = updatedLecture.newData.classTimeMask
+                    classification = updatedLecture.newData.classification
+                    credit = updatedLecture.newData.credit
+                    department = updatedLecture.newData.department
+                    instructor = updatedLecture.newData.instructor
+                    lectureNumber = updatedLecture.newData.lectureNumber
+                    quota = updatedLecture.newData.quota
+                    freshmanQuota = updatedLecture.newData.freshmanQuota
+                    remark = updatedLecture.newData.remark
+                    courseNumber = updatedLecture.newData.courseNumber
+                    courseTitle = updatedLecture.newData.courseTitle
                 }
                 updatedAt = Instant.now()
             }
@@ -241,6 +258,31 @@ class SugangSnuSyncServiceImpl(
                 updatedFields = updatedLecture.updatedField
             )
         }
+
+    fun dropOverlappingLectures(
+        timetables: Flow<Timetable>,
+        updatedLecture: UpdatedLecture
+    ) = timetables.map { it.apply { lectures.dropWhile { lecture -> lecture.lectureId == updatedLecture.oldData.id } } }
+        .let {
+            timeTableRepository.saveAll(it)
+        }
+        .map { timetable ->
+            TimetableLectureDeleteByOverlapResult(
+                year = timetable.year,
+                semester = timetable.semester,
+                lectureId = updatedLecture.oldData.id!!,
+                userId = timetable.userId,
+                timetableTitle = timetable.title,
+                courseTitle = updatedLecture.oldData.courseTitle,
+            )
+        }
+
+    fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
+        updatedLecture.updatedField.contains(Lecture::classTimes) &&
+            timetable.lectures.any {
+                it.lectureId != updatedLecture.oldData.id &&
+                    ClassTimeUtils.timesOverlap(it.classTimes, updatedLecture.newData.classTimes)
+            }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =
         bookmarkRepository.findAllContainsLectureId(

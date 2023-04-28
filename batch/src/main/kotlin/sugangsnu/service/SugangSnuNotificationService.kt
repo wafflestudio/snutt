@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
@@ -45,7 +46,8 @@ class SugangSnuNotificationServiceImpl(
         val userUpdatedLectureCountMap =
             syncSavedLecturesResults.filterIsInstance<TimetableLectureUpdateResult>().toCountMap()
         val userDeletedLectureCountMap =
-            syncSavedLecturesResults.filterIsInstance<TimetableLectureDeleteResult>().toCountMap()
+            syncSavedLecturesResults.filter { it is TimetableLectureDeleteResult || it is TimetableLectureDeleteByOverlapResult }
+                .toCountMap()
 
         val tokenAndMessage = (userUpdatedLectureCountMap.keys - userDeletedLectureCountMap.keys).map {
             userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되었습니다."
@@ -97,6 +99,12 @@ class SugangSnuNotificationServiceImpl(
                 """
                 $year-${semester.fullName} 관심강좌 목록의 
                 '$courseTitle' 강의가 폐강되어 삭제되었습니다.
+                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+            }
+            is TimetableLectureDeleteByOverlapResult -> {
+                """
+                $year-${semester.fullName} '$timetableTitle' 시간표의 
+                '$courseTitle' 강의가 업데이트되었으나, 시간표의 다른 강의와 겹쳐 삭제되었습니다.
                 """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
             }
         }
