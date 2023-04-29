@@ -34,7 +34,7 @@ export function createNotiKey(key_name:string, registration_ids:[string]): Promi
     }).then(function(body){
       return Promise.resolve(body.notification_key);
     }).catch(function(err){
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -50,7 +50,7 @@ export function getNotiKey(key_name:string): Promise<string> {
     }).then(function (body) {
       return Promise.resolve(body.notification_key);
     }).catch(function (err) {
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -69,7 +69,7 @@ export function addDevice(key_name:string, key:string, registration_ids:[string]
     }).then(function(body){
       return Promise.resolve(body.notification_key);
     }).catch(function(err){
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -88,7 +88,7 @@ export function removeDevice(key_name:string, key:string, registration_ids:[stri
     }).then(function(body){
       return Promise.resolve(body.notification_key);
     }).catch(function(err){
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -102,7 +102,7 @@ export function addTopic(registration_id:string): Promise<any> {
         // no need for project_id
       }
     }).catch(function(err){
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -121,7 +121,7 @@ export function removeTopicBatch(registration_tokens:[string]): Promise<any> {
       },
       json: true
     }).catch(function(err){
-      return Promise.reject(new FcmError(err.response.statusMessage));
+      return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
     });
 }
 
@@ -145,7 +145,7 @@ export async function sendMsg(to:string, title:string, body:string, author: stri
     },
     json:true,
   }).catch(function(err){
-    return Promise.reject(new FcmError(err.response.statusMessage));
+    return Promise.reject(new FcmError(err.response.statusMessage, err.response.body));
   });
   
   let response = await promise;
