@@ -41,7 +41,7 @@ data class TimetableLecture(
     var courseNumber: String?,
     @Field("course_title")
     var courseTitle: String,
-    var color: ColorSet? = null,
+    var color: ColorSet = ColorSet(),
     var colorIndex: Int = 0,
     @JsonProperty("lecture_id")
     @Field("lecture_id", targetType = FieldType.OBJECT_ID)

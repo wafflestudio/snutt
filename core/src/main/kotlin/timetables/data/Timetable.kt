@@ -26,4 +26,5 @@ data class Timetable(
     @Field("updated_at")
     @JsonProperty("updated_at")
     var updatedAt: Instant,
+    var theme: Int = 0,
 )
