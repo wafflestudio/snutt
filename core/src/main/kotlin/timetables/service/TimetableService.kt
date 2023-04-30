@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.exception.DuplicatedTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import timetables.dto.TimetableBriefDto
 import java.time.Instant
+import kotlin.time.measureTime
 
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
@@ -43,6 +45,29 @@ class TimetableServiceImpl(
         copiedTimetable.id = null
         copiedTimetable.userId = userId
         copiedTimetable.updatedAt = Instant.now()
-        return timetableRepository.save(copiedTimetable)
+        return copyWithUniqueTitle(copiedTimetable, copiedTimetable.title)
+    }
+
+    private suspend fun copyWithUniqueTitle(timetable: Timetable, title: String): Timetable {
+        var newTitle = title
+        var trialCnt = 1
+        while (true) {
+            try {
+                timetable.title = newTitle
+                validateUniqueTimetableTitle(timetable)
+                return timetableRepository.save(timetable)
+            } catch (e: DuplicatedTimetableTitleException) {
+                newTitle = "${title}(${trialCnt})"
+                trialCnt++
+                continue
+            }
+        }
+    }
+
+    private suspend fun validateUniqueTimetableTitle(timetable: Timetable) {
+        val duplicates = timetableRepository.findAllByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year,timetable.semester, timetable.title)
+        if (duplicates.isNotEmpty()) {
+            throw DuplicatedTimetableTitleException(timetable.title)
+        }
     }
 }

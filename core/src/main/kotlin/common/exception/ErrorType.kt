@@ -33,4 +33,5 @@ enum class ErrorType(
     SHARED_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "shared_timetable_id가 유효하지 않습니다", "존재하지 않는 공유시간표입니다."),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
+    DUPLICATED_TIMETABLE_TITLE(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "시간표 이름 중복"),
 }

@@ -32,3 +32,4 @@ class InvalidBodyFieldValueException(private val fieldName: String) :
     Snu4tException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: $fieldName)")
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
+class DuplicatedTimetableTitleException(private val title: String): Snu4tException(ErrorType.DUPLICATED_TIMETABLE_TITLE, "중복된 시간표 제목입니다. (title: $title)")
