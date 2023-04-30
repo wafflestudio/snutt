@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import timetables.dto.TimetableBriefDto
 import java.time.Instant
-import kotlin.time.measureTime
 
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
@@ -57,7 +56,7 @@ class TimetableServiceImpl(
                 validateUniqueTimetableTitle(timetable)
                 return timetableRepository.save(timetable)
             } catch (e: DuplicatedTimetableTitleException) {
-                newTitle = "${title}(${trialCnt})"
+                newTitle = "$title($trialCnt)"
                 trialCnt++
                 continue
             }
@@ -65,7 +64,7 @@ class TimetableServiceImpl(
     }
 
     private suspend fun validateUniqueTimetableTitle(timetable: Timetable) {
-        val duplicates = timetableRepository.findAllByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year,timetable.semester, timetable.title)
+        val duplicates = timetableRepository.findAllByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
         if (duplicates.isNotEmpty()) {
             throw DuplicatedTimetableTitleException(timetable.title)
         }
