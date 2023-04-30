@@ -43,4 +43,10 @@ class SharedTimetableHandler(
         sharedTimetableService.delete(userId, timeTableId)
         null
     }
+
+    suspend fun copySharedTimetable(req: ServerRequest) = handle(req) {
+        val userId = req.userId
+        val sharedTimetableId = req.pathVariable("id")
+        sharedTimetableService.copy(userId, sharedTimetableId)
+    }
 }

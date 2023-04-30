@@ -9,7 +9,9 @@ import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableBriefDto
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableDetailDto
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableListDto
 import com.wafflestudio.snu4t.sharedtimetable.repository.SharedTimetableRepository
+import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import com.wafflestudio.snu4t.timetables.service.TimetableService
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -18,12 +20,14 @@ interface SharedTimetableService {
     suspend fun gets(userId: String): SharedTimetableListDto
     suspend fun get(sharedTimetableId: String): SharedTimetableDetailDto
     suspend fun add(userId: String, title: String, timetableId: String): SharedTimetable
-    suspend fun update(title: String, timetableId: String): SharedTimetable
-    suspend fun delete(userId: String, timetableId: String)
+    suspend fun update(title: String, sharedTimetableId: String): SharedTimetable
+    suspend fun delete(userId: String, sharedTimetableId: String)
+    suspend fun copy(userId: String, sharedTimetableId: String): Timetable
 }
 
 @Service
 class SharedTimetableServiceImpl(
+    private val timetableService: TimetableService,
     private val timetableRepository: TimetableRepository,
     private val sharedTimetableRepository: SharedTimetableRepository,
 ) : SharedTimetableService {
@@ -74,20 +78,25 @@ class SharedTimetableServiceImpl(
         )
     }
 
-    override suspend fun update(title: String, timetableId: String): SharedTimetable {
-        val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(timetableId) ?: throw SharedTimetableNotFoundException
+    override suspend fun update(title: String, sharedTimetableId: String): SharedTimetable {
+        val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(sharedTimetableId) ?: throw SharedTimetableNotFoundException
         sharedTimetable.title = title
         sharedTimetable.updatedAt = LocalDateTime.now()
         sharedTimetableRepository.save(sharedTimetable)
         return sharedTimetable
     }
 
-    override suspend fun delete(userId: String, timetableId: String) {
-        val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(timetableId) ?: throw SharedTimetableNotFoundException
+    override suspend fun delete(userId: String, sharedTimetableId: String) {
+        val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(sharedTimetableId) ?: throw SharedTimetableNotFoundException
         if (sharedTimetable.userId != userId) {
             throw NotSharedTimetableOwnerException
         }
         sharedTimetable.isDeleted = true
         sharedTimetableRepository.save(sharedTimetable)
+    }
+
+    override suspend fun copy(userId: String, sharedTimetableId: String): Timetable {
+        val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(sharedTimetableId) ?: throw SharedTimetableNotFoundException
+        return timetableService.copy(userId, sharedTimetable.timetableId)
     }
 }
