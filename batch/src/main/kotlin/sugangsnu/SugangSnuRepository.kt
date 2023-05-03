@@ -25,7 +25,7 @@ class SugangSnuRepository(
     }
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
-        sugangSnuApi.post().uri { builder ->
+        sugangSnuApi.get().uri { builder ->
             builder.path(SUGANG_SNU_COURSEBOOK_PATH)
                 .query(DEFAULT_COURSEBOOK_PARAMS)
                 .build()

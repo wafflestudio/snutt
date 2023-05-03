@@ -19,7 +19,7 @@ data class Lecture(
     @Field("real_class_time")
     var classTimeText: String?,
     @Field("class_time_json")
-    var classTime: List<ClassTime>,
+    var classTimes: List<ClassTime>,
     @Field("class_time_mask")
     var classTimeMask: List<Int>,
     var classification: String?,
