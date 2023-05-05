@@ -258,12 +258,17 @@ function timesOverlap(time1:TimePlace, time2: TimePlace): boolean {
 
 function syncRealTimeWithPeriod(lecture: any): void  {
   lecture.class_time_json.forEach(it => {
-    it.start_time = it.start_time || new Time((it.start + 8) * 60).toHourMinuteFormat()
-    it.end_time = it.end_time || new Time((it.start + it.len + 8) * 60).toHourMinuteFormat()
-    const startTime = Time.fromHourMinuteString(it.start_time)
-    const endTime = Time.fromHourMinuteString(it.end_time)
-    it.len = it.len ? Number(it.len) : Math.ceil(endTime.subtract(startTime).minute / 30) / 2
-    it.start = it.start ? Number(it.start) : Math.floor(startTime.subtractHour(8).minute / 30) / 2
+    if (it.start_time && it.end_time) {
+      it.startMinute = Time.fromHourMinuteString(it.start_time).getMinute()
+      it.endMinute = Time.fromHourMinuteString(it.end_time).getMinute()
+      delete it.start_time
+      delete it.end_time
+    } else if (it.start && it.len) {
+      it.startMinute = new Time((it.start + 8) * 60).getMinute()
+      it.endMinute = new Time((it.start + it.len + 8) * 60).getMinute()
+      delete it.start
+      delete it.len
+    }
   })
 }
 

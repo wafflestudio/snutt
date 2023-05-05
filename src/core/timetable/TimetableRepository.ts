@@ -20,7 +20,7 @@ let userLectureSchema = new mongoose.Schema({
   class_time: String,
   real_class_time: String,
   class_time_json: [
-    {day: Number, start: Number, len: Number, place: String, start_time: String, end_time: String}
+    {day: Number, place: String, startMinute: Number, endMinute: Number}
   ],
   class_time_mask: {type: [Number], required: true, default: [0, 0, 0, 0, 0, 0, 0]},
   instructor: String,                               // 강사
@@ -294,7 +294,19 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     credit: mongooseDoc.credit,                                   // 학점
     class_time: mongooseDoc.class_time,
     real_class_time: mongooseDoc.real_class_time,
-    class_time_json: mongooseDoc.class_time_json,
+    class_time_json: mongooseDoc.class_time_json.map(json => {
+      let startTime = new Time(json.startMinute)
+      let endTime = new Time(json.endMinute)
+      let start = Math.floor((startTime.getDecimalHour() - 8) * 2) / 2
+      let end = Math.ceil((endTime.getDecimalHour() - 8) * 2) / 2
+      return {
+        ...json,
+        start_time: startTime.toHourMinuteFormat(),
+        end_time: endTime.toHourMinuteFormat(),
+        start: start,
+        len: end - start
+      }
+    }),
     class_time_mask: mongooseDoc.class_time_mask,
     instructor: mongooseDoc.instructor,                               // 강사
     quota: mongooseDoc.quota,                                    // 정원
