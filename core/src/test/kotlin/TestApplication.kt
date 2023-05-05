@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.event.EventListener
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.test.context.event.BeforeTestExecutionEvent
-import java.time.Instant
 
 @SpringBootApplication
 class TestApplication(
