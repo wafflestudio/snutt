@@ -184,11 +184,11 @@ function getOverlappingLectures(table: Timetable, lecture: UserLecture): UserLec
 }
 
 function validateLectureTimeJson(timePlace: TimePlace): void {
-  const startTime = Time.fromHourMinuteString(timePlace.start_time)
-  const endTime = Time.fromHourMinuteString(timePlace.end_time)
+  const startTime = new Time(timePlace.startMinute)
+  const endTime = new Time(timePlace.endMinute)
   const endsTooLate = endTime.minute > Time.fromHourMinuteString("23:55").minute
   const lectureTimeTooShort = (endTime.minute - startTime.minute) < 5
-  const hasInvalidNumbers = !ObjectUtil.isNumber(timePlace.day) || !ObjectUtil.isNumber(timePlace.len) || !ObjectUtil.isNumber(timePlace.start)
+  const hasInvalidNumbers = !ObjectUtil.isNumber(timePlace.day)
   if (endsTooLate || lectureTimeTooShort || hasInvalidNumbers) {
     throw new InvalidLectureTimeJsonError();
   }
@@ -250,24 +250,22 @@ function twoLecturesOverlap(lectureA: Lecture, lectureB: Lecture): boolean {
   )
 }
 
-function timesOverlap(time1:TimePlace, time2: TimePlace): boolean {
-  return time1.day === time2.day
-    && (Time.fromHourMinuteString(time1.start_time).minute < Time.fromHourMinuteString(time2.end_time).minute)
-    && (Time.fromHourMinuteString(time1.end_time).minute > Time.fromHourMinuteString(time2.start_time).minute)
+function timesOverlap(time1: TimePlace, time2: TimePlace): boolean {
+  return time1.day === time2.day && time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
 function syncRealTimeWithPeriod(lecture: any): void  {
   lecture.class_time_json.forEach(it => {
     if (it.start_time && it.end_time) {
-      it.startMinute = Time.fromHourMinuteString(it.start_time).getMinute()
-      it.endMinute = Time.fromHourMinuteString(it.end_time).getMinute()
-      delete it.start_time
-      delete it.end_time
+      const startTime = Time.fromHourMinuteString(it.start_time)
+      const endTime = Time.fromHourMinuteString(it.end_time)
+      it.startMinute = startTime.getMinute()
+      it.endMinute = endTime.getMinute()
+      it.len = it.len ? Number(it.len) : Math.ceil(endTime.subtract(startTime).minute / 30) / 2
+      it.start = it.start ? Number(it.start) : Math.floor(startTime.subtractHour(8).minute / 30) / 2
     } else if (it.start && it.len) {
       it.startMinute = new Time((it.start + 8) * 60).getMinute()
       it.endMinute = new Time((it.start + it.len + 8) * 60).getMinute()
-      delete it.start
-      delete it.len
     }
   })
 }
