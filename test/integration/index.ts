@@ -92,6 +92,8 @@ describe('Integration Test', function() {
             "len": 1,
             "start_time": "21:00",
             "end_time": "22:00",
+            "startMinute": 1260,
+            "endMinute": 1320,
             "place": "302-308",
             "_id": "56fcd83c041742971bd20a88"
           },
@@ -101,6 +103,8 @@ describe('Integration Test', function() {
             "len": 1,
             "start_time": "21:00",
             "end_time": "22:00",
+            "startMinute": 1260,
+            "endMinute": 1320,
             "place": "302-308",
             "_id": "56fcd83c041742971bd20a87"
           }
