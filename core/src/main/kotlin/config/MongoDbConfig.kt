@@ -4,6 +4,8 @@ import com.wafflestudio.snu4t.common.enum.DayOfWeekReadConverter
 import com.wafflestudio.snu4t.common.enum.DayOfWeekWriteConverter
 import com.wafflestudio.snu4t.common.enum.SemesterReadConverter
 import com.wafflestudio.snu4t.common.enum.SemesterWriteConverter
+import com.wafflestudio.snu4t.common.enum.TimetableThemeReadConverter
+import com.wafflestudio.snu4t.common.enum.TimetableThemeWriteConverter
 import com.wafflestudio.snu4t.notification.data.NotificationTypeReadConverter
 import com.wafflestudio.snu4t.notification.data.NotificationTypeWriteConverter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -27,14 +29,18 @@ class MongoDbConfig {
         dayOfWeekReadConverter: DayOfWeekReadConverter,
         notificationTypeWriteConverter: NotificationTypeWriteConverter,
         notificationTypeReadConverter: NotificationTypeReadConverter,
+        timetableThemeWriteConverter: TimetableThemeWriteConverter,
+        timetableThemeReadConverter: TimetableThemeReadConverter,
     ): MongoCustomConversions {
-        val converterList: List<Converter<*, *>?> = listOf(
+        val converterList = listOf(
             semesterWriteConverter,
             semesterReadConverter,
             dayOfWeekWriteConverter,
             dayOfWeekReadConverter,
             notificationTypeWriteConverter,
             notificationTypeReadConverter,
+            timetableThemeWriteConverter,
+            timetableThemeReadConverter,
         )
         return MongoCustomConversions(converterList)
     }
