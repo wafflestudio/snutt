@@ -12,17 +12,14 @@ object ClassTimeUtils {
 
         classTimes.map { classTime ->
             val dayValue = classTime.day.value
-            val startPeriod = floor((classTime.startMinute.toDouble() - 480) / 30) / 2
-            val endPeriod = ceil((classTime.endMinute.toDouble() - 480) / 30) / 2
+            val startPeriod = classTime.startPeriod
+            val endPeriod = classTime.endPeriod
             for (i: Int in (startPeriod * 2).toInt() until (endPeriod * 2).toInt())
                 bitTable[dayValue][i] = 1
         }
 
         return bitTable.map { day -> day.reduce { res, i -> res.shl(1) + i } }
     }
-
-    fun parseMinute(classTime: String) =
-        classTime.split(":").let { (hour, minute) -> hour.toInt() * 60 + minute.toInt() }
 
     fun timesOverlap(times1: List<ClassTime>, times2: List<ClassTime>) =
         times1.any { classTime1 ->
@@ -35,3 +32,8 @@ object ClassTimeUtils {
         time1.day == time2.day &&
             time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
+
+val ClassTime.startPeriod: Double
+    get() = floor((startMinute - 8 * 60).toDouble() / 60 * 2) / 2
+val ClassTime.endPeriod: Double
+    get() = ceil((endMinute - 8 * 60).toDouble() / 60 * 2) / 2
