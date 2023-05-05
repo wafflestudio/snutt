@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.lectures.utils
 
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import kotlin.math.ceil
+import kotlin.math.floor
 
 object ClassTimeUtils {
 
@@ -11,9 +12,9 @@ object ClassTimeUtils {
 
         classTimes.map { classTime ->
             val dayValue = classTime.day.value
-            val endPeriod = classTime.startPeriod + ceil(classTime.periodLength * 2) / 2
-            if (classTime.periodLength <= 0) throw RuntimeException("")
-            for (i: Int in (classTime.startPeriod * 2).toInt() until (endPeriod * 2).toInt())
+            val startPeriod = floor((classTime.startMinute.toDouble() - 480) / 30) / 2
+            val endPeriod = ceil((classTime.endMinute.toDouble() - 480) / 30) / 2
+            for (i: Int in (startPeriod * 2).toInt() until (endPeriod * 2).toInt())
                 bitTable[dayValue][i] = 1
         }
 
@@ -32,10 +33,5 @@ object ClassTimeUtils {
 
     fun twoTimesOverlap(time1: ClassTime, time2: ClassTime) =
         time1.day == time2.day &&
-            time1.startTimeMinute < time2.endTimeMinute && time1.endTimeMinute > time2.startTimeMinute
+            time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
-
-val ClassTime.startTimeMinute: Int
-    get() = ClassTimeUtils.parseMinute(startTime)
-val ClassTime.endTimeMinute: Int
-    get() = ClassTimeUtils.parseMinute(endTime)
