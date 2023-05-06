@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
-import com.wafflestudio.snu4t.common.exception.DuplicatedTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
