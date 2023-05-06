@@ -40,33 +40,22 @@ class TimetableServiceImpl(
 
     override suspend fun copy(userId: String, timetableId: String): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        val copiedTimetable = timetable.copy()
-        copiedTimetable.id = null
-        copiedTimetable.userId = userId
-        copiedTimetable.updatedAt = Instant.now()
+        val copiedTimetable = timetable.copy(
+            id = null,
+            userId = userId,
+            updatedAt = Instant.now()
+        )
         return copyWithUniqueTitle(copiedTimetable, copiedTimetable.title)
     }
 
     private suspend fun copyWithUniqueTitle(timetable: Timetable, title: String): Timetable {
-        var newTitle = title
-        var trialCnt = 1
-        while (true) {
-            try {
-                timetable.title = newTitle
-                validateUniqueTimetableTitle(timetable)
-                return timetableRepository.save(timetable)
-            } catch (e: DuplicatedTimetableTitleException) {
-                newTitle = "$title($trialCnt)"
-                trialCnt++
-                continue
-            }
+        var trialCnt = 0
+        val newTitleSequence = generateSequence { if (trialCnt == 0) title else "$title(${trialCnt++})" }
+
+        return newTitleSequence.first { isUniqueTimetableTitle(timetable) }.let {
+            timetableRepository.save(timetable)
         }
     }
 
-    private suspend fun validateUniqueTimetableTitle(timetable: Timetable) {
-        val duplicates = timetableRepository.findAllByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
-        if (duplicates.isNotEmpty()) {
-            throw DuplicatedTimetableTitleException(timetable.title)
-        }
-    }
+    private suspend fun isUniqueTimetableTitle(timetable: Timetable): Boolean = !timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
 }
