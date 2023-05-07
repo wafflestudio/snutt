@@ -295,7 +295,7 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     credit: mongooseDoc.credit,                                   // 학점
     class_time: mongooseDoc.class_time,
     real_class_time: mongooseDoc.real_class_time,
-    class_time_json: mongooseDoc.class_time_json.map(json => {
+    class_time_json: mongooseDoc.class_time_json.toObject().map(json => {
       let startTime = new Time(json.startMinute)
       let endTime = new Time(json.endMinute)
       let start = Math.floor((startTime.getDecimalHour() - 8) * 2) / 2
