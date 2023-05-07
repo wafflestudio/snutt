@@ -14,7 +14,7 @@ interface LectureService {
     suspend fun upsertLectures(lectures: Iterable<Lecture>)
     fun getLecturesByYearAndSemesterAsFlow(year: Int, semester: Semester): Flow<Lecture>
     suspend fun deleteLectures(lectures: Iterable<Lecture>)
-    suspend fun search(query: SearchDto): Flow<Lecture>
+    fun search(query: SearchDto): Flow<Lecture>
 }
 
 @Service
@@ -29,5 +29,5 @@ class LectureServiceImpl(private val lectureRepository: LectureRepository) : Lec
         lectureRepository.saveAll(lectures).collect()
 
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
-    override suspend fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
+    override fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
 }

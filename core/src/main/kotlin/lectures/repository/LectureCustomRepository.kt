@@ -19,14 +19,14 @@ import org.springframework.data.mongodb.core.query.nin
 import org.springframework.data.mongodb.core.query.regex
 
 interface LectureCustomRepository {
-    suspend fun searchLectures(query: SearchDto): Flow<Lecture>
+    fun searchLectures(query: SearchDto): Flow<Lecture>
 }
 
 class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
 
-    override suspend fun searchLectures(search: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
+    override fun searchLectures(search: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
         Query.query(
             Criteria().andOperator(
                 listOfNotNull(
