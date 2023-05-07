@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
-import com.wafflestudio.snu4t.users.dto.RegisterResponse
+import com.wafflestudio.snu4t.users.dto.LoginResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod
     operation = Operation(
         operationId = "registerLocal",
         requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalRegisterRequest::class))]),
-        responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = RegisterResponse::class))])]
+        responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = LoginResponse::class))])]
     ),
 )
 annotation class AuthDocs

@@ -38,6 +38,7 @@ class MainRouter(
     fun authRoute() = v1CoRouter {
         "/auth".nest {
             POST("/register_local", authHandler::registerLocal)
+            POST("/login_local", authHandler::loginLocal)
         }
     }
 
