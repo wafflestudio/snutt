@@ -57,23 +57,33 @@ data class SearchQueryLegacy(
         )
     }
 
+    /*
+    기존 timeMask 스펙을 대응하기 위한 코드
+    8시부터 23시까지 30분 단위로 강의가 존재하는 경우 1, 존재하지 않는 경우 0인 2진수가 전달된다.
+    이를 searchTimeDto로 변환
+    ex) 111000... -> 8:00~9:30 수업 -> startMinute = 480, endMinute: 570
+     */
     private fun bitmaskToClassTime(timeMask: List<Int>?): List<SearchTimeDto>? =
         timeMask?.flatMapIndexed { dayValue, mask ->
             mask.toTimeMask().zip((mask shr 1).toTimeMask())
-                .foldIndexed(emptyList()) { index, acc, (bit, bitLeft) ->
-                    if (bit && !bitLeft) {
+                .foldIndexed(emptyList()) { index, acc, (bit, bitBefore) ->
+                    if (bit && !bitBefore) {
                         acc + SearchTimeDto(
                             day = DayOfWeek.getOfValue(dayValue)!!,
-                            startMinute = index * 30 + 240,
-                            endMinute = index * 30 + 270
+                            startMinute = index * 30 + 8 * 60,
+                            endMinute = index * 30 + 8 * 60 + 30
                         )
-                    } else if (bit && bitLeft) {
-                        acc.dropLast(1) + acc.last().copy(endMinute = index * 30 + 270)
+                    } else if (bit && bitBefore) {
+                        val updated = acc.last().copy(endMinute = index * 30 + 8 * 60)
+                        acc.dropLast(1) + updated
                     } else {
                         acc
                     }
                 }
         }
 
+    /*
+    ex) 258048 -> 2진수 00000000000000111111000000000000 -> [..., true, true, true, true, true, true, false, false, ...]
+     */
     private fun Int.toTimeMask(): List<Boolean> = this.toString(2).substring(2).map { it == '1' }
 }

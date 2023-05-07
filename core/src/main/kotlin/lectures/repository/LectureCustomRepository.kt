@@ -19,34 +19,37 @@ import org.springframework.data.mongodb.core.query.nin
 import org.springframework.data.mongodb.core.query.regex
 
 interface LectureCustomRepository {
-    fun searchLectures(query: SearchDto): Flow<Lecture>
+    fun searchLectures(searchCondition: SearchDto): Flow<Lecture>
 }
 
 class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
 
-    override fun searchLectures(search: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
+    override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
         Query.query(
             Criteria().andOperator(
                 listOfNotNull(
-                    Lecture::year isEqualTo search.year and Lecture::semester isEqualTo search.semester,
-                    search.credit?.let { Lecture::credit inValues it },
-                    search.academicYear?.let { Lecture::academicYear inValues it },
-                    search.courseNumber?.let { Lecture::courseNumber inValues it },
-                    search.classification?.let { Lecture::classification inValues it },
-                    search.category?.let { Lecture::category inValues it },
-                    search.department?.let { Lecture::department inValues it },
-                    search.query?.let { makeSearchCriteriaFromQuery(it) },
-                    search.times?.takeIf { it.isNotEmpty() }?.let {
+                    Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
+                    searchCondition.credit?.let { Lecture::credit inValues it },
+                    searchCondition.academicYear?.let { Lecture::academicYear inValues it },
+                    searchCondition.courseNumber?.let { Lecture::courseNumber inValues it },
+                    searchCondition.classification?.let { Lecture::classification inValues it },
+                    searchCondition.category?.let { Lecture::category inValues it },
+                    searchCondition.department?.let { Lecture::department inValues it },
+                    searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
+                    searchCondition.times?.takeIf { it.isNotEmpty() }?.let {
                         // 시간이 존재하지 않는 경우 제외
-                        Lecture::classPlaceAndTimes ne listOf() and Lecture::classPlaceAndTimes all (Criteria().orOperator(
-                            it.map { time ->
-                                ClassPlaceAndTime::startMinute.gte(time.startMinute)
-                                    .and(ClassPlaceAndTime::endMinute).lte(time.endMinute)
-                            }))
+                        Lecture::classPlaceAndTimes ne listOf() and Lecture::classPlaceAndTimes all (
+                            Criteria().orOperator(
+                                it.map { time ->
+                                    ClassPlaceAndTime::startMinute.gte(time.startMinute)
+                                        .and(ClassPlaceAndTime::endMinute).lte(time.endMinute)
+                                }
+                            )
+                            )
                     },
-                    *search.etcTags.orEmpty().map { etcTag ->
+                    *searchCondition.etcTags.orEmpty().map { etcTag ->
                         when (etcTag) {
                             "E" -> Lecture::remark regex ".*ⓔ.*"
                             "MO" -> Lecture::remark regex ".*ⓜⓞ.*"
@@ -55,7 +58,7 @@ class LectureCustomRepositoryImpl(
                     }.toTypedArray()
                 ),
             )
-        ).skip(search.offset).limit(search.limit)
+        ).skip(searchCondition.offset).limit(searchCondition.limit)
     ).asFlow()
 
     private fun makeSearchCriteriaFromQuery(query: String): Criteria =

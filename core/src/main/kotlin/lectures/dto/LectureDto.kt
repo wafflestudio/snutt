@@ -3,8 +3,6 @@ package com.wafflestudio.snu4t.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Field
 
 data class LectureDto(
     @JsonProperty("_id")
