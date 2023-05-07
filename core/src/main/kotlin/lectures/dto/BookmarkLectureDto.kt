@@ -16,7 +16,7 @@ data class BookmarkLectureDto(
     @JsonProperty("real_class_time")
     var classTimeText: String?,
     @JsonProperty("class_time_json")
-    var classTimes: List<ClassTimeDto>,
+    var classTimes: List<ClassPlaceAndTimeDto>,
     var classTimeMask: List<Int>,
     var classification: String?,
     var credit: Long,
@@ -36,7 +36,7 @@ fun BookmarkLectureDto(lecture: BookmarkLecture): BookmarkLectureDto = BookmarkL
     category = lecture.category,
     periodText = lecture.periodText,
     classTimeText = lecture.classTimeText,
-    classTimes = lecture.classTimes.map { ClassTimeDto(it) },
+    classTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
     classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
     credit = lecture.credit,
