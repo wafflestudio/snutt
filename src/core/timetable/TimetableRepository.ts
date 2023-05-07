@@ -286,6 +286,20 @@ function fromMongoose(mongooseDoc): Timetable {
 }
 
 function lectureFromMongoose(mongooseDoc): UserLecture {
+  let classTime = (typeof mongooseDoc.class_time_json.toObject !== "undefined" ?
+    mongooseDoc.class_time_json.toObject() : mongooseDoc.class_time_json).map(json => {
+    let startTime = new Time(json.startMinute)
+    let endTime = new Time(json.endMinute)
+    let start = Math.floor((startTime.getDecimalHour() - 8) * 2) / 2
+    let end = Math.ceil((endTime.getDecimalHour() - 8) * 2) / 2
+    return {
+      ...json,
+      start_time: startTime.toHourMinuteFormat(),
+      end_time: endTime.toHourMinuteFormat(),
+      start: start,
+      len: end - start
+    }
+  })
   return {
     _id: mongooseDoc._id,
     classification: mongooseDoc.classification,                           // 교과 구분
@@ -295,19 +309,7 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     credit: mongooseDoc.credit,                                   // 학점
     class_time: mongooseDoc.class_time,
     real_class_time: mongooseDoc.real_class_time,
-    class_time_json: mongooseDoc.class_time_json.toObject().map(json => {
-      let startTime = new Time(json.startMinute)
-      let endTime = new Time(json.endMinute)
-      let start = Math.floor((startTime.getDecimalHour() - 8) * 2) / 2
-      let end = Math.ceil((endTime.getDecimalHour() - 8) * 2) / 2
-      return {
-        ...json,
-        start_time: startTime.toHourMinuteFormat(),
-        end_time: endTime.toHourMinuteFormat(),
-        start: start,
-        len: end - start
-      }
-    }),
+    class_time_json: classTime,
     class_time_mask: mongooseDoc.class_time_mask,
     instructor: mongooseDoc.instructor,                               // 강사
     quota: mongooseDoc.quota,                                    // 정원

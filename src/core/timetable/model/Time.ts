@@ -19,10 +19,10 @@ export interface Time {
 }
 
 export class Time implements Time {
-  minute: number;
+  totalMinute: number;
 
   constructor(minute: number) {
-    this.minute = minute
+    this.totalMinute = minute
   }
 
   static fromHourMinuteString(hourMinuteString: string): Time {
@@ -39,23 +39,23 @@ export class Time implements Time {
   }
 
   subtract(other: Time): Time {
-    return new Time(this.minute - other.minute)
+    return new Time(this.totalMinute - other.totalMinute)
   }
 
   addMinute(minute: number) {
-    return new Time(this.minute + minute)
+    return new Time(this.totalMinute + minute)
   }
 
   addHour(hour: number) {
-    return new Time(this.minute + hour * 60)
+    return new Time(this.totalMinute + hour * 60)
   }
 
   subtractMinute(minute: number) {
-    return new Time(this.minute - minute)
+    return new Time(this.totalMinute - minute)
   }
 
   subtractHour(hour: number) {
-    return new Time(this.minute - hour * 60)
+    return new Time(this.totalMinute - hour * 60)
   }
 
   toHourMinuteFormat() {
@@ -63,15 +63,15 @@ export class Time implements Time {
   }
 
   getHour(): number {
-    return Math.trunc(this.minute / 60)
+    return Math.trunc(this.totalMinute / 60)
   }
 
   getMinute(): number {
-    return Math.trunc(this.minute % 60)
+    return Math.trunc(this.totalMinute % 60)
   }
 
   getDecimalHour(): number {
-    return this.minute / 60
+    return this.totalMinute / 60
   }
 
 }
