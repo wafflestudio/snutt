@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
+import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.RegisterResponse
@@ -22,6 +23,7 @@ interface UserService {
 @Service
 class UserServiceImpl(
     private val authService: AuthService,
+    private val timetableService: TimetableService,
     private val userRepository: UserRepository,
 ) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
@@ -51,8 +53,10 @@ class UserServiceImpl(
             )
         )
 
+        timetableService.createDefaultTable(user.id!!)
+
         return RegisterResponse(
-            userId = user.id!!,
+            userId = user.id,
             token = credentialHash,
         )
     }
