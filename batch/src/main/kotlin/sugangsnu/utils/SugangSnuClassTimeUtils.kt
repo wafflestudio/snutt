@@ -28,14 +28,12 @@ object SugangSnuClassTimeUtils {
             .map { (sugangSnuClassTime, locationTexts) ->
                 ClassTime(
                     day = DayOfWeek.getByKoreanText(sugangSnuClassTime.dayOfWeek)!!,
-                    startTime = "${sugangSnuClassTime.startHour}:${sugangSnuClassTime.startMinute}",
-                    endTime = "${sugangSnuClassTime.endHour}:${sugangSnuClassTime.endMinute}",
-                    periodLength = sugangSnuClassTime.endPeriod - sugangSnuClassTime.startPeriod,
-                    startPeriod = sugangSnuClassTime.startPeriod,
                     place = locationTexts.joinToString("/"),
+                    startMinute = sugangSnuClassTime.startHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
+                    endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
                 )
             }
-            .sortedWith(compareBy({ it.day.value }, { it.startPeriod }))
+            .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
     }.getOrElse {
         logger.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesText, locationsText)
         emptyList()

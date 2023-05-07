@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.lectures.utils
 
 import com.wafflestudio.snu4t.lectures.data.ClassTime
 import kotlin.math.ceil
+import kotlin.math.floor
 
 object ClassTimeUtils {
 
@@ -11,17 +12,14 @@ object ClassTimeUtils {
 
         classTimes.map { classTime ->
             val dayValue = classTime.day.value
-            val endPeriod = classTime.startPeriod + ceil(classTime.periodLength * 2) / 2
-            if (classTime.periodLength <= 0) throw RuntimeException("")
-            for (i: Int in (classTime.startPeriod * 2).toInt() until (endPeriod * 2).toInt())
+            val startPeriod = classTime.startPeriod
+            val endPeriod = classTime.endPeriod
+            for (i: Int in (startPeriod * 2).toInt() until (endPeriod * 2).toInt())
                 bitTable[dayValue][i] = 1
         }
 
         return bitTable.map { day -> day.reduce { res, i -> res.shl(1) + i } }
     }
-
-    fun parseMinute(classTime: String) =
-        classTime.split(":").let { (hour, minute) -> hour.toInt() * 60 + minute.toInt() }
 
     fun timesOverlap(times1: List<ClassTime>, times2: List<ClassTime>) =
         times1.any { classTime1 ->
@@ -32,10 +30,10 @@ object ClassTimeUtils {
 
     fun twoTimesOverlap(time1: ClassTime, time2: ClassTime) =
         time1.day == time2.day &&
-            time1.startTimeMinute < time2.endTimeMinute && time1.endTimeMinute > time2.startTimeMinute
+            time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
-val ClassTime.startTimeMinute: Int
-    get() = ClassTimeUtils.parseMinute(startTime)
-val ClassTime.endTimeMinute: Int
-    get() = ClassTimeUtils.parseMinute(endTime)
+val ClassTime.startPeriod: Double
+    get() = floor((startMinute - 8 * 60).toDouble() / 60 * 2) / 2
+val ClassTime.endPeriod: Double
+    get() = ceil((endMinute - 8 * 60).toDouble() / 60 * 2) / 2
