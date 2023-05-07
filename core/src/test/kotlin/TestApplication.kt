@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.internal.MongoClientImpl
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import io.kotest.core.config.AbstractProjectConfig
@@ -18,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.event.EventListener
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.test.context.event.BeforeTestExecutionEvent
-import java.time.Instant
 
 @SpringBootApplication
 class TestApplication(
@@ -55,7 +55,7 @@ class TruncateCollectionsTest(
                 semester = Semester.AUTUMN,
                 lectures = listOf(),
                 title = "test",
-                updatedAt = Instant.now()
+                theme = TimetableTheme.SNUTT,
             )
 
             When("I save it.") {
