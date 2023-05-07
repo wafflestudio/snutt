@@ -55,7 +55,7 @@ class LectureCustomRepositoryImpl(
                     }.toTypedArray()
                 ),
             )
-        )
+        ).skip(search.offset).limit(search.limit)
     ).asFlow()
 
     private fun makeSearchCriteriaFromQuery(query: String): Criteria =
@@ -104,6 +104,6 @@ class LectureCustomRepositoryImpl(
     }
 
     private fun String.hasKorean(): Boolean {
-        return this.map { it.isHangul() }.reduce { acc, c -> acc || c }
+        return this.isNotEmpty() && this.map { it.isHangul() }.reduce { acc, c -> acc || c }
     }
 }

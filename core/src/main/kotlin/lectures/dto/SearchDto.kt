@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
 
 data class SearchDto(
     val year: Int,
@@ -19,6 +18,6 @@ data class SearchDto(
     val etcTags: List<String>? = null,
     val times: List<SearchTimeDto>? = null,
     val page: Int = 0,
-    val offset: Int = page * 20,
+    val offset: Long = page * 20L,
     val limit: Int = 20,
 )

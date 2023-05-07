@@ -44,8 +44,7 @@ data class SearchQueryLegacy(
     @JsonProperty("time_mask")
     val timeMask: List<Int>? = null,
     val etc: List<String>? = null,
-    val page: Int = 0,
-    val offset: Int = page * 20,
+    val offset: Long = 0,
     val limit: Int = 20,
 ) {
     fun toSearchDto(): SearchDto {
@@ -54,7 +53,7 @@ data class SearchQueryLegacy(
             query = title,
             classification, credit, courseNumber, academicYear, department, category, etc,
             bitmaskToClassTime(timeMask),
-            page, offset
+            (offset / 20).toInt(), offset
         )
     }
 
