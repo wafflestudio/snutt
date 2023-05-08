@@ -102,11 +102,11 @@ class LectureCustomRepositoryImpl(
             }
         )
 
-    private fun Char.isHangul(): Boolean {
+    private fun Char.isKoreanLetter(): Boolean {
         return this in '가'..'힣'
     }
 
     private fun String.hasKorean(): Boolean {
-        return this.isNotEmpty() && this.map { it.isHangul() }.reduce { acc, c -> acc || c }
+        return this.isNotEmpty() && this.map { it.isKoreanLetter() }.reduce { acc, c -> acc || c }
     }
 }
