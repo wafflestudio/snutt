@@ -30,7 +30,7 @@ object SugangSnuClassTimeUtils {
                     day = DayOfWeek.getByKoreanText(sugangSnuClassTime.dayOfWeek)!!,
                     place = locationTexts.joinToString("/"),
                     startMinute = sugangSnuClassTime.startHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
-                    endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
+                    endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.endMinute.toInt(),
                 )
             }
             .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
