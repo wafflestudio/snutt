@@ -240,6 +240,7 @@ export async function insert(table: Timetable): Promise<Timetable> {
     year: table.year,
     semester: table.semester,
     title: table.title,
+    theme: table.theme,
     lecture_list: table.lecture_list,
     updated_at: table.updated_at
   });
