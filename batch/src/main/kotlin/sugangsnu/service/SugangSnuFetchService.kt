@@ -104,7 +104,7 @@ class SugangSnuFetchServiceImpl(
             category = category.koreanName,
             classTimeText = classTimeText,
             periodText = periodText,
-            classTimes = classTimes,
+            classPlaceAndTimes = classTimes,
             classTimeMask = classTimeMask,
         )
     }

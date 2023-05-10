@@ -3,12 +3,14 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.LectureHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.router.docs.AdminApi
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.LectureDocs
 import com.wafflestudio.snu4t.router.docs.NotificationApi
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
@@ -27,6 +29,7 @@ class MainRouter(
     private val adminHandler: AdminHandler,
     private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
+    private val lectureHandler: LectureHandler,
 ) {
     @Bean
     fun ping() = coRouter {
@@ -38,6 +41,7 @@ class MainRouter(
     fun authRoute() = v1CoRouter {
         "/auth".nest {
             POST("/register_local", authHandler::registerLocal)
+            POST("/login_local", authHandler::loginLocal)
         }
     }
 
@@ -48,6 +52,12 @@ class MainRouter(
             GET("", timeTableHandler::getBriefs)
             GET("/{id}/links", timeTableHandler::getLink)
         }
+    }
+
+    @Bean
+    @LectureDocs
+    fun lectureRoute() = v1CoRouter {
+        POST("/search_query", lectureHandler::searchLectures)
     }
 
     @Bean

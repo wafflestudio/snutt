@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.utils
 
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import com.wafflestudio.snu4t.lectures.data.ClassTime
+import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuClassTime
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
@@ -12,7 +12,7 @@ object SugangSnuClassTimeUtils {
         """^(?<day>[월화수목금토일])\((?<startHour>\d{2}):(?<startMinute>\d{2})~(?<endHour>\d{2}):(?<endMinute>\d{2})\)$""".toRegex()
     private val periodFormat = DecimalFormat("#.#")
 
-    fun convertTextToClassTimeObject(classTimesText: String, locationsText: String): List<ClassTime> = runCatching {
+    fun convertTextToClassTimeObject(classTimesText: String, locationsText: String): List<ClassPlaceAndTime> = runCatching {
         val sugangSnuClassTimes = classTimesText.split("/")
             .filter { it.isNotBlank() }.map(::parseSugangSnuClassTime)
         val locationTexts = locationsText.split("/").filter { it.isNotBlank() }.let { locationText ->
@@ -26,16 +26,14 @@ object SugangSnuClassTimeUtils {
         sugangSnuClassTimes.zip(locationTexts)
             .groupBy({ it.first }, { it.second })
             .map { (sugangSnuClassTime, locationTexts) ->
-                ClassTime(
+                ClassPlaceAndTime(
                     day = DayOfWeek.getByKoreanText(sugangSnuClassTime.dayOfWeek)!!,
-                    startTime = "${sugangSnuClassTime.startHour}:${sugangSnuClassTime.startMinute}",
-                    endTime = "${sugangSnuClassTime.endHour}:${sugangSnuClassTime.endMinute}",
-                    periodLength = sugangSnuClassTime.endPeriod - sugangSnuClassTime.startPeriod,
-                    startPeriod = sugangSnuClassTime.startPeriod,
                     place = locationTexts.joinToString("/"),
+                    startMinute = sugangSnuClassTime.startHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
+                    endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.endMinute.toInt(),
                 )
             }
-            .sortedWith(compareBy({ it.day.value }, { it.startPeriod }))
+            .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
     }.getOrElse {
         logger.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesText, locationsText)
         emptyList()

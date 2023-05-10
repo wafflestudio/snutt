@@ -2,7 +2,9 @@ package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
+import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.map
@@ -16,12 +18,14 @@ interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
     suspend fun copy(userId: String, timetableId: String): Timetable
+    suspend fun createDefaultTable(userId: String)
 }
 
 @Service
 class TimetableServiceImpl(
     private val timetableRepository: TimetableRepository,
     private val dynamicLinkClient: DynamicLinkClient,
+    private val coursebookService: CoursebookService,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
     override suspend fun getBriefs(userId: String): List<TimetableBriefDto> =
@@ -57,4 +61,15 @@ class TimetableServiceImpl(
     }
 
     private suspend fun isUniqueTimetableTitle(timetable: Timetable): Boolean = !timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
+    override suspend fun createDefaultTable(userId: String) {
+        val courseBook = coursebookService.getLatestCoursebook()
+        val timetable = Timetable(
+            userId = userId,
+            year = courseBook.year,
+            semester = courseBook.semester,
+            title = "나의 시간표",
+            theme = TimetableTheme.SNUTT,
+        )
+        timetableRepository.save(timetable)
+    }
 }

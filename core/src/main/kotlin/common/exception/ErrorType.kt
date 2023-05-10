@@ -14,6 +14,8 @@ enum class ErrorType(
     NO_USER_TOKEN(HttpStatus.UNAUTHORIZED, 0x2001, "유저 토큰이 존재하지 않습니다."),
     WRONG_USER_TOKEN(HttpStatus.FORBIDDEN, 0x2002, "유저 토큰이 유효하지 않습니다", "로그인이 필요합니다."),
     USER_NOT_ADMIN(HttpStatus.FORBIDDEN, 0x2003, "어드민 권한이 없습니다."),
+    WRONG_LOCAL_ID(HttpStatus.FORBIDDEN, 0x2004, "잘못된 id 입니다."),
+    WRONG_PASSWORD(HttpStatus.FORBIDDEN, 0x2005, "잘못된 password 입니다."),
 
     INVALID_LOCAL_ID(HttpStatus.FORBIDDEN, 0x3000, "localId가 유효하지 않습니다.", "아이디는 4~32자의 영문자와 숫자로 이루어져야 합니다."),
     INVALID_PASSWORD(HttpStatus.FORBIDDEN, 0x3001, "password가 유효하지 않습니다.", "비밀번호는 6~20자로 영문자와 숫자를 모두 포함해야 합니다."),
