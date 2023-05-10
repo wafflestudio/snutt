@@ -77,6 +77,7 @@ class MainRouter(
             GET("", sharedTimetableHandler::getSharedTimetables)
             GET("/{id}", sharedTimetableHandler::getSharedTimetable)
             POST("", sharedTimetableHandler::addSharedTimetable)
+            POST("/{id}/copy", sharedTimetableHandler::copySharedTimetable)
             PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
             DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
         }

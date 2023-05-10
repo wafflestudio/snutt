@@ -12,11 +12,12 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import timetables.dto.TimetableBriefDto
+import java.time.Instant
 
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
-
+    suspend fun copy(userId: String, timetableId: String): Timetable
     suspend fun createDefaultTable(userId: String)
 }
 
@@ -40,6 +41,26 @@ class TimetableServiceImpl(
         )
     }
 
+    override suspend fun copy(userId: String, timetableId: String): Timetable {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        val copiedTimetable = timetable.copy(
+            id = null,
+            userId = userId,
+            updatedAt = Instant.now()
+        )
+        return copyWithUniqueTitle(copiedTimetable, copiedTimetable.title)
+    }
+
+    private suspend fun copyWithUniqueTitle(timetable: Timetable, title: String): Timetable {
+        var trialCnt = 0
+        val newTitleSequence = generateSequence { if (trialCnt == 0) title else "$title(${trialCnt++})" }
+
+        return newTitleSequence.first { isUniqueTimetableTitle(timetable) }.let {
+            timetableRepository.save(timetable)
+        }
+    }
+
+    private suspend fun isUniqueTimetableTitle(timetable: Timetable): Boolean = !timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
     override suspend fun createDefaultTable(userId: String) {
         val courseBook = coursebookService.getLatestCoursebook()
         val timetable = Timetable(
