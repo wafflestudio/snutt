@@ -174,7 +174,7 @@ class SugangSnuSyncServiceImpl(
                     category = updatedLecture.newData.category
                     periodText = updatedLecture.newData.periodText
                     classTimeText = updatedLecture.newData.classTimeText
-                    classTimes = updatedLecture.newData.classTimes
+                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
                     classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
@@ -230,7 +230,7 @@ class SugangSnuSyncServiceImpl(
                     category = updatedLecture.newData.category
                     periodText = updatedLecture.newData.periodText
                     classTimeText = updatedLecture.newData.classTimeText
-                    classTimes = updatedLecture.newData.classTimes
+                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
                     classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
@@ -278,10 +278,10 @@ class SugangSnuSyncServiceImpl(
         }
 
     fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
-        updatedLecture.updatedField.contains(Lecture::classTimes) &&
+        updatedLecture.updatedField.contains(Lecture::classPlaceAndTimes) &&
             timetable.lectures.any {
                 it.lectureId != updatedLecture.oldData.id &&
-                    ClassTimeUtils.timesOverlap(it.classTimes, updatedLecture.newData.classTimes)
+                    ClassTimeUtils.timesOverlap(it.classPlaceAndTimes, updatedLecture.newData.classPlaceAndTimes)
             }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =
