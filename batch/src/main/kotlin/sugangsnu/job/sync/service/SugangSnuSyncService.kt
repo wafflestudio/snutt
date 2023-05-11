@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.service
+package com.wafflestudio.snu4t.sugangsnu.job.sync.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
 import com.wafflestudio.snu4t.common.cache.CacheRepository
@@ -7,16 +7,17 @@ import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuLectureCompareResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
-import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
+import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOverlapResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UpdatedLecture
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
+import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuFetchService
 import com.wafflestudio.snu4t.tag.data.TagCollection
 import com.wafflestudio.snu4t.tag.data.TagList
 import com.wafflestudio.snu4t.tag.repository.TagListRepository
@@ -50,7 +51,7 @@ class SugangSnuSyncServiceImpl(
     private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        val newLectures = sugangSnuFetchService.getSugangSnuLecturesWithCategory(coursebook.year, coursebook.semester)
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -64,7 +65,7 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        val newLectures = sugangSnuFetchService.getSugangSnuLecturesWithCategory(coursebook.year, coursebook.semester)
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 
@@ -88,7 +89,7 @@ class SugangSnuSyncServiceImpl(
         val created = (newMap.keys - oldMap.keys).map(newMap::getValue)
         val updated = (newMap.keys intersect oldMap.keys)
             .map { oldMap[it]!! to newMap[it]!! }
-            .filter { (old, new) -> old != new }
+            .filter { (old, new) -> old equalsMetadata new }
             .map { (old, new) ->
                 UpdatedLecture(
                     old, new,

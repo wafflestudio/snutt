@@ -25,6 +25,7 @@ data class LectureDto(
     val year: Int,
     val courseNumber: String,
     val courseTitle: String,
+    val registrationCount: Int,
 )
 
 fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
@@ -47,4 +48,5 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     year = lecture.year,
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
+    registrationCount = lecture.registrationCount
 )

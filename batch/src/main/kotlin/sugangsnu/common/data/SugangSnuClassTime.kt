@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.data
+package com.wafflestudio.snu4t.sugangsnu.common.data
 
 data class SugangSnuClassTime(
     val dayOfWeek: String,

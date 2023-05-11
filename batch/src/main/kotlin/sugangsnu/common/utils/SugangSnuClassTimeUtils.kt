@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.sugangsnu.utils
+package com.wafflestudio.snu4t.sugangsnu.common.utils
 
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuClassTime
+import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuClassTime
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 
@@ -14,7 +14,7 @@ object SugangSnuClassTimeUtils {
 
     fun convertTextToClassTimeObject(classTimesText: String, locationsText: String): List<ClassPlaceAndTime> = runCatching {
         val sugangSnuClassTimes = classTimesText.split("/")
-            .filter { it.isNotBlank() }.map(::parseSugangSnuClassTime)
+            .filter { it.isNotBlank() }.map(SugangSnuClassTimeUtils::parseSugangSnuClassTime)
         val locationTexts = locationsText.split("/").filter { it.isNotBlank() }.let { locationText ->
             when (locationText.size) {
                 sugangSnuClassTimes.size -> locationText

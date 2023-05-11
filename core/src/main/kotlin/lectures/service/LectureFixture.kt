@@ -29,6 +29,7 @@ class LectureFixture(private val lectureRepository: LectureRepository) {
                 year = 2021,
                 courseNumber = "",
                 courseTitle = "",
+                registrationCount = 0
             )
         )
     }

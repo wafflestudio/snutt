@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.data
+package com.wafflestudio.snu4t.sugangsnu.common.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester

@@ -1,20 +1,21 @@
-package com.wafflestudio.snu4t.sugangsnu.service
+package com.wafflestudio.snu4t.sugangsnu.common.service
 
 import com.wafflestudio.snu4t.common.enum.UrlScheme
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
-import com.wafflestudio.snu4t.sugangsnu.utils.toKoreanFieldName
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOverlapResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
+import com.wafflestudio.snu4t.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
@@ -30,7 +31,6 @@ class SugangSnuNotificationServiceImpl(
     private val userRepository: UserRepository,
     private val pushNotificationService: PushNotificationService,
 ) : SugangSnuNotificationService {
-
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
 
         syncSavedLecturesResults

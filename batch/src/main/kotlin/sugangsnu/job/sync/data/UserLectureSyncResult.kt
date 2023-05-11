@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.data
+package com.wafflestudio.snu4t.sugangsnu.job.sync.data
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture

@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.common
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.sugangsnu.api.SugangSnuApi
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
-import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
-import com.wafflestudio.snu4t.sugangsnu.utils.toSugangSnuSearchString
+import com.wafflestudio.snu4t.sugangsnu.common.api.SugangSnuApi
+import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
+import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
+import com.wafflestudio.snu4t.sugangsnu.common.utils.toSugangSnuSearchString
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -63,15 +63,4 @@ class SugangSnuRepository(
                 throw it.createExceptionAndAwait()
             }
         }
-
-    // 기존 코드에 있었으나 필요없는 것으로 판단
-    // TODO: 다음학기 정상작동 시 삭제
-//    suspend fun getCoursebookCondition(year: Int, semester: Semester): SugangSnuCoursebookCondition =
-//        sugangSnuApi.post().uri { builder ->
-//            builder.path(SUGANG_SNU_COURSEBOOK_PATH)
-//                .query(DEFAULT_COURSEBOOK_PARAMS)
-//                .queryParam("srchOpenSchyy", year)
-//                .queryParam("srchOpenShtm", semester.toSugangSnuSearchString())
-//                .build()
-//        }.awaitExchange { it.awaitBody() }
 }
