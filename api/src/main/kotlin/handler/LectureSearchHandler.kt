@@ -8,7 +8,7 @@ import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
 import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -16,12 +16,12 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
 
 @Component
-class LectureHandler(
+class LectureSearchHandler(
     private val objectMapper: ObjectMapper,
     private val lectureService: LectureService,
-    snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
+    snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiDefaultMiddleware
+    handlerMiddleware = snuttRestApiNoAuthMiddleware
 ) {
     suspend fun searchLectures(req: ServerRequest): ServerResponse = handle(req) {
         val query: SearchQueryLegacy = req.awaitBody()
@@ -43,6 +43,7 @@ data class SearchQueryLegacy(
     val category: List<String>? = null,
     @JsonProperty("time_mask")
     val timeMask: List<Int>? = null,
+    val times: List<SearchTimeDto>? = null,
     val etc: List<String>? = null,
     val offset: Long = 0,
     val limit: Int = 20,
@@ -52,7 +53,7 @@ data class SearchQueryLegacy(
             year, semester,
             query = title,
             classification, credit, courseNumber, academicYear, department, category, etc,
-            bitmaskToClassTime(timeMask),
+            times ?: bitmaskToClassTime(timeMask),
             (offset / 20).toInt(), offset
         )
     }
