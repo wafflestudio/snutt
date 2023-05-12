@@ -27,8 +27,10 @@ fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTim
     place = classPlaceAndTime.place,
     startMinute = classPlaceAndTime.startMinute,
     endMinute = classPlaceAndTime.endMinute,
-    startTime = "${classPlaceAndTime.startMinute / 60}:${classPlaceAndTime.startMinute % 60}",
-    endTime = "${classPlaceAndTime.endMinute / 60}:${classPlaceAndTime.endMinute % 60}",
+    startTime = minuteToString(classPlaceAndTime.startMinute),
+    endTime = minuteToString(classPlaceAndTime.endMinute),
     startPeriod = classPlaceAndTime.startPeriod,
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
 )
+
+private fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"
