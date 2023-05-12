@@ -31,15 +31,14 @@ class LectureCustomRepositoryImpl(
             Criteria().andOperator(
                 listOfNotNull(
                     Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                    searchCondition.credit?.let { Lecture::credit inValues it },
-                    searchCondition.academicYear?.let { Lecture::academicYear inValues it },
-                    searchCondition.courseNumber?.let { Lecture::courseNumber inValues it },
-                    searchCondition.classification?.let { Lecture::classification inValues it },
-                    searchCondition.category?.let { Lecture::category inValues it },
-                    searchCondition.department?.let { Lecture::department inValues it },
-                    searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
+                    searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
+                    searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
+                    searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
+                    searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
+                    searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
+                    searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
+                    searchCondition.query?.takeIf { it.isNotEmpty() }?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.times?.takeIf { it.isNotEmpty() }?.let {
-                        // 시간이 존재하지 않는 경우 제외
                         Lecture::classPlaceAndTimes ne listOf() and Lecture::classPlaceAndTimes all (
                             Criteria().orOperator(
                                 it.map { time ->
