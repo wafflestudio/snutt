@@ -51,7 +51,7 @@ class SugangSnuSyncServiceImpl(
     private val cacheRepository: CacheRepository,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
-        val newLectures = sugangSnuFetchService.getSugangSnuLecturesWithCategory(coursebook.year, coursebook.semester)
+        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -65,7 +65,7 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
-        val newLectures = sugangSnuFetchService.getSugangSnuLecturesWithCategory(coursebook.year, coursebook.semester)
+        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 

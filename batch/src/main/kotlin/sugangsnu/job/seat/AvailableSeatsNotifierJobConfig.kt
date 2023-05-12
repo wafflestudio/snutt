@@ -41,7 +41,7 @@ class AvailableSeatsNotifierJobConfig {
                 val latestCoursebook = coursebookService.getLatestCoursebook()
                 val updateResult = availableSeatsNotifierService.noti(latestCoursebook)
                 if(Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
-                delay(30000)
+                delay(20000)
                 when(updateResult) {
                     AvailableSeatsNotificationResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
                     AvailableSeatsNotificationResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE

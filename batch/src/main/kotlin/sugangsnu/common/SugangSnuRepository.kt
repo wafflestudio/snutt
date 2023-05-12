@@ -5,12 +5,14 @@ import com.wafflestudio.snu4t.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toSugangSnuSearchString
+import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
+
 
 @Component
 class SugangSnuRepository(
@@ -19,10 +21,23 @@ class SugangSnuRepository(
     companion object {
         const val SUGANG_SNU_COURSEBOOK_PATH = "/sugang/cc/cc100ajax.action"
         const val DEFAULT_COURSEBOOK_PARAMS = "openUpDeptCd=&openDeptCd="
-        const val SUGANG_SNU_LECTURE_PATH = "/sugang/cc/cc100InterfaceExcel.action"
-        const val DEFAULT_LECTURE_PARAMS =
+        const val SUGANG_SNU_SEARCH_PATH = "/sugang/cc/cc100InterfaceSrch.action"
+        const val DEFAULT_SEARCH_PAGE_PARAMS = "workType=S&sortKey=&sortOrder="
+        const val SUGANG_SNU_LECTURE_EXCEL_DOWNLOAD_PATH = "/sugang/cc/cc100InterfaceExcel.action"
+        const val DEFAULT_LECTURE_EXCEL_DOWNLOAD_PARAMS =
             """seeMore=더보기&srchBdNo=&srchCamp=&srchOpenSbjtFldCd=&srchCptnCorsFg=&srchCurrPage=1&srchExcept=&srchGenrlRemoteLtYn=&srchIsEngSbjt=&srchIsPendingCourse=&srchLsnProgType=&srchMrksApprMthdChgPosbYn=&srchMrksGvMthd=&srchOpenUpDeptCd=&srchOpenMjCd=&srchOpenPntMax=&srchOpenPntMin=&srchOpenSbjtDayNm=&srchOpenSbjtNm=&srchOpenSbjtTm=&srchOpenSbjtTmNm=&srchOpenShyr=&srchOpenSubmattCorsFg=&srchOpenSubmattFgCd1=&srchOpenSubmattFgCd2=&srchOpenSubmattFgCd3=&srchOpenSubmattFgCd4=&srchOpenSubmattFgCd5=&srchOpenSubmattFgCd6=&srchOpenSubmattFgCd7=&srchOpenSubmattFgCd8=&srchOpenSubmattFgCd9=&srchOpenDeptCd=&srchOpenUpSbjtFldCd=&srchPageSize=9999&srchProfNm=&srchSbjtCd=&srchSbjtNm=&srchTlsnAplyCapaCntMax=&srchTlsnAplyCapaCntMin=&srchTlsnRcntMax=&srchTlsnRcntMin=&workType=EX"""
     }
+
+    suspend fun getSearchPageHtml(pageNo: Long = 1): PooledDataBuffer = sugangSnuApi.get()
+            .uri { builder ->
+                builder.path(SUGANG_SNU_SEARCH_PATH)
+                    .query(DEFAULT_SEARCH_PAGE_PARAMS)
+                    .queryParam("pageNo", pageNo)
+                    .build()
+            }
+            .accept(MediaType.TEXT_HTML)
+            .retrieve()
+            .awaitBody<PooledDataBuffer>()
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
         sugangSnuApi.get().uri { builder ->
@@ -45,8 +60,8 @@ class SugangSnuRepository(
     ): PooledDataBuffer =
         sugangSnuApi.get().uri { builder ->
             builder.run {
-                path(SUGANG_SNU_LECTURE_PATH)
-                query(DEFAULT_LECTURE_PARAMS)
+                path(SUGANG_SNU_LECTURE_EXCEL_DOWNLOAD_PATH)
+                query(DEFAULT_LECTURE_EXCEL_DOWNLOAD_PARAMS)
                 queryParam("srchLanguage", language)
                 queryParam("srchOpenSchyy", year)
                 queryParam("srchOpenShtm", semester.toSugangSnuSearchString())
