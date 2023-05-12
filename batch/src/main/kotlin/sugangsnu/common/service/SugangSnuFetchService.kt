@@ -6,16 +6,10 @@ import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.SugangSnuClassTimeUtils
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.io.InputStream
 
 interface SugangSnuFetchService {
     suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture>

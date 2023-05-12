@@ -5,14 +5,12 @@ import com.wafflestudio.snu4t.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toSugangSnuSearchString
-import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
-
 
 @Component
 class SugangSnuRepository(
@@ -29,15 +27,15 @@ class SugangSnuRepository(
     }
 
     suspend fun getSearchPageHtml(pageNo: Long = 1): PooledDataBuffer = sugangSnuApi.get()
-            .uri { builder ->
-                builder.path(SUGANG_SNU_SEARCH_PATH)
-                    .query(DEFAULT_SEARCH_PAGE_PARAMS)
-                    .queryParam("pageNo", pageNo)
-                    .build()
-            }
-            .accept(MediaType.TEXT_HTML)
-            .retrieve()
-            .awaitBody<PooledDataBuffer>()
+        .uri { builder ->
+            builder.path(SUGANG_SNU_SEARCH_PATH)
+                .query(DEFAULT_SEARCH_PAGE_PARAMS)
+                .queryParam("pageNo", pageNo)
+                .build()
+        }
+        .accept(MediaType.TEXT_HTML)
+        .retrieve()
+        .awaitBody<PooledDataBuffer>()
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
         sugangSnuApi.get().uri { builder ->

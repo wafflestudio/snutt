@@ -88,18 +88,22 @@ class AvailableSeatsNotifierServiceImpl(
                 async {
                     val users = seatNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }
                         .let { userRepository.findAllByIdIsIn(it) }.toList()
-                    notificationRepository.saveAll(users.map {
-                        Notification(
-                            userId = it.id!!,
-                            message = lecture.courseTitle,
-                            type = NotificationType.NORMAL
-                        )
-                    })
-                    pushNotificationService.sendMessages(users.mapNotNull { user ->
-                        user.fcmKey?.let {
-                            PushTargetMessage(it, PushMessage(lecture.courseTitle, "자리났다"))
+                    notificationRepository.saveAll(
+                        users.map {
+                            Notification(
+                                userId = it.id!!,
+                                message = lecture.courseTitle,
+                                type = NotificationType.NORMAL
+                            )
                         }
-                    })
+                    )
+                    pushNotificationService.sendMessages(
+                        users.mapNotNull { user ->
+                            user.fcmKey?.let {
+                                PushTargetMessage(it, PushMessage(lecture.courseTitle, "자리났다"))
+                            }
+                        }
+                    )
                 }
             }.awaitAll()
         }
@@ -137,7 +141,6 @@ class AvailableSeatsNotifierServiceImpl(
                                     )
                                 }
                         }
-
                 }
         }
 

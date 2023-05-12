@@ -4,6 +4,6 @@ import com.wafflestudio.snu4t.seatsnotification.data.SeatNotification
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface SeatNotificationRepository : CoroutineCrudRepository<SeatNotification, String>{
+interface SeatNotificationRepository : CoroutineCrudRepository<SeatNotification, String> {
     fun findAllByLectureId(lectureId: String): Flow<SeatNotification>
 }

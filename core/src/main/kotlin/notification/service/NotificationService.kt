@@ -1,9 +1,6 @@
 package com.wafflestudio.snu4t.notification.service
 
-import com.wafflestudio.snu4t.common.exception.NoUserFcmKeyException
 import com.wafflestudio.snu4t.common.push.PushNotificationService
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.dto.NotificationQuery
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository

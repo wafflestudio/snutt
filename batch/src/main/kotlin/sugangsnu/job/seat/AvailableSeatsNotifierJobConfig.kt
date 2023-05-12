@@ -15,10 +15,8 @@ import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
-import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
-import java.time.ZonedDateTime
 
 @Configuration
 class AvailableSeatsNotifierJobConfig {
@@ -40,9 +38,9 @@ class AvailableSeatsNotifierJobConfig {
             runBlocking {
                 val latestCoursebook = coursebookService.getLatestCoursebook()
                 val updateResult = availableSeatsNotifierService.noti(latestCoursebook)
-                if(Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
+                if (Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
                 delay(20000)
-                when(updateResult) {
+                when (updateResult) {
                     AvailableSeatsNotificationResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
                     AvailableSeatsNotificationResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
                     AvailableSeatsNotificationResult.SUCCESS -> RepeatStatus.CONTINUABLE

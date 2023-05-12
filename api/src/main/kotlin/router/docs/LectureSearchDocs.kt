@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/search_query", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "searchLecture",
-            requestBody = RequestBody(content = [Content(schema=Schema(implementation = SearchQueryLegacy::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema=Schema(implementation = LectureDto::class)))])]
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = SearchQueryLegacy::class))]),
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = LectureDto::class)))])]
         ),
     ),
 )
