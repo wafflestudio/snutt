@@ -31,13 +31,14 @@ class LectureCustomRepositoryImpl(
             Criteria().andOperator(
                 listOfNotNull(
                     Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
+                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() }
+                        ?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
                     searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
                     searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
                     searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
                     searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
                     searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
-                    searchCondition.query?.takeIf { it.isNotEmpty() }?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.times?.takeIf { it.isNotEmpty() }?.let {
                         Lecture::classPlaceAndTimes ne listOf() and Lecture::classPlaceAndTimes all (
                             Criteria().orOperator(
@@ -46,7 +47,7 @@ class LectureCustomRepositoryImpl(
                                         .and(ClassPlaceAndTime::endMinute).lte(time.endMinute)
                                 }
                             )
-                            )
+                        )
                     },
                     *searchCondition.etcTags.orEmpty().map { etcTag ->
                         when (etcTag) {
