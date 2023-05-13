@@ -15,7 +15,6 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.repository.UserRepository
-import kotlinx.coroutines.delay
 import org.springframework.stereotype.Service
 
 interface UserService {
@@ -44,7 +43,7 @@ class UserServiceImpl(
         val email = localRegisterRequest.email
 
         if (!cacheRepository.acquireLock(CacheKey.LOCK_REGISTER_LOCAL.build(localId))) throw DuplicateLocalIdException
-        
+
         if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
         if (!authService.isValidPassword(password)) throw InvalidPasswordException
         email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }

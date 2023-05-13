@@ -8,6 +8,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("com.h2database:h2")
 
+    implementation("org.jsoup:jsoup:1.16.1")
+
     // excel
     implementation("org.apache.poi:poi-ooxml:5.2.3")
 

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.service
+package com.wafflestudio.snu4t.sugangsnu.job.sync.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
 import com.wafflestudio.snu4t.common.cache.CacheRepository
@@ -7,16 +7,17 @@ import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.BookmarkLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuCoursebookCondition
-import com.wafflestudio.snu4t.sugangsnu.data.SugangSnuLectureCompareResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteByOverlapResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.data.TimetableLectureUpdateResult
-import com.wafflestudio.snu4t.sugangsnu.data.UpdatedLecture
-import com.wafflestudio.snu4t.sugangsnu.data.UserLectureSyncResult
+import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
+import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
+import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuFetchService
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOverlapResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UpdatedLecture
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
 import com.wafflestudio.snu4t.tag.data.TagCollection
 import com.wafflestudio.snu4t.tag.data.TagList
 import com.wafflestudio.snu4t.tag.repository.TagListRepository
@@ -88,7 +89,7 @@ class SugangSnuSyncServiceImpl(
         val created = (newMap.keys - oldMap.keys).map(newMap::getValue)
         val updated = (newMap.keys intersect oldMap.keys)
             .map { oldMap[it]!! to newMap[it]!! }
-            .filter { (old, new) -> old != new }
+            .filter { (old, new) -> old equalsMetadata new }
             .map { (old, new) ->
                 UpdatedLecture(
                     old, new,
@@ -174,7 +175,7 @@ class SugangSnuSyncServiceImpl(
                     category = updatedLecture.newData.category
                     periodText = updatedLecture.newData.periodText
                     classTimeText = updatedLecture.newData.classTimeText
-                    classTimes = updatedLecture.newData.classTimes
+                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
                     classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
@@ -230,7 +231,7 @@ class SugangSnuSyncServiceImpl(
                     category = updatedLecture.newData.category
                     periodText = updatedLecture.newData.periodText
                     classTimeText = updatedLecture.newData.classTimeText
-                    classTimes = updatedLecture.newData.classTimes
+                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
                     classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
@@ -278,10 +279,10 @@ class SugangSnuSyncServiceImpl(
         }
 
     fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
-        updatedLecture.updatedField.contains(Lecture::classTimes) &&
+        updatedLecture.updatedField.contains(Lecture::classPlaceAndTimes) &&
             timetable.lectures.any {
                 it.lectureId != updatedLecture.oldData.id &&
-                    ClassTimeUtils.timesOverlap(it.classTimes, updatedLecture.newData.classTimes)
+                    ClassTimeUtils.timesOverlap(it.classPlaceAndTimes, updatedLecture.newData.classPlaceAndTimes)
             }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =

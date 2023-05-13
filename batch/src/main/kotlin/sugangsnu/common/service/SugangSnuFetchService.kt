@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.sugangsnu.service
+package com.wafflestudio.snu4t.sugangsnu.common.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.sugangsnu.SugangSnuRepository
-import com.wafflestudio.snu4t.sugangsnu.enum.LectureCategory
-import com.wafflestudio.snu4t.sugangsnu.utils.SugangSnuClassTimeUtils
+import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
+import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
+import com.wafflestudio.snu4t.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.slf4j.LoggerFactory
@@ -79,6 +79,7 @@ class SugangSnuFetchServiceImpl(
             .takeIf { quotaRegex.matches(it) }!!.let { quotaRegex.find(it)!!.groups }
             .let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) }
         val remark = row.getCellByColumnName("비고")
+        val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
         val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(classTimeText)
         val classTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
@@ -104,8 +105,9 @@ class SugangSnuFetchServiceImpl(
             category = category.koreanName,
             classTimeText = classTimeText,
             periodText = periodText,
-            classTimes = classTimes,
+            classPlaceAndTimes = classTimes,
             classTimeMask = classTimeMask,
+            registrationCount = registrationCount
         )
     }
 }

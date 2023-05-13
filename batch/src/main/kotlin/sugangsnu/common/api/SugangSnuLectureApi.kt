@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.api
+package com.wafflestudio.snu4t.sugangsnu.common.api
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.enum
+package com.wafflestudio.snu4t.sugangsnu.common.enum
 
 enum class LectureCategory(val parentCategory: String, val queryValue: Long, val koreanName: String) {
     // 학문의 기초

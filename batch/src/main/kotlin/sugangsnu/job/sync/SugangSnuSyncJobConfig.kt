@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.sugangsnu
+package com.wafflestudio.snu4t.sugangsnu.job.sync
 
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuNotificationService
-import com.wafflestudio.snu4t.sugangsnu.service.SugangSnuSyncService
-import com.wafflestudio.snu4t.sugangsnu.utils.nextCoursebook
+import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuNotificationService
+import com.wafflestudio.snu4t.sugangsnu.common.utils.nextCoursebook
+import com.wafflestudio.snu4t.sugangsnu.job.sync.service.SugangSnuSyncService
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -18,12 +18,12 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration
 class SugangSnuSyncJobConfig {
     @Bean
-    fun sugangSnuMigrationJob(jobRepository: JobRepository, fetchSugangSnuStep: Step): Job =
+    fun sugangSnuMigrationJob(jobRepository: JobRepository, syncSugangSnuStep: Step): Job =
         JobBuilder("sugangSnuMigrationJob", jobRepository)
-            .start(fetchSugangSnuStep).build()
+            .start(syncSugangSnuStep).build()
 
     @Bean
-    fun fetchSugangSnuStep(
+    fun syncSugangSnuStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
         sugangSnuSyncService: SugangSnuSyncService,

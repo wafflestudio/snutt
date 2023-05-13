@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.findModifyAndAwait
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.and
-import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.core.update
 
 interface TimetableCustomRepository {
