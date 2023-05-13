@@ -118,7 +118,7 @@ class VacancyNotifierServiceImpl(
                 firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
             val totalPage = (totalCount + 9) / 10
             val totalContent = (2..totalPage).chunked(totalPage / 20).flatMap { iter ->
-                delay(500)
+                delay(300)
                 iter.map { page -> async { getSugangSnuSearchContent(page) } }.awaitAll()
             } + firstPageContent
 
