@@ -117,8 +117,12 @@ class VacancyNotifierServiceImpl(
             val totalCount =
                 firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
             val totalPage = (totalCount + 9) / 10
+            val totalContent = (2..totalPage).chunked(totalPage / 20).flatMap { iter ->
+                delay(500)
+                iter.map { page -> async { getSugangSnuSearchContent(page) } }.awaitAll()
+            } + firstPageContent
 
-            ((2..totalPage).map { page -> async { getSugangSnuSearchContent(page) } }.awaitAll() + firstPageContent)
+            totalContent
                 .flatMap { content ->
                     content
                         .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
