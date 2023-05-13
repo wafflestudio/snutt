@@ -1,11 +1,12 @@
 package com.wafflestudio.snu4t.common.enum
 
+import com.fasterxml.jackson.annotation.JsonValue
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.stereotype.Component
 
-enum class TimetableTheme(val value: Int) {
+enum class TimetableTheme(@JsonValue val value: Int) {
     SNUTT(0),
     FALL(1),
     MODERN(2),

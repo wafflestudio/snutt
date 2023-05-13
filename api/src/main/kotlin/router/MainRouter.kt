@@ -64,7 +64,7 @@ class MainRouter(
     @BookmarkDocs
     fun bookmarkRoute() = v1CoRouter {
         "/bookmarks".nest {
-            GET("", bookmarkHandler::getBookmark)
+            GET("", bookmarkHandler::getBookmarks)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
         }

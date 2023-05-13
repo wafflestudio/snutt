@@ -15,7 +15,7 @@ class BookmarkHandler(
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(handlerMiddleware = snuttRestApiDefaultMiddleware) {
 
-    suspend fun getBookmark(req: ServerRequest) = handle(req) {
+    suspend fun getBookmarks(req: ServerRequest) = handle(req) {
         val userId: String = req.userId
         val year: Int = req.parseRequiredQueryParam("year")
         val semester: Semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
