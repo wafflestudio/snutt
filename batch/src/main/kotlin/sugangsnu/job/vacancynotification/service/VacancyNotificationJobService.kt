@@ -17,7 +17,6 @@ import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotification
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.jsoup.Jsoup
