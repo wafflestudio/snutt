@@ -1,5 +1,7 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.common.cache.CacheKey
+import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
@@ -13,6 +15,7 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import kotlinx.coroutines.delay
 import org.springframework.stereotype.Service
 
 interface UserService {
@@ -30,6 +33,7 @@ class UserServiceImpl(
     private val authService: AuthService,
     private val timetableService: TimetableService,
     private val userRepository: UserRepository,
+    private val cacheRepository: CacheRepository,
 ) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
         userRepository.findByCredentialHashAndActive(credentialHash, true) ?: throw WrongUserTokenException
@@ -39,6 +43,8 @@ class UserServiceImpl(
         val password = localRegisterRequest.password
         val email = localRegisterRequest.email
 
+        if (!cacheRepository.acquireLock(CacheKey.LOCK_REGISTER_LOCAL.build(localId))) throw DuplicateLocalIdException
+        
         if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
         if (!authService.isValidPassword(password)) throw InvalidPasswordException
         email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }
