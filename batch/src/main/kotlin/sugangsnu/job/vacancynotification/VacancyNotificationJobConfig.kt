@@ -1,10 +1,9 @@
-package com.wafflestudio.snu4t.sugangsnu.job.seat
+package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification
 
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuNotificationService
-import com.wafflestudio.snu4t.sugangsnu.job.seat.data.AvailableSeatsNotificationResult
-import com.wafflestudio.snu4t.sugangsnu.job.seat.service.AvailableSeatsNotifierService
-import kotlinx.coroutines.delay
+import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
+import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service.VacancyNotifierService
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -19,31 +18,30 @@ import java.time.Instant
 import java.time.ZoneId
 
 @Configuration
-class AvailableSeatsNotifierJobConfig {
+class VacancyNotificationJobConfig {
     @Bean
-    fun availableSeatsNotifier(jobRepository: JobRepository, availableSeatsNotifierStep: Step): Job =
-        JobBuilder("availableSeatsNotifier", jobRepository)
-            .start(availableSeatsNotifierStep)
+    fun vacancyNotificationJob(jobRepository: JobRepository, vacancyNotificationStep: Step): Job =
+        JobBuilder("vacancyNotificationJob", jobRepository)
+            .start(vacancyNotificationStep)
             .build()
 
     @Bean
-    fun availableSeatsNotifierStep(
+    fun vacancyNotificationStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
-        availableSeatsNotifierService: AvailableSeatsNotifierService,
+        vacancyNotifierService: VacancyNotifierService,
         coursebookService: CoursebookService,
         sugangSnuNotificationService: SugangSnuNotificationService,
-    ): Step = StepBuilder("availableSeatsNotifierStep", jobRepository).tasklet(
+    ): Step = StepBuilder("vacancyNotificationStep", jobRepository).tasklet(
         { _, _ ->
             runBlocking {
                 val latestCoursebook = coursebookService.getLatestCoursebook()
-                val updateResult = availableSeatsNotifierService.noti(latestCoursebook)
+                val updateResult = vacancyNotifierService.noti(latestCoursebook)
                 if (Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
-                delay(20000)
                 when (updateResult) {
-                    AvailableSeatsNotificationResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
-                    AvailableSeatsNotificationResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
-                    AvailableSeatsNotificationResult.SUCCESS -> RepeatStatus.CONTINUABLE
+                    VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
+                    VacancyNotificationJobResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
+                    VacancyNotificationJobResult.SUCCESS -> RepeatStatus.CONTINUABLE
                 }
             }
         },

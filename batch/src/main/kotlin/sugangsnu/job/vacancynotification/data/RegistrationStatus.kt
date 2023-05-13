@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.job.seat.data
+package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data
 
 data class RegistrationStatus(
     val courseNumber: String,

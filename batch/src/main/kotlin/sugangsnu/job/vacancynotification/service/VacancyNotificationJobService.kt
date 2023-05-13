@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.sugangsnu.job.seat.service
+package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.push.PushNotificationService
@@ -9,14 +9,15 @@ import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
-import com.wafflestudio.snu4t.seatsnotification.repository.SeatNotificationRepository
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
-import com.wafflestudio.snu4t.sugangsnu.job.seat.data.AvailableSeatsNotificationResult
-import com.wafflestudio.snu4t.sugangsnu.job.seat.data.RegistrationStatus
+import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.RegistrationStatus
+import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.jsoup.Jsoup
@@ -24,32 +25,31 @@ import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
-interface AvailableSeatsNotifierService {
-    suspend fun noti(coursebook: Coursebook): AvailableSeatsNotificationResult
+interface VacancyNotifierService {
+    suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult
 }
 
 @Service
-class AvailableSeatsNotifierServiceImpl(
+class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
-    private val seatNotificationRepository: SeatNotificationRepository,
+    private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val pushNotificationService: PushNotificationService,
     private val userRepository: UserRepository,
     private val notificationRepository: NotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
-) : AvailableSeatsNotifierService {
+) : VacancyNotifierService {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
 
-    override suspend fun noti(coursebook: Coursebook): AvailableSeatsNotificationResult {
+    override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
         logger.info("시작")
         val registrationStatus = runCatching {
             getRegistrationStatus()
         }.getOrElse {
-            it.printStackTrace()
             logger.error("부하기간")
-            return AvailableSeatsNotificationResult.OVERLOAD_PERIOD
+            return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
-        if (registrationStatus.all { it.registrationCount == 0 }) return AvailableSeatsNotificationResult.REGISTRATION_IS_NOT_STARTED
+        if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
         val lectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
@@ -86,7 +86,7 @@ class AvailableSeatsNotifierServiceImpl(
         coroutineScope {
             notiTargetLectures.map { lecture ->
                 async {
-                    val users = seatNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }
+                    val users = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }
                         .let { userRepository.findAllByIdIsIn(it) }.toList()
                     notificationRepository.saveAll(
                         users.map {
@@ -108,14 +108,14 @@ class AvailableSeatsNotifierServiceImpl(
             }.awaitAll()
         }
 
-        return AvailableSeatsNotificationResult.SUCCESS
+        return VacancyNotificationJobResult.SUCCESS
     }
 
     private suspend fun getRegistrationStatus(): List<RegistrationStatus> =
         coroutineScope {
             val firstPageContent = getSugangSnuSearchContent(1)
             val totalCount =
-                firstPageContent.select("div.content > div.search-result-con > small > em").text().toLong()
+                firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
             val totalPage = (totalCount + 9) / 10
 
             ((2..totalPage).map { page -> async { getSugangSnuSearchContent(page) } }.awaitAll() + firstPageContent)
@@ -144,7 +144,7 @@ class AvailableSeatsNotifierServiceImpl(
                 }
         }
 
-    private suspend fun getSugangSnuSearchContent(pageNo: Long): Element {
+    private suspend fun getSugangSnuSearchContent(pageNo: Int): Element {
         val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(pageNo)
         return try {
             Jsoup.parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")

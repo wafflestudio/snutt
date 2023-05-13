@@ -26,7 +26,7 @@ class SugangSnuRepository(
             """seeMore=더보기&srchBdNo=&srchCamp=&srchOpenSbjtFldCd=&srchCptnCorsFg=&srchCurrPage=1&srchExcept=&srchGenrlRemoteLtYn=&srchIsEngSbjt=&srchIsPendingCourse=&srchLsnProgType=&srchMrksApprMthdChgPosbYn=&srchMrksGvMthd=&srchOpenUpDeptCd=&srchOpenMjCd=&srchOpenPntMax=&srchOpenPntMin=&srchOpenSbjtDayNm=&srchOpenSbjtNm=&srchOpenSbjtTm=&srchOpenSbjtTmNm=&srchOpenShyr=&srchOpenSubmattCorsFg=&srchOpenSubmattFgCd1=&srchOpenSubmattFgCd2=&srchOpenSubmattFgCd3=&srchOpenSubmattFgCd4=&srchOpenSubmattFgCd5=&srchOpenSubmattFgCd6=&srchOpenSubmattFgCd7=&srchOpenSubmattFgCd8=&srchOpenSubmattFgCd9=&srchOpenDeptCd=&srchOpenUpSbjtFldCd=&srchPageSize=9999&srchProfNm=&srchSbjtCd=&srchSbjtNm=&srchTlsnAplyCapaCntMax=&srchTlsnAplyCapaCntMin=&srchTlsnRcntMax=&srchTlsnRcntMin=&workType=EX"""
     }
 
-    suspend fun getSearchPageHtml(pageNo: Long = 1): PooledDataBuffer = sugangSnuApi.get()
+    suspend fun getSearchPageHtml(pageNo: Int = 1): PooledDataBuffer = sugangSnuApi.get()
         .uri { builder ->
             builder.path(SUGANG_SNU_SEARCH_PATH)
                 .query(DEFAULT_SEARCH_PAGE_PARAMS)

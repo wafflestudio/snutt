@@ -47,7 +47,7 @@ class LectureCustomRepositoryImpl(
                                         .and(ClassPlaceAndTime::endMinute).lte(time.endMinute)
                                 }
                             )
-                        )
+                            )
                     },
                     *searchCondition.etcTags.orEmpty().map { etcTag ->
                         when (etcTag) {
