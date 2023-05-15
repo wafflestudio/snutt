@@ -6,7 +6,7 @@ import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.stereotype.Component
 
-enum class TimetableTheme(@JsonValue val value: Int) {
+enum class TimetableTheme(@get:JsonValue val value: Int) {
     SNUTT(0),
     FALL(1),
     MODERN(2),
