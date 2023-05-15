@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.common.enum
 
 import com.fasterxml.jackson.annotation.JsonValue
-import com.wafflestudio.snu4t.common.exception.Snu4tException
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
