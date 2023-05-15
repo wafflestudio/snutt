@@ -1,10 +1,13 @@
 package com.wafflestudio.snu4t.timetables.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.mongodb.core.mapping.Field
 
 data class ColorSet(
     @Field("bg")
-    var backgroundColor: String?,
+    @JsonProperty("bg")
+    var backgroundColor: String? = null,
     @Field("fg")
-    var foregroundColor: String?,
+    @JsonProperty("fg")
+    var foregroundColor: String? = null,
 )

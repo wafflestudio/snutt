@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.lectures.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -13,6 +14,7 @@ interface LectureService {
     suspend fun upsertLectures(lectures: Iterable<Lecture>)
     fun getLecturesByYearAndSemesterAsFlow(year: Int, semester: Semester): Flow<Lecture>
     suspend fun deleteLectures(lectures: Iterable<Lecture>)
+    fun search(query: SearchDto): Flow<Lecture>
 }
 
 @Service
@@ -27,4 +29,5 @@ class LectureServiceImpl(private val lectureRepository: LectureRepository) : Lec
         lectureRepository.saveAll(lectures).collect()
 
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
+    override fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
 }

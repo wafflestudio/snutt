@@ -28,11 +28,14 @@ enum class ErrorType(
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
     INVALID_BODY_FIELD_VALUE(HttpStatus.BAD_REQUEST, 40002, "요청 바디 값 오류"),
     NOT_SHARED_TIMETABLE_OWNER(HttpStatus.BAD_REQUEST, 40003, "내 shared timetable이 아닙니다.", "내 공유시간표가 아니면 삭제할 수 없습니다."),
-    SHARED_TIME_TABLE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 40004, "이미 공유시간표에 존재하는 timetableId입니다.", "이미 추가된 공유시간표입니다."),
+    SHARED_TIMETABLE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 40004, "이미 공유시간표에 존재하는 timetableId입니다.", "이미 추가된 공유시간표입니다."),
     NO_USER_FCM_KEY(HttpStatus.BAD_REQUEST, 40005, "유저 FCM 키가 존재하지 않습니다."),
+    INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(HttpStatus.BAD_REQUEST, 40006, "이전 학기에는 빈자리 알림을 등록할 수 없습니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     SHARED_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "shared_timetable_id가 유효하지 않습니다", "존재하지 않는 공유시간표입니다."),
+
+    DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.BAD_REQUEST, 40900, "빈자리 알림 중복"),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
 }

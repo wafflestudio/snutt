@@ -8,20 +8,18 @@ open class Snu4tException(
 
 object WrongApiKeyException : Snu4tException(ErrorType.WRONG_API_KEY)
 object NoUserTokenException : Snu4tException(ErrorType.NO_USER_TOKEN)
+object WrongUserTokenException : Snu4tException(ErrorType.WRONG_USER_TOKEN)
 object UserNotAdminException : Snu4tException(ErrorType.USER_NOT_ADMIN)
 object WrongLocalIdException : Snu4tException(ErrorType.WRONG_LOCAL_ID)
 object WrongPasswordException : Snu4tException(ErrorType.WRONG_PASSWORD)
-object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
-object WrongUserTokenException : Snu4tException(ErrorType.WRONG_USER_TOKEN)
+
 object InvalidLocalIdException : Snu4tException(ErrorType.INVALID_LOCAL_ID)
 object InvalidPasswordException : Snu4tException(ErrorType.INVALID_PASSWORD)
-object InvalidEmailException : Snu4tException(ErrorType.INVALID_EMAIL)
 object DuplicateLocalIdException : Snu4tException(ErrorType.DUPLICATE_LOCAL_ID)
+object InvalidEmailException : Snu4tException(ErrorType.INVALID_EMAIL)
+
 object LectureNotFoundException : Snu4tException(ErrorType.LECTURE_NOT_FOUND)
-object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
-object SharedTimetableNotFoundException : Snu4tException(ErrorType.SHARED_TIMETABLE_NOT_FOUND)
-object NotSharedTimetableOwnerException : Snu4tException(ErrorType.NOT_SHARED_TIMETABLE_OWNER)
-object SharedTimetableAlreadyExistsException : Snu4tException(ErrorType.SHARED_TIME_TABLE_ALREADY_EXISTS)
+
 class MissingRequiredParameterException(private val fieldName: String) :
     Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
 
@@ -30,5 +28,16 @@ class InvalidParameterException(private val fieldName: String) :
 
 class InvalidBodyFieldValueException(private val fieldName: String) :
     Snu4tException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: $fieldName)")
+
+object NotSharedTimetableOwnerException : Snu4tException(ErrorType.NOT_SHARED_TIMETABLE_OWNER)
+object SharedTimetableAlreadyExistsException : Snu4tException(ErrorType.SHARED_TIMETABLE_ALREADY_EXISTS)
+object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
+object InvalidRegistrationForPreviousSemesterCourseException :
+    Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)
+
+object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
+object SharedTimetableNotFoundException : Snu4tException(ErrorType.SHARED_TIMETABLE_NOT_FOUND)
+
+object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

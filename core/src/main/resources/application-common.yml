@@ -6,7 +6,6 @@ spring:
       uri:
     redis:
       host:
-      port: 6379
       database:
 logging:
   level:
