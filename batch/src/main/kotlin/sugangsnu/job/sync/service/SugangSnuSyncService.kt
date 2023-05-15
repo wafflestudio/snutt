@@ -174,7 +174,6 @@ class SugangSnuSyncServiceImpl(
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
-                    classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
                     department = updatedLecture.newData.department
@@ -228,7 +227,6 @@ class SugangSnuSyncServiceImpl(
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
-                    classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification
                     credit = updatedLecture.newData.credit
                     department = updatedLecture.newData.department

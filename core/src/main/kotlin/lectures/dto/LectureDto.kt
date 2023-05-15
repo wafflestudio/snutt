@@ -12,8 +12,6 @@ data class LectureDto(
     val category: String?,
     @JsonProperty("class_time_json")
     val classPlaceAndTimes: List<ClassPlaceAndTimeDto>,
-    @JsonProperty("class_time_mask")
-    val classTimeMask: List<Int>,
     val classification: String?,
     val credit: Long,
     val department: String?,
@@ -37,7 +35,6 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     academicYear = lecture.academicYear,
     category = lecture.category,
     classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
-    classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
     credit = lecture.credit,
     department = lecture.department,
