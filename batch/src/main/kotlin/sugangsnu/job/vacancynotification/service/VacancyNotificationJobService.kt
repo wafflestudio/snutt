@@ -64,10 +64,6 @@ class VacancyNotifierServiceImpl(
 
         val lectureAndRegistrationStatus = (lectureMap.keys intersect registrationStatusMap.keys)
             .map { lectureMap[it]!! to registrationStatusMap[it]!! }
-        val updated = lectureAndRegistrationStatus
-            .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
-            .map { (lecture, status) -> lecture.apply { registrationCount = status.registrationCount } }
-        lectureService.upsertLectures(updated)
 
         val isCurrentStudentRegistrationPeriod =
             coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, status) ->
@@ -81,8 +77,13 @@ class VacancyNotifierServiceImpl(
             } else {
                 lecture.quota == lecture.registrationCount
             }
-        }.filter { (lecture, status) -> (lecture.registrationCount ?: 0) > status.registrationCount }
+        }.filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
             .map { (lecture, status) -> lecture }
+
+        val updated = lectureAndRegistrationStatus
+            .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
+            .map { (lecture, status) -> lecture.apply { registrationCount = status.registrationCount } }
+        lectureService.upsertLectures(updated)
 
         notiTargetLectures.forEach {
             logger.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
