@@ -15,6 +15,7 @@ data class TimetableLecture(
     @JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
+    @JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
     @Field("class_time")
