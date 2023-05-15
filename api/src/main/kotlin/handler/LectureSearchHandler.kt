@@ -53,7 +53,7 @@ data class SearchQueryLegacy(
             query = title,
             classification, credit, courseNumber, academicYear, department, category, etc,
             times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
-            (offset / 20).toInt(), offset
+            page.toInt(), offset
         )
     }
 
