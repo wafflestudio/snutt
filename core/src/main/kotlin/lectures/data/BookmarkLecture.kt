@@ -3,6 +3,8 @@ package com.wafflestudio.snu4t.lectures.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import com.wafflestudio.snu4t.lectures.utils.toClassTimeText
+import com.wafflestudio.snu4t.lectures.utils.toPeriodText
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
@@ -14,12 +16,6 @@ data class BookmarkLecture(
     @Field("academic_year")
     var academicYear: String?,
     var category: String?,
-    @Field("class_time")
-    @JsonProperty("class_time")
-    var periodText: String?,
-    @Field("real_class_time")
-    @JsonProperty("real_class_time")
-    var classTimeText: String?,
     @Field("class_time_json")
     @JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTime>,
@@ -44,8 +40,6 @@ fun BookmarkLecture(lecture: Lecture): BookmarkLecture = BookmarkLecture(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    periodText = lecture.periodText,
-    classTimeText = lecture.classTimeText,
     classPlaceAndTimes = lecture.classPlaceAndTimes,
     classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,

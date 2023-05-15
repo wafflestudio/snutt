@@ -173,8 +173,6 @@ class SugangSnuSyncServiceImpl(
                 lectures.find { it.id == updatedLecture.oldData.id }?.apply {
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
-                    periodText = updatedLecture.newData.periodText
-                    classTimeText = updatedLecture.newData.classTimeText
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
                     classTimeMask = updatedLecture.newData.classTimeMask
                     classification = updatedLecture.newData.classification

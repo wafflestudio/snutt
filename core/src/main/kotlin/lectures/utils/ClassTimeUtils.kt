@@ -33,6 +33,13 @@ object ClassTimeUtils {
             time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
+fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"
+fun List<ClassPlaceAndTime>.toPeriodText() =
+    this.joinToString("/") { "${it.day.korText}(${it.startPeriod}-${it.endPeriod})" }
+
+fun List<ClassPlaceAndTime>.toClassTimeText() =
+    this.joinToString("/") { "${it.day.korText}(${minuteToString(it.startMinute)}~${minuteToString(it.endMinute)})" }
+
 val ClassPlaceAndTime.startPeriod: Double
     get() = floor((startMinute - 8 * 60).toDouble() / 60 * 2) / 2
 val ClassPlaceAndTime.endPeriod: Double

@@ -39,21 +39,6 @@ object SugangSnuClassTimeUtils {
         emptyList()
     }
 
-    // 교시 기준으로 변환 ( 구버전 호환 필드용 - classTimeText )
-    fun convertClassTimeTextToPeriodText(classTimeText: String): String =
-        classTimeText.split('/')
-            .filter { it.isNotEmpty() && classTimeRegEx.matches(it) }
-            .joinToString("/") { classTime ->
-                runCatching {
-                    with(parseSugangSnuClassTime(classTime)) {
-                        "$dayOfWeek(${periodFormat.format(startPeriod)}-${periodFormat.format(endPeriod - startPeriod)})"
-                    }
-                }.getOrElse {
-                    logger.error("교시 파싱 에러 {}", classTimeText)
-                    ""
-                }
-            }
-
     private fun parseSugangSnuClassTime(classTime: String): SugangSnuClassTime {
         return classTimeRegEx.find(classTime)!!.groups.let { matchResult ->
             SugangSnuClassTime(

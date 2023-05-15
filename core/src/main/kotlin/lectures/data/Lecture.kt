@@ -46,8 +46,6 @@ data class Lecture(
         return this === other ||
             academicYear == other.academicYear &&
             category == other.category &&
-            periodText == other.periodText &&
-            classTimeText == other.classTimeText &&
             classPlaceAndTimes == other.classPlaceAndTimes &&
             classTimeMask == other.classTimeMask &&
             classification == other.classification &&

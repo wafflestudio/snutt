@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.utils.endPeriod
+import com.wafflestudio.snu4t.lectures.utils.minuteToString
 import com.wafflestudio.snu4t.lectures.utils.startPeriod
 
 data class ClassPlaceAndTimeDto(
@@ -32,4 +33,3 @@ fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTim
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
 )
 
-private fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"
