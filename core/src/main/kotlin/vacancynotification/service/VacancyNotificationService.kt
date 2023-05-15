@@ -1,8 +1,7 @@
 package com.wafflestudio.snu4t.vacancynotification.service
 
-import com.mongodb.DuplicateKeyException
 import com.wafflestudio.snu4t.common.exception.DuplicateVacancyNotificationException
-import com.wafflestudio.snu4t.common.exception.InvalidRegistrationForPreviosSemesterCourseException
+import com.wafflestudio.snu4t.common.exception.InvalidRegistrationForPreviousSemesterCourseException
 import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.lectures.service.LectureService
@@ -11,6 +10,7 @@ import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotification
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 
 interface VacancyNotificationService {
@@ -34,7 +34,7 @@ class VacancyNotificationServiceImpl(
 
             if (lecture == null) throw LectureNotFoundException
             if (!(lecture.year == latestCoursebook.year && lecture.semester == latestCoursebook.semester)) {
-                throw InvalidRegistrationForPreviosSemesterCourseException
+                throw InvalidRegistrationForPreviousSemesterCourseException
             }
 
             trySave(VacancyNotification(userId = userId, lectureId = lectureId, coursebookId = latestCoursebook.id!!))

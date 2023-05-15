@@ -38,6 +38,11 @@ class VacancyNotifierServiceImpl(
     private val notificationRepository: NotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
 ) : VacancyNotifierService {
+    companion object{
+        const val COUNT_PER_PAGE = 10
+        const val DELAY_PER_CHUNK = 300L
+    }
+
     private val logger = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
 
@@ -116,9 +121,10 @@ class VacancyNotifierServiceImpl(
             val firstPageContent = getSugangSnuSearchContent(1)
             val totalCount =
                 firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
-            val totalPage = (totalCount + 9) / 10
+            val totalPage = (totalCount + 9) / COUNT_PER_PAGE
+            // 강의 전체를 20등분해서 요청, 각 chunk 마다 DELAY_PER_CHUNK 의 간격
             val totalContent = (2..totalPage).chunked(totalPage / 20).flatMap { iter ->
-                delay(300)
+                delay(DELAY_PER_CHUNK)
                 iter.map { page -> async { getSugangSnuSearchContent(page) } }.awaitAll()
             } + firstPageContent
 
