@@ -3,8 +3,6 @@ package com.wafflestudio.snu4t.lectures.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.wafflestudio.snu4t.lectures.utils.toClassTimeText
-import com.wafflestudio.snu4t.lectures.utils.toPeriodText
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 

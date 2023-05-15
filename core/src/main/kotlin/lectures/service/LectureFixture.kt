@@ -14,8 +14,6 @@ class LectureFixture(private val lectureRepository: LectureRepository) {
             Lecture(
                 academicYear = "1",
                 category = "",
-                periodText = "",
-                classTimeText = "",
                 classPlaceAndTimes = listOf(),
                 classTimeMask = listOf(),
                 classification = "",

@@ -3,8 +3,6 @@ package com.wafflestudio.snu4t.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.utils.toClassTimeText
-import com.wafflestudio.snu4t.lectures.utils.toPeriodText
 
 data class LectureDto(
     @JsonProperty("_id")
@@ -12,10 +10,6 @@ data class LectureDto(
     @JsonProperty("academic_year")
     val academicYear: String?,
     val category: String?,
-    @JsonProperty("class_time")
-    val periodText: String?,
-    @JsonProperty("real_class_time")
-    val classTimeText: String?,
     @JsonProperty("class_time_json")
     val classPlaceAndTimes: List<ClassPlaceAndTimeDto>,
     @JsonProperty("class_time_mask")
@@ -42,8 +36,6 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    periodText = lecture.classPlaceAndTimes.toPeriodText(),
-    classTimeText = lecture.classPlaceAndTimes.toClassTimeText(),
     classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
     classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
