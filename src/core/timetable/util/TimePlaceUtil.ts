@@ -47,7 +47,9 @@ export function timeAndPlaceToJson(timesString: string, locationsString: string,
                 start_time: startTime,
                 end_time: endTime,
                 len,
-                place
+                place,
+                startMinute: null,
+                endMinute: null,
             };
         });
 
