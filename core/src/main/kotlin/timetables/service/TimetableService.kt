@@ -17,6 +17,7 @@ import java.time.Instant
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
+
     suspend fun copy(userId: String, timetableId: String): Timetable
     suspend fun createDefaultTable(userId: String)
 }
@@ -61,6 +62,7 @@ class TimetableServiceImpl(
     }
 
     private suspend fun isUniqueTimetableTitle(timetable: Timetable): Boolean = !timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
+
     override suspend fun createDefaultTable(userId: String) {
         val courseBook = coursebookService.getLatestCoursebook()
         val timetable = Timetable(
