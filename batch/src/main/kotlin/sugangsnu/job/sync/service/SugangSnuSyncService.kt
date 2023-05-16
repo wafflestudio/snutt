@@ -89,7 +89,7 @@ class SugangSnuSyncServiceImpl(
         val created = (newMap.keys - oldMap.keys).map(newMap::getValue)
         val updated = (newMap.keys intersect oldMap.keys)
             .map { oldMap[it]!! to newMap[it]!! }
-            .filter { (old, new) -> old equalsMetadata new }
+            .filter { (old, new) -> !(old equalsMetadata new) }
             .map { (old, new) ->
                 UpdatedLecture(
                     old, new,
