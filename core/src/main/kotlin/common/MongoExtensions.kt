@@ -10,6 +10,8 @@ infix fun Criteria.isEqualTo(o: Any?): Criteria = this.`is`(o)
 infix fun <T> KProperty<T>.isEqualTo(value: T) = Criteria(this.toDotPath()).isEqualTo(value)
 infix fun Criteria.elemMatch(c: Criteria): Criteria = this.elemMatch(c)
 infix fun Criteria.all(c: Criteria): Criteria = this.all(c)
+infix fun Criteria.regex(re: Regex): Criteria = this.regex(re)
+infix fun Criteria.regex(re: String): Criteria = this.regex(re)
 
 fun Query.addInWhereIfNotEmpty(field: String, values: List<*>?) {
     if (!values.isNullOrEmpty()) {

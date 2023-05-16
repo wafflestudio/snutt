@@ -22,7 +22,7 @@ interface SharedTimetableService {
     suspend fun add(userId: String, title: String, timetableId: String): SharedTimetable
     suspend fun update(title: String, sharedTimetableId: String): SharedTimetable
     suspend fun delete(userId: String, sharedTimetableId: String)
-    suspend fun copy(userId: String, sharedTimetableId: String): Timetable
+    suspend fun copy(userId: String, sharedTimetableId: String, title: String): Timetable
 }
 
 @Service
@@ -95,8 +95,8 @@ class SharedTimetableServiceImpl(
         sharedTimetableRepository.save(sharedTimetable)
     }
 
-    override suspend fun copy(userId: String, sharedTimetableId: String): Timetable {
+    override suspend fun copy(userId: String, sharedTimetableId: String, title: String): Timetable {
         val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(sharedTimetableId) ?: throw SharedTimetableNotFoundException
-        return timetableService.copy(userId, sharedTimetable.timetableId)
+        return timetableService.copy(userId, sharedTimetable.timetableId, title)
     }
 }

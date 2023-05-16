@@ -18,7 +18,7 @@ interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
 
-    suspend fun copy(userId: String, timetableId: String): Timetable
+    suspend fun copy(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun createDefaultTable(userId: String)
 }
 
@@ -42,26 +42,41 @@ class TimetableServiceImpl(
         )
     }
 
-    override suspend fun copy(userId: String, timetableId: String): Timetable {
+    override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         val copiedTimetable = timetable.copy(
             id = null,
             userId = userId,
-            updatedAt = Instant.now()
+            updatedAt = Instant.now(),
+            title = title ?: timetable.title
         )
         return copyWithUniqueTitle(copiedTimetable, copiedTimetable.title)
     }
 
     private suspend fun copyWithUniqueTitle(timetable: Timetable, title: String): Timetable {
-        var trialCnt = 0
-        val newTitleSequence = generateSequence { if (trialCnt == 0) title else "$title(${trialCnt++})" }
+        val latestTitle = timetableRepository.findLatestChildTimetable(
+            timetable.userId,
+            timetable.year,
+            timetable.semester,
+            title
+        )?.title ?: return timetableRepository.save(timetable)
 
-        return newTitleSequence.first { isUniqueTimetableTitle(timetable) }.let {
-            timetableRepository.save(timetable)
-        }
+        val countMatch = Regex("\\((\\d+)\\)")
+            .findAll(latestTitle)
+            .lastOrNull()
+            ?.value
+            ?: ""
+
+        val count = countMatch
+            .filter { it.isDigit() }
+            .toIntOrNull()
+            ?: 0
+        val baseTitle = latestTitle.replace(Regex("\\s\\($count\\)$"), "")
+
+        timetable.title = "$baseTitle (${count + 1})"
+
+        return timetableRepository.save(timetable)
     }
-
-    private suspend fun isUniqueTimetableTitle(timetable: Timetable): Boolean = !timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(timetable.userId, timetable.year, timetable.semester, timetable.title)
 
     override suspend fun createDefaultTable(userId: String) {
         val courseBook = coursebookService.getLatestCoursebook()
