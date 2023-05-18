@@ -12,6 +12,7 @@ data class TimetableDto(
     var userId: String,
     var year: Int,
     var semester: Semester,
+    @JsonProperty("lecture_list")
     var lectures: List<TimetableLectureDto> = emptyList(),
     var title: String,
     val theme: TimetableTheme,
