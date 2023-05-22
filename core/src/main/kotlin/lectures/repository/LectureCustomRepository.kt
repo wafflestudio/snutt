@@ -1,6 +1,5 @@
 package com.wafflestudio.snu4t.lectures.repository
 
-import com.wafflestudio.snu4t.common.all
 import com.wafflestudio.snu4t.common.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -12,10 +11,12 @@ import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.and
-import org.springframework.data.mongodb.core.query.gte
+import org.springframework.data.mongodb.core.query.gt
 import org.springframework.data.mongodb.core.query.inValues
+import org.springframework.data.mongodb.core.query.lt
 import org.springframework.data.mongodb.core.query.ne
 import org.springframework.data.mongodb.core.query.nin
+import org.springframework.data.mongodb.core.query.not
 import org.springframework.data.mongodb.core.query.regex
 
 interface LectureCustomRepository {
@@ -40,14 +41,21 @@ class LectureCustomRepositoryImpl(
                     searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
                     searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
                     searchCondition.times?.takeIf { it.isNotEmpty() }?.let {
-                        Lecture::classPlaceAndTimes ne listOf() and Lecture::classPlaceAndTimes all (
-                            Criteria().orOperator(
-                                it.map { time ->
-                                    ClassPlaceAndTime::startMinute.gte(time.startMinute)
-                                        .and(ClassPlaceAndTime::endMinute).lte(time.endMinute)
-                                }
+                        Criteria().andOperator(
+                            Lecture::classPlaceAndTimes ne listOf(),
+                            // 수업시간 하나라도 제시한 시간대들에 안맞는 경우가 존재하면 안됨
+                            Lecture::classPlaceAndTimes.not().elemMatch(
+                                Criteria().andOperator(
+                                    it.map { time ->
+                                        Criteria().orOperator(
+                                            ClassPlaceAndTime::day.ne(time.day),
+                                            ClassPlaceAndTime::startMinute.lt(time.startMinute),
+                                            ClassPlaceAndTime::endMinute.gt(time.endMinute)
+                                        )
+                                    }
+                                )
                             )
-                            )
+                        )
                     },
                     *searchCondition.etcTags.orEmpty().map { etcTag ->
                         when (etcTag) {

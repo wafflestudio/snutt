@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.dto.LectureDto
@@ -17,7 +16,6 @@ import org.springframework.web.reactive.function.server.awaitBody
 
 @Component
 class LectureSearchHandler(
-    private val objectMapper: ObjectMapper,
     private val lectureService: LectureService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
@@ -45,7 +43,8 @@ data class SearchQueryLegacy(
     val timeMask: List<Int>? = null,
     val times: List<SearchTimeDto>? = null,
     val etc: List<String>? = null,
-    val offset: Long = 0,
+    val page: Long = 0,
+    val offset: Long = page * 20,
     val limit: Int = 20,
 ) {
     fun toSearchDto(): SearchDto {
@@ -53,7 +52,7 @@ data class SearchQueryLegacy(
             year, semester,
             query = title,
             classification, credit, courseNumber, academicYear, department, category, etc,
-            times ?: bitmaskToClassTime(timeMask),
+            times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
             (offset / 20).toInt(), offset
         )
     }
@@ -75,7 +74,7 @@ data class SearchQueryLegacy(
                             endMinute = index * 30 + 8 * 60 + 30
                         )
                     } else if (bit && bitBefore) {
-                        val updated = acc.last().copy(endMinute = index * 30 + 8 * 60)
+                        val updated = acc.last().copy(endMinute = index * 30 + 8 * 60 + 30)
                         acc.dropLast(1) + updated
                     } else {
                         acc
@@ -86,5 +85,5 @@ data class SearchQueryLegacy(
     /*
     ex) 258048 -> 2진수 00000000000000111111000000000000 -> [..., true, true, true, true, true, true, false, false, ...]
      */
-    private fun Int.toTimeMask(): List<Boolean> = this.toString(2).substring(2).map { it == '1' }
+    private fun Int.toTimeMask(): List<Boolean> = this.toString(2).padStart(30, '0').map { it == '1' }
 }
