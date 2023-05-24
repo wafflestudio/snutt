@@ -29,6 +29,9 @@ class TimetableServiceImpl(
     private val coursebookService: CoursebookService,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
+    companion object {
+        private val titleCountRegex = """\((\d+)\)""".toRegex()
+    }
     override suspend fun getBriefs(userId: String): List<TimetableBriefDto> =
         timetableRepository.findAllByUserId(userId)
             .map(::TimetableBriefDto)
@@ -61,7 +64,7 @@ class TimetableServiceImpl(
             title
         )?.title ?: return timetableRepository.save(timetable)
 
-        val countMatch = Regex("\\((\\d+)\\)")
+        val countMatch = titleCountRegex
             .findAll(latestTitle)
             .lastOrNull()
             ?.value
@@ -71,7 +74,7 @@ class TimetableServiceImpl(
             .filter { it.isDigit() }
             .toIntOrNull()
             ?: 0
-        val baseTitle = latestTitle.replace(Regex("\\s\\($count\\)$"), "")
+        val baseTitle = latestTitle.replace(Regex("""\s\($count\)$"""), "")
 
         timetable.title = "$baseTitle (${count + 1})"
 

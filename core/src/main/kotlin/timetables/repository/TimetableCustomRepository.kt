@@ -88,7 +88,7 @@ class TimetableCustomRepositoryImpl(
             Timetable::userId isEqualTo userId and
                 Timetable::year isEqualTo year and
                 Timetable::semester isEqualTo semester and
-                Timetable::title regex "$title(\\s+\\(\\d+\\))?"
+                Timetable::title regex """$title(\s+\(\d+\))?"""
         ).with(Sort.by(Sort.Direction.DESC, "title")),
         Timetable::class.java
     ).awaitSingleOrNull()
