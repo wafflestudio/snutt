@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableDetailDto
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableListDto
 import com.wafflestudio.snu4t.sharedtimetable.repository.SharedTimetableRepository
 import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import kotlinx.coroutines.flow.toList
@@ -57,7 +58,7 @@ class SharedTimetableServiceImpl(
             id = sharedTimetableId,
             userId = sharedTimetable.userId,
             title = sharedTimetable.title,
-            timetable = timetable,
+            timetable = TimetableDto(timetable),
         )
     }
     override suspend fun add(userId: String, title: String, timetableId: String): SharedTimetable {

@@ -25,19 +25,6 @@ google:
         bundle-id:
         app-store-id:
 
-truffle:
-  client:
-    name: snutt-timetable
-    phase: local
-    api-key:
-    dynamic-link:
-      domain-uri-prefix:
-      android:
-        package-name:
-      ios:
-        bundle-id:
-        app-store-id:
-
 http:
   response-timeout: 3s
 
@@ -71,9 +58,6 @@ google:
         bundle-id:
         app-store-id:
 
-truffle:
-  enabled: true
-
 ---
 
 spring:
@@ -100,8 +84,5 @@ google:
       ios:
         bundle-id:
         app-store-id:
-
-truffle:
-  enabled: true
 
 secret-names: prod/snutt-timetable
