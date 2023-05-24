@@ -9,6 +9,7 @@ import java.time.Instant
 data class TimetableDto(
     @JsonProperty("_id")
     var id: String? = null,
+    @JsonProperty("user_id")
     var userId: String,
     var year: Int,
     var semester: Semester,

@@ -17,14 +17,17 @@ data class TimetableLectureDto(
     var credit: Long?,
     var department: String?,
     var instructor: String?,
+    @JsonProperty("lecture_number")
     var lectureNumber: String?,
     var quota: Int?,
+    @JsonProperty("freshman_quota")
     var freshmanQuota: Int?,
     var remark: String?,
+    @JsonProperty("course_number")
     var courseNumber: String?,
+    @JsonProperty("course_title")
     var courseTitle: String,
     var color: ColorSet = ColorSet(),
-    @JsonProperty("color_index")
     var colorIndex: Int = 0,
     @JsonProperty("lecture_id")
     var lectureId: String? = null,
