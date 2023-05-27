@@ -6,6 +6,7 @@ import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidPasswordException
+import com.wafflestudio.snu4t.common.exception.Snu4tException
 import com.wafflestudio.snu4t.common.exception.WrongLocalIdException
 import com.wafflestudio.snu4t.common.exception.WrongPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
@@ -42,33 +43,40 @@ class UserServiceImpl(
         val password = localRegisterRequest.password
         val email = localRegisterRequest.email
 
-        if (!cacheRepository.acquireLock(CacheKey.LOCK_REGISTER_LOCAL.build(localId))) throw DuplicateLocalIdException
+        val cacheKey = CacheKey.LOCK_REGISTER_LOCAL.build(localId)
 
-        if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
-        if (!authService.isValidPassword(password)) throw InvalidPasswordException
-        email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }
+        runCatching {
+            if (!cacheRepository.acquireLock(cacheKey)) throw DuplicateLocalIdException
 
-        if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
+            if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
+            if (!authService.isValidPassword(password)) throw InvalidPasswordException
+            email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }
 
-        val credential = authService.buildLocalCredential(localId, password)
-        val credentialHash = authService.generateCredentialHash(credential)
+            if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
-        val user = userRepository.save(
-            User(
-                email = email,
-                isEmailVerified = false,
-                credential = credential,
-                credentialHash = credentialHash,
-                fcmKey = null,
+            val credential = authService.buildLocalCredential(localId, password)
+            val credentialHash = authService.generateCredentialHash(credential)
+
+            val user = userRepository.save(
+                User(
+                    email = email,
+                    isEmailVerified = false,
+                    credential = credential,
+                    credentialHash = credentialHash,
+                    fcmKey = null,
+                )
             )
-        )
 
-        timetableService.createDefaultTable(user.id!!)
+            timetableService.createDefaultTable(user.id!!)
 
-        return LoginResponse(
-            userId = user.id,
-            token = credentialHash,
-        )
+            return LoginResponse(
+                userId = user.id,
+                token = credentialHash,
+            )
+        }.getOrElse {
+            if (it is Snu4tException) cacheRepository.releaseLock(cacheKey)
+            throw it
+        }
     }
 
     override suspend fun loginLocal(localRegisterRequest: LocalLoginRequest): LoginResponse {
