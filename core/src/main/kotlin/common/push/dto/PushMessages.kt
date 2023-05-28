@@ -21,7 +21,6 @@ data class TopicMessage(
 /**
  * Message To Send
  */
-
 data class PushMessage(
     val title: String,
     val body: String,
@@ -39,7 +38,6 @@ fun PushMessage(
 /**
  * Keys used in Push Message Data
  */
-
 private object Keys {
     const val URL_SCHEME = "url_scheme"
 }
