@@ -1,9 +1,10 @@
 package com.wafflestudio.snu4t.sugangsnu.common.service
 
-import com.wafflestudio.snu4t.common.enum.UrlScheme
 import com.wafflestudio.snu4t.common.push.PushNotificationService
+import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
+import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
@@ -29,6 +30,7 @@ class SugangSnuNotificationServiceImpl(
     private val notificationRepository: NotificationRepository,
     private val userRepository: UserRepository,
     private val pushNotificationService: PushNotificationService,
+    private val phase: Phase
 ) : SugangSnuNotificationService {
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
 
@@ -56,9 +58,12 @@ class SugangSnuNotificationServiceImpl(
             userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다."
         }
 
+        val notificationScheme =
+            UrlScheme.NOTIFICATIONS.compileWith(phase)
+
         return tokenAndMessage
             .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, PushMessage("수강편람 업데이트", message, UrlScheme.NOTIFICATIONS)) }
+            .map { (token, message) -> PushTargetMessage(token!!, PushMessage("수강편람 업데이트", message, notificationScheme)) }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
