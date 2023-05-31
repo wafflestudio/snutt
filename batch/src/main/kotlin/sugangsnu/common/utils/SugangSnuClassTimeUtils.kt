@@ -15,7 +15,7 @@ object SugangSnuClassTimeUtils {
     fun convertTextToClassTimeObject(classTimesText: String, locationsText: String): List<ClassPlaceAndTime> = runCatching {
         val sugangSnuClassTimes = classTimesText.split("/")
             .filter { it.isNotBlank() }.map(SugangSnuClassTimeUtils::parseSugangSnuClassTime)
-        val locationTexts = locationsText.split("/").filter { it.isNotBlank() }.let { locationText ->
+        val locationTexts = locationsText.split("/").let { locationText ->
             when (locationText.size) {
                 sugangSnuClassTimes.size -> locationText
                 1 -> List(sugangSnuClassTimes.size) { locationText.first() }
