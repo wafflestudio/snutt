@@ -27,5 +27,6 @@ data class Notification(
     private val link: String? = null,
     @Indexed(direction = IndexDirection.DESCENDING)
     @Field("created_at")
+    @JsonProperty("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
 )
