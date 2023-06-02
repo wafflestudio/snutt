@@ -1,15 +1,12 @@
 package com.wafflestudio.snu4t.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimetableLecture(
     @Id
     @JsonProperty("_id")

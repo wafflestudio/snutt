@@ -1,11 +1,8 @@
 package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLectureDto(
     @JsonProperty("_id")
     var id: String? = null,

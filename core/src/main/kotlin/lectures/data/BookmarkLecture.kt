@@ -1,12 +1,9 @@
 package com.wafflestudio.snu4t.lectures.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLecture(
     @Id
     @JsonProperty("_id")
