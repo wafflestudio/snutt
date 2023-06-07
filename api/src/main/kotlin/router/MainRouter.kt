@@ -89,7 +89,7 @@ class MainRouter(
     @NotificationApi
     fun notificationRoute() = v1CoRouter {
         "/notification".nest {
-            GET("", notificationHandler::getNotification)
+            GET("", notificationHandler::getNotifications)
             GET("/count", notificationHandler::getUnreadCounts)
         }
     }
