@@ -10,16 +10,19 @@ import java.time.LocalDateTime
 
 @Repository
 interface NotificationRepository : CoroutineCrudRepository<Notification, String> {
-
-    fun findAllByUserIdInAndCreatedAtGreaterThan(userIds: List<String?>, createdAt: LocalDateTime, pageable: Pageable): Flow<Notification>
+    fun findAllByUserIdInAndCreatedAtGreaterThanOrderByCreatedAtDesc(userIds: List<String?>, createdAt: LocalDateTime, pageable: Pageable): Flow<Notification>
     suspend fun countByUserIdInAndCreatedAtAfter(userIds: List<String?>, createdAt: LocalDateTime): Long
 }
 
 // 전체 공지도 포함해야 함 (전체공지는 userId = null)
 // 따라서 in 절 쿼리를 사용하였음
 
-suspend fun NotificationRepository.findNotifications(userId: String, createdAt: LocalDateTime, pageable: Pageable): List<Notification> {
-    return findAllByUserIdInAndCreatedAtGreaterThan(listOf(userId, null), createdAt, pageable).toList()
+suspend fun NotificationRepository.findNotifications(
+    userId: String,
+    createdAt: LocalDateTime,
+    pageable: Pageable
+): List<Notification> {
+    return findAllByUserIdInAndCreatedAtGreaterThanOrderByCreatedAtDesc(listOf(userId, null), createdAt, pageable).toList()
 }
 
 suspend fun NotificationRepository.countUnreadNotifications(userId: String, createdAt: LocalDateTime): Long {

@@ -18,7 +18,7 @@ class NotificationService(
     private val userService: UserService,
     private val pushNotificationService: PushNotificationService,
 ) {
-    suspend fun getNotification(query: NotificationQuery): List<Notification> {
+    suspend fun getNotifications(query: NotificationQuery): List<Notification> {
         val user = query.user
         val notifications = repository.findNotifications(
             userId = user.id!!,
