@@ -8,7 +8,6 @@ import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
-import kotlinx.coroutines.coroutineScope
 import notification.dto.InsertNotificationRequest
 import org.springframework.stereotype.Service
 
@@ -19,7 +18,7 @@ class NotificationAdminService(
     private val notificationService: NotificationService,
     private val userRepository: UserRepository
 ) {
-    suspend fun insertNotification(request: InsertNotificationRequest) = coroutineScope {
+    suspend fun insertNotification(request: InsertNotificationRequest) {
         val user = request.userId?.let {
             userRepository.findByCredentialLocalIdAndActiveTrue(it) ?: throw UserNotFoundException
         }
