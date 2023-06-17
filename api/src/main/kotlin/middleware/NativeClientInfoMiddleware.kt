@@ -12,10 +12,12 @@ class NativeClientInfoMiddleware() : Middleware {
     override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext =
         context.copy(
             clientInfo = ClientInfo(
-                osType = OsType.fromString(req.headers().firstHeader("x-os-type")),
+                osType = OsType.from(req.headers().firstHeader("x-os-type")),
                 osVersion = req.headers().firstHeader("x-os-version"),
-                appType = AppType.fromString(req.headers().firstHeader("x-app-type")) ?: AppType.RELEASE,
+                appType = AppType.from(req.headers().firstHeader("x-app-type")) ?: AppType.RELEASE,
                 appVersion = req.headers().firstHeader("x-app-version"),
+                deviceId = req.headers().firstHeader("x-device-id"),
+                deviceModel = req.headers().firstHeader("x-device-model"),
             )
         )
 }

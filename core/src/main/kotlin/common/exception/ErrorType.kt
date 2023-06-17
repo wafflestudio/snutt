@@ -23,13 +23,14 @@ enum class ErrorType(
     INVALID_EMAIL(HttpStatus.FORBIDDEN, 0x300F, "email이 유효하지 않습니다.", "이메일 형식이 올바르지 않습니다."),
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다.", "해당 강의는 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다.", "해당 유저는 존재하지 않습니다."),
 
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
     INVALID_BODY_FIELD_VALUE(HttpStatus.BAD_REQUEST, 40002, "요청 바디 값 오류"),
     NOT_SHARED_TIMETABLE_OWNER(HttpStatus.BAD_REQUEST, 40003, "내 shared timetable이 아닙니다.", "내 공유시간표가 아니면 삭제할 수 없습니다."),
     SHARED_TIMETABLE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 40004, "이미 공유시간표에 존재하는 timetableId입니다.", "이미 추가된 공유시간표입니다."),
-    NO_USER_FCM_KEY(HttpStatus.BAD_REQUEST, 40005, "유저 FCM 키가 존재하지 않습니다."),
+    NO_USER_FCM_KEY(HttpStatus.NOT_FOUND, 40005, "유저 FCM 키가 존재하지 않습니다."),
     INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(HttpStatus.BAD_REQUEST, 40006, "이전 학기에는 빈자리 알림을 등록할 수 없습니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),

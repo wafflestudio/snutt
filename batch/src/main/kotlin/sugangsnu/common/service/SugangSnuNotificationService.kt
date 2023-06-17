@@ -9,6 +9,7 @@ import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
+import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
@@ -16,7 +17,6 @@ import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOv
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
-import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 
@@ -27,13 +27,12 @@ interface SugangSnuNotificationService {
 
 @Service
 class SugangSnuNotificationServiceImpl(
-    private val notificationRepository: NotificationRepository,
-    private val userRepository: UserRepository,
+    private val deviceService: DeviceService,
     private val pushNotificationService: PushNotificationService,
-    private val phase: Phase
+    private val notificationRepository: NotificationRepository,
+    private val phase: Phase,
 ) : SugangSnuNotificationService {
     override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: Iterable<UserLectureSyncResult>) {
-
         syncSavedLecturesResults
             .map { it.toNotification() }
             .let { notificationRepository.saveAll(it) }
@@ -50,20 +49,27 @@ class SugangSnuNotificationServiceImpl(
             syncSavedLecturesResults.filter { it is TimetableLectureDeleteResult || it is TimetableLectureDeleteByOverlapResult }
                 .toCountMap()
 
-        val tokenAndMessage = (userUpdatedLectureCountMap.keys - userDeletedLectureCountMap.keys).map {
-            userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되었습니다."
-        } + (userUpdatedLectureCountMap.keys intersect userDeletedLectureCountMap.keys).map {
-            userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[it]}개 강의가 변경되고 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다."
-        } + (userDeletedLectureCountMap.keys - userUpdatedLectureCountMap.keys).map {
-            userRepository.findById(it)?.fcmKey to "수강편람이 업데이트되어 ${userDeletedLectureCountMap[it]}개 강의가 삭제되었습니다."
+        val userIdAndMessage = (userUpdatedLectureCountMap.keys - userDeletedLectureCountMap.keys).map { userId ->
+            userId to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[userId]}개 강의가 변경되었습니다."
+        } + (userUpdatedLectureCountMap.keys intersect userDeletedLectureCountMap.keys).map { userId ->
+            userId to "수강편람이 업데이트되어 ${userUpdatedLectureCountMap[userId]}개 강의가 변경되고 ${userDeletedLectureCountMap[userId]}개 강의가 삭제되었습니다."
+        } + (userDeletedLectureCountMap.keys - userUpdatedLectureCountMap.keys).map { userId ->
+            userId to "수강편람이 업데이트되어 ${userDeletedLectureCountMap[userId]}개 강의가 삭제되었습니다."
         }
 
-        val notificationScheme =
-            UrlScheme.NOTIFICATIONS.compileWith(phase)
+        val notificationScheme = UrlScheme.NOTIFICATIONS.compileWith(phase)
 
-        return tokenAndMessage
-            .filterNot { (token, _) -> token.isNullOrBlank() }
-            .map { (token, message) -> PushTargetMessage(token!!, PushMessage("수강편람 업데이트", message, notificationScheme)) }
+        val userIds = userIdAndMessage.map { it.first }
+        val userToDevices = deviceService.getUsersDevices(userIds)
+
+        return userIdAndMessage.flatMap { (userId, message) ->
+            userToDevices[userId]?.map {
+                PushTargetMessage(
+                    it.fcmRegistrationId,
+                    PushMessage("수강편람 업데이트", message, notificationScheme),
+                )
+            } ?: emptyList()
+        }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {

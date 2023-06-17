@@ -22,8 +22,11 @@ data class Notification(
     val userId: String?,
     val message: String,
     val type: NotificationType,
-    // link: 사용하지 않음
-    // https://github.com/wafflestudio/snutt-timetable/pull/45#discussion_r1155538953 참고
+    /**
+     * 사용 금지
+     *
+     * See [issue](https://github.com/wafflestudio/snutt-timetable/pull/45#discussion_r1155538953)
+     */
     private val link: String? = null,
     @Indexed(direction = IndexDirection.DESCENDING)
     @Field("created_at")

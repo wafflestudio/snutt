@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.users.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.notification.data.UserDevice
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
@@ -14,6 +15,9 @@ data class User(
     var isEmailVerified: Boolean?,
     var credential: Credential,
     var credentialHash: String,
+    /**
+     * Legacy FCM 기기 그룹 관련 API 를 이용하던 당시의 값. 유효한 [UserDevice] 가 존재하는 경우, 해당 유저에 대해서는 사용하지 않음.
+     */
     var fcmKey: String?,
     var active: Boolean = true,
     var isAdmin: Boolean = false,

@@ -19,14 +19,13 @@ import org.springframework.stereotype.Service
 @Service
 @Profile("!test")
 class FcmPushNotificationService(
-    @Value("\${google.firebase.project-id}") val projectId: String,
-    @Value("\${google.firebase.service-account}") val serviceAccountString: String,
+    @Value("\${google.firebase.project-id}") private val projectId: String,
+    @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
 ) : PushNotificationService {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     init {
-        val options: FirebaseOptions = FirebaseOptions.builder()
+        val options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
             .setDatabaseUrl("https://$projectId.firebaseio.com/")
             .build()
@@ -34,10 +33,14 @@ class FcmPushNotificationService(
         FirebaseApp.initializeApp(options)
     }
 
+    companion object {
+        private const val GLOBAL_TOPIC = "global"
+    }
+
     override suspend fun sendMessage(pushMessage: PushTargetMessage) {
         val message = pushMessage.toFcmMessage()
         val response = FirebaseMessaging.getInstance().sendAsync(message).await()
-        logger.info("Message Request Sent : $message, response : $response")
+        log.info("Message Request Sent : $message, response : $response")
     }
 
     // FCM api가 한번에 500개까지 받을 수 있으므로 500개씩 chunk
@@ -54,16 +57,26 @@ class FcmPushNotificationService(
 
         pushMessages
             .zip(responses)
-            .map { (message, response) -> logger.info("Message Request Sent: $message, response : $response") }
+            .map { (message, response) -> log.info("Message Request Sent: $message, response : $response") }
     }
 
-    override suspend fun sendGlobalMessage(payload: PushMessage) {
-        sendTopicMessage(TopicMessage("global", payload))
+    override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
+        sendTopicMessage(TopicMessage(GLOBAL_TOPIC, pushMessage))
     }
 
     override suspend fun sendTopicMessage(pushMessage: TopicMessage) {
         val message = pushMessage.toFcmMessage()
         val response = FirebaseMessaging.getInstance().sendAsync(message).await()
-        logger.info("Message Request Sent : $message, response : $response")
+        log.info("Message Request Sent : $message, response : $response")
+    }
+
+    override suspend fun subscribeGlobalTopic(registrationId: String) {
+        FirebaseMessaging.getInstance().subscribeToTopicAsync(listOf(registrationId), GLOBAL_TOPIC).await()
+        log.debug("Subscribed to global topic: $registrationId")
+    }
+
+    override suspend fun unsubscribeGlobalTopic(registrationId: String) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopicAsync(listOf(registrationId), GLOBAL_TOPIC).await()
+        log.debug("Unsubscribed from global topic: $registrationId")
     }
 }

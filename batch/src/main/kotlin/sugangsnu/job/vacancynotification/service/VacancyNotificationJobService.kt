@@ -9,6 +9,7 @@ import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
+import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
@@ -18,6 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.jsoup.Jsoup
@@ -32,8 +34,9 @@ interface VacancyNotifierService {
 @Service
 class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
-    private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val pushNotificationService: PushNotificationService,
+    private val deviceService: DeviceService,
+    private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val userRepository: UserRepository,
     private val notificationRepository: NotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -78,7 +81,7 @@ class VacancyNotifierServiceImpl(
                 lecture.quota == lecture.registrationCount
             }
         }.filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
-            .map { (lecture, status) -> lecture }
+            .map { (lecture, _) -> lecture }
 
         val updated = lectureAndRegistrationStatus
             .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
@@ -102,14 +105,14 @@ class VacancyNotifierServiceImpl(
                                 type = NotificationType.NORMAL
                             )
                         }
-                    )
-                    pushNotificationService.sendMessages(
-                        users.mapNotNull { user ->
-                            user.fcmKey?.let {
-                                PushTargetMessage(it, PushMessage(lecture.courseTitle, "자리났다"))
-                            }
+                    ).collect()
+
+                    val pushMessages = deviceService.getUsersDevices(users.map { it.id!! }).values.flatMap { userDevices ->
+                        userDevices.map {
+                            PushTargetMessage(it.fcmRegistrationId, PushMessage(lecture.courseTitle, "자리났다"))
                         }
-                    )
+                    }
+                    pushNotificationService.sendMessages(pushMessages)
                 }
             }.awaitAll()
         }

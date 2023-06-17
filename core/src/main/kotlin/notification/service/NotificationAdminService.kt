@@ -1,60 +1,58 @@
 package com.wafflestudio.snu4t.notification.service
 
-import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
 import com.wafflestudio.snu4t.common.exception.NoUserFcmKeyException
+import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import kotlinx.coroutines.coroutineScope
 import notification.dto.InsertNotificationRequest
 import org.springframework.stereotype.Service
 
 @Service
 class NotificationAdminService(
     private val pushNotificationService: PushNotificationService,
+    private val deviceService: DeviceService,
     private val notificationService: NotificationService,
     private val userRepository: UserRepository
 ) {
-    suspend fun insertNotification(body: InsertNotificationRequest): String {
-        val receiver = getReceiver(body.userId)
-
-        val notification = body.toNotification(receiver?.id!!)
-        notificationService.addNotification(notification)
-
-        if (body.insertFcm) {
-            sendPush(receiver, body)
+    suspend fun insertNotification(request: InsertNotificationRequest) = coroutineScope {
+        val user = request.userId?.let {
+            userRepository.findByCredentialLocalIdAndActiveTrue(it) ?: throw UserNotFoundException
         }
 
-        // 구버전 API 에서 보내주고 있길래 따라함
-        return "ok"
-    }
-
-    private suspend fun sendPush(receiver: User?, body: InsertNotificationRequest) {
-        val messagePayload = PushMessage(body.title, body.body, body.dataPayload)
-        if (receiver == null) {
-            pushNotificationService.sendGlobalMessage(messagePayload)
-        } else {
-            val fcmKey = receiver.fcmKey ?: throw NoUserFcmKeyException
-            val pushTargetMessage = PushTargetMessage(fcmKey, messagePayload)
-            pushNotificationService.sendMessage(pushTargetMessage)
-        }
-    }
-
-    private suspend fun InsertNotificationRequest.toNotification(receiverId: String?): Notification {
-        return Notification(
-            userId = receiverId,
-            message = body,
-            type = type
+        notificationService.addNotification(
+            Notification(
+                userId = user?.id,
+                message = request.body,
+                type = request.type
+            )
         )
+
+        user?.let {
+            sendPush(it, request)
+        } ?: run {
+            sendGlobalPush(request)
+        }
     }
 
-    private suspend fun getReceiver(receiverId: String?): User? {
-        if (receiverId.isNullOrBlank()) {
-            return null
-        }
+    private suspend fun sendPush(user: User, request: InsertNotificationRequest) {
+        if (!request.insertFcm) return
 
-        return userRepository.findById(receiverId) ?: throw InvalidLocalIdException
+        val message = PushMessage(request.title, request.body, request.dataPayload)
+        val userDevices = deviceService.getUserDevices(user.id!!).ifEmpty { throw NoUserFcmKeyException }
+
+        val pushMessages = userDevices.map { PushTargetMessage(it.fcmRegistrationId, message) }
+        pushNotificationService.sendMessages(pushMessages)
+    }
+
+    private suspend fun sendGlobalPush(request: InsertNotificationRequest) {
+        if (!request.insertFcm) return
+
+        val message = PushMessage(request.title, request.body, request.dataPayload)
+        pushNotificationService.sendGlobalMessage(message)
     }
 }

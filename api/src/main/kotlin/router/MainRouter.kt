@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
@@ -29,6 +30,7 @@ class MainRouter(
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
     private val adminHandler: AdminHandler,
+    private val deviceHandler: DeviceHandler,
     private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
@@ -45,6 +47,15 @@ class MainRouter(
         "/auth".nest {
             POST("/register_local", authHandler::registerLocal)
             POST("/login_local", authHandler::loginLocal)
+            POST("/logout", authHandler::logout)
+        }
+    }
+
+    @Bean
+    fun deviceRoute() = v1CoRouter {
+        "/device".nest {
+            POST("/{id}", deviceHandler::addRegistrationId)
+            DELETE("/{id}", deviceHandler::removeRegistrationId)
         }
     }
 

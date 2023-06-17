@@ -16,9 +16,15 @@ class MockPushNotificationService : PushNotificationService {
     override suspend fun sendMessages(pushMessages: List<PushTargetMessage>) {
     }
 
-    override suspend fun sendGlobalMessage(payload: PushMessage) {
+    override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
     }
 
     override suspend fun sendTopicMessage(pushMessage: TopicMessage) {
+    }
+
+    override suspend fun subscribeGlobalTopic(registrationId: String) {
+    }
+
+    override suspend fun unsubscribeGlobalTopic(registrationId: String) {
     }
 }

@@ -19,6 +19,7 @@ object DuplicateLocalIdException : Snu4tException(ErrorType.DUPLICATE_LOCAL_ID)
 object InvalidEmailException : Snu4tException(ErrorType.INVALID_EMAIL)
 
 object LectureNotFoundException : Snu4tException(ErrorType.LECTURE_NOT_FOUND)
+object UserNotFoundException : Snu4tException(ErrorType.USER_NOT_FOUND)
 
 class MissingRequiredParameterException(private val fieldName: String) :
     Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
