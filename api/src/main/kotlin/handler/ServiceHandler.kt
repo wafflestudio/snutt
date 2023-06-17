@@ -17,7 +17,7 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
         function: suspend () -> T?,
     ): ServerResponse {
         req.setContext((handlerMiddleware + additionalMiddleware).invoke(req, req.getContext()))
-        return function()?.toResponse() ?: ServerResponse.ok().buildAndAwait() // Unit ? null?
+        return function()?.toResponse() ?: ServerResponse.ok().buildAndAwait()
     }
 
     private suspend fun <T : Any> T.toResponse(): ServerResponse {

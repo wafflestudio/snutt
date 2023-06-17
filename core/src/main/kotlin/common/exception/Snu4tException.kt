@@ -32,6 +32,8 @@ class InvalidBodyFieldValueException(private val fieldName: String) :
 
 object NotSharedTimetableOwnerException : Snu4tException(ErrorType.NOT_SHARED_TIMETABLE_OWNER)
 object SharedTimetableAlreadyExistsException : Snu4tException(ErrorType.SHARED_TIMETABLE_ALREADY_EXISTS)
+object InvalidOsTypeException : Snu4tException(ErrorType.INVALID_OS_TYPE)
+object InvalidAppTypeException : Snu4tException(ErrorType.INVALID_APP_TYPE)
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)

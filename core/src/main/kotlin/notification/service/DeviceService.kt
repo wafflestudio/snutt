@@ -1,5 +1,7 @@
 package com.wafflestudio.snu4t.notification.service
 
+import com.wafflestudio.snu4t.common.cache.CacheKey
+import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.common.client.ClientInfo
 import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.notification.data.UserDevice
@@ -8,14 +10,19 @@ import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class DeviceService(
+    private val pushNotificationService: PushNotificationService,
     private val userDeviceRepository: UserDeviceRepository,
     private val userRepository: UserRepository,
-    private val pushNotificationService: PushNotificationService,
+    private val cacheRepository: CacheRepository,
 ) {
     suspend fun addRegistrationId(userId: String, registrationId: String, clientInfo: ClientInfo) = coroutineScope {
+        val cacheKey = CacheKey.LOCK_ADD_FCM_REGISTRATION_ID.build(userId, registrationId)
+        if (!cacheRepository.acquireLock(cacheKey)) return@coroutineScope
+
         launch {
             pushNotificationService.subscribeGlobalTopic(registrationId)
         }
@@ -30,13 +37,12 @@ class DeviceService(
                     userDeviceRepository.save(this)
                 }
             } ?: run {
-                // deviceId 가 바뀌고 registrationId 가 그대로인 경우, isDeleted = false 인 중복 registrationId 가 존재하게 될 수 있음
                 userDeviceRepository.save(
                     UserDevice(
                         userId = userId,
                         osType = clientInfo.osType,
                         osVersion = clientInfo.osVersion,
-                        deviceId = registrationId,
+                        deviceId = clientInfo.deviceId,
                         deviceModel = clientInfo.deviceModel,
                         appType = clientInfo.appType,
                         appVersion = clientInfo.appVersion,
@@ -45,6 +51,8 @@ class DeviceService(
                 )
             }
         }
+
+        cacheRepository.releaseLock(cacheKey)
     }
 
     private fun UserDevice.updateIfChanged(clientInfo: ClientInfo, registrationId: String): Boolean {
@@ -59,9 +67,13 @@ class DeviceService(
         }
 
         fcmRegistrationId = fcmRegistrationId.updateIfDifferent(registrationId)
+        osType = osType.updateIfDifferent(clientInfo.osType)
         osVersion = osVersion.updateIfDifferent(clientInfo.osVersion)
+        deviceId = deviceId.updateIfDifferent(clientInfo.deviceId)
+        deviceModel = deviceModel.updateIfDifferent(clientInfo.deviceModel)
         appType = appType.updateIfDifferent(clientInfo.appType)
         appVersion = appVersion.updateIfDifferent(clientInfo.appVersion)
+        if (isUpdated) updatedAt = LocalDateTime.now()
         return isUpdated
     }
 

@@ -17,14 +17,14 @@ data class UserDevice(
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String,
     @Field("os_type")
-    val osType: OsType,
+    var osType: OsType,
     @Field("os_version")
     var osVersion: String?,
     @Indexed
     @Field("device_id")
-    val deviceId: String?,
+    var deviceId: String?,
     @Field("device_model")
-    val deviceModel: String?,
+    var deviceModel: String?,
     @Field("app_type")
     var appType: AppType?,
     @Field("app_version")
