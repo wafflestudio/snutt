@@ -8,6 +8,6 @@ enum class OsType {
 
     companion object {
         private val ENUM_MAP: Map<String, OsType> = OsType.values().associateBy { it.toString().lowercase() }
-        fun from(osType: String?): OsType? = osType?.let { return ENUM_MAP[osType.lowercase()] }
+        fun from(osType: String?): OsType? = osType?.let { ENUM_MAP[osType.lowercase()] }
     }
 }
