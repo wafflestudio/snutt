@@ -101,8 +101,6 @@ class UserServiceImpl(
 
     override suspend fun logout(logoutRequest: LogoutRequest) {
         val user = userRepository.findByIdAndActiveTrue(logoutRequest.userId) ?: throw UserNotFoundException
-        userRepository.save(user)
-
         deviceService.removeRegistrationId(user.id!!, logoutRequest.registrationId)
     }
 
