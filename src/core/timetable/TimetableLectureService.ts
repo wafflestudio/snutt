@@ -273,7 +273,7 @@ function syncRealTimeWithPeriod(lecture: any): void  {
 
 function isInvalidClassTime(lecture: Lecture): boolean {
   return lecture.class_time_json.some(
-    it => it.start_time == null && it.start == null || it.end_time == null && it.len == null
+    it => (it.start == null || it.len == null) && (it.startMinute == null || it.endMinute == null) && (it.start_time == null || it.end_time == null)
   );
 }
 

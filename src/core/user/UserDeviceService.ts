@@ -49,5 +49,5 @@ async function refreshFcmKey(user: User, registrationId: string): Promise<void> 
   if (!keyValue) throw "refreshFcmKey failed";
 
   user.fcmKey = keyValue;
-  UserService.modify(user);
+  await UserService.modify(user);
 }
