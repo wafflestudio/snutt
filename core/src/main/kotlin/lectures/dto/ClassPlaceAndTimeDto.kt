@@ -32,4 +32,3 @@ fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTim
     startPeriod = classPlaceAndTime.startPeriod,
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
 )
-

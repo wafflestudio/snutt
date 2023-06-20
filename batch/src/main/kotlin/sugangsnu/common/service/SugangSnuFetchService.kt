@@ -2,8 +2,6 @@ package com.wafflestudio.snu4t.sugangsnu.common.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.lectures.utils.toPeriodText
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.SugangSnuClassTimeUtils
