@@ -1,15 +1,17 @@
 package com.wafflestudio.snu4t.notification.repository
 
 import com.wafflestudio.snu4t.common.desc
-import com.wafflestudio.snu4t.common.gt
+import com.wafflestudio.snu4t.common.isEqualTo
 import com.wafflestudio.snu4t.notification.data.Notification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.and
-import org.springframework.data.mongodb.core.query.inValues
+import org.springframework.data.mongodb.core.query.gt
 import java.time.LocalDateTime
 
 interface NotificationCustomRepository {
@@ -20,7 +22,14 @@ class NotificationRepositoryImpl(private val reactiveMongoTemplate: ReactiveMong
     override fun findNotifications(userId: String, createdAt: LocalDateTime, offset: Long, limit: Int) =
         reactiveMongoTemplate.find<Notification>(
             Query.query(
-                Notification::userId inValues listOf(null, userId) and Notification::createdAt gt createdAt
-            ).with(Notification::createdAt.desc()).skip(offset).limit(limit)
+                Criteria().andOperator(
+                    Notification::createdAt gt createdAt,
+                    Notification::userId isEqualTo userId,
+                )
+            ).apply {
+                with(Notification::createdAt.desc())
+                skip(offset)
+                limit(limit)
+            }
         ).asFlow()
 }
