@@ -50,12 +50,20 @@ data class SearchQueryLegacy(
 ) {
     fun toSearchDto(): SearchDto {
         return SearchDto(
-            year, semester,
+            year = year,
+            semester = semester,
             query = title,
-            classification, credit, courseNumber, academicYear, department, category, etc,
-            times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask), timesToExclude,
-            (offset / 20).toInt(), offset
-        )
+            classification = classification,
+            credit = credit,
+            courseNumber = courseNumber,
+            academicYear = academicYear,
+            department = department,
+            category = category,
+            etcTags = etc,
+            times = times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
+            timesToExclude = timesToExclude,
+            offset = offset,
+            limit = limit)
     }
 
     /*
