@@ -63,7 +63,8 @@ data class SearchQueryLegacy(
             times = times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
             timesToExclude = timesToExclude,
             offset = offset,
-            limit = limit)
+            limit = limit
+        )
     }
 
     /*
