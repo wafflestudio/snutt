@@ -5,12 +5,10 @@ import com.wafflestudio.snu4t.common.isEqualTo
 import com.wafflestudio.snu4t.notification.data.Notification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
-import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.and
 import org.springframework.data.mongodb.core.query.gt
 import java.time.LocalDateTime
 
