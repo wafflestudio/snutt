@@ -5,6 +5,5 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class LogoutRequest(
-    val userId: String,
     val registrationId: String,
 )

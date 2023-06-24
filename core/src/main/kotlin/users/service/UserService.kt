@@ -28,7 +28,7 @@ interface UserService {
 
     suspend fun loginLocal(localRegisterRequest: LocalLoginRequest): LoginResponse
 
-    suspend fun logout(logoutRequest: LogoutRequest)
+    suspend fun logout(userId: String, logoutRequest: LogoutRequest)
 
     suspend fun update(user: User): User
 }
@@ -99,8 +99,8 @@ class UserServiceImpl(
         )
     }
 
-    override suspend fun logout(logoutRequest: LogoutRequest) {
-        val user = userRepository.findByIdAndActiveTrue(logoutRequest.userId) ?: throw UserNotFoundException
+    override suspend fun logout(userId: String, logoutRequest: LogoutRequest) {
+        val user = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
         deviceService.removeRegistrationId(user.id!!, logoutRequest.registrationId)
     }
 

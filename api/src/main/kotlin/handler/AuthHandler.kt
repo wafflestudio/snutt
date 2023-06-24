@@ -28,8 +28,9 @@ class AuthHandler(
     }
 
     suspend fun logout(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.userId
         val logoutRequest: LogoutRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.logout(logoutRequest)
+        userService.logout(userId, logoutRequest)
 
         OkResponse()
     }
