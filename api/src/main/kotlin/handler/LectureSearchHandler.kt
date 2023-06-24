@@ -44,8 +44,8 @@ data class SearchQueryLegacy(
     val times: List<SearchTimeDto>? = null,
     val timesToExclude: List<SearchTimeDto>? = null,
     val etc: List<String>? = null,
-    val page: Long = 0,
-    val offset: Long = page * 20,
+    val page: Int = 0,
+    val offset: Long = page * 20L,
     val limit: Int = 20,
 ) {
     fun toSearchDto(): SearchDto {
