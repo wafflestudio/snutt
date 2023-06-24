@@ -62,6 +62,7 @@ data class SearchQueryLegacy(
             etcTags = etc,
             times = times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
             timesToExclude = timesToExclude,
+            page = page,
             offset = offset,
             limit = limit
         )
