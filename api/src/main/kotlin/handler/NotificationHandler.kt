@@ -14,7 +14,7 @@ class NotificationHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
 ) {
     suspend fun getNotifications(req: ServerRequest) = handle(req) {
-        val offset = req.parseQueryParam<Int>("offset") ?: 0
+        val offset = req.parseQueryParam<Long>("offset") ?: 0
         val limit = req.parseQueryParam<Int>("limit") ?: 20
         val explicit = (req.parseQueryParam<Int>("explicit") ?: 0) > 0
         notificationService.getNotifications(NotificationQuery(offset, limit, explicit, req.getContext().user!!))

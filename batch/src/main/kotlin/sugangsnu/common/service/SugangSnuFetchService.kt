@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.sugangsnu.common.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.SugangSnuClassTimeUtils
@@ -81,9 +80,7 @@ class SugangSnuFetchServiceImpl(
         val remark = row.getCellByColumnName("비고")
         val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
-        val periodText = SugangSnuClassTimeUtils.convertClassTimeTextToPeriodText(classTimeText)
         val classTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
-        val classTimeMask = ClassTimeUtils.classTimeToBitmask(classTimes)
 
         val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
 
@@ -103,10 +100,7 @@ class SugangSnuFetchServiceImpl(
             year = year,
             semester = semester,
             category = category.koreanName,
-            classTimeText = classTimeText,
-            periodText = periodText,
             classPlaceAndTimes = classTimes,
-            classTimeMask = classTimeMask,
             registrationCount = registrationCount
         )
     }

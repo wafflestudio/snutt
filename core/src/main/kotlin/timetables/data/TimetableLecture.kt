@@ -18,17 +18,9 @@ data class TimetableLecture(
     @JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
-    @Field("class_time")
-    @JsonProperty("class_time")
-    var periodText: String?,
-    @Field("real_class_time")
-    @JsonProperty("real_class_time")
-    var classTimeText: String?,
     @Field("class_time_json")
     @JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTime>,
-    @Field("class_time_mask")
-    var classTimeMask: List<Int>,
     var classification: String?,
     var credit: Long?,
     var department: String?,

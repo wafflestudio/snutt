@@ -42,6 +42,7 @@ data class SearchQueryLegacy(
     @JsonProperty("time_mask")
     val timeMask: List<Int>? = null,
     val times: List<SearchTimeDto>? = null,
+    val timesToExclude: List<SearchTimeDto>? = null,
     val etc: List<String>? = null,
     val page: Long = 0,
     val offset: Long = page * 20,
@@ -49,11 +50,21 @@ data class SearchQueryLegacy(
 ) {
     fun toSearchDto(): SearchDto {
         return SearchDto(
-            year, semester,
+            year = year,
+            semester = semester,
             query = title,
-            classification, credit, courseNumber, academicYear, department, category, etc,
-            times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
-            (offset / 20).toInt(), offset
+            classification = classification,
+            credit = credit,
+            courseNumber = courseNumber,
+            academicYear = academicYear,
+            department = department,
+            category = category,
+            etcTags = etc,
+            times = times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
+            timesToExclude = timesToExclude,
+            page = page,
+            offset = offset,
+            limit = limit
         )
     }
 
