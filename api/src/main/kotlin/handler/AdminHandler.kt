@@ -13,7 +13,6 @@ class AdminHandler(
     private val notificationAdminService: NotificationAdminService,
     snuttRestAdminApiMiddleware: SnuttRestAdminApiMiddleware,
 ) : ServiceHandler(snuttRestAdminApiMiddleware) {
-
     suspend fun insertNotification(req: ServerRequest) = handle(req) {
         val body = req.awaitBody<InsertNotificationRequest>()
         notificationAdminService.insertNotification(body)

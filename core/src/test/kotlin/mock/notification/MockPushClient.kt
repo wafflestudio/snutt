@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.mock.notification
 
-import com.wafflestudio.snu4t.common.push.PushNotificationService
+import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("test")
-class MockPushNotificationService : PushNotificationService {
+internal class MockPushClient : PushClient {
     override suspend fun sendMessage(pushMessage: PushTargetMessage) {
     }
 

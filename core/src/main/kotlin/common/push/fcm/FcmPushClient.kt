@@ -4,13 +4,13 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
-import com.wafflestudio.snu4t.common.push.PushNotificationService
+import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
@@ -18,10 +18,10 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("!test")
-class FcmPushNotificationService(
+internal class FcmPushClient(
     @Value("\${google.firebase.project-id}") private val projectId: String,
     @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
-) : PushNotificationService {
+) : PushClient {
     private val log = LoggerFactory.getLogger(javaClass)
 
     init {
@@ -34,6 +34,7 @@ class FcmPushNotificationService(
     }
 
     companion object {
+        private const val FCM_MESSAGE_COUNT_LIMIT = 500
         private const val GLOBAL_TOPIC = "global"
     }
 
@@ -43,11 +44,10 @@ class FcmPushNotificationService(
         log.info("Message Request Sent : $message, response : $response")
     }
 
-    // FCM api가 한번에 500개까지 받을 수 있으므로 500개씩 chunk
-    override suspend fun sendMessages(pushMessages: List<PushTargetMessage>): Unit = coroutineScope {
+    override suspend fun sendMessages(pushMessages: List<PushTargetMessage>): Unit = supervisorScope {
         val messagingInstance = FirebaseMessaging.getInstance()
         val responses = pushMessages
-            .chunked(500)
+            .chunked(FCM_MESSAGE_COUNT_LIMIT)
             .map { chunk ->
                 val messages = chunk.map { it.toFcmMessage() }
                 async { messagingInstance.sendAllAsync(messages).await() }

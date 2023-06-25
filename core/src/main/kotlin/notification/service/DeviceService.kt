@@ -3,7 +3,7 @@ package com.wafflestudio.snu4t.notification.service
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.common.client.ClientInfo
-import com.wafflestudio.snu4t.common.push.PushNotificationService
+import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.notification.data.UserDevice
 import com.wafflestudio.snu4t.notification.repository.UserDeviceRepository
 import com.wafflestudio.snu4t.users.repository.UserRepository
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class DeviceService(
-    private val pushNotificationService: PushNotificationService,
+class DeviceService internal constructor(
+    private val pushClient: PushClient,
     private val userDeviceRepository: UserDeviceRepository,
     private val userRepository: UserRepository,
     private val cacheRepository: CacheRepository,
@@ -25,7 +25,7 @@ class DeviceService(
 
         coroutineScope {
             launch {
-                pushNotificationService.subscribeGlobalTopic(registrationId)
+                pushClient.subscribeGlobalTopic(registrationId)
             }
 
             launch {
@@ -81,7 +81,7 @@ class DeviceService(
 
     suspend fun removeRegistrationId(userId: String, registrationId: String) = coroutineScope {
         launch {
-            pushNotificationService.unsubscribeGlobalTopic(registrationId)
+            pushClient.unsubscribeGlobalTopic(registrationId)
         }
 
         launch {

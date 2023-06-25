@@ -1,27 +1,23 @@
 package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.repository.NotificationRepository
-import com.wafflestudio.snu4t.notification.service.DeviceService
+import com.wafflestudio.snu4t.notification.service.NotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
-import com.wafflestudio.snu4t.users.repository.UserRepository
 import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
@@ -34,16 +30,13 @@ interface VacancyNotifierService {
 @Service
 class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
-    private val pushNotificationService: PushNotificationService,
-    private val deviceService: DeviceService,
+    private val notificationService: NotificationService,
     private val vacancyNotificationRepository: VacancyNotificationRepository,
-    private val userRepository: UserRepository,
-    private val notificationRepository: NotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
 ) : VacancyNotifierService {
     companion object {
-        const val COUNT_PER_PAGE = 10
-        const val DELAY_PER_CHUNK = 300L
+        private const val COUNT_PER_PAGE = 10
+        private const val DELAY_PER_CHUNK = 300L
     }
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -92,29 +85,14 @@ class VacancyNotifierServiceImpl(
             logger.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
         }
 
-        coroutineScope {
-            notiTargetLectures.map { lecture ->
-                async {
-                    val users = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }
-                        .let { userRepository.findAllByIdIsIn(it) }.toList()
-                    notificationRepository.saveAll(
-                        users.map {
-                            Notification(
-                                userId = it.id!!,
-                                message = lecture.courseTitle,
-                                type = NotificationType.NORMAL
-                            )
-                        }
-                    ).collect()
-
-                    val pushMessages = deviceService.getUsersDevices(users.map { it.id!! }).values.flatMap { userDevices ->
-                        userDevices.map {
-                            PushTargetMessage(it.fcmRegistrationId, PushMessage(lecture.courseTitle, "자리났다"))
-                        }
-                    }
-                    pushNotificationService.sendMessages(pushMessages)
+        supervisorScope {
+            notiTargetLectures.forEach { lecture ->
+                launch {
+                    val userIds = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
+                    val pushMessage = PushMessage(lecture.courseTitle, "자리났다", NotificationType.NORMAL)
+                    notificationService.sendPushes(userIds, pushMessage)
                 }
-            }.awaitAll()
+            }
         }
 
         return VacancyNotificationJobResult.SUCCESS
