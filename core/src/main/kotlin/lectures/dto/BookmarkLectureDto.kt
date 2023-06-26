@@ -23,6 +23,10 @@ data class BookmarkLectureDto(
     var remark: String?,
     var courseNumber: String,
     var courseTitle: String,
+
+    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
+    @JsonProperty("class_time_mask")
+    val classTimeMask: List<Int> = emptyList(),
 )
 
 fun BookmarkLectureDto(lecture: BookmarkLecture): BookmarkLectureDto = BookmarkLectureDto(
