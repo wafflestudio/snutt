@@ -29,6 +29,7 @@ data class PushMessage(
     val type: NotificationType,
     val data: Data = Data(emptyMap()),
     val detailMessage: String? = null,
+    val notify: Boolean = true,
 ) {
     data class Data(val payload: Map<String, String>)
 
@@ -36,7 +37,6 @@ data class PushMessage(
         return Notification(
             userId = userId,
             title = title,
-            body = body,
             message = detailMessage ?: body,
             type = type,
         )
@@ -49,7 +49,8 @@ fun PushMessage(
     type: NotificationType,
     data: Map<String, String>,
     detailMessage: String? = null,
-) = PushMessage(title, body, type, PushMessage.Data(data), detailMessage)
+    notify: Boolean = true,
+) = PushMessage(title, body, type, PushMessage.Data(data), detailMessage, notify)
 
 /**
  * Keys used in Push Message Data
@@ -64,7 +65,8 @@ fun PushMessage(
     type: NotificationType,
     urlScheme: UrlScheme.Compiled,
     detailMessage: String? = null,
+    notify: Boolean = true,
 ): PushMessage {
     val data = mapOf(Keys.URL_SCHEME to urlScheme.value)
-    return PushMessage(title, body, type, PushMessage.Data(data), detailMessage)
+    return PushMessage(title, body, type, PushMessage.Data(data), detailMessage, notify)
 }

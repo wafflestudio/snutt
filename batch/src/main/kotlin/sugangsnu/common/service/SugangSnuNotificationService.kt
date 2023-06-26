@@ -8,9 +8,11 @@ import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.NotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOverlapResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
+import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
 import kotlinx.coroutines.launch
@@ -68,13 +70,24 @@ class SugangSnuNotificationServiceImpl(
             val userId = syncResult.userId
             val (detailMessage, notificationType) = syncResult.toDetailMessageAndNotificationType()
 
-            userId to PushMessage(
-                title = "수강편람 업데이트",
-                body = userIdToMessageBody[userId]!!,
-                type = notificationType,
-                urlScheme = notificationScheme,
-                detailMessage = detailMessage,
-            )
+            userId to when (syncResult) {
+                is TimetableLectureSyncResult -> PushMessage(
+                    title = "수강편람 업데이트",
+                    body = userIdToMessageBody[userId]!!,
+                    type = notificationType,
+                    urlScheme = notificationScheme,
+                    detailMessage = detailMessage,
+                    notify = true,
+                )
+                is BookmarkLectureSyncResult -> PushMessage(
+                    title = "수강편람 업데이트",
+                    body = detailMessage,
+                    type = notificationType,
+                    urlScheme = notificationScheme,
+                    detailMessage = detailMessage,
+                    notify = false,
+                )
+            }
         }
     }
 

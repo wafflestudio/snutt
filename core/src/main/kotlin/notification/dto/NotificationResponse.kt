@@ -11,7 +11,6 @@ data class NotificationResponse(
     @JsonProperty("user_id")
     val userId: String?,
     val title: String,
-    val body: String,
     val message: String,
     val type: NotificationType,
     @JsonProperty("created_at")
@@ -22,7 +21,6 @@ data class NotificationResponse(
             id = notification.id,
             userId = notification.userId,
             title = notification.title,
-            body = notification.body,
             message = notification.message,
             type = notification.type,
             createdAt = notification.createdAt,

@@ -46,6 +46,7 @@ class NotificationService internal constructor(
     suspend fun sendPush(userId: String, pushMessage: PushMessage) = coroutineScope {
         launch { saveNotification(userId, pushMessage) }
 
+        if (!pushMessage.notify) return@coroutineScope
         launch {
             val userDevices = deviceService.getUserDevices(userId).ifEmpty { return@launch }
 
@@ -57,6 +58,7 @@ class NotificationService internal constructor(
     suspend fun sendPushes(userIds: List<String>, pushMessage: PushMessage) = coroutineScope {
         launch { saveNotifications(userIds, pushMessage) }
 
+        if (!pushMessage.notify) return@coroutineScope
         launch {
             val userIdToDevices = deviceService.getUsersDevices(userIds).ifEmpty { return@launch }
 
@@ -71,6 +73,7 @@ class NotificationService internal constructor(
     suspend fun sendGlobalPush(pushMessage: PushMessage) = coroutineScope {
         launch { saveNotification(userId = null, pushMessage) }
 
+        if (!pushMessage.notify) return@coroutineScope
         launch { pushClient.sendGlobalMessage(pushMessage) }
     }
 

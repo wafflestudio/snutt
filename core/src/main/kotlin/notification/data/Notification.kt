@@ -18,7 +18,6 @@ data class Notification(
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String?,
     val title: String,
-    val body: String,
     val message: String,
     val type: NotificationType,
     @Indexed(direction = IndexDirection.DESCENDING)

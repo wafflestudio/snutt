@@ -21,6 +21,7 @@ class NotificationAdminService(
             request.body,
             request.type,
             request.dataPayload,
+            notify = request.insertFcm,
         )
 
         user?.let {
