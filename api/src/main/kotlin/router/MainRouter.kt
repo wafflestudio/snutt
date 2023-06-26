@@ -9,11 +9,12 @@ import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
-import com.wafflestudio.snu4t.router.docs.AdminApi
+import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.DeviceDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
-import com.wafflestudio.snu4t.router.docs.NotificationApi
+import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
@@ -52,6 +53,7 @@ class MainRouter(
     }
 
     @Bean
+    @DeviceDocs
     fun deviceRoute() = v1CoRouter {
         "/device".nest {
             POST("/{id}", deviceHandler::addRegistrationId)
@@ -97,7 +99,7 @@ class MainRouter(
         }
     }
 
-    @NotificationApi
+    @NotificationDocs
     fun notificationRoute() = v1CoRouter {
         "/notification".nest {
             GET("", notificationHandler::getNotifications)
@@ -105,7 +107,7 @@ class MainRouter(
         }
     }
 
-    @AdminApi
+    @AdminDocs
     fun adminRoute() = v1CoRouter {
         "/admin".nest {
             POST("/insert_noti", adminHandler::insertNotification)
