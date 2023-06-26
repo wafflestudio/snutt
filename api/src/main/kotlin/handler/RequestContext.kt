@@ -22,3 +22,6 @@ fun ServerRequest.setContext(value: RequestContext) {
 
 val ServerRequest.userId: String
     get() = this.getContext().user?.id ?: throw WrongUserTokenException
+
+val ServerRequest.clientInfo: ClientInfo?
+    get() = this.getContext().clientInfo

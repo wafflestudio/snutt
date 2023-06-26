@@ -11,7 +11,8 @@ enum class CacheKey(
     private val keyFormat: String,
     private val ttl: Duration,
 ) {
-    LOCK_REGISTER_LOCAL("lock:register_local:%s", Duration.ofMinutes(1)),
+    LOCK_REGISTER_LOCAL("lock:register_local:%s", Duration.ofMinutes(1)), // localId
+    LOCK_ADD_FCM_REGISTRATION_ID("lock:add_registration_id:%s_%s", Duration.ofMinutes(1)), // userId, registrationId
     ;
 
     fun build(vararg args: Any?): BuiltCacheKey {
