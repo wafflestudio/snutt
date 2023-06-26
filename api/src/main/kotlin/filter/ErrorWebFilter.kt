@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono
 class ErrorWebFilter(
     private val objectMapper: ObjectMapper,
 ) : WebFilter {
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         return chain.filter(exchange)
@@ -37,7 +37,7 @@ class ErrorWebFilter(
                         )
                     }
                     else -> {
-                        logger.error(throwable.message, throwable)
+                        log.error(throwable.message, throwable)
                         httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
                         errorBody = makeErrorBody(Snu4tException())
                     }

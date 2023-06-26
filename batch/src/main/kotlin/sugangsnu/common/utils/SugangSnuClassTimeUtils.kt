@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 
 object SugangSnuClassTimeUtils {
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     private val classTimeRegEx =
         """^(?<day>[월화수목금토일])\((?<startHour>\d{2}):(?<startMinute>\d{2})~(?<endHour>\d{2}):(?<endMinute>\d{2})\)$""".toRegex()
     private val periodFormat = DecimalFormat("#.#")
@@ -35,7 +35,7 @@ object SugangSnuClassTimeUtils {
             }
             .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
     }.getOrElse {
-        logger.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesText, locationsText)
+        log.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesText, locationsText)
         emptyList()
     }
 

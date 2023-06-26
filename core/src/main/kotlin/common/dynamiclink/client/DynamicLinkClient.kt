@@ -27,8 +27,7 @@ class FirebaseDynamicLinkClient(
     @Value("\${google.firebase.dynamic-link.ios.bundle-id}") val iosBundleId: String,
     @Value("\${google.firebase.dynamic-link.ios.app-store-id:#{null}}") val iosAppStoreId: String?,
 ) : DynamicLinkClient {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
         const val SHORT_LINK_PATH = "shortLinks"
@@ -47,7 +46,7 @@ class FirebaseDynamicLinkClient(
             .retrieve()
             .awaitBody<DynamicLinkResponse>()
     }.getOrElse {
-        logger.error("링크 생성 실패 (payload: {}, error: {}", dynamicLinkRequest, it.message)
+        log.error("링크 생성 실패 (payload: {}, error: {}", dynamicLinkRequest, it.message)
         throw DynamicLinkGenerationFailedException
     }
 

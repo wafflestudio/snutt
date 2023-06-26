@@ -39,15 +39,15 @@ class VacancyNotifierServiceImpl(
         private const val DELAY_PER_CHUNK = 300L
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
 
     override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
-        logger.info("시작")
+        log.info("시작")
         val registrationStatus = runCatching {
             getRegistrationStatus()
         }.getOrElse {
-            logger.error("부하기간")
+            log.error("부하기간")
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
         if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
@@ -82,7 +82,7 @@ class VacancyNotifierServiceImpl(
         lectureService.upsertLectures(updated)
 
         notiTargetLectures.forEach {
-            logger.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
+            log.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
         }
 
         supervisorScope {
