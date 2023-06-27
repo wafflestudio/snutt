@@ -1,89 +1,28 @@
 package com.wafflestudio.snu4t.notification.service
 
-import com.wafflestudio.snu4t.common.push.PushClient
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.dto.NotificationQuery
-import com.wafflestudio.snu4t.notification.repository.NotificationRepository
-import com.wafflestudio.snu4t.notification.repository.countUnreadNotifications
 import com.wafflestudio.snu4t.users.data.User
-import com.wafflestudio.snu4t.users.service.UserService
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
-@Service
-class NotificationService internal constructor(
-    private val userService: UserService,
-    private val deviceService: DeviceService,
-    private val pushClient: PushClient,
-    private val notificationRepository: NotificationRepository,
-) {
-    suspend fun getNotifications(query: NotificationQuery): List<Notification> {
-        val user = query.user
-        val notifications = notificationRepository.findNotifications(
-            userId = user.id!!,
-            createdAt = user.regDate,
-            offset = query.offset,
-            limit = query.limit,
-        ).toList()
+/**
+ * 알림함의 알림을 관리하는 서비스입니다.
+ */
+interface NotificationService {
+    suspend fun getNotifications(query: NotificationQuery): List<Notification>
 
-        if (query.explicit) {
-            userService.update(user.apply { notificationCheckedAt = LocalDateTime.now() })
-        }
+    suspend fun getUnreadCount(user: User): Long
 
-        return notifications
-    }
+    /**
+     * 푸시를 보내지 않고 알림함에 보일 [Notification] 만 저장하므로 사용 시 주의가 필요합니다.
+     *
+     * @see [PushNotificationService.sendPushAndNotification]
+     */
+    suspend fun sendNotification(notification: Notification)
 
-    suspend fun getUnreadCount(user: User): Long {
-        return notificationRepository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
-    }
-
-    suspend fun sendPush(userId: String, pushMessage: PushMessage) = coroutineScope {
-        launch { saveNotification(userId, pushMessage) }
-
-        if (!pushMessage.notify) return@coroutineScope
-        launch {
-            val userDevices = deviceService.getUserDevices(userId).ifEmpty { return@launch }
-
-            val pushTargetMessages = userDevices.map { PushTargetMessage(it.fcmRegistrationId, pushMessage) }
-            pushClient.sendMessages(pushTargetMessages)
-        }
-    }
-
-    suspend fun sendPushes(userIds: List<String>, pushMessage: PushMessage) = coroutineScope {
-        launch { saveNotifications(userIds, pushMessage) }
-
-        if (!pushMessage.notify) return@coroutineScope
-        launch {
-            val userIdToDevices = deviceService.getUsersDevices(userIds).ifEmpty { return@launch }
-
-            val pushTargetMessages = userIdToDevices.values.flatMap { userDevices ->
-                userDevices.map { PushTargetMessage(it.fcmRegistrationId, pushMessage) }
-            }
-
-            pushClient.sendMessages(pushTargetMessages)
-        }
-    }
-
-    suspend fun sendGlobalPush(pushMessage: PushMessage) = coroutineScope {
-        launch { saveNotification(userId = null, pushMessage) }
-
-        if (!pushMessage.notify) return@coroutineScope
-        launch { pushClient.sendGlobalMessage(pushMessage) }
-    }
-
-    private suspend fun saveNotification(userId: String?, pushMessage: PushMessage) {
-        val notification = pushMessage.toNotification(userId)
-        notificationRepository.save(notification)
-    }
-
-    private suspend fun saveNotifications(userIds: List<String>, pushMessage: PushMessage) {
-        val notifications = userIds.map { pushMessage.toNotification(it) }
-        notificationRepository.saveAll(notifications).collect()
-    }
+    /**
+     * 푸시를 보내지 않고 알림함에 보일 [Notification] 만 저장하므로 사용 시 주의가 필요합니다.
+     *
+     * @see [PushNotificationService.sendPushesAndNotifications]
+     */
+    suspend fun sendNotifications(notifications: List<Notification>)
 }

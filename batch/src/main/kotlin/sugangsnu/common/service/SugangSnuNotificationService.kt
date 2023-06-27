@@ -4,11 +4,11 @@ import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
+import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.service.NotificationService
+import com.wafflestudio.snu4t.notification.service.PushNotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
-import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteByOverlapResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResult
@@ -20,22 +20,27 @@ import kotlinx.coroutines.supervisorScope
 import org.springframework.stereotype.Service
 
 interface SugangSnuNotificationService {
-    suspend fun notifyUserLectureChanges(syncSavedLecturesResults: List<UserLectureSyncResult>)
+    suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>)
     suspend fun notifyCoursebookUpdate(coursebook: Coursebook)
 }
 
 @Service
 class SugangSnuNotificationServiceImpl(
-    private val notificationService: NotificationService,
+    private val pushNotificationService: PushNotificationService,
     private val phase: Phase,
 ) : SugangSnuNotificationService {
-    override suspend fun notifyUserLectureChanges(syncSavedLecturesResults: List<UserLectureSyncResult>) = supervisorScope {
-        getPushMessagesForUsers(syncSavedLecturesResults).forEach { (userId, pushMessage) ->
-            launch { notificationService.sendPush(userId, pushMessage) }
+    override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = supervisorScope {
+        launch {
+            sendPushForTimetable(userLectureSyncResults.filterIsInstance<TimetableLectureSyncResult>())
+        }
+
+        launch {
+            val notifications = userLectureSyncResults.map { it.toNotification() }
+            pushNotificationService.sendNotifications(notifications)
         }
     }
 
-    private suspend fun getPushMessagesForUsers(userLectureSyncResults: List<UserLectureSyncResult>): Map<String, PushMessage> {
+    private suspend fun sendPushForTimetable(userLectureSyncResults: List<TimetableLectureSyncResult>) = supervisorScope {
         val notificationScheme = UrlScheme.NOTIFICATIONS.compileWith(phase)
 
         val userUpdatedLectureCountMap =
@@ -66,47 +71,33 @@ class SugangSnuNotificationServiceImpl(
             }
         }
 
-        return userLectureSyncResults.associate { syncResult ->
-            val userId = syncResult.userId
-            val (detailMessage, notificationType) = syncResult.toDetailMessageAndNotificationType()
+        userIdToMessageBody.forEach { (userId, messageBody) ->
+            val pushMessage = PushMessage(
+                title = "수강편람 업데이트",
+                body = messageBody,
+                urlScheme = notificationScheme,
+            )
 
-            userId to when (syncResult) {
-                is TimetableLectureSyncResult -> PushMessage(
-                    title = "수강편람 업데이트",
-                    body = userIdToMessageBody[userId]!!,
-                    type = notificationType,
-                    urlScheme = notificationScheme,
-                    detailMessage = detailMessage,
-                    notify = true,
-                )
-                is BookmarkLectureSyncResult -> PushMessage(
-                    title = "수강편람 업데이트",
-                    body = detailMessage,
-                    type = notificationType,
-                    urlScheme = notificationScheme,
-                    detailMessage = detailMessage,
-                    notify = false,
-                )
+            launch {
+                pushNotificationService.sendPush(pushMessage, userId)
             }
         }
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
         val messageBody = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
-        notificationService.sendGlobalPush(
-            PushMessage(
-                title = "신규 수강편람",
-                body = messageBody,
-                type = NotificationType.COURSEBOOK,
-            )
+
+        pushNotificationService.sendGlobalPushAndNotification(
+            PushMessage(title = "신규 수강편람", body = messageBody),
+            NotificationType.COURSEBOOK,
         )
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =
         this.map { result -> result.userId to result.lectureId }.distinct().groupingBy { it.first }.eachCount()
 
-    private fun UserLectureSyncResult.toDetailMessageAndNotificationType(): Pair<String, NotificationType> {
-        return when (this) {
+    private fun UserLectureSyncResult.toNotification(): Notification {
+        val (message, notificationType) = when (this) {
             // 업데이트 알림
             is TimetableLectureUpdateResult -> {
                 """
@@ -141,5 +132,7 @@ class SugangSnuNotificationServiceImpl(
                 """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
             }
         }
+
+        return Notification(userId = userId, title = "수강편람 업데이트", message = message, type = notificationType)
     }
 }
