@@ -18,7 +18,7 @@ interface SugangSnuFetchService {
 class SugangSnuFetchServiceImpl(
     private val sugangSnuRepository: SugangSnuRepository,
 ) : SugangSnuFetchService {
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
     override suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture> =
@@ -56,7 +56,7 @@ class SugangSnuFetchServiceImpl(
             this[
                 columnNameIndex.getOrElse(key) {
                     // TODO: slack 메시지로 보내기
-                    logger.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
+                    log.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
                     this.size
                 }
             ].stringCellValue
