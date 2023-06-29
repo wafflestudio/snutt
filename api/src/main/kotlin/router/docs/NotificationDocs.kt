@@ -36,4 +36,4 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     )
 )
-annotation class NotificationApi
+annotation class NotificationDocs

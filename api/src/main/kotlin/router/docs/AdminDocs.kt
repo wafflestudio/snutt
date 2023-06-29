@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMethod
                 content = [Content(schema = Schema(implementation = InsertNotificationRequest::class))],
                 required = true,
             ),
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = Unit::class)))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = OkResponse::class)))])]
         ),
     ),
 )
-annotation class AdminApi
+annotation class AdminDocs
