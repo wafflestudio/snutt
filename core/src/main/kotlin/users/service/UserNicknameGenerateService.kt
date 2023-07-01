@@ -9,7 +9,6 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
 import javax.annotation.PostConstruct
 
 @Component
@@ -25,11 +24,11 @@ class UserNicknameGenerateService(
 
     @PostConstruct
     fun init() = runBlocking {
-        adjectives.addAll(readAndSplitByComma("adjectives.txt").block().orEmpty())
-        nouns.addAll(readAndSplitByComma("nouns.txt").block().orEmpty())
+        adjectives.addAll(readAndSplitByComma("adjectives.txt"))
+        nouns.addAll(readAndSplitByComma("nouns.txt"))
     }
 
-    private fun readAndSplitByComma(filename: String): Mono<List<String>> {
+    private fun readAndSplitByComma(filename: String): List<String> {
         val classPathResource = ClassPathResource(filename)
         val dataBufferFlux = DataBufferUtils.read(classPathResource, DefaultDataBufferFactory(), 4096)
         return DataBufferUtils.join(dataBufferFlux)
@@ -37,8 +36,10 @@ class UserNicknameGenerateService(
                 buffer.asInputStream()
                     .readBytes()
                     .decodeToString()
-                    .split(",")
+                    .split("\n")
             }
+            .block()
+            .orEmpty()
     }
 
     suspend fun generate(userInput: String? = null): String {
@@ -57,13 +58,10 @@ class UserNicknameGenerateService(
         return "$adj $noun"
     }
 
-    private fun createTag(existingTags: Set<Int>): String {
-        var ret = (0..9999).random()
-
-        while (ret in existingTags) {
-            ret = (0..9999).random()
-        }
-
-        return ret.toString().padStart(4, '0')
-    }
+    private fun createTag(existingTags: Set<Int>): String =
+        generateSequence { (0..9999).random() }
+            .filter { it !in existingTags }
+            .first()
+            .toString()
+            .padStart(4, '0')
 }
