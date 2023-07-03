@@ -1,4 +1,5 @@
 import mongoose = require('mongoose');
+import TimePlaceUtil = require('@app/core/timetable/util/TimePlaceUtil');
 import Timetable from './model/Timetable';
 import UserLecture from './/model/UserLecture';
 import AbstractTimetable from './model/AbstractTimetable';
@@ -311,7 +312,7 @@ function lectureFromMongoose(mongooseDoc): UserLecture {
     class_time: mongooseDoc.class_time,
     real_class_time: mongooseDoc.real_class_time,
     class_time_json: classTime,
-    class_time_mask: mongooseDoc.class_time_mask,
+    class_time_mask: TimePlaceUtil.timeJsonToMask(classTime),
     instructor: mongooseDoc.instructor,                               // 강사
     quota: mongooseDoc.quota,                                    // 정원
     freshmanQuota: mongooseDoc.freshmanQuota,                    // 신입생정원
