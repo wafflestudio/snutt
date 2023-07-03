@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeDto
+import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.timetables.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 
@@ -52,4 +53,5 @@ fun TimetableLectureDto(timetableLecture: TimetableLecture) = TimetableLectureDt
     color = timetableLecture.color,
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,
+    classTimeMask = ClassTimeUtils.classTimeToBitmask(timetableLecture.classPlaceAndTimes),
 )
