@@ -5,7 +5,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 object ClassTimeUtils {
-    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
+    // FIXME: 안드로이드 구버전 대응용 1년 후 2024년에 삭제 (2023/06/26)
     fun classTimeToBitmask(classPlaceAndTimes: List<ClassPlaceAndTime>): List<Int> {
         val bitTable = Array(7) { Array(30) { 0 } }
 
