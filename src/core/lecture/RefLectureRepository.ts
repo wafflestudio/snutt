@@ -4,6 +4,7 @@
  * UserLecture는 유저 시간표 상의 강의
  */
 import mongoose = require('mongoose');
+import TimePlaceUtil = require('@app/core/timetable/util/TimePlaceUtil');
 
 import RefLecture from './model/RefLecture';
 import RefLectrureNotFoundError from './error/RefLectureNotFoundError';
@@ -187,7 +188,7 @@ function fromMongoose(mongooseDoc): RefLecture {
     class_time: mongooseDoc.class_time,
     real_class_time: mongooseDoc.real_class_time,
     class_time_json: classTime,
-    class_time_mask: mongooseDoc.class_time_mask,
+    class_time_mask: TimePlaceUtil.timeJsonToMask(classTime),
     instructor: mongooseDoc.instructor,                               // 강사
     quota: mongooseDoc.quota,                                    // 정원
     freshmanQuota: mongooseDoc.freshmanQuota,                    // 신입생정원
