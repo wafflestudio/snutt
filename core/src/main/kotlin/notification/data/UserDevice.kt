@@ -9,34 +9,34 @@ import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.LocalDateTime
 
-@Document("user_devices")
+@Document
 data class UserDevice(
     @Id
     val id: String? = null,
     @Indexed
-    @Field("user_id", targetType = FieldType.OBJECT_ID)
+    @Field(targetType = FieldType.OBJECT_ID)
     val userId: String,
-    @Field("os_type")
+    @Field
     var osType: OsType,
-    @Field("os_version")
+    @Field
     var osVersion: String?,
     @Indexed
-    @Field("device_id")
+    @Field
     var deviceId: String?,
-    @Field("device_model")
+    @Field
     var deviceModel: String?,
-    @Field("app_type")
+    @Field
     var appType: AppType?,
-    @Field("app_version")
+    @Field
     var appVersion: String?,
     @Indexed
-    @Field("fcm_registration_id")
+    @Field
     var fcmRegistrationId: String,
-    @Field("created_at")
+    @Field
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    @Field("updated_at")
+    @Field
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-    @Field("is_deleted")
+    @Field
     var isDeleted: Boolean = false,
 ) {
     companion object {

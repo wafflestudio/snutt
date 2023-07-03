@@ -21,24 +21,21 @@ data class TopicMessage(
 )
 
 /**
- * Message To Send
+ * 푸시 메시지로 전송할 데이터
  */
 data class PushMessage(
     val title: String,
     val body: String,
-    val type: NotificationType,
     val data: Data = Data(emptyMap()),
-    val detailMessage: String? = null,
 ) {
     data class Data(val payload: Map<String, String>)
 
-    fun toNotification(userId: String?): Notification {
+    fun toNotification(notificationType: NotificationType, userId: String?): Notification {
         return Notification(
             userId = userId,
             title = title,
-            body = body,
-            message = detailMessage ?: body,
-            type = type,
+            message = body,
+            type = notificationType,
         )
     }
 }
@@ -46,10 +43,8 @@ data class PushMessage(
 fun PushMessage(
     title: String,
     body: String,
-    type: NotificationType,
     data: Map<String, String>,
-    detailMessage: String? = null,
-) = PushMessage(title, body, type, PushMessage.Data(data), detailMessage)
+) = PushMessage(title, body, PushMessage.Data(data))
 
 /**
  * Keys used in Push Message Data
@@ -61,10 +56,8 @@ private object Keys {
 fun PushMessage(
     title: String,
     body: String,
-    type: NotificationType,
     urlScheme: UrlScheme.Compiled,
-    detailMessage: String? = null,
 ): PushMessage {
     val data = mapOf(Keys.URL_SCHEME to urlScheme.value)
-    return PushMessage(title, body, type, PushMessage.Data(data), detailMessage)
+    return PushMessage(title, body, PushMessage.Data(data))
 }

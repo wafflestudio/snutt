@@ -14,11 +14,13 @@ import java.time.LocalDateTime
 data class Notification(
     @Id
     val id: String? = null,
+    /**
+     * null 이면 모든 유저에게 보임
+     */
     @Indexed
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String?,
     val title: String,
-    val body: String,
     val message: String,
     val type: NotificationType,
     @Indexed(direction = IndexDirection.DESCENDING)

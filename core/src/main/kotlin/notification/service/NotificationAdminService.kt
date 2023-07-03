@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class NotificationAdminService(
-    private val notificationService: NotificationService,
+    private val pushNotificationService: PushNotificationService,
     private val userRepository: UserRepository,
 ) {
     suspend fun insertNotification(request: InsertNotificationRequest) {
@@ -19,14 +19,18 @@ class NotificationAdminService(
         val pushMessage = PushMessage(
             request.title,
             request.body,
-            request.type,
             request.dataPayload,
         )
+        val notificationType = request.type
 
-        user?.let {
-            notificationService.sendPush(it.id!!, pushMessage)
-        } ?: run {
-            notificationService.sendGlobalPush(pushMessage)
+        if (request.insertFcm) {
+            user?.let {
+                pushNotificationService.sendPushAndNotification(pushMessage, notificationType, it.id!!)
+            } ?: run {
+                pushNotificationService.sendGlobalPushAndNotification(pushMessage, notificationType)
+            }
+        } else {
+            pushNotificationService.sendNotification(pushMessage.toNotification(notificationType, user?.id))
         }
     }
 }
