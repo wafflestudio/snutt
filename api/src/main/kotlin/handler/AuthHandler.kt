@@ -1,8 +1,10 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
+import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.service.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -23,5 +25,13 @@ class AuthHandler(
     suspend fun loginLocal(req: ServerRequest): ServerResponse = handle(req) {
         val localLoginRequest: LocalLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
         userService.loginLocal(localLoginRequest)
+    }
+
+    suspend fun logout(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.userId
+        val logoutRequest: LogoutRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.logout(userId, logoutRequest)
+
+        OkResponse()
     }
 }

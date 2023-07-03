@@ -10,14 +10,8 @@ data class LectureDto(
     @JsonProperty("academic_year")
     val academicYear: String?,
     val category: String?,
-    @JsonProperty("class_time")
-    val periodText: String?,
-    @JsonProperty("real_class_time")
-    val classTimeText: String?,
     @JsonProperty("class_time_json")
     val classPlaceAndTimes: List<ClassPlaceAndTimeDto>,
-    @JsonProperty("class_time_mask")
-    val classTimeMask: List<Int>,
     val classification: String?,
     val credit: Long,
     val department: String?,
@@ -34,16 +28,17 @@ data class LectureDto(
     @JsonProperty("course_title")
     val courseTitle: String,
     val registrationCount: Int,
+
+    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
+    @JsonProperty("class_time_mask")
+    val classTimeMask: List<Int> = emptyList(),
 )
 
 fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    periodText = lecture.periodText,
-    classTimeText = lecture.classTimeText,
     classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
-    classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
     credit = lecture.credit,
     department = lecture.department,

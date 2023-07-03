@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
-import com.wafflestudio.snu4t.notification.data.Notification
+import com.wafflestudio.snu4t.notification.dto.NotificationResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 Parameter(`in` = ParameterIn.QUERY, name = "limit", required = false),
                 Parameter(`in` = ParameterIn.QUERY, name = "explicit", required = false),
             ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = Notification::class)))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = NotificationResponse::class)))])]
         ),
     ),
     RouterOperation(
@@ -36,4 +36,4 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     )
 )
-annotation class NotificationApi
+annotation class NotificationDocs

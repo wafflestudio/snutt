@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.common.enum
 
 import com.fasterxml.jackson.annotation.JsonValue
-import com.wafflestudio.snu4t.common.exception.Snu4tException
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
@@ -32,15 +31,8 @@ enum class DayOfWeek(
 
 @ReadingConverter
 @Component
-class DayOfWeekReadConverter : Converter<Any, DayOfWeek> {
-    override fun convert(source: Any): DayOfWeek {
-        return when (source) {
-            is Int -> DayOfWeek.getOfValue(source)!!
-            // TODO: node 서버 이전 이후에 전부 Int 타입으로 바꾸고 아래 double type 삭제하면 좋을 듯
-            is Double -> DayOfWeek.getOfValue(source)!!
-            else -> throw Snu4tException()
-        }
-    }
+class DayOfWeekReadConverter : Converter<Int, DayOfWeek> {
+    override fun convert(source: Int): DayOfWeek = DayOfWeek.getOfValue(source)!!
 }
 
 @Component

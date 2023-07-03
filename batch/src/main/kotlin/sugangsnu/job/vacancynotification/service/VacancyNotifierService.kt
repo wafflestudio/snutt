@@ -1,18 +1,14 @@
 package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.repository.NotificationRepository
+import com.wafflestudio.snu4t.notification.service.PushNotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
-import com.wafflestudio.snu4t.users.repository.UserRepository
 import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,6 +16,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
@@ -32,26 +30,24 @@ interface VacancyNotifierService {
 @Service
 class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
-    private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val pushNotificationService: PushNotificationService,
-    private val userRepository: UserRepository,
-    private val notificationRepository: NotificationRepository,
+    private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
 ) : VacancyNotifierService {
     companion object {
-        const val COUNT_PER_PAGE = 10
-        const val DELAY_PER_CHUNK = 300L
+        private const val COUNT_PER_PAGE = 10
+        private const val DELAY_PER_CHUNK = 300L
     }
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
 
     override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
-        logger.info("시작")
+        log.info("시작")
         val registrationStatus = runCatching {
             getRegistrationStatus()
         }.getOrElse {
-            logger.error("부하기간")
+            log.error("부하기간")
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
         if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
@@ -78,7 +74,7 @@ class VacancyNotifierServiceImpl(
                 lecture.quota == lecture.registrationCount
             }
         }.filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
-            .map { (lecture, status) -> lecture }
+            .map { (lecture, _) -> lecture }
 
         val updated = lectureAndRegistrationStatus
             .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
@@ -86,32 +82,17 @@ class VacancyNotifierServiceImpl(
         lectureService.upsertLectures(updated)
 
         notiTargetLectures.forEach {
-            logger.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
+            log.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
         }
 
-        coroutineScope {
-            notiTargetLectures.map { lecture ->
-                async {
-                    val users = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }
-                        .let { userRepository.findAllByIdIsIn(it) }.toList()
-                    notificationRepository.saveAll(
-                        users.map {
-                            Notification(
-                                userId = it.id!!,
-                                message = lecture.courseTitle,
-                                type = NotificationType.NORMAL
-                            )
-                        }
-                    )
-                    pushNotificationService.sendMessages(
-                        users.mapNotNull { user ->
-                            user.fcmKey?.let {
-                                PushTargetMessage(it, PushMessage(lecture.courseTitle, "자리났다"))
-                            }
-                        }
-                    )
+        supervisorScope {
+            notiTargetLectures.forEach { lecture ->
+                launch {
+                    val userIds = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
+                    val pushMessage = PushMessage(title = lecture.courseTitle, body = "자리났다")
+                    pushNotificationService.sendPushesAndNotifications(pushMessage, NotificationType.NORMAL, userIds)
                 }
-            }.awaitAll()
+            }
         }
 
         return VacancyNotificationJobResult.SUCCESS
