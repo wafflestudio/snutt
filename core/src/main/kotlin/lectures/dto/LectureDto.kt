@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 
 data class LectureDto(
     @JsonProperty("_id")
@@ -51,5 +52,6 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     year = lecture.year,
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
-    registrationCount = lecture.registrationCount
+    registrationCount = lecture.registrationCount,
+    classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
 )

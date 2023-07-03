@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
+import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 
 data class BookmarkLectureDto(
     @JsonProperty("_id")
@@ -45,4 +46,5 @@ fun BookmarkLectureDto(lecture: BookmarkLecture): BookmarkLectureDto = BookmarkL
     lectureNumber = lecture.lectureNumber,
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
+    classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
 )
