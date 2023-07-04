@@ -106,17 +106,18 @@ export function timeJsonToMask(timeJson:Array<TimePlace>, duplicateCheck?:boolea
     }
 
     timeJson.forEach(function(lecture, lectureIdx) {
-        var dayIdx = Number(lecture.day);
-        var end = Number(lecture.start) + Math.ceil(Number(lecture.len) * 2) / 2;
+        let dayIdx = Number(lecture.day);
+        let start = Math.floor((lecture.startMinute - 8 * 60) / 60 * 2) / 2
+        let end = Math.ceil((lecture.endMinute - 8 * 60) / 60 * 2) / 2
         if (Number(lecture.len) <= 0) throw new InvalidLectureTimeJsonError();
-        if (lecture.start >= 0 && lecture.start <= 14 && end >= 0 && end <= 15) {
+        if (start >= 0 && start <= 14 && end >= 0 && end <= 15) {
             if (duplicateCheck) {
-                for (var i = lecture.start * 2; i < end*2; i++) {
+                for (let i = start * 2; i < end*2; i++) {
                     if (bitTable2D[dayIdx][i]) throw new LectureTimeOverlapError();
                     bitTable2D[dayIdx][i] = 1;
                 }
             } else {
-                for (var i = lecture.start * 2; i < end*2; i++) {
+                for (let i = start * 2; i < end*2; i++) {
                     bitTable2D[dayIdx][i] = 1;
                 }
             }
