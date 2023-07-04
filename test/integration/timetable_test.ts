@@ -594,7 +594,7 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
             "len": 2,
             "place": "302-308"
           }]})
-      .expect(403)
+      .expect(400)
       .end(function(err, res) {
         assert.equal(res.body.errcode, ErrorCode.INVALID_TIMEJSON);
         done(err);
