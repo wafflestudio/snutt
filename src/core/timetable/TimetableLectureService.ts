@@ -131,7 +131,6 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   if (lecture['class_time_json']) {
     if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
     syncRealTimeWithPeriod(lecture)
-    LectureService.setTimemask(lecture);
     validateLectureTime(lecture);
 
     const overlappingLectures = getOverlappingLectures(table, lecture).filter(overlappingLecture => overlappingLecture._id != lecture._id)

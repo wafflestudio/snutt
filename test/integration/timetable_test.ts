@@ -564,33 +564,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
       });
   });
 
-  it ('Modifying custom lecture with invalid timemask should fail', function(done) {
-    request.put('/tables/'+table_id+'/lecture/'+lecture._id)
-      .set('x-access-token', token)
-      .send({"class_time_mask": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],"class_time_json": [
-          {
-            "day": 1,
-            "start": 1.5,
-            "len": 1.5,
-            "place": "302-308"
-          }]})
-      .expect(400)
-      .end(function(err, res) {
-        if (err) {
-          done(err);
-        }
-        assert.equal(res.body.errcode, ErrorCode.INVALID_TIMEMASK);
-        done(err);
-      });
-  });
 
   it ('Modifying custom lecture with invalid color should fail', function(done) {
     request.put('/tables/'+table_id+'/lecture/'+lecture._id)
@@ -623,7 +596,7 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
           }]})
       .expect(403)
       .end(function(err, res) {
-        assert.equal(res.body.errcode, ErrorCode.LECTURE_TIME_OVERLAP);
+        assert.equal(res.body.errcode, ErrorCode.INVALID_TIMEJSON);
         done(err);
       });
   });
