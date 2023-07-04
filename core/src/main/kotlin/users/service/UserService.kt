@@ -64,17 +64,17 @@ class UserServiceImpl(
             val credential = authService.buildLocalCredential(localId, password)
             val credentialHash = authService.generateCredentialHash(credential)
 
-            val randomNickname = userNicknameGenerateService.generate()
-            val user = userRepository.save(
-                User(
-                    email = email,
-                    isEmailVerified = false,
-                    credential = credential,
-                    credentialHash = credentialHash,
-                    nickname = randomNickname,
-                    fcmKey = null,
-                )
-            )
+            val randomNickname =
+                userNicknameGenerateService.generateUniqueRandomNickname()
+
+            val user = User(
+                email = email,
+                isEmailVerified = false,
+                credential = credential,
+                credentialHash = credentialHash,
+                nickname = randomNickname,
+                fcmKey = null,
+            ).let { userRepository.save(it) }
 
             timetableService.createDefaultTable(user.id!!)
 

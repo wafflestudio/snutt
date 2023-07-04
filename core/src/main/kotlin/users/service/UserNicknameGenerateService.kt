@@ -23,13 +23,19 @@ class UserNicknameGenerateService(
             .split("\n")
     }
 
-    suspend fun generate(userInput: String? = null): String {
-        val nickname = userInput.orEmpty().ifEmpty { createRandomNickname() }
+    suspend fun generateUniqueRandomNickname(): String {
+        val nickname = createRandomNickname()
         val tagsWithSameNickname = userRepository.findByNicknameStartingWith(nickname)
             .mapNotNull { it.getNicknameTag() }
             .toSet()
 
         val uniqueTag = createTag(tagsWithSameNickname)
+        return "$nickname$TAG_DELIMITER$uniqueTag"
+    }
+
+    fun generateRandomNickname(): String {
+        val nickname = createRandomNickname()
+        val uniqueTag = createTag(emptySet())
         return "$nickname$TAG_DELIMITER$uniqueTag"
     }
 
