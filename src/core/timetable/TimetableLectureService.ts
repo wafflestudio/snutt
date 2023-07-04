@@ -131,7 +131,6 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
   if (lecture['class_time_json']) {
     if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
     syncRealTimeWithPeriod(lecture)
-    LectureService.setTimemask(lecture);
     validateLectureTime(lecture);
 
     const overlappingLectures = getOverlappingLectures(table, lecture).filter(overlappingLecture => overlappingLecture._id != lecture._id)
@@ -262,8 +261,6 @@ function syncRealTimeWithPeriod(lecture: any): void  {
       const endTime = Time.fromHourMinuteString(it.end_time)
       it.startMinute = startTime.totalMinute
       it.endMinute = endTime.totalMinute
-      it.len = it.len ? Number(it.len) : Math.ceil(endTime.subtract(startTime).totalMinute / 30) / 2
-      it.start = it.start ? Number(it.start) : Math.floor(startTime.subtractHour(8).totalMinute / 30) / 2
     } else if (it.start && it.len) {
       it.startMinute = new Time((it.start + 8) * 60).totalMinute
       it.endMinute = new Time((it.start + it.len + 8) * 60).totalMinute

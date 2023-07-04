@@ -38,6 +38,5 @@ export function remove(lectureId: string): Promise<void> {
 export function partialModifiy(lectureId: string, lecture: any): Promise<RefLecture> {
     let lectureCopy = ObjectUtil.deepCopy(lecture);
     ObjectUtil.deleteObjectId(lectureCopy);
-    LectureService.setTimemask(lectureCopy);
     return RefLectureRepository.partialUpdateRefLecture(lectureId, lectureCopy);
 }
