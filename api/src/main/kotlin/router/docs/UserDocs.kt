@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/device/{id}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/user/device/{id}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "registerLocal",
             parameters = [
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/device/{id}", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/user/device/{id}", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "registerLocal",
             parameters = [
@@ -34,4 +34,4 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
 )
-annotation class DeviceDocs
+annotation class UserDocs
