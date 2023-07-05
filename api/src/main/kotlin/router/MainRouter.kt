@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.CoRouterFunctionDsl
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.coRouter
 
 @Component
@@ -38,8 +38,8 @@ class MainRouter(
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
 ) {
     @Bean
-    fun ping() = coRouter {
-        GET("/ping") { ServerResponse.ok().bodyValueAndAwait("pong") }
+    fun healthCheck() = coRouter {
+        GET("/health-check") { ServerResponse.ok().buildAndAwait() }
     }
 
     @Bean
