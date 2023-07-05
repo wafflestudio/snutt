@@ -5,6 +5,7 @@ import ApiRouter = require('./ApiRouter');
 
 let router = ExpressPromiseRouter();
 
+router.get('/health-check', (req, res) => res.sendStatus(200));
 router.use('/monitor', MonitorRouter);
 
 router.use(function(req, res) {
