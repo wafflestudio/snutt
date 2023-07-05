@@ -12,11 +12,11 @@ import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
-import com.wafflestudio.snu4t.router.docs.DeviceDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
+import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
@@ -53,11 +53,11 @@ class MainRouter(
     }
 
     @Bean
-    @DeviceDocs
-    fun deviceRoute() = v1CoRouter {
-        "/device".nest {
-            POST("/{id}", deviceHandler::addRegistrationId)
-            DELETE("/{id}", deviceHandler::removeRegistrationId)
+    @UserDocs
+    fun userRoute() = v1CoRouter {
+        "/user".nest {
+            POST("/device/{id}", deviceHandler::addRegistrationId)
+            DELETE("/device/{id}", deviceHandler::removeRegistrationId)
         }
     }
 
