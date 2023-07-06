@@ -119,10 +119,9 @@ class MainRouter(
     fun vacancyNotificationRoute() = coRouter {
         path("/v1").nest {
             "/vacancy-notifications".nest {
-                GET("", vacancyNotificationHandler::getVacancyNotifications)
-                GET("/lectures/{lectureId}", vacancyNotificationHandler::getVacancyNotification)
+                GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
                 POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
-                DELETE("/{id}", vacancyNotificationHandler::deleteVacancyNotification)
+                DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
             }
         }
     }

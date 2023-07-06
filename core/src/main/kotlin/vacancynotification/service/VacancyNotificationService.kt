@@ -4,31 +4,36 @@ import com.wafflestudio.snu4t.common.exception.DuplicateVacancyNotificationExcep
 import com.wafflestudio.snu4t.common.exception.InvalidRegistrationForPreviousSemesterCourseException
 import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.lectures.service.LectureService
+import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.vacancynotification.data.VacancyNotification
 import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 
 interface VacancyNotificationService {
+    suspend fun getVacancyNotificationLectures(userId: String): List<Lecture>
     suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification
-    suspend fun getVacancyNotifications(userId: String): List<VacancyNotification>
-    suspend fun getVacancyNotification(userId: String, lectureId: String): VacancyNotification
-    suspend fun deleteVacancyNotification(id: String)
+    suspend fun deleteVacancyNotification(lectureId: String)
 }
 
 @Service
 class VacancyNotificationServiceImpl(
     private val vacancyNotificationRepository: VacancyNotificationRepository,
-    private val lectureService: LectureService,
+    private val lectureRepository: LectureRepository,
     private val coursebookService: CoursebookService
 ) : VacancyNotificationService {
+    override suspend fun getVacancyNotificationLectures(userId: String): List<Lecture> =
+        vacancyNotificationRepository.findAllByUserId(userId).map { it.lectureId }
+            .let { lectureRepository.findAllById(it) }.toList()
+
     override suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification =
         coroutineScope {
-            val deferredLecture = async { lectureService.getByIdOrNull(lectureId) }
+            val deferredLecture = async { lectureRepository.findById(lectureId) }
             val deferredLatestCoursebook = async { coursebookService.getLatestCoursebook() }
             val (lecture, latestCoursebook) = deferredLecture.await() to deferredLatestCoursebook.await()
 
@@ -40,14 +45,8 @@ class VacancyNotificationServiceImpl(
             trySave(VacancyNotification(userId = userId, lectureId = lectureId, coursebookId = latestCoursebook.id!!))
         }
 
-    override suspend fun getVacancyNotifications(userId: String): List<VacancyNotification> =
-        vacancyNotificationRepository.findAllByUserId(userId).toList()
-
-    override suspend fun getVacancyNotification(userId: String, lectureId: String): VacancyNotification =
-        vacancyNotificationRepository.findFirstByUserIdAndLectureId(userId, lectureId)
-
-    override suspend fun deleteVacancyNotification(id: String) {
-        vacancyNotificationRepository.deleteById(id)
+    override suspend fun deleteVacancyNotification(lectureId: String) {
+        vacancyNotificationRepository.deleteByLectureId(lectureId)
     }
 
     private suspend fun trySave(vacancyNotification: VacancyNotification) =
