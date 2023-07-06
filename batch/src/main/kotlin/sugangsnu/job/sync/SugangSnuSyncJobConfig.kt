@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuNotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.utils.nextCoursebook
 import com.wafflestudio.snu4t.sugangsnu.job.sync.service.SugangSnuSyncService
+import com.wafflestudio.snu4t.vacancynotification.service.VacancyNotificationService
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -29,6 +30,7 @@ class SugangSnuSyncJobConfig {
         sugangSnuSyncService: SugangSnuSyncService,
         coursebookService: CoursebookService,
         sugangSnuNotificationService: SugangSnuNotificationService,
+        vacancyNotificationService: VacancyNotificationService,
     ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
         { _, _ ->
             runBlocking {
@@ -38,6 +40,7 @@ class SugangSnuSyncJobConfig {
                     sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
                 } else {
                     val newCoursebook = existingCoursebook.nextCoursebook()
+                    vacancyNotificationService.deleteAll()
                     sugangSnuSyncService.addCoursebook(newCoursebook)
                     sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                 }

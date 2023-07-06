@@ -7,5 +7,5 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 interface VacancyNotificationRepository : CoroutineCrudRepository<VacancyNotification, String> {
     fun findAllByLectureId(lectureId: String): Flow<VacancyNotification>
     fun findAllByUserId(userId: String): Flow<VacancyNotification>
-    suspend fun findFirstByUserIdAndLectureId(userId: String, lectureId: String): VacancyNotification
+    suspend fun deleteByLectureId(lectureId: String)
 }
