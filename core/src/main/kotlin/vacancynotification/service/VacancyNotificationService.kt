@@ -19,6 +19,7 @@ interface VacancyNotificationService {
     suspend fun getVacancyNotificationLectures(userId: String): List<Lecture>
     suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification
     suspend fun deleteVacancyNotification(lectureId: String)
+    suspend fun deleteAll()
 }
 
 @Service
@@ -42,11 +43,15 @@ class VacancyNotificationServiceImpl(
                 throw InvalidRegistrationForPreviousSemesterCourseException
             }
 
-            trySave(VacancyNotification(userId = userId, lectureId = lectureId, coursebookId = latestCoursebook.id!!))
+            trySave(VacancyNotification(userId = userId, lectureId = lectureId))
         }
 
     override suspend fun deleteVacancyNotification(lectureId: String) {
         vacancyNotificationRepository.deleteByLectureId(lectureId)
+    }
+
+    override suspend fun deleteAll() {
+        vacancyNotificationRepository.deleteAll()
     }
 
     private suspend fun trySave(vacancyNotification: VacancyNotification) =
