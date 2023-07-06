@@ -21,20 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "getVacancyNotificationLectures",
             responses = [
                 ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = LectureDto::class)))]),
-                ApiResponse(
-                    responseCode = "400",
-                    description = "이전 학기 강의 등록 시",
-                    content = [Content(examples = [ExampleObject(value = """{"errcode" : "40005", "message" : "이전 학기에는 빈자리 알림을 등록할 수 없습니다.", "displayMessage" : "이전 학기에는 빈자리 알림을 등록할 수 없습니다."}""")])]
-                ),
-                ApiResponse(
-                    responseCode = "400",
-                    description = "빈자리 알림 중복",
-                    content = [Content(examples = [ExampleObject(value = """{"errcode" : "40900", "message" : "빈자리 알림 중복", "displayMessage" : "빈자리 알림 중복"}""")])]
-                ),
-                ApiResponse(
-                    responseCode = "404",
-                    content = [Content(examples = [ExampleObject(value = """{"errcode" : "16387", "message" : "lecture가 없습니다.", "displayMessage" : "lecture가 없습니다."}""")])]
-                ),
             ]
         ),
     ),
@@ -45,7 +31,24 @@ import org.springframework.web.bind.annotation.RequestMethod
             parameters = [
                 Parameter(`in` = ParameterIn.PATH, name = "lectureId", required = true),
             ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
+            responses = [
+                ApiResponse(responseCode = "200", content = [Content(schema = Schema())]),
+                ApiResponse(
+                    responseCode = "400 (1)",
+                    description = "이전 학기 강의 등록 시",
+                    content = [Content(examples = [ExampleObject(value = """{"errcode" : 40005, "message" : "이전 학기에는 빈자리 알림을 등록할 수 없습니다.", "displayMessage" : "이전 학기에는 빈자리 알림을 등록할 수 없습니다."}""")])]
+                ),
+                ApiResponse(
+                    responseCode = "400 (2)",
+                    description = "빈자리 알림 중복",
+                    content = [Content(examples = [ExampleObject(value = """{"errcode" : 40900, "message" : "빈자리 알림 중복", "displayMessage" : "빈자리 알림 중복"}""")])]
+                ),
+                ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 강의 id",
+                    content = [Content(examples = [ExampleObject(value = """{"errcode" : 16387, "message" : "lecture가 없습니다.", "displayMessage" : "lecture가 없습니다."}""")])]
+                ),
+            ]
         ),
     ),
     RouterOperation(
