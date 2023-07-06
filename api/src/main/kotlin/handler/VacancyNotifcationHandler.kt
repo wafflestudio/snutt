@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
 import com.wafflestudio.snu4t.vacancynotification.service.VacancyNotificationService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -18,6 +19,7 @@ class VacancyNotifcationHandler(
         val userId = req.userId
 
         vacancyNotificationService.getVacancyNotificationLectures(userId).map { LectureDto(it) }
+            .let { VacancyNotificationLecturesResponse(it) }
     }
 
     suspend fun addVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {

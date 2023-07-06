@@ -1,10 +1,9 @@
 package com.wafflestudio.snu4t.router.docs
 
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
+import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "getVacancyNotificationLectures",
             responses = [
-                ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = LectureDto::class)))]),
+                ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = VacancyNotificationLecturesResponse::class))]),
             ]
         ),
     ),
