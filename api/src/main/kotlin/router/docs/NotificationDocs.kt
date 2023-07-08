@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
+import com.wafflestudio.snu4t.notification.dto.NotificationCountResponse
 import com.wafflestudio.snu4t.notification.dto.NotificationResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/notification/count", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getUnreadCounts",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = Long::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = NotificationCountResponse::class))])]
         ),
     )
 )
