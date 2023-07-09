@@ -39,7 +39,7 @@ jobs:
         id: build-push-image
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token)
-          docker build -f Dockerfile-batch -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token)
+          docker build -f Dockerfile-batch -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token) --build-arg SUGANGSNU_CERT=$(SUGANGSNU_CERT)
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
