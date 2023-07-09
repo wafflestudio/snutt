@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.springframework.boot") version "3.0.2" apply false
+    id("org.springframework.boot") version "3.1.1" apply false
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
     kotlin("jvm") version "1.7.21"
@@ -32,7 +32,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.0.2")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.1.1")
         }
     }
 
