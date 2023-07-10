@@ -1,9 +1,13 @@
 package com.wafflestudio.snu4t.sugangsnu.common.api
 
+import io.netty.handler.ssl.SslContextBuilder
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient
 
 @Configuration
 class SugangSnuApiConfig() {
@@ -17,7 +21,18 @@ class SugangSnuApiConfig() {
             .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
             .build()
 
-        return WebClient.builder().baseUrl(SUGANG_SNU_BASEURL)
+        val noVerificationSslContext = SslContextBuilder
+            .forClient()
+            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+            .build()
+
+        val noVerificationSslHttpClient = HttpClient
+            .create()
+            .secure { it.sslContext(noVerificationSslContext) }
+
+        return WebClient.builder()
+            .clientConnector(ReactorClientHttpConnector(noVerificationSslHttpClient))
+            .baseUrl(SUGANG_SNU_BASEURL)
             .exchangeStrategies(exchangeStrategies) // set exchange strategies
             .defaultHeaders {
                 it.setAll(
