@@ -53,7 +53,6 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
   }
 
   logger.info(lecture)
-  validateLectureTime(lecture);
 
   LectureColorService.validateLectureColor(lecture)
 
@@ -90,6 +89,7 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
   if (!lecture.color && !lecture.colorIndex) {
     lecture.colorIndex = getAvailableColorIndex(timetable);
   }
+  validateLectureTime(lecture);
 
   await addLecture(timetable, lecture, isForced);
 }
@@ -254,7 +254,7 @@ function timesOverlap(time1: TimePlace, time2: TimePlace): boolean {
   return time1.day === time2.day && time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
-function syncRealTimeWithPeriod(lecture: any): void  {
+function syncRealTimeWithPeriod(lecture: UserLecture): void  {
   lecture.class_time_json.forEach(it => {
     if (it.start_time && it.end_time) {
       const startTime = Time.fromHourMinuteString(it.start_time)
