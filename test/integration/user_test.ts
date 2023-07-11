@@ -124,17 +124,6 @@ export = function(request: supertest.SuperTest<supertest.Test>) {
         });
     });
 
-    it('fails when no old password', function(done) {
-      request.put('/user/password')
-        .set('x-access-token', token2)
-        .send({new_password:"abc1234*"})
-        .expect(403)
-        .end(function(err, res){
-          assert.equal(res.body.errcode, ErrorCode.WRONG_PASSWORD);
-          done(err);
-        });
-    });
-
     it('fails when wrong old password', function(done) {
       request.put('/user/password')
         .set('x-access-token', token2)

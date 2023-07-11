@@ -53,7 +53,6 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
   }
 
   logger.info(lecture)
-  validateLectureTime(lecture);
 
   LectureColorService.validateLectureColor(lecture)
 
@@ -90,6 +89,7 @@ export async function addCustomLecture(timetable: Timetable, lecture: UserLectur
   if (!lecture.color && !lecture.colorIndex) {
     lecture.colorIndex = getAvailableColorIndex(timetable);
   }
+  validateLectureTime(lecture);
 
   await addLecture(timetable, lecture, isForced);
 }
