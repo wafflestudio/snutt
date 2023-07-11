@@ -254,7 +254,7 @@ function timesOverlap(time1: TimePlace, time2: TimePlace): boolean {
   return time1.day === time2.day && time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
-function syncRealTimeWithPeriod(lecture: UserLecture): void  {
+function syncRealTimeWithPeriod(lecture: any): void  {
   lecture.class_time_json.forEach(it => {
     if (it.start_time && it.end_time) {
       const startTime = Time.fromHourMinuteString(it.start_time)
