@@ -101,7 +101,7 @@ class SugangSnuNotificationServiceImpl(
             // 업데이트 알림
             is TimetableLectureUpdateResult -> {
                 """
-                   $year-${semester.fullName} '$timetableTitle' 시간표의
+                   $year-${semester.fullName} '$timetableTitle' 시간표의 
                    '$courseTitle' 강의가 업데이트 되었습니다.
                    (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
                 """.trimIndent().replace("\n", "") to NotificationType.LECTURE_UPDATE
