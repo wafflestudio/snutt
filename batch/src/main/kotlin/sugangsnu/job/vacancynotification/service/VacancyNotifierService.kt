@@ -5,7 +5,7 @@ import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.service.PushNotificationService
+import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
@@ -30,7 +30,7 @@ interface VacancyNotifierService {
 @Service
 class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
-    private val pushNotificationService: PushNotificationService,
+    private val pushWithNotificationService: PushWithNotificationService,
     private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val sugangSnuRepository: SugangSnuRepository,
 ) : VacancyNotifierService {
@@ -90,7 +90,7 @@ class VacancyNotifierServiceImpl(
                 launch {
                     val userIds = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
                     val pushMessage = PushMessage(title = lecture.courseTitle, body = "자리났다")
-                    pushNotificationService.sendPushesAndNotifications(pushMessage, NotificationType.NORMAL, userIds)
+                    pushWithNotificationService.sendPushesAndNotifications(pushMessage, NotificationType.NORMAL, userIds)
                 }
             }
         }

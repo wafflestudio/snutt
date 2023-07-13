@@ -6,7 +6,9 @@ import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import com.wafflestudio.snu4t.notification.service.PushNotificationService
+import com.wafflestudio.snu4t.notification.service.NotificationService
+import com.wafflestudio.snu4t.notification.service.PushService
+import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
@@ -16,7 +18,6 @@ import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 interface SugangSnuNotificationService {
@@ -26,12 +27,14 @@ interface SugangSnuNotificationService {
 
 @Service
 class SugangSnuNotificationServiceImpl(
-    private val pushNotificationService: PushNotificationService,
+    private val pushWithNotificationService: PushWithNotificationService,
+    private val notificationService: NotificationService,
+    private val pushService: PushService,
     private val phase: Phase,
 ) : SugangSnuNotificationService {
     override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = coroutineScope {
         val notifications = userLectureSyncResults.map { it.toNotification() }
-        pushNotificationService.sendNotifications(notifications)
+        notificationService.sendNotifications(notifications)
         sendPushForTimetable(userLectureSyncResults.filterIsInstance<TimetableLectureSyncResult>())
     }
 
@@ -82,7 +85,7 @@ class SugangSnuNotificationServiceImpl(
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
         val messageBody = "${coursebook.year}년도 ${coursebook.semester.fullName} 수강편람이 추가되었습니다."
 
-        pushNotificationService.sendGlobalPushAndNotification(
+        pushWithNotificationService.sendGlobalPushAndNotification(
             PushMessage(title = "신규 수강편람", body = messageBody),
             NotificationType.COURSEBOOK,
         )
