@@ -1,9 +1,9 @@
 package com.wafflestudio.snu4t.bookmark.repository
 
 import com.wafflestudio.snu4t.bookmark.data.Bookmark
-import com.wafflestudio.snu4t.common.elemMatch
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.isEqualTo
+import com.wafflestudio.snu4t.common.extension.elemMatch
+import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import kotlinx.coroutines.flow.Flow
