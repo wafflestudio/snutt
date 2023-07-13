@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.notification.repository
 
-import com.wafflestudio.snu4t.common.desc
+import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.notification.data.Notification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
