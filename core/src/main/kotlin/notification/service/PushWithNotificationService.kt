@@ -16,7 +16,9 @@ interface PushWithNotificationService {
      * 복수 명의 유저에게 푸시를 보내고 알림함에 보이게 합니다.
      */
     suspend fun sendPushesAndNotifications(
-        pushMessage: PushMessage, notificationType: NotificationType, userIds: List<String>
+        pushMessage: PushMessage,
+        notificationType: NotificationType,
+        userIds: List<String>
     )
 
     /**
@@ -45,11 +47,13 @@ class PushWithNotificationServiceImpl internal constructor(
         userIds: List<String>,
     ): Unit = coroutineScope {
         launch {
-            notificationService.sendNotifications(userIds.map {
-                pushMessage.toNotification(
-                    notificationType, it
-                )
-            })
+            notificationService.sendNotifications(
+                userIds.map {
+                    pushMessage.toNotification(
+                        notificationType, it
+                    )
+                }
+            )
         }
         launch { pushService.sendPushes(pushMessage, userIds) }
     }
