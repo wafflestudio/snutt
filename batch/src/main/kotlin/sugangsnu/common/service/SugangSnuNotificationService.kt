@@ -49,11 +49,11 @@ class SugangSnuNotificationServiceImpl(
 
         val allUserIds = userUpdatedLectureCountMap.keys + userDeletedLectureCountMap.keys
 
-        val userIdToMessageBody = allUserIds.associateWith { userId ->
+        val userIdToMessage = allUserIds.associateWith { userId ->
             val updatedCount = userUpdatedLectureCountMap[userId]
             val deletedCount = userDeletedLectureCountMap[userId]
 
-            when {
+            val messageBody = when {
                 updatedCount != null && deletedCount != null -> {
                     "수강편람이 업데이트되어 ${updatedCount}개 강의가 변경되고 ${deletedCount}개 강의가 삭제되었습니다."
                 }
@@ -67,19 +67,13 @@ class SugangSnuNotificationServiceImpl(
                     error("This should not happen")
                 }
             }
-        }
-
-        userIdToMessageBody.forEach { (userId, messageBody) ->
-            val pushMessage = PushMessage(
+            PushMessage(
                 title = "수강편람 업데이트",
                 body = messageBody,
                 urlScheme = notificationScheme,
             )
-
-            launch {
-                pushNotificationService.sendPush(pushMessage, userId)
-            }
         }
+        pushService.sendTargetPushes(userIdToMessage)
     }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {
