@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -8,10 +9,11 @@ import kotlin.system.exitProcess
 @SpringBootApplication
 class Snu4tBatchApplication
 
+val log = LoggerFactory.getLogger(Snu4tBatchApplication::class.java)
 fun main(args: Array<String>) {
     runCatching {
         val applicationContext = runApplication<Snu4tBatchApplication>(*args)
         Thread.sleep(30000)
         exitProcess(SpringApplication.exit(applicationContext))
-    }.onFailure { exception -> exception.printStackTrace() }
+    }.onFailure { exception -> log.error(exception.stackTraceToString()) }
 }
