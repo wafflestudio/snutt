@@ -51,7 +51,7 @@ internal class FcmPushClient(
             .chunked(FCM_MESSAGE_COUNT_LIMIT)
             .map { chunk ->
                 val messages = chunk.map { it.toFcmMessage() }
-                async(CoroutineExceptionHandler { _, throwable -> log.error(throwable.stackTraceToString()) }) {
+                async(CoroutineExceptionHandler { _, throwable -> log.error("푸시전송 실패", throwable) }) {
                     messagingInstance.sendAllAsync(
                         messages
                     ).await()
