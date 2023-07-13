@@ -15,8 +15,8 @@ import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResu
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import org.springframework.stereotype.Service
 
 interface SugangSnuNotificationService {
@@ -29,18 +29,13 @@ class SugangSnuNotificationServiceImpl(
     private val pushNotificationService: PushNotificationService,
     private val phase: Phase,
 ) : SugangSnuNotificationService {
-    override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = supervisorScope {
-        launch {
-            sendPushForTimetable(userLectureSyncResults.filterIsInstance<TimetableLectureSyncResult>())
-        }
-
-        launch {
-            val notifications = userLectureSyncResults.map { it.toNotification() }
-            pushNotificationService.sendNotifications(notifications)
-        }
+    override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = coroutineScope {
+        val notifications = userLectureSyncResults.map { it.toNotification() }
+        pushNotificationService.sendNotifications(notifications)
+        sendPushForTimetable(userLectureSyncResults.filterIsInstance<TimetableLectureSyncResult>())
     }
 
-    private suspend fun sendPushForTimetable(userLectureSyncResults: List<TimetableLectureSyncResult>) = supervisorScope {
+    private suspend fun sendPushForTimetable(userLectureSyncResults: List<TimetableLectureSyncResult>) = coroutineScope {
         val notificationScheme = UrlScheme.NOTIFICATIONS.compileWith(phase)
 
         val userUpdatedLectureCountMap =
