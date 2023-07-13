@@ -8,9 +8,10 @@ import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
@@ -44,13 +45,17 @@ internal class FcmPushClient(
         log.info("Message Request Sent : $message, response : $response")
     }
 
-    override suspend fun sendMessages(pushMessages: List<PushTargetMessage>): Unit = supervisorScope {
+    override suspend fun sendMessages(pushMessages: List<PushTargetMessage>): Unit = coroutineScope {
         val messagingInstance = FirebaseMessaging.getInstance()
         val responses = pushMessages
             .chunked(FCM_MESSAGE_COUNT_LIMIT)
             .map { chunk ->
                 val messages = chunk.map { it.toFcmMessage() }
-                async { messagingInstance.sendAllAsync(messages).await() }
+                async(CoroutineExceptionHandler { _, throwable -> log.error("푸시전송 실패", throwable) }) {
+                    messagingInstance.sendAllAsync(
+                        messages
+                    ).await()
+                }
             }
             .awaitAll()
             .flatMap { it.responses }

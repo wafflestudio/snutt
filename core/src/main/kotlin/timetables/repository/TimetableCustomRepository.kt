@@ -1,8 +1,8 @@
 package com.wafflestudio.snu4t.timetables.repository
 
-import com.wafflestudio.snu4t.common.elemMatch
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.isEqualTo
+import com.wafflestudio.snu4t.common.extension.elemMatch
+import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import kotlinx.coroutines.flow.Flow

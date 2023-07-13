@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.lectures.repository
 
-import com.wafflestudio.snu4t.common.isEqualTo
+import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.dto.SearchDto

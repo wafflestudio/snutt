@@ -1,9 +1,10 @@
 package com.wafflestudio.snu4t.notification.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.common.extension.toZonedDateTime
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class NotificationResponse(
     @JsonProperty("_id")
@@ -14,7 +15,7 @@ data class NotificationResponse(
     val message: String,
     val type: NotificationType,
     @JsonProperty("created_at")
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: ZonedDateTime,
 ) {
     companion object {
         fun from(notification: Notification) = NotificationResponse(
@@ -23,7 +24,7 @@ data class NotificationResponse(
             title = notification.title,
             message = notification.message,
             type = notification.type,
-            createdAt = notification.createdAt,
+            createdAt = notification.createdAt.toZonedDateTime(),
         )
     }
 }
