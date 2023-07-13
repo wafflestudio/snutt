@@ -17,7 +17,9 @@ import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureDeleteResu
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureSyncResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.TimetableLectureUpdateResult
 import com.wafflestudio.snu4t.sugangsnu.job.sync.data.UserLectureSyncResult
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 interface SugangSnuNotificationService {
