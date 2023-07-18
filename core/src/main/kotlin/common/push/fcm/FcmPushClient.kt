@@ -8,7 +8,6 @@ import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
 import com.wafflestudio.snu4t.common.push.dto.TopicMessage
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -51,13 +50,17 @@ internal class FcmPushClient(
             .chunked(FCM_MESSAGE_COUNT_LIMIT)
             .map { chunk ->
                 val messages = chunk.map { it.toFcmMessage() }
-                async(CoroutineExceptionHandler { _, throwable -> log.error("푸시전송 실패", throwable) }) {
-                    messagingInstance.sendAllAsync(
-                        messages
-                    ).await()
+                async {
+                    runCatching {
+                        messagingInstance.sendAllAsync(messages).await()
+                    }.getOrElse {
+                        log.error("푸시전송 실패", it)
+                        null
+                    }
                 }
             }
             .awaitAll()
+            .filterNotNull()
             .flatMap { it.responses }
 
         pushMessages
