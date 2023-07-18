@@ -257,20 +257,22 @@ class SugangSnuSyncServiceImpl(
     fun dropOverlappingLectures(
         timetables: Flow<Timetable>,
         updatedLecture: UpdatedLecture
-    ) = timetables.map { it.apply { lectures.dropWhile { lecture -> lecture.lectureId == updatedLecture.oldData.id } } }
-        .let {
-            timeTableRepository.saveAll(it)
+    ) = timetables.map {
+        it.apply {
+            lectures = lectures.filter { lecture -> lecture.lectureId != updatedLecture.oldData.id }
         }
-        .map { timetable ->
-            TimetableLectureDeleteByOverlapResult(
-                year = timetable.year,
-                semester = timetable.semester,
-                lectureId = updatedLecture.oldData.id!!,
-                userId = timetable.userId,
-                timetableTitle = timetable.title,
-                courseTitle = updatedLecture.oldData.courseTitle,
-            )
-        }
+    }.let {
+        timeTableRepository.saveAll(it)
+    }.map { timetable ->
+        TimetableLectureDeleteByOverlapResult(
+            year = timetable.year,
+            semester = timetable.semester,
+            lectureId = updatedLecture.oldData.id!!,
+            userId = timetable.userId,
+            timetableTitle = timetable.title,
+            courseTitle = updatedLecture.oldData.courseTitle,
+        )
+    }
 
     fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
         updatedLecture.updatedField.contains(Lecture::classPlaceAndTimes) &&
