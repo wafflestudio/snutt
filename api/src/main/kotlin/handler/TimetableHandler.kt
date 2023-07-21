@@ -48,7 +48,7 @@ class TimetableHandler(
         val sourceTimetableId = req.parseQueryParam<String>("source")
         val body = req.awaitBody<TimetableAddRequestDto>()
 
-        if(sourceTimetableId == null) {
+        if (sourceTimetableId == null) {
             timeTableService.addTimetable(userId, body)
         } else {
             timeTableService.copyTimetable(userId, sourceTimetableId)
