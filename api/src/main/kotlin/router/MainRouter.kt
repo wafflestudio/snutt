@@ -15,7 +15,7 @@ import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
-import com.wafflestudio.snu4t.router.docs.TableDocs
+import com.wafflestudio.snu4t.router.docs.TimetableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
 import org.springframework.context.annotation.Bean
@@ -62,11 +62,31 @@ class MainRouter(
     }
 
     @Bean
-    @TableDocs
+    @TimetableDocs
     fun tableRoute() = v1CoRouter {
         "/tables".nest {
-            GET("", timeTableHandler::getBriefs)
-            GET("/{id}/links", timeTableHandler::getLink)
+            GET("", timeTableHandler::getTimetableBriefs)
+            GET("/recent", timeTableHandler::getMostRecentlyUpdatedTimetables)
+            GET("/{year}/{semester}", timeTableHandler::getTimetablesBySemester)
+            POST("", timeTableHandler::addTimetable)
+            GET("/{timetableId}", timeTableHandler::getTimetable)
+            PUT("/{timetableId}", timeTableHandler::modifyTimetable)
+            DELETE("/{timetableId}", timeTableHandler::deleteTimetable)
+            GET("/{timetableId}/links", timeTableHandler::getTimetableLink)
+            POST("/{timetableId}/copy", timeTableHandler::copyTimetable)
+            PUT("/{timetableId}/theme", timeTableHandler::modifyTimetableTheme)
+            "{timetableId}/lecture".nest {
+                POST("", timeTableHandler::addCustomLecture)
+                POST("/{lectureId}", timeTableHandler::addLecture)
+                PUT("/{timetableLectureId}/reset", timeTableHandler::resetTimetableLecture)
+                PUT("/{timetableLectureId}", timeTableHandler::modifyTimetableLecture)
+                DELETE("/{timetableLectureId}", timeTableHandler::deleteTimetableLecture)
+            }
+        }
+
+        "/tables".nest {
+            GET("", timeTableHandler::getTimetableBriefs)
+            GET("/{id}/links", timeTableHandler::getTimetableLink)
         }
     }
 

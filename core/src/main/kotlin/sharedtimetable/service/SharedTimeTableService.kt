@@ -98,6 +98,6 @@ class SharedTimetableServiceImpl(
 
     override suspend fun copy(userId: String, sharedTimetableId: String, title: String): Timetable {
         val sharedTimetable = sharedTimetableRepository.findSharedTimetableByIdAndIsDeletedFalse(sharedTimetableId) ?: throw SharedTimetableNotFoundException
-        return timetableService.copy(userId, sharedTimetable.timetableId, title)
+        return timetableService.copyTimetable(userId, sharedTimetable.timetableId, title)
     }
 }

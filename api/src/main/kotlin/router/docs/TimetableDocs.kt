@@ -19,4 +19,4 @@ import timetables.dto.TimetableBriefDto
         ),
     )
 )
-annotation class TableDocs
+annotation class TimetableDocs
