@@ -126,13 +126,13 @@ class TimetableHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val timetableLectureId = req.pathVariable("timetableLectureId")
-        ServerResponse.ok()
+        TODO("Not yet implemented")
     }
 
     suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val lectureId = req.pathVariable("timetableLectureId")
-        ServerResponse.ok()
+        TODO("Not yet implemented")
     }
 }
