@@ -5,6 +5,10 @@ spring:
 snutt:
   secret-key:
 
+server:
+  netty:
+    idle-timeout: 5s
+
 ---
 spring:
   config:

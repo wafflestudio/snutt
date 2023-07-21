@@ -5,8 +5,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 object ClassTimeUtils {
-
-    // FIXME: 바로 다음에 없애야 하는 스펙
+    // FIXME: 안드로이드 구버전 대응용 1년 후 2024년에 삭제 (2023/06/26)
     fun classTimeToBitmask(classPlaceAndTimes: List<ClassPlaceAndTime>): List<Int> {
         val bitTable = Array(7) { Array(30) { 0 } }
 
@@ -32,6 +31,8 @@ object ClassTimeUtils {
         time1.day == time2.day &&
             time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
+
+fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"
 
 val ClassPlaceAndTime.startPeriod: Double
     get() = floor((startMinute - 8 * 60).toDouble() / 60 * 2) / 2

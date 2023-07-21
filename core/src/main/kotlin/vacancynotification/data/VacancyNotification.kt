@@ -20,7 +20,4 @@ data class VacancyNotification(
     @Indexed
     @Field(targetType = FieldType.OBJECT_ID)
     val lectureId: String,
-    @Indexed
-    @Field(targetType = FieldType.OBJECT_ID)
-    val coursebookId: String,
 )

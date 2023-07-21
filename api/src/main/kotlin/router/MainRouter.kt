@@ -3,24 +3,26 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
-import com.wafflestudio.snu4t.router.docs.AdminApi
+import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
-import com.wafflestudio.snu4t.router.docs.NotificationApi
+import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
+import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.CoRouterFunctionDsl
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.coRouter
 
 @Component
@@ -29,14 +31,15 @@ class MainRouter(
     private val bookmarkHandler: BookmarkHandler,
     private val authHandler: AuthHandler,
     private val adminHandler: AdminHandler,
+    private val deviceHandler: DeviceHandler,
     private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
 ) {
     @Bean
-    fun ping() = coRouter {
-        GET("/ping") { ServerResponse.ok().bodyValueAndAwait("pong") }
+    fun healthCheck() = coRouter {
+        GET("/health-check") { ServerResponse.ok().buildAndAwait() }
     }
 
     @Bean
@@ -45,6 +48,16 @@ class MainRouter(
         "/auth".nest {
             POST("/register_local", authHandler::registerLocal)
             POST("/login_local", authHandler::loginLocal)
+            POST("/logout", authHandler::logout)
+        }
+    }
+
+    @Bean
+    @UserDocs
+    fun userRoute() = v1CoRouter {
+        "/user".nest {
+            POST("/device/{id}", deviceHandler::addRegistrationId)
+            DELETE("/device/{id}", deviceHandler::removeRegistrationId)
         }
     }
 
@@ -86,15 +99,15 @@ class MainRouter(
         }
     }
 
-    @NotificationApi
+    @NotificationDocs
     fun notificationRoute() = v1CoRouter {
         "/notification".nest {
-            GET("", notificationHandler::getNotification)
+            GET("", notificationHandler::getNotifications)
             GET("/count", notificationHandler::getUnreadCounts)
         }
     }
 
-    @AdminApi
+    @AdminDocs
     fun adminRoute() = v1CoRouter {
         "/admin".nest {
             POST("/insert_noti", adminHandler::insertNotification)
@@ -103,14 +116,11 @@ class MainRouter(
 
     @Bean
     @VacancyNotificationDocs
-    fun vacancyNotificationRoute() = coRouter {
-        path("/v1").nest {
-            "/vacancy-notifications".nest {
-                GET("", vacancyNotificationHandler::getVacancyNotifications)
-                GET("/lectures/{lectureId}", vacancyNotificationHandler::getVacancyNotification)
-                POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
-                DELETE("/{id}", vacancyNotificationHandler::deleteVacancyNotification)
-            }
+    fun vacancyNotificationRoute() = v1CoRouter {
+        "/vacancy-notifications".nest {
+            GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
+            POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
+            DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
         }
     }
 

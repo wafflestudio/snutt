@@ -19,6 +19,7 @@ object DuplicateLocalIdException : Snu4tException(ErrorType.DUPLICATE_LOCAL_ID)
 object InvalidEmailException : Snu4tException(ErrorType.INVALID_EMAIL)
 
 object LectureNotFoundException : Snu4tException(ErrorType.LECTURE_NOT_FOUND)
+object UserNotFoundException : Snu4tException(ErrorType.USER_NOT_FOUND)
 
 class MissingRequiredParameterException(private val fieldName: String) :
     Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
@@ -31,6 +32,8 @@ class InvalidBodyFieldValueException(private val fieldName: String) :
 
 object NotSharedTimetableOwnerException : Snu4tException(ErrorType.NOT_SHARED_TIMETABLE_OWNER)
 object SharedTimetableAlreadyExistsException : Snu4tException(ErrorType.SHARED_TIMETABLE_ALREADY_EXISTS)
+object InvalidOsTypeException : Snu4tException(ErrorType.INVALID_OS_TYPE)
+object InvalidAppTypeException : Snu4tException(ErrorType.INVALID_APP_TYPE)
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)

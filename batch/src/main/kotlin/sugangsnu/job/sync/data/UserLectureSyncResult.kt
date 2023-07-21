@@ -6,6 +6,16 @@ import kotlin.reflect.KProperty1
 
 sealed class UserLectureSyncResult(open val userId: String, open val lectureId: String)
 
+sealed class BookmarkLectureSyncResult(
+    override val userId: String,
+    override val lectureId: String,
+) : UserLectureSyncResult(userId, lectureId)
+
+sealed class TimetableLectureSyncResult(
+    override val userId: String,
+    override val lectureId: String,
+) : UserLectureSyncResult(userId, lectureId)
+
 data class BookmarkLectureUpdateResult(
     val year: Int,
     val semester: Semester,
@@ -13,7 +23,7 @@ data class BookmarkLectureUpdateResult(
     override val userId: String,
     override val lectureId: String,
     val updatedFields: List<KProperty1<Lecture, *>>,
-) : UserLectureSyncResult(userId, lectureId)
+) : BookmarkLectureSyncResult(userId, lectureId)
 
 data class BookmarkLectureDeleteResult(
     val year: Int,
@@ -21,7 +31,7 @@ data class BookmarkLectureDeleteResult(
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,
-) : UserLectureSyncResult(userId, lectureId)
+) : BookmarkLectureSyncResult(userId, lectureId)
 
 data class TimetableLectureUpdateResult(
     val year: Int,
@@ -31,7 +41,7 @@ data class TimetableLectureUpdateResult(
     override val userId: String,
     override val lectureId: String,
     val updatedFields: List<KProperty1<Lecture, *>>,
-) : UserLectureSyncResult(userId, lectureId)
+) : TimetableLectureSyncResult(userId, lectureId)
 
 data class TimetableLectureDeleteResult(
     val year: Int,
@@ -40,7 +50,7 @@ data class TimetableLectureDeleteResult(
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,
-) : UserLectureSyncResult(userId, lectureId)
+) : TimetableLectureSyncResult(userId, lectureId)
 
 data class TimetableLectureDeleteByOverlapResult(
     val year: Int,
@@ -49,4 +59,4 @@ data class TimetableLectureDeleteByOverlapResult(
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,
-) : UserLectureSyncResult(userId, lectureId)
+) : TimetableLectureSyncResult(userId, lectureId)

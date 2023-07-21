@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.lectures.repository
 
-import com.wafflestudio.snu4t.common.isEqualTo
+import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
@@ -40,20 +40,34 @@ class LectureCustomRepositoryImpl(
                     searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
                     searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
                     searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
-                    searchCondition.times?.takeIf { it.isNotEmpty() }?.let {
+                    searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
                         Criteria().andOperator(
                             Lecture::classPlaceAndTimes ne listOf(),
-                            // 수업시간 하나라도 제시한 시간대들에 안맞는 경우가 존재하면 안됨
+                            // 수업시간 하나라도 제시한 시간대들에 포함이 되지 않는 경우가 존재하면 안됨
                             Lecture::classPlaceAndTimes.not().elemMatch(
                                 Criteria().andOperator(
-                                    it.map { time ->
+                                    searchTimes.map { searchTime ->
                                         Criteria().orOperator(
-                                            ClassPlaceAndTime::day.ne(time.day),
-                                            ClassPlaceAndTime::startMinute.lt(time.startMinute),
-                                            ClassPlaceAndTime::endMinute.gt(time.endMinute)
+                                            ClassPlaceAndTime::day.ne(searchTime.day),
+                                            ClassPlaceAndTime::startMinute.lt(searchTime.startMinute),
+                                            ClassPlaceAndTime::endMinute.gt(searchTime.endMinute)
                                         )
                                     }
                                 )
+                            )
+                        )
+                    },
+                    searchCondition.timesToExclude?.takeIf { it.isNotEmpty() }?.let { excludeTimes ->
+                        // 수업시간들과 제시한 시간대들 중 하나라도 겹치는 경우가 존재하면 안됨
+                        Lecture::classPlaceAndTimes.not().elemMatch(
+                            Criteria().orOperator(
+                                excludeTimes.map { time ->
+                                    Criteria().andOperator(
+                                        ClassPlaceAndTime::day.isEqualTo(time.day),
+                                        ClassPlaceAndTime::startMinute.lt(time.endMinute),
+                                        ClassPlaceAndTime::endMinute.gt(time.startMinute)
+                                    )
+                                }
                             )
                         )
                     },

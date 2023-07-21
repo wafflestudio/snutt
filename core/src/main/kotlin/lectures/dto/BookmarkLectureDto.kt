@@ -1,43 +1,41 @@
 package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
+import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLectureDto(
     @JsonProperty("_id")
     var id: String? = null,
+    @JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
-    @JsonProperty("class_time")
-    var periodText: String?,
-    @JsonProperty("real_class_time")
-    var classTimeText: String?,
     @JsonProperty("class_time_json")
     var classTimes: List<ClassPlaceAndTimeDto>,
-    var classTimeMask: List<Int>,
     var classification: String?,
     var credit: Long,
     var department: String?,
     var instructor: String?,
+    @JsonProperty("lecture_number")
     var lectureNumber: String,
     var quota: Int?,
     var freshmanQuota: Int?,
     var remark: String?,
+    @JsonProperty("course_number")
     var courseNumber: String,
+    @JsonProperty("course_title")
     var courseTitle: String,
+
+    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
+    @JsonProperty("class_time_mask")
+    val classTimeMask: List<Int> = emptyList(),
 )
 
 fun BookmarkLectureDto(lecture: BookmarkLecture): BookmarkLectureDto = BookmarkLectureDto(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    periodText = lecture.periodText,
-    classTimeText = lecture.classTimeText,
     classTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
-    classTimeMask = lecture.classTimeMask,
     classification = lecture.classification,
     credit = lecture.credit,
     department = lecture.department,
@@ -48,4 +46,5 @@ fun BookmarkLectureDto(lecture: BookmarkLecture): BookmarkLectureDto = BookmarkL
     lectureNumber = lecture.lectureNumber,
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
+    classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
 )

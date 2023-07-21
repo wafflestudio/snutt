@@ -1,30 +1,52 @@
 package com.wafflestudio.snu4t.notification.service
 
-import com.wafflestudio.snu4t.common.push.PushNotificationService
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.dto.NotificationQuery
 import com.wafflestudio.snu4t.notification.repository.NotificationRepository
 import com.wafflestudio.snu4t.notification.repository.countUnreadNotifications
-import com.wafflestudio.snu4t.notification.repository.findNotifications
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.service.UserService
-import org.springframework.data.domain.PageRequest
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+/**
+ * 알림함의 알림을 관리하는 서비스입니다.
+ */
+interface NotificationService {
+    suspend fun getNotifications(query: NotificationQuery): List<Notification>
+
+    suspend fun getUnreadCount(user: User): Long
+
+    /**
+     * 푸시를 보내지 않고 알림함에 보일 [Notification] 만 저장하므로 사용 시 주의가 필요합니다.
+     *
+     * @see [PushWithNotificationService.sendPushAndNotification]
+     */
+    suspend fun sendNotification(notification: Notification)
+
+    /**
+     * 푸시를 보내지 않고 알림함에 보일 [Notification] 만 저장하므로 사용 시 주의가 필요합니다.
+     *
+     * @see [PushWithNotificationService.sendPushesAndNotifications]
+     */
+    suspend fun sendNotifications(notifications: List<Notification>)
+}
+
 @Service
-class NotificationService(
-    private val repository: NotificationRepository,
+class NotificationServiceImpl(
     private val userService: UserService,
-    private val pushNotificationService: PushNotificationService,
-) {
-    suspend fun getNotification(query: NotificationQuery): List<Notification> {
+    private val notificationRepository: NotificationRepository,
+) : NotificationService {
+    override suspend fun getNotifications(query: NotificationQuery): List<Notification> {
         val user = query.user
-        val notifications = repository.findNotifications(
+        val notifications = notificationRepository.findNotifications(
             userId = user.id!!,
             createdAt = user.regDate,
-            pageable = PageRequest.of(query.offset, query.limit)
-        )
+            offset = query.offset,
+            limit = query.limit,
+        ).toList()
 
         if (query.explicit) {
             userService.update(user.apply { notificationCheckedAt = LocalDateTime.now() })
@@ -33,13 +55,15 @@ class NotificationService(
         return notifications
     }
 
-    suspend fun getUnreadCount(user: User): Long {
-        return repository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
+    override suspend fun getUnreadCount(user: User): Long {
+        return notificationRepository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
     }
 
-    suspend fun addNotification(notification: Notification): Notification {
-        //  신규 추가되는 것인지 체크
-        check(notification.id == null)
-        return repository.save(notification)
+    override suspend fun sendNotification(notification: Notification) {
+        notificationRepository.save(notification)
+    }
+
+    override suspend fun sendNotifications(notifications: List<Notification>) {
+        notificationRepository.saveAll(notifications).collect()
     }
 }

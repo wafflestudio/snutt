@@ -6,6 +6,6 @@ enum class AppType {
 
     companion object {
         private val ENUM_MAP: Map<String, AppType> = AppType.values().associateBy { it.toString().lowercase() }
-        fun fromString(appType: String?): AppType? = appType?.let { ENUM_MAP[appType.lowercase()] }
+        fun from(appType: String?): AppType? = appType?.let { ENUM_MAP[appType.lowercase()] }
     }
 }
