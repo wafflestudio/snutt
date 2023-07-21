@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
@@ -47,38 +48,26 @@ class TimetableServiceImpl(
 
     override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        val copiedTimetable = timetable.copy(
+        val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
+        val latestCopiedTimetableNumber =
+            getLatestCopiedTimetableNumber(userId, timetable.year, timetable.semester, title ?: timetable.title)
+        return timetable.copy(
             id = null,
             userId = userId,
             updatedAt = Instant.now(),
-            title = title ?: timetable.title
-        )
-        return copyWithUniqueTitle(copiedTimetable, copiedTimetable.title)
+            title = baseTitle + " (${latestCopiedTimetableNumber + 1})"
+        ).let{timetableRepository.save(it)}
     }
 
-    private suspend fun copyWithUniqueTitle(timetable: Timetable, title: String): Timetable {
-        val latestTitle = timetableRepository.findLatestChildTimetable(
-            timetable.userId,
-            timetable.year,
-            timetable.semester,
-            title
-        )?.title ?: return timetableRepository.save(timetable)
-
-        val countMatch = titleCountRegex
-            .findAll(latestTitle)
-            .lastOrNull()
-            ?.value
-            ?: ""
-
-        val count = countMatch
-            .filter { it.isDigit() }
-            .toIntOrNull()
-            ?: 0
-        val baseTitle = latestTitle.replace(Regex("""\s\($count\)$"""), "")
-
-        timetable.title = "$baseTitle (${count + 1})"
-
-        return timetableRepository.save(timetable)
+    private suspend fun getLatestCopiedTimetableNumber(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        title: String
+    ): Int {
+        val baseTitle = title.replace(Regex("""\s\(\d+\)$"""), "")
+        return timetableRepository.findLatestChildTimetable(userId, year, semester, baseTitle)?.title
+            ?.replace(baseTitle, "")?.filter { it.isDigit() }?.toIntOrNull() ?: 0
     }
 
     override suspend fun createDefaultTable(userId: String) {
