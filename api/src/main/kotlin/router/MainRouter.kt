@@ -116,13 +116,11 @@ class MainRouter(
 
     @Bean
     @VacancyNotificationDocs
-    fun vacancyNotificationRoute() = coRouter {
-        path("/v1").nest {
-            "/vacancy-notifications".nest {
-                GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
-                POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
-                DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
-            }
+    fun vacancyNotificationRoute() = v1CoRouter {
+        "/vacancy-notifications".nest {
+            GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
+            POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
+            DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
         }
     }
 
