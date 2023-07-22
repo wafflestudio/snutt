@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.notification.data
 
 import com.wafflestudio.snu4t.common.client.AppType
+import com.wafflestudio.snu4t.common.client.AppVersion
 import com.wafflestudio.snu4t.common.client.OsType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
@@ -28,7 +29,7 @@ data class UserDevice(
     @Field
     var appType: AppType?,
     @Field
-    var appVersion: String?,
+    var appVersion: AppVersion?,
     @Indexed
     @Field
     var fcmRegistrationId: String,

@@ -37,6 +37,7 @@ enum class ErrorType(
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     SHARED_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "shared_timetable_id가 유효하지 않습니다", "존재하지 않는 공유시간표입니다."),
     NO_USER_FCM_KEY(HttpStatus.NOT_FOUND, 40402, "유저 FCM 키가 존재하지 않습니다."),
+    CONFIG_NOT_FOUND(HttpStatus.NOT_FOUND, 40403, "config가 존재하지 않습니다."),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.BAD_REQUEST, 40900, "빈자리 알림 중복"),
 
