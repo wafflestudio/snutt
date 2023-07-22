@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.deleteAndAwait
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.data.redis.core.setAndAwait
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import java.util.concurrent.Executors
 
 interface Cache {
@@ -34,7 +34,7 @@ interface Cache {
     suspend fun flushDatabase()
 }
 
-@Repository
+@Component
 class RedisCache(
     private val redisTemplate: ReactiveStringRedisTemplate,
     private val objectMapper: ObjectMapper,

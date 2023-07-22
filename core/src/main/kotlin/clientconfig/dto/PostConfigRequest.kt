@@ -29,8 +29,8 @@ data class ConfigResponse(
             ConfigResponse(
                 id = config.id!!,
                 data = jacksonObjectMapper().readTree(config.value),
-                minVersion = ConfigVersionDto.from(config.minIosVersion, config.minAndroidVersion),
-                maxVersion = ConfigVersionDto.from(config.maxIosVersion, config.maxAndroidVersion),
+                minVersion = ConfigVersionDto.of(config.minIosVersion, config.minAndroidVersion),
+                maxVersion = ConfigVersionDto.of(config.maxIosVersion, config.maxAndroidVersion),
             )
     }
 }
@@ -48,7 +48,7 @@ data class ConfigVersionDto(
         get() = AppVersion(android)
 
     companion object {
-        fun from(iosAppVersion: AppVersion?, androidAppVersion: AppVersion?): ConfigVersionDto? {
+        fun of(iosAppVersion: AppVersion?, androidAppVersion: AppVersion?): ConfigVersionDto? {
             return if (iosAppVersion != null && androidAppVersion != null) {
                 ConfigVersionDto(
                     ios = iosAppVersion.appVersion,

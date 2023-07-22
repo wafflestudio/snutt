@@ -7,22 +7,22 @@ import org.springframework.stereotype.Component
 
 data class AppVersion(val appVersion: String) : Comparable<AppVersion> {
     override fun compareTo(other: AppVersion): Int {
-        val thisVersion = this.versionToInt()
-        val otherVersion = other.versionToInt()
+        val thisVersion = this.toInts()
+        val otherVersion = other.toInts()
         val len = maxOf(thisVersion.size, otherVersion.size)
 
         for (i in 0 until len) {
-            val part1 = thisVersion.getOrElse(i) { 0 }
-            val part2 = otherVersion.getOrElse(i) { 0 }
+            val thisPart = thisVersion.getOrElse(i) { 0 }
+            val otherPart = otherVersion.getOrElse(i) { 0 }
             when {
-                part1 < part2 -> return -1
-                part1 > part2 -> return 1
+                thisPart < otherPart -> return -1
+                thisPart > otherPart -> return 1
             }
         }
         return 0
     }
 
-    private fun versionToInt() = appVersion.split(".").map { it.takeWhile { c -> c.isDigit() }.toInt() }
+    private fun toInts() = appVersion.split(".").map { it.takeWhile { c -> c.isDigit() }.toInt() }
 
     override fun toString(): String = appVersion
 }

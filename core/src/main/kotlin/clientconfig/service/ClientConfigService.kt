@@ -27,7 +27,7 @@ class ClientConfigService(
         return CacheKey.CLIENT_CONFIGS.build(osType, appVersion).let { cacheKey ->
             cache.get(cacheKey) {
                 clientConfigRepository.findAll().toList()
-                    .filter { it.isDisplayable(osType, appVersion) }.distinctBy { it.name }
+                    .filter { it.isAdaptable(osType, appVersion) }.distinctBy { it.name }
             }
         } ?: emptyList()
     }
@@ -61,9 +61,7 @@ class ClientConfigService(
 
     suspend fun deleteConfig(name: String, configId: String) {
         val deleted = clientConfigRepository.deleteByNameAndId(name, configId)
-        if (deleted == 0L) {
-            throw ConfigNotFoundException
-        }
+        if (deleted == 0L) throw ConfigNotFoundException
     }
 
     suspend fun patchConfig(name: String, configId: String, body: PatchConfigRequest): ClientConfig {
