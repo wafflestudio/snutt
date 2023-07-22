@@ -59,15 +59,18 @@ class LectureCustomRepositoryImpl(
                     },
                     searchCondition.timesToExclude?.takeIf { it.isNotEmpty() }?.let { excludeTimes ->
                         // 수업시간들과 제시한 시간대들 중 하나라도 겹치는 경우가 존재하면 안됨
-                        Lecture::classPlaceAndTimes.not().elemMatch(
-                            Criteria().orOperator(
-                                excludeTimes.map { time ->
-                                    Criteria().andOperator(
-                                        ClassPlaceAndTime::day.isEqualTo(time.day),
-                                        ClassPlaceAndTime::startMinute.lt(time.endMinute),
-                                        ClassPlaceAndTime::endMinute.gt(time.startMinute)
-                                    )
-                                }
+                        Criteria().andOperator(
+                            Lecture::classPlaceAndTimes ne listOf(),
+                            Lecture::classPlaceAndTimes.not().elemMatch(
+                                Criteria().orOperator(
+                                    excludeTimes.map { time ->
+                                        Criteria().andOperator(
+                                            ClassPlaceAndTime::day.isEqualTo(time.day),
+                                            ClassPlaceAndTime::startMinute.lt(time.endMinute),
+                                            ClassPlaceAndTime::endMinute.gt(time.startMinute)
+                                        )
+                                    }
+                                )
                             )
                         )
                     },
