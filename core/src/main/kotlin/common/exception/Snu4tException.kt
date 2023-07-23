@@ -40,6 +40,7 @@ object InvalidRegistrationForPreviousSemesterCourseException :
 
 object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object SharedTimetableNotFoundException : Snu4tException(ErrorType.SHARED_TIMETABLE_NOT_FOUND)
+object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 

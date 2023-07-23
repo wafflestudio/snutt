@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.job.sync.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snu4t.common.cache.CacheRepository
+import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -48,7 +48,7 @@ class SugangSnuSyncServiceImpl(
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val tagListRepository: TagListRepository,
-    private val cacheRepository: CacheRepository,
+    private val cache: Cache,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
@@ -77,7 +77,7 @@ class SugangSnuSyncServiceImpl(
         return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
     }
 
-    override suspend fun flushCache() = cacheRepository.flushDatabase()
+    override suspend fun flushCache() = cache.flushDatabase()
 
     private fun compareLectures(
         newLectures: Iterable<Lecture>,

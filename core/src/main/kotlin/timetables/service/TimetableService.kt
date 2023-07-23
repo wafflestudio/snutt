@@ -56,7 +56,7 @@ class TimetableServiceImpl(
             userId = userId,
             updatedAt = Instant.now(),
             title = baseTitle + " (${latestCopiedTimetableNumber + 1})"
-        ).let{timetableRepository.save(it)}
+        ).let { timetableRepository.save(it) }
     }
 
     private suspend fun getLatestCopiedTimetableNumber(

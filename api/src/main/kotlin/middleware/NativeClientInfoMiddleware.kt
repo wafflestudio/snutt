@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.middleware
 
 import com.wafflestudio.snu4t.common.client.AppType
+import com.wafflestudio.snu4t.common.client.AppVersion
 import com.wafflestudio.snu4t.common.client.ClientInfo
 import com.wafflestudio.snu4t.common.client.OsType
 import com.wafflestudio.snu4t.common.exception.InvalidAppTypeException
@@ -21,7 +22,7 @@ class NativeClientInfoMiddleware() : Middleware {
                 appType = req.headers().firstHeader("x-app-type")?.let {
                     AppType.from(it) ?: throw InvalidAppTypeException
                 } ?: AppType.RELEASE,
-                appVersion = req.headers().firstHeader("x-app-version"),
+                appVersion = req.headers().firstHeader("x-app-version")?.let { AppVersion(it) },
                 deviceId = req.headers().firstHeader("x-device-id"),
                 deviceModel = req.headers().firstHeader("x-device-model"),
             )
