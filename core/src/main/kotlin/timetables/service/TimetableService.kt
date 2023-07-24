@@ -18,7 +18,7 @@ import java.time.Instant
 interface TimetableService {
     fun getTimetables(userId: String): Flow<Timetable>
     suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable
-    suspend fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable>
+    fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable>
     suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable
     suspend fun getTimetableLink(userId: String, timetableId: String): DynamicLinkResponse
     suspend fun getTimetable(userId: String, timetableId: String): Timetable
@@ -42,7 +42,7 @@ class TimetableServiceImpl(
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
 
-    override suspend fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable> =
+    override fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable> =
         timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester)
 
     override suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable {

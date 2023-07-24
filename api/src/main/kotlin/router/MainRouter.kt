@@ -83,11 +83,6 @@ class MainRouter(
                 DELETE("/{timetableLectureId}", timeTableHandler::deleteTimetableLecture)
             }
         }
-
-        "/tables".nest {
-            GET("", timeTableHandler::getTimetableBriefs)
-            GET("/{id}/links", timeTableHandler::getTimetableLink)
-        }
     }
 
     @Bean
