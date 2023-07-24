@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
@@ -78,19 +79,30 @@ class VacancyNotifierServiceImpl(
 
         val updated = lectureAndRegistrationStatus
             .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
-            .map { (lecture, status) -> lecture.apply { registrationCount = status.registrationCount } }
+            .map { (lecture, status) ->
+                lecture.apply {
+                    registrationCount = status.registrationCount
+                    wasFull = wasFull || lecture.registrationCount == lecture.quota
+                }
+            }
         lectureService.upsertLectures(updated)
-
-        notiTargetLectures.forEach {
-            log.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
-        }
 
         supervisorScope {
             notiTargetLectures.forEach { lecture ->
+                log.info("이름: ${lecture.courseTitle}, 강좌번호: ${lecture.courseNumber}, 분반번호: ${lecture.lectureNumber}")
                 launch {
-                    val userIds = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
-                    val pushMessage = PushMessage(title = lecture.courseTitle, body = "자리났다")
-                    pushWithNotificationService.sendPushesAndNotifications(pushMessage, NotificationType.NORMAL, userIds)
+                    val userIds =
+                        vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
+                    val pushMessage = PushMessage(
+                        title = "빈자리 알림",
+                        body = "${lecture.courseTitle}(${lecture.lectureNumber})의 수강신청이 가능해졌습니다.",
+                        urlScheme = UrlScheme.VACANCY
+                    )
+                    pushWithNotificationService.sendPushesAndNotifications(
+                        pushMessage,
+                        NotificationType.NORMAL,
+                        userIds
+                    )
                 }
             }
         }
