@@ -2,7 +2,7 @@ package com.wafflestudio.snu4t.notification.service
 
 import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.PushTargetMessage
+import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
 import org.springframework.stereotype.Service
 
 /**
@@ -23,18 +23,18 @@ class PushServiceImpl internal constructor(
     override suspend fun sendPush(pushMessage: PushMessage, userId: String) {
         val userDevices = deviceService.getUserDevices(userId).ifEmpty { return }
 
-        val pushTargetMessages = userDevices.map { PushTargetMessage(it.fcmRegistrationId, pushMessage) }
-        pushClient.sendMessages(pushTargetMessages)
+        val targetedPushMessageWithTokens = userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
+        pushClient.sendMessages(targetedPushMessageWithTokens)
     }
 
     override suspend fun sendPushes(pushMessage: PushMessage, userIds: List<String>) {
         val userIdToDevices = deviceService.getUsersDevices(userIds).ifEmpty { return }
 
-        val pushTargetMessages = userIdToDevices.values.flatMap { userDevices ->
-            userDevices.map { PushTargetMessage(it.fcmRegistrationId, pushMessage) }
+        val targetedPushMessageWithTokens = userIdToDevices.values.flatMap { userDevices ->
+            userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
         }
 
-        pushClient.sendMessages(pushTargetMessages)
+        pushClient.sendMessages(targetedPushMessageWithTokens)
     }
 
     override suspend fun sendGlobalPush(pushMessage: PushMessage) = pushClient.sendGlobalMessage(pushMessage)
@@ -42,6 +42,6 @@ class PushServiceImpl internal constructor(
     override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>) =
         userToPushMessage.entries.flatMap { (userId, pushMessage) ->
             deviceService.getUserDevices(userId).map { it.fcmRegistrationId to pushMessage }
-        }.map { (fcmRegistrationId, message) -> PushTargetMessage(fcmRegistrationId, message) }
+        }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
             .let { pushClient.sendMessages(it) }
 }

@@ -2,9 +2,12 @@ package com.wafflestudio.snu4t.common.push
 
 import com.wafflestudio.snu4t.config.Phase
 
-enum class UrlScheme(private val url: String) {
-
-    NOTIFICATIONS("notifications"),
+enum class UrlScheme(
+    private val protocol: Protocol,
+    private val url: String,
+    private val devUrl: String = url
+) {
+    NOTIFICATIONS(Protocol.SNUTT, "notifications"),
     ;
 
     fun compileWith(
@@ -12,8 +15,8 @@ enum class UrlScheme(private val url: String) {
         referrer: String? = null
     ): Compiled {
         val fullScheme = when (phase) {
-            Phase.PROD -> "snutt://$url"
-            else -> "snutt-dev://$url"
+            Phase.PROD -> "${protocol.protocol}://$url"
+            else -> "${protocol.devProtocol}://$devUrl"
         }
 
         if (referrer.isNullOrBlank()) {
@@ -25,4 +28,11 @@ enum class UrlScheme(private val url: String) {
 
     @JvmInline
     value class Compiled(val value: String)
+}
+
+enum class Protocol(val protocol: String, val devProtocol: String = protocol) {
+    SNUTT("snutt", "snutt-dev"),
+    HTTPS("https"),
+    HTTP("http"),
+    ;
 }

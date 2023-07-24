@@ -39,8 +39,6 @@ class SugangSnuNotificationServiceImpl(
     }
 
     private suspend fun sendPushForTimetable(userLectureSyncResults: List<TimetableLectureSyncResult>) = coroutineScope {
-        val notificationScheme = UrlScheme.NOTIFICATIONS.compileWith(phase)
-
         val userUpdatedLectureCountMap =
             userLectureSyncResults.filterIsInstance<TimetableLectureUpdateResult>().toCountMap()
         val userDeletedLectureCountMap =
@@ -70,7 +68,7 @@ class SugangSnuNotificationServiceImpl(
             PushMessage(
                 title = "수강편람 업데이트",
                 body = messageBody,
-                urlScheme = notificationScheme,
+                urlScheme = UrlScheme.NOTIFICATIONS,
             )
         }
         pushService.sendTargetPushes(userIdToMessage)
