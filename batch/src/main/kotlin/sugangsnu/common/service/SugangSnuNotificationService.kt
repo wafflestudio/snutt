@@ -55,13 +55,13 @@ class SugangSnuNotificationServiceImpl(
 
             val messageBody = when {
                 updatedCount != null && deletedCount != null -> {
-                    "수강편람이 업데이트되어 ${updatedCount}개 강의가 변경되고 ${deletedCount}개 강의가 삭제되었습니다."
+                    "강의 ${updatedCount}개가 변경, ${deletedCount}개가 삭제되었습니다. 알림함에서 자세히 확인하세요."
                 }
                 updatedCount != null -> {
-                    "수강편람이 업데이트되어 ${updatedCount}개 강의가 변경되었습니다."
+                    "강의 ${updatedCount}개가 변경되었습니다. 알림함에서 자세히 확인하세요."
                 }
                 deletedCount != null -> {
-                    "수강편람이 업데이트되어 ${deletedCount}개 강의가 삭제되었습니다."
+                    "강의 ${deletedCount}개가 삭제되었습니다. 알림함에서 자세히 확인하세요."
                 }
                 else -> {
                     error("This should not happen")
