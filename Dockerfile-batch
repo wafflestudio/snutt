@@ -2,7 +2,5 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 ARG CODEARTIFACT_AUTH_TOKEN
 COPY . /app
-RUN keytool -import -alias sugangsnu -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -file tmp/sugangsnu.cert
-RUN keytool -list -v -keystore $JAVA_HOME/lib/security/cacerts -alias sugangsnu -storepass changeit
 RUN ./gradlew :batch:bootJar -PcodeArtifactAuthToken=$CODEARTIFACT_AUTH_TOKEN
 ENTRYPOINT java $JAVA_OPTS -jar batch/build/libs/snu4t-batch.jar --job.name=${JOB_NAME}
