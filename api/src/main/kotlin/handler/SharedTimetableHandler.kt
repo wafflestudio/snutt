@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableCopyRequest
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableCreateRequest
 import com.wafflestudio.snu4t.sharedtimetable.dto.SharedTimetableModifyRequest
 import com.wafflestudio.snu4t.sharedtimetable.service.SharedTimetableService
@@ -47,6 +48,7 @@ class SharedTimetableHandler(
     suspend fun copySharedTimetable(req: ServerRequest) = handle(req) {
         val userId = req.userId
         val sharedTimetableId = req.pathVariable("id")
-        sharedTimetableService.copy(userId, sharedTimetableId)
+        val body = req.awaitBody<SharedTimetableCopyRequest>()
+        sharedTimetableService.copy(userId, sharedTimetableId, body.title)
     }
 }

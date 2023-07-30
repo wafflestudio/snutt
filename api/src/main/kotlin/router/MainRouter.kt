@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
@@ -12,6 +13,7 @@ import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
@@ -36,6 +38,7 @@ class MainRouter(
     private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
+    private val configHandler: ConfigHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -111,18 +114,29 @@ class MainRouter(
     fun adminRoute() = v1CoRouter {
         "/admin".nest {
             POST("/insert_noti", adminHandler::insertNotification)
+
+            POST("/configs/{name}", adminHandler::postConfig)
+            GET("/configs/{name}", adminHandler::getConfigs)
+            DELETE("/configs/{name}/{id}", adminHandler::deleteConfig)
+            PATCH("/configs/{name}/{id}", adminHandler::patchConfig)
         }
     }
 
     @Bean
     @VacancyNotificationDocs
-    fun vacancyNotificationRoute() = coRouter {
-        path("/v1").nest {
-            "/vacancy-notifications".nest {
-                GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
-                POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
-                DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
-            }
+    fun vacancyNotificationRoute() = v1CoRouter {
+        "/vacancy-notifications".nest {
+            GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
+            POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
+            DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
+        }
+    }
+
+    @Bean
+    @ConfigDocs
+    fun configRoute() = v1CoRouter {
+        "/configs".nest {
+            GET("", configHandler::getConfigs)
         }
     }
 

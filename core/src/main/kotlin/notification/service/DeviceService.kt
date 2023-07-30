@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.notification.service
 
+import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
-import com.wafflestudio.snu4t.common.cache.CacheRepository
 import com.wafflestudio.snu4t.common.client.ClientInfo
 import com.wafflestudio.snu4t.common.push.PushClient
 import com.wafflestudio.snu4t.notification.data.UserDevice
@@ -17,11 +17,11 @@ class DeviceService internal constructor(
     private val pushClient: PushClient,
     private val userDeviceRepository: UserDeviceRepository,
     private val userRepository: UserRepository,
-    private val cacheRepository: CacheRepository,
+    private val cache: Cache,
 ) {
     suspend fun addRegistrationId(userId: String, registrationId: String, clientInfo: ClientInfo) {
         val cacheKey = CacheKey.LOCK_ADD_FCM_REGISTRATION_ID.build(userId, registrationId)
-        if (!cacheRepository.acquireLock(cacheKey)) return
+        if (!cache.acquireLock(cacheKey)) return
 
         coroutineScope {
             launch {
@@ -54,7 +54,7 @@ class DeviceService internal constructor(
             }
         }
 
-        cacheRepository.releaseLock(cacheKey)
+        cache.releaseLock(cacheKey)
     }
 
     private fun UserDevice.updateIfChanged(clientInfo: ClientInfo, registrationId: String): Boolean {
