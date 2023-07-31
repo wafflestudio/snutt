@@ -62,12 +62,12 @@ class VacancyNotifierServiceImpl(
             .map { lectureMap[it]!! to registrationStatusMap[it]!! }
 
         val isCurrentStudentRegistrationPeriod =
-            coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, status) ->
+            coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, _) ->
                 (lecture.freshmanQuota ?: 0) > 0
             }
                 .find { (lecture, status) -> lecture.quota - lecture.freshmanQuota!! < status.registrationCount } == null
 
-        val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, status) ->
+        val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, _) ->
             if (isCurrentStudentRegistrationPeriod) {
                 lecture.quota - (lecture.freshmanQuota ?: 0) == lecture.registrationCount
             } else {
