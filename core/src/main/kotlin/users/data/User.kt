@@ -3,7 +3,7 @@ package com.wafflestudio.snu4t.users.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.notification.data.UserDevice
 import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.index.TextIndexed
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -13,7 +13,7 @@ data class User(
     @JsonProperty("_id")
     val id: String? = null,
     var email: String?,
-    @TextIndexed
+    @Indexed(unique = true, sparse = true)
     var nickname: String?,
     var isEmailVerified: Boolean?,
     var credential: Credential,

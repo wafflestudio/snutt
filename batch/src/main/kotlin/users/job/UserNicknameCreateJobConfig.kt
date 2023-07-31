@@ -87,7 +87,7 @@ class UserNicknameCreateJobConfig(
             reactiveMongoTemplate.save(updated).awaitSingle()
             log.info("유저(id: #${user.id}, email:#${user.email})의 닉네임을 ${updated.nickname}로 변경했습니다.")
         } catch (e: DuplicateKeyException) {
-            log.info("유저(id: #${user.id}, email:#${user.email})의 닉네임 ${user.nickname}이 중복되어 재시도합니다.")
+            log.info("유저(id: #${user.id}, email:#${user.email})의 닉네임 ${nickname}이 중복되어 재시도합니다.")
             val unique = user.copy(nickname = userNicknameGenerateService.generateUniqueRandomNickname())
             reactiveMongoTemplate.save(unique).awaitSingle()
             log.info("유저(id: #${user.id}, email:#${user.email})의 닉네임을 ${unique.nickname}로 변경했습니다.")
