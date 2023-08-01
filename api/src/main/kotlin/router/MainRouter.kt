@@ -102,6 +102,7 @@ class MainRouter(
         }
     }
 
+    @Bean
     @NotificationDocs
     fun notificationRoute() = v1CoRouter {
         "/notification".nest {
@@ -110,6 +111,7 @@ class MainRouter(
         }
     }
 
+    @Bean
     @AdminDocs
     fun adminRoute() = v1CoRouter {
         "/admin".nest {

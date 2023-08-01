@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.users.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.notification.data.UserDevice
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -12,6 +13,8 @@ data class User(
     @JsonProperty("_id")
     val id: String? = null,
     var email: String?,
+    @Indexed(unique = true, sparse = true)
+    var nickname: String?,
     var isEmailVerified: Boolean?,
     var credential: Credential,
     var credentialHash: String,
@@ -24,4 +27,15 @@ data class User(
     val regDate: LocalDateTime = LocalDateTime.now(),
     var lastLoginTimestamp: Long = System.currentTimeMillis(),
     var notificationCheckedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    fun getNicknameTag(): Int? {
+        return nickname
+            ?.split(NICKNAME_TAG_DELIMITER)
+            ?.last()
+            ?.toInt()
+    }
+
+    companion object {
+        const val NICKNAME_TAG_DELIMITER = "#"
+    }
+}

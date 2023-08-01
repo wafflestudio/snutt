@@ -15,11 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import notification.dto.InsertNotificationRequest
 import org.springdoc.core.annotations.RouterOperation
 import org.springdoc.core.annotations.RouterOperations
-import org.springframework.context.annotation.Bean
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMethod
 
-@Bean
 @RouterOperations(
     RouterOperation(
         path = "/v1/admin/insert_noti", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],

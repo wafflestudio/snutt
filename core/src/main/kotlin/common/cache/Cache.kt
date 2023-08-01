@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
@@ -13,8 +13,8 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.deleteAndAwait
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.data.redis.core.setAndAwait
+import org.springframework.data.redis.core.setIfAbsentAndAwait
 import org.springframework.stereotype.Component
-import java.util.concurrent.Executors
 
 interface Cache {
     suspend fun <T : Any> Cache.get(
@@ -42,13 +42,7 @@ class RedisCache(
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        private val coroutineScope = CoroutineScope(
-            SupervisorJob() +
-                Executors.newSingleThreadExecutor {
-                    r ->
-                    Thread(r, "snu4t-cache").apply { isDaemon = true }
-                }.asCoroutineDispatcher()
-        )
+        private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     }
 
     override suspend fun <T : Any> Cache.get(
@@ -88,7 +82,7 @@ class RedisCache(
 
     override suspend fun delete(builtKey: BuiltCacheKey) {
         runCatching {
-            log.debug("[CACHE DELETE] {}", builtKey.key)
+            log.debug("[CACHE DEL] {}", builtKey.key)
             redisTemplate.deleteAndAwait(builtKey.key)
         }.getOrElse {
             log.error(it.message, it)
@@ -97,12 +91,12 @@ class RedisCache(
 
     override suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean {
         log.debug("[CACHE SETNX] {}", builtKey.key)
-        return redisTemplate.opsForValue().setIfAbsent(builtKey.key, "true", builtKey.ttl).awaitSingle()
+        return redisTemplate.opsForValue().setIfAbsentAndAwait(builtKey.key, "true", builtKey.ttl)
     }
 
     override suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean {
         log.debug("[CACHE DEL] {}", builtKey.key)
-        return redisTemplate.delete(builtKey.key).awaitSingle() > 0
+        return redisTemplate.deleteAndAwait(builtKey.key) > 0
     }
 
     override suspend fun flushDatabase() {
