@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.service.LectureService
@@ -62,12 +63,12 @@ class VacancyNotifierServiceImpl(
             .map { lectureMap[it]!! to registrationStatusMap[it]!! }
 
         val isCurrentStudentRegistrationPeriod =
-            coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, status) ->
+            coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, _) ->
                 (lecture.freshmanQuota ?: 0) > 0
             }
                 .find { (lecture, status) -> lecture.quota - lecture.freshmanQuota!! < status.registrationCount } == null
 
-        val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, status) ->
+        val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, _) ->
             if (isCurrentStudentRegistrationPeriod) {
                 lecture.quota - (lecture.freshmanQuota ?: 0) == lecture.registrationCount
             } else {
@@ -78,19 +79,30 @@ class VacancyNotifierServiceImpl(
 
         val updated = lectureAndRegistrationStatus
             .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
-            .map { (lecture, status) -> lecture.apply { registrationCount = status.registrationCount } }
+            .map { (lecture, status) ->
+                lecture.apply {
+                    registrationCount = status.registrationCount
+                    wasFull = wasFull || lecture.registrationCount == lecture.quota
+                }
+            }
         lectureService.upsertLectures(updated)
-
-        notiTargetLectures.forEach {
-            log.info("이름: ${it.courseTitle}, 강좌번호: ${it.courseNumber}, 분반번호: ${it.lectureNumber}")
-        }
 
         supervisorScope {
             notiTargetLectures.forEach { lecture ->
+                log.info("이름: {}, 강좌번호: {}, 분반번호: {}", lecture.courseTitle, lecture.courseNumber, lecture.lectureNumber)
                 launch {
-                    val userIds = vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
-                    val pushMessage = PushMessage(title = lecture.courseTitle, body = "자리났다")
-                    pushWithNotificationService.sendPushesAndNotifications(pushMessage, NotificationType.NORMAL, userIds)
+                    val userIds =
+                        vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
+                    val pushMessage = PushMessage(
+                        title = "빈자리 알림",
+                        body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
+                        urlScheme = UrlScheme.VACANCY
+                    )
+                    pushWithNotificationService.sendPushesAndNotifications(
+                        pushMessage,
+                        NotificationType.NORMAL,
+                        userIds
+                    )
                 }
             }
         }
