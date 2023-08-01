@@ -89,13 +89,13 @@ class VacancyNotifierServiceImpl(
 
         supervisorScope {
             notiTargetLectures.forEach { lecture ->
-                log.info("이름: ${lecture.courseTitle}, 강좌번호: ${lecture.courseNumber}, 분반번호: ${lecture.lectureNumber}")
+                log.info("이름: {}, 강좌번호: {}, 분반번호: {}", lecture.courseTitle, lecture.courseNumber, lecture.lectureNumber)
                 launch {
                     val userIds =
                         vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
                     val pushMessage = PushMessage(
                         title = "빈자리 알림",
-                        body = """"lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
+                        body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
                         urlScheme = UrlScheme.VACANCY
                     )
                     pushWithNotificationService.sendPushesAndNotifications(
