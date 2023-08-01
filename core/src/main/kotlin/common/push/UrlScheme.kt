@@ -8,6 +8,7 @@ enum class UrlScheme(
     private val devUrl: String = url
 ) {
     NOTIFICATIONS(Protocol.SNUTT, "notifications"),
+    VACANCY(Protocol.SNUTT, "vacancy"),
     ;
 
     fun compileWith(
