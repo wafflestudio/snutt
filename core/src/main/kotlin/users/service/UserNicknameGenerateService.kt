@@ -25,7 +25,7 @@ class UserNicknameGenerateService(
 
     suspend fun generateUniqueRandomNickname(): String {
         val nickname = createRandomNickname()
-        val tagsWithSameNickname = userRepository.findByNicknameStartingWith(nickname)
+        val tagsWithSameNickname = userRepository.findAllByNicknameStartingWith(nickname)
             .mapNotNull { it.getNicknameTag() }
             .toSet()
 
