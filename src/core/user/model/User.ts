@@ -12,4 +12,5 @@ export default interface User {
   fcmKey?: string;
   active?: boolean;
   lastLoginTimestamp?: number;
+  nickname?: string;
 }
