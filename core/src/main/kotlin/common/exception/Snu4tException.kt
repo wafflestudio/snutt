@@ -43,5 +43,6 @@ object SharedTimetableNotFoundException : Snu4tException(ErrorType.SHARED_TIMETA
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
+object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
