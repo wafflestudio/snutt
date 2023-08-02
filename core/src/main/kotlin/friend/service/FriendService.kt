@@ -76,8 +76,8 @@ class FriendServiceImpl(
     private suspend fun sendFriendRequestPush(fromUser: User, toUser: User) {
         val fromUserNickname = requireNotNull(fromUser.nickname)
         val pushMessage = PushMessage(
-            title = "$fromUserNickname 님이 친구 요청을 보냈어요",
-            body = "$fromUserNickname 님과 친구하면 서로 대표 시간표를 볼 수 있어요",
+            title = "'$fromUserNickname'님이 친구 요청을 보냈어요",
+            body = "'$fromUserNickname'님과 친구를 맺고 서로 대표 시간표를 확인해보세요!",
         )
         pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, toUser.id!!)
     }
