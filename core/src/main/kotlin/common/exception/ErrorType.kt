@@ -35,8 +35,11 @@ enum class ErrorType(
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     NO_USER_FCM_KEY(HttpStatus.NOT_FOUND, 40402, "유저 FCM 키가 존재하지 않습니다."),
     CONFIG_NOT_FOUND(HttpStatus.NOT_FOUND, 40403, "config가 존재하지 않습니다."),
+    FRIEND_NOT_FOUND(HttpStatus.NOT_FOUND, 40404, "친구 관계가 존재하지 않습니다."),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.BAD_REQUEST, 40900, "빈자리 알림 중복"),
+    DUPLICATE_FRIEND(HttpStatus.CONFLICT, 40902, "이미 친구 관계이거나 친구 요청을 보냈습니다."),
+    INVALID_FRIEND(HttpStatus.CONFLICT, 40903, "친구 요청을 보낼 수 없는 유저입니다."),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
 }

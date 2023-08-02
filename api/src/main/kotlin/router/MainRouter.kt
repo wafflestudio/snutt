@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
+import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
@@ -13,6 +14,7 @@ import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
@@ -36,6 +38,7 @@ class MainRouter(
     private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val configHandler: ConfigHandler,
+    private val friendHandler: FriendHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -123,6 +126,18 @@ class MainRouter(
     fun configRoute() = v1CoRouter {
         "/configs".nest {
             GET("", configHandler::getConfigs)
+        }
+    }
+
+    @Bean
+    @FriendDocs
+    fun friendRoute() = v1CoRouter {
+        "/friends".nest {
+            GET("", friendHandler::getFriends)
+            POST("", friendHandler::requestFriend)
+            POST("/{friendId}/accept", friendHandler::acceptFriend)
+            POST("/{friendId}/decline", friendHandler::declineFriend)
+            DELETE("/{friendId}", friendHandler::breakFriend)
         }
     }
 
