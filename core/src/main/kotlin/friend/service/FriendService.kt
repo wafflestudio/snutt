@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.friend.data.Friend
+import com.wafflestudio.snu4t.friend.dto.FriendState
 import com.wafflestudio.snu4t.friend.repository.FriendRepository
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 interface FriendService {
-    suspend fun getFriendUsers(userId: String, isAccepted: Boolean): List<Pair<Friend, User>>
+    suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>>
 
     suspend fun requestFriend(fromUserId: String, toUserNickname: String)
 
@@ -28,8 +29,8 @@ class FriendServiceImpl(
     private val friendRepository: FriendRepository,
     private val userRepository: UserRepository,
 ) : FriendService {
-    override suspend fun getFriendUsers(userId: String, isAccepted: Boolean): List<Pair<Friend, User>> {
-        val userIdToFriend = friendRepository.findAllFriends(userId, isAccepted).associateBy {
+    override suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>> {
+        val userIdToFriend = friendRepository.findAllFriends(userId, state).associateBy {
             if (it.fromUserId != userId) it.fromUserId else it.toUserId
         }.ifEmpty { return emptyList() }
 

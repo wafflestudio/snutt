@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/friends", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getFriends",
-            parameters = [Parameter(`in` = ParameterIn.QUERY, name = "isAccepted", required = false)],
+            parameters = [Parameter(`in` = ParameterIn.QUERY, name = "state", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
         ),
     ),

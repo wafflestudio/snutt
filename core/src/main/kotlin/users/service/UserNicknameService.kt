@@ -8,7 +8,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
-class UserNicknameGenerateService(
+class UserNicknameService(
     private val userRepository: UserRepository,
     @Value("adjectives.txt") adjectivesResource: ClassPathResource,
     @Value("nouns.txt") nounsResource: ClassPathResource,
@@ -37,6 +37,11 @@ class UserNicknameGenerateService(
         val nickname = createRandomNickname()
         val uniqueTag = createTag(emptySet())
         return "$nickname$TAG_DELIMITER$uniqueTag"
+    }
+
+    fun getSplitNickname(nickname: String): Pair<String, String> {
+        val (nicknameWithoutTag, tag) = nickname.split(TAG_DELIMITER, limit = 2)
+        return Pair(nicknameWithoutTag, tag)
     }
 
     private fun createRandomNickname(): String {

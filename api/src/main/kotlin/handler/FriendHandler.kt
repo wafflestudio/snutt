@@ -3,26 +3,37 @@ package com.wafflestudio.snu4t.handler
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
+import com.wafflestudio.snu4t.friend.dto.FriendState
+import com.wafflestudio.snu4t.friend.dto.NicknameResponse
 import com.wafflestudio.snu4t.friend.service.FriendService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.users.service.UserNicknameService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBody
+import org.springframework.web.server.ServerWebInputException
 
 @Component
 class FriendHandler(
     private val friendService: FriendService,
+    private val userNicknameService: UserNicknameService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
     suspend fun getFriends(req: ServerRequest) = handle(req) {
         val userId = req.userId
-        val isAccepted: Boolean = req.parseQueryParam("isAccepted") ?: true
+        val state = FriendState.from(req.parseRequiredQueryParam<String>("state")) ?: throw ServerWebInputException("Invalid state")
 
-        val content = friendService.getFriendUsers(userId, isAccepted).map { (friend, toUser) ->
+        val content = friendService.getFriendUsers(userId, state).map { (friend, toUser) ->
+            val nickname = requireNotNull(toUser.nickname)
             FriendResponse(
                 id = friend.id!!,
                 userId = toUser.id!!,
-                nickname = requireNotNull(toUser.nickname),
+                nickname = userNicknameService.getSplitNickname(nickname).let { (nicknameWithoutTag, tag) ->
+                    NicknameResponse(
+                        nickname = nicknameWithoutTag,
+                        tag = tag,
+                    )
+                },
                 createdAt = friend.createdAt,
             )
         }

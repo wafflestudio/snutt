@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.friend.repository
 
 import com.wafflestudio.snu4t.friend.data.Friend
+import com.wafflestudio.snu4t.friend.dto.FriendState
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -12,7 +13,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
 
 interface FriendCustomRepository {
-    suspend fun findAllFriends(userId: String, isAccepted: Boolean): List<Friend>
+    suspend fun findAllFriends(userId: String, state: FriendState): List<Friend>
 
     suspend fun findByUserPair(userIds: Pair<String, String>): Friend?
 }
@@ -20,16 +21,32 @@ interface FriendCustomRepository {
 class FriendCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : FriendCustomRepository {
-    override suspend fun findAllFriends(userId: String, isAccepted: Boolean): List<Friend> {
+    override suspend fun findAllFriends(userId: String, state: FriendState): List<Friend> {
         return reactiveMongoTemplate.find<Friend>(
             Query.query(
-                Criteria().andOperator(
-                    Criteria().orOperator(
-                        Friend::fromUserId isEqualTo userId,
-                        Friend::toUserId isEqualTo userId,
-                    ),
-                    Friend::isAccepted isEqualTo isAccepted,
-                )
+                when (state) {
+                    FriendState.ACTIVE -> {
+                        Criteria().andOperator(
+                            Criteria().orOperator(
+                                Friend::fromUserId isEqualTo userId,
+                                Friend::toUserId isEqualTo userId,
+                            ),
+                            Friend::isAccepted isEqualTo true,
+                        )
+                    }
+                    FriendState.REQUESTING -> {
+                        Criteria().andOperator(
+                            Friend::fromUserId isEqualTo userId,
+                            Friend::isAccepted isEqualTo false,
+                        )
+                    }
+                    FriendState.REQUESTED -> {
+                        Criteria().andOperator(
+                            Friend::toUserId isEqualTo userId,
+                            Friend::isAccepted isEqualTo false,
+                        )
+                    }
+                }
             ).with(Sort.by(Sort.Direction.DESC, "createdAt"))
         ).asFlow().toList()
     }
