@@ -74,6 +74,11 @@ export async function findByUserIdAndMongooseId(userId: string, mongooseId: stri
   return fromMongoose(doc);
 }
 
+export async function existsByUseridAndSemester(userId: string, year: number, semester: number): Promise<Boolean> {
+  let doc = await mongooseModel.findOne({'user_id': userId, 'year': year, 'semester': semester}).exec();
+  return fromMongoose(doc) != null;
+}
+
 export async function findByUserIdAndSemester(userId: string, year: number, semester: number): Promise<Timetable[]> {
   let docs = await mongooseModel.find({'user_id': userId, 'year': year, 'semester': semester}).exec();
   return docs.map(fromMongoose);
