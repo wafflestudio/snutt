@@ -28,14 +28,11 @@ enum class ErrorType(
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
     INVALID_BODY_FIELD_VALUE(HttpStatus.BAD_REQUEST, 40002, "요청 바디 값 오류"),
-    NOT_SHARED_TIMETABLE_OWNER(HttpStatus.BAD_REQUEST, 40003, "내 shared timetable이 아닙니다.", "내 공유시간표가 아니면 삭제할 수 없습니다."),
-    SHARED_TIMETABLE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 40004, "이미 공유시간표에 존재하는 timetableId입니다.", "이미 추가된 공유시간표입니다."),
     INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(HttpStatus.BAD_REQUEST, 40005, "이전 학기에는 빈자리 알림을 등록할 수 없습니다."),
     INVALID_OS_TYPE(HttpStatus.BAD_REQUEST, 40006, "잘못된 OS 타입입니다."),
     INVALID_APP_TYPE(HttpStatus.BAD_REQUEST, 40007, "잘못된 APP 타입입니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
-    SHARED_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "shared_timetable_id가 유효하지 않습니다", "존재하지 않는 공유시간표입니다."),
     NO_USER_FCM_KEY(HttpStatus.NOT_FOUND, 40402, "유저 FCM 키가 존재하지 않습니다."),
     CONFIG_NOT_FOUND(HttpStatus.NOT_FOUND, 40403, "config가 존재하지 않습니다."),
 

@@ -7,7 +7,6 @@ import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
-import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
@@ -16,7 +15,6 @@ import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
-import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
@@ -34,7 +32,6 @@ class MainRouter(
     private val authHandler: AuthHandler,
     private val adminHandler: AdminHandler,
     private val deviceHandler: DeviceHandler,
-    private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
@@ -86,19 +83,6 @@ class MainRouter(
             GET("", bookmarkHandler::getBookmarks)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
-        }
-    }
-
-    @Bean
-    @SharedTimetableDocs
-    fun sharedTimetableRoute() = v1CoRouter {
-        "/shared-tables".nest {
-            GET("", sharedTimetableHandler::getSharedTimetables)
-            GET("/{id}", sharedTimetableHandler::getSharedTimetable)
-            POST("", sharedTimetableHandler::addSharedTimetable)
-            POST("/{id}/copy", sharedTimetableHandler::copySharedTimetable)
-            PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
-            DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
         }
     }
 
