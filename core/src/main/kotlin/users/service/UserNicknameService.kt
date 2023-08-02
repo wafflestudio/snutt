@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.users.dto.NicknameDto
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toSet
@@ -39,9 +40,9 @@ class UserNicknameService(
         return "$nickname$TAG_DELIMITER$uniqueTag"
     }
 
-    fun getSplitNickname(nickname: String): Pair<String, String> {
+    fun getNicknameDto(nickname: String): NicknameDto {
         val (nicknameWithoutTag, tag) = nickname.split(TAG_DELIMITER, limit = 2)
-        return Pair(nicknameWithoutTag, tag)
+        return NicknameDto(nickname = nicknameWithoutTag, tag = tag)
     }
 
     private fun createRandomNickname(): String {

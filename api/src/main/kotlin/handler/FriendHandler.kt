@@ -4,7 +4,6 @@ import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
 import com.wafflestudio.snu4t.friend.dto.FriendState
-import com.wafflestudio.snu4t.friend.dto.NicknameResponse
 import com.wafflestudio.snu4t.friend.service.FriendService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.users.service.UserNicknameService
@@ -28,12 +27,7 @@ class FriendHandler(
             FriendResponse(
                 id = friend.id!!,
                 userId = toUser.id!!,
-                nickname = userNicknameService.getSplitNickname(nickname).let { (nicknameWithoutTag, tag) ->
-                    NicknameResponse(
-                        nickname = nicknameWithoutTag,
-                        tag = tag,
-                    )
-                },
+                nickname = userNicknameService.getNicknameDto(nickname),
                 createdAt = friend.createdAt,
             )
         }
