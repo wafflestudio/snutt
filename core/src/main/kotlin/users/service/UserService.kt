@@ -40,7 +40,7 @@ class UserServiceImpl(
     private val timetableService: TimetableService,
     private val deviceService: DeviceService,
     private val userRepository: UserRepository,
-    private val userNicknameGenerateService: UserNicknameGenerateService,
+    private val userNicknameService: UserNicknameService,
     private val cache: Cache,
 ) : UserService {
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
@@ -69,7 +69,7 @@ class UserServiceImpl(
             val credentialHash = authService.generateCredentialHash(credential)
 
             val randomNickname =
-                userNicknameGenerateService.generateUniqueRandomNickname()
+                userNicknameService.generateUniqueRandomNickname()
 
             val user = User(
                 email = email,

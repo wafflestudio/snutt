@@ -38,8 +38,11 @@ object InvalidRegistrationForPreviousSemesterCourseException :
 
 object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
+object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
+object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)
+object InvalidFriendException : Snu4tException(ErrorType.INVALID_FRIEND)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
