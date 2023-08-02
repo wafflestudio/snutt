@@ -17,6 +17,7 @@ data class TimetableDto(
     var lectures: List<TimetableLectureDto> = emptyList(),
     var title: String,
     val theme: TimetableTheme,
+    val isPrimary: Boolean,
     @JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
 )
@@ -29,5 +30,6 @@ fun TimetableDto(timetable: Timetable) = TimetableDto(
     lectures = timetable.lectures.map { TimetableLectureDto(it) },
     title = timetable.title,
     theme = timetable.theme,
+    isPrimary = timetable.isPrimary ?: false,
     updatedAt = timetable.updatedAt,
 )

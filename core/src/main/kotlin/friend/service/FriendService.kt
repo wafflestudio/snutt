@@ -30,6 +30,8 @@ interface FriendService {
     suspend fun declineFriend(friendId: String, toUserId: String)
 
     suspend fun breakFriend(friendId: String, userId: String)
+
+    suspend fun isFriend(userId: String, targetUserId: String): Boolean
 }
 
 @Service
@@ -103,5 +105,10 @@ class FriendServiceImpl(
         if ((friend.fromUserId != userId && friend.toUserId != userId) || !friend.isAccepted) throw FriendNotFoundException
 
         friendRepository.delete(friend)
+    }
+
+    override suspend fun isFriend(userId: String, targetUserId: String): Boolean {
+        return friendRepository.findByUserPair(userId to targetUserId)
+            ?.takeIf { it.isAccepted } != null
     }
 }

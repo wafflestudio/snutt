@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -21,6 +22,14 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "getFriends",
             parameters = [Parameter(`in` = ParameterIn.QUERY, name = "state", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/table", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "getPrimaryTableOfFriend",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
         ),
     ),
     RouterOperation(

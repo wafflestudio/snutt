@@ -13,6 +13,7 @@ data class TimetableBriefDto(
     val year: Int,
     val semester: Int,
     val title: String,
+    val isPrimary: Boolean,
     val updatedAt: Instant,
     val totalCredit: Long,
 )
@@ -22,6 +23,7 @@ fun TimetableBriefDto(timeTable: Timetable): TimetableBriefDto = TimetableBriefD
     year = timeTable.year,
     semester = timeTable.semester.value,
     title = timeTable.title,
+    isPrimary = timeTable.isPrimary ?: false,
     updatedAt = timeTable.updatedAt,
     totalCredit = timeTable.lectures.sumOf { it.credit ?: 0L }
 )

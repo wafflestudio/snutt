@@ -7,7 +7,9 @@ import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
@@ -18,9 +20,10 @@ import java.time.Instant
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
-
+    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto
     suspend fun copy(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun createDefaultTable(userId: String)
+    suspend fun setPrimary(userId: String, timetableId: String)
 }
 
 @Service
@@ -44,6 +47,12 @@ class TimetableServiceImpl(
             linkPrefix,
             "snutt://share?timetableId=$timetableId"
         )
+    }
+
+    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto {
+        return timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
+            ?.let(::TimetableDto)
+            ?: throw TimetableNotFoundException
     }
 
     override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {
@@ -80,5 +89,27 @@ class TimetableServiceImpl(
             theme = TimetableTheme.SNUTT,
         )
         timetableRepository.save(timetable)
+    }
+
+    override suspend fun setPrimary(userId: String, timetableId: String) {
+        val newPrimaryTable = timetableRepository.findById(timetableId)
+            ?: throw TimetableNotFoundException
+
+        if (newPrimaryTable.isPrimary == true) {
+            return
+        }
+
+        val primaryTableBefore = timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(
+            userId,
+            newPrimaryTable.year,
+            newPrimaryTable.semester
+        )
+
+        listOfNotNull(
+            newPrimaryTable.copy(isPrimary = true),
+            primaryTableBefore?.copy(isPrimary = false)
+        )
+            .let(timetableRepository::saveAll)
+            .collect()
     }
 }

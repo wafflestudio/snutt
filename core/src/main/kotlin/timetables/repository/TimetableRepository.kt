@@ -7,5 +7,6 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface TimetableRepository : CoroutineCrudRepository<Timetable, String>, TimetableCustomRepository {
     fun findAllByUserId(userId: String): Flow<Timetable>
+    suspend fun findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId: String, year: Int, semester: Semester): Timetable?
     suspend fun existsByUserIdAndYearAndSemesterAndTitle(userId: String, year: Int, semester: Semester, title: String): Boolean
 }
