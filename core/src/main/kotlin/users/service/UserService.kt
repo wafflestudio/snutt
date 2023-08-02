@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.users.service
 
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
+import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
@@ -57,7 +58,10 @@ class UserServiceImpl(
 
             if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
-            email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }
+            email?.let {
+                if (!authService.isValidEmail(email)) throw InvalidEmailException
+                if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
+            }
 
             if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
