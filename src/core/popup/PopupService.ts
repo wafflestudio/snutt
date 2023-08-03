@@ -6,7 +6,7 @@ export async function getPopups(user: User, osType?: string, osVersion?: string,
        {
          "key": "new-service-vacancy-notification",
          "image_url": "https://snutt-asset.s3.ap-northeast-2.amazonaws.com/popup-images/0803PrePopup.png",
-         "hidden_days": null,
+         "hidden_days": 1,
        },
      ],
   };
