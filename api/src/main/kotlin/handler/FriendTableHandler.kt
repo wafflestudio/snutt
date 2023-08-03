@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.friend.service.FriendService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.timetables.service.TimetableService
@@ -15,11 +16,20 @@ class FriendTableHandler(
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
 
     suspend fun getPrimaryTable(req: ServerRequest) = handle(req) {
-        val friendId = req.parseRequiredQueryParam<String>("friendUserId")
-        require(friendService.isFriend(req.userId, friendId))
+        val friend = friendService.get(req.pathVariable("friendId"))
+            ?.takeIf { it.isAccepted && it.includes(req.userId) }
+            ?: throw FriendNotFoundException
 
         val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         val year = req.parseRequiredQueryParam<Int>("year")
-        timetableService.getUserPrimaryTable(friendId, year, semester)
+        timetableService.getUserPrimaryTable(friend.getPairUserId(req.userId), year, semester)
+    }
+
+    suspend fun getRegisteredSemesters(req: ServerRequest) = handle(req) {
+        val friend = friendService.get(req.pathVariable("friendId"))
+            ?.takeIf { it.isAccepted && it.includes(req.userId) }
+            ?: throw FriendNotFoundException
+
+        timetableService.getRegisteredSemesters(friend.getPairUserId(req.userId))
     }
 }

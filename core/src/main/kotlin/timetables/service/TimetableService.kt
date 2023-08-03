@@ -6,10 +6,12 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
+import com.wafflestudio.snu4t.timetables.data.SemesterDto
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
@@ -21,6 +23,9 @@ interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
     suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto
+
+    suspend fun getRegisteredSemesters(userId: String): List<SemesterDto>
+
     suspend fun copy(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun createDefaultTable(userId: String)
     suspend fun setPrimary(userId: String, timetableId: String)
@@ -53,6 +58,13 @@ class TimetableServiceImpl(
         return timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
             ?.let(::TimetableDto)
             ?: throw TimetableNotFoundException
+    }
+
+    override suspend fun getRegisteredSemesters(userId: String): List<SemesterDto> {
+        return timetableRepository.findAllByUserId(userId)
+            .map { SemesterDto(it.year, it.semester) }
+            .distinctUntilChanged()
+            .toList()
     }
 
     override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {

@@ -31,7 +31,7 @@ interface FriendService {
 
     suspend fun breakFriend(friendId: String, userId: String)
 
-    suspend fun isFriend(userId: String, targetUserId: String): Boolean
+    suspend fun get(friendId: String): Friend?
 }
 
 @Service
@@ -107,8 +107,7 @@ class FriendServiceImpl(
         friendRepository.delete(friend)
     }
 
-    override suspend fun isFriend(userId: String, targetUserId: String): Boolean {
-        return friendRepository.findByUserPair(userId to targetUserId)
-            ?.takeIf { it.isAccepted } != null
+    override suspend fun get(friendId: String): Friend? {
+        return friendRepository.findById(friendId)
     }
 }

@@ -22,4 +22,17 @@ data class Friend(
     var isAccepted: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    fun includes(userId: String): Boolean {
+        return fromUserId == userId || toUserId == userId
+    }
+
+    fun getPairUserId(userId: String): String {
+        check(this.includes(userId))
+        return when (userId) {
+            fromUserId -> toUserId
+            toUserId -> fromUserId
+            else -> throw IllegalArgumentException("UNREACHABLE")
+        }
+    }
+}
