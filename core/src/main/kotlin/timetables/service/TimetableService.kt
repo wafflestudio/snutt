@@ -62,9 +62,13 @@ class TimetableServiceImpl(
     }
 
     override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto {
-        return timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
-            ?.let(::TimetableDto)
-            ?: throw TimetableNotFoundException
+        val tables = timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
+            .map(::TimetableDto)
+            .toList()
+            .ifEmpty { throw TimetableNotFoundException }
+
+        return tables.find { it.isPrimary }
+            ?: tables.first().copy(isPrimary = true)
     }
 
     override suspend fun getRegisteredSemesters(userId: String): List<SemesterDto> {
@@ -125,11 +129,12 @@ class TimetableServiceImpl(
             newPrimaryTable.semester
         )
 
-        listOfNotNull(
-            newPrimaryTable.copy(isPrimary = true),
-            primaryTableBefore?.copy(isPrimary = false)
-        )
-            .let(timetableRepository::saveAll)
-            .collect()
+        if (primaryTableBefore == null) {
+            timetableRepository.save(newPrimaryTable.copy(isPrimary = true))
+        } else {
+            timetableRepository
+                .saveAll(listOf(newPrimaryTable.copy(isPrimary = true), primaryTableBefore.copy(isPrimary = false)))
+                .collect()
+        }
     }
 }
