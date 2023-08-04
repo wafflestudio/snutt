@@ -50,11 +50,3 @@ fun PushMessage(
     body: String,
     data: Map<String, String>,
 ) = PushMessage(title, body, data = PushMessage.Data(data))
-
-fun PushMessage(
-    title: String,
-    body: String,
-    urlScheme: UrlScheme
-): PushMessage {
-    return PushMessage(title, body, urlScheme)
-}
