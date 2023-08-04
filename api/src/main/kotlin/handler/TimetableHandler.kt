@@ -23,4 +23,9 @@ class TimetableHandler(
         val timetableId = req.pathVariable("id")
         timeTableService.getLink(timetableId)
     }
+
+    suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
+        val timetableId = req.pathVariable("id")
+        timeTableService.setPrimary(req.userId, timetableId)
+    }
 }

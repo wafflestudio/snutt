@@ -2,9 +2,12 @@ package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
+import com.wafflestudio.snu4t.timetables.data.SemesterDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -21,6 +24,14 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "getFriends",
             parameters = [Parameter(`in` = ParameterIn.QUERY, name = "state", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/table", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "getPrimaryTableOfFriend",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
         ),
     ),
     RouterOperation(
@@ -56,6 +67,26 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "breakFriend",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/friends/{friendId}/primary-table", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "getPrimaryTable",
+            parameters = [
+                Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true),
+                Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
+                Parameter(`in` = ParameterIn.QUERY, name = "year", schema = Schema(implementation = Int::class), required = true),
+            ],
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/friends/{friendId}/registered-semesters", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "getRegisteredSemesters",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = SemesterDto::class)))])]
         ),
     ),
 )

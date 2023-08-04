@@ -6,6 +6,7 @@ import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
+import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
@@ -39,6 +40,7 @@ class MainRouter(
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val configHandler: ConfigHandler,
     private val friendHandler: FriendHandler,
+    private val friendTableHandler: FriendTableHandler
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -70,6 +72,7 @@ class MainRouter(
         "/tables".nest {
             GET("", timeTableHandler::getBriefs)
             GET("/{id}/links", timeTableHandler::getLink)
+            POST("/{id}/primary", timeTableHandler::setPrimary)
         }
     }
 
@@ -138,6 +141,8 @@ class MainRouter(
             POST("/{friendId}/accept", friendHandler::acceptFriend)
             POST("/{friendId}/decline", friendHandler::declineFriend)
             DELETE("/{friendId}", friendHandler::breakFriend)
+            GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
+            GET("/{friendId}/registered-semesters", friendTableHandler::getRegisteredSemesters)
         }
     }
 

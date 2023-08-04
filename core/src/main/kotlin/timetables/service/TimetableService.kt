@@ -6,8 +6,12 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
+import com.wafflestudio.snu4t.timetables.data.SemesterDto
 import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
@@ -18,9 +22,13 @@ import java.time.Instant
 interface TimetableService {
     suspend fun getBriefs(userId: String): List<TimetableBriefDto>
     suspend fun getLink(timetableId: String): DynamicLinkResponse
+    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto
+
+    suspend fun getRegisteredSemesters(userId: String): List<SemesterDto>
 
     suspend fun copy(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun createDefaultTable(userId: String)
+    suspend fun setPrimary(userId: String, timetableId: String)
 }
 
 @Service
@@ -33,10 +41,17 @@ class TimetableServiceImpl(
     companion object {
         private val titleCountRegex = """\((\d+)\)""".toRegex()
     }
-    override suspend fun getBriefs(userId: String): List<TimetableBriefDto> =
-        timetableRepository.findAllByUserId(userId)
+    override suspend fun getBriefs(userId: String): List<TimetableBriefDto> {
+        val tables = timetableRepository.findAllByUserId(userId)
             .map(::TimetableBriefDto)
             .toList()
+
+        if (tables.none { it.isPrimary }) {
+            return listOf(tables.first().copy(isPrimary = true)) + tables.drop(1)
+        }
+
+        return tables
+    }
 
     override suspend fun getLink(timetableId: String): DynamicLinkResponse {
         timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
@@ -44,6 +59,24 @@ class TimetableServiceImpl(
             linkPrefix,
             "snutt://share?timetableId=$timetableId"
         )
+    }
+
+    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto {
+        val tables = timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
+            .map(::TimetableDto)
+            .toList()
+            .ifEmpty { throw TimetableNotFoundException }
+
+        return tables.find { it.isPrimary }
+            ?: tables.first().copy(isPrimary = true)
+    }
+
+    override suspend fun getRegisteredSemesters(userId: String): List<SemesterDto> {
+        return timetableRepository.findAllByUserId(userId)
+            .map { SemesterDto(it.year, it.semester) }
+            .distinctUntilChanged()
+            .toList()
+            .sortedByDescending { it.order }
     }
 
     override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {
@@ -80,5 +113,28 @@ class TimetableServiceImpl(
             theme = TimetableTheme.SNUTT,
         )
         timetableRepository.save(timetable)
+    }
+
+    override suspend fun setPrimary(userId: String, timetableId: String) {
+        val newPrimaryTable = timetableRepository.findById(timetableId)
+            ?: throw TimetableNotFoundException
+
+        if (newPrimaryTable.isPrimary == true) {
+            return
+        }
+
+        val primaryTableBefore = timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(
+            userId,
+            newPrimaryTable.year,
+            newPrimaryTable.semester
+        )
+
+        if (primaryTableBefore == null) {
+            timetableRepository.save(newPrimaryTable.copy(isPrimary = true))
+        } else {
+            timetableRepository
+                .saveAll(listOf(newPrimaryTable.copy(isPrimary = true), primaryTableBefore.copy(isPrimary = false)))
+                .collect()
+        }
     }
 }
