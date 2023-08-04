@@ -94,6 +94,7 @@ export async function addCopyFromSourceId(user, sourceId): Promise<Timetable> {
         title: newTitle,
         theme : source.theme,
         lecture_list: source.lecture_list,
+        is_primary: source.is_primary,
         updated_at: Date.now()
       };
       await validateTimetable(newTimetable)
