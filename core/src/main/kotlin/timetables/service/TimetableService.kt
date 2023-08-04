@@ -41,10 +41,17 @@ class TimetableServiceImpl(
     companion object {
         private val titleCountRegex = """\((\d+)\)""".toRegex()
     }
-    override suspend fun getBriefs(userId: String): List<TimetableBriefDto> =
-        timetableRepository.findAllByUserId(userId)
+    override suspend fun getBriefs(userId: String): List<TimetableBriefDto> {
+        val tables = timetableRepository.findAllByUserId(userId)
             .map(::TimetableBriefDto)
             .toList()
+
+        if (tables.none { it.isPrimary }) {
+            return listOf(tables.first().copy(isPrimary = true)) + tables.drop(1)
+        }
+
+        return tables
+    }
 
     override suspend fun getLink(timetableId: String): DynamicLinkResponse {
         timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
@@ -65,6 +72,7 @@ class TimetableServiceImpl(
             .map { SemesterDto(it.year, it.semester) }
             .distinctUntilChanged()
             .toList()
+            .sortedByDescending { it.order }
     }
 
     override suspend fun copy(userId: String, timetableId: String, title: String?): Timetable {

@@ -17,7 +17,6 @@ data class TimetableBriefDto(
     val updatedAt: Instant,
     val totalCredit: Long,
 )
-
 fun TimetableBriefDto(timeTable: Timetable): TimetableBriefDto = TimetableBriefDto(
     id = timeTable.id.let(::requireNotNull),
     year = timeTable.year,
