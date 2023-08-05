@@ -17,6 +17,7 @@ data class TimetableDto(
     var lectures: List<TimetableLectureDto> = emptyList(),
     var title: String,
     val theme: TimetableTheme,
+    @JsonProperty("is_primary")
     val isPrimary: Boolean,
     @JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
