@@ -5,8 +5,8 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
+import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.timetables.data.SemesterDto
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
@@ -24,7 +24,7 @@ interface TimetableService {
     suspend fun getLink(timetableId: String): DynamicLinkResponse
     suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto
 
-    suspend fun getRegisteredSemesters(userId: String): List<SemesterDto>
+    suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto>
 
     suspend fun copy(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun createDefaultTable(userId: String)
@@ -71,9 +71,9 @@ class TimetableServiceImpl(
             ?: tables.first().copy(isPrimary = true)
     }
 
-    override suspend fun getRegisteredSemesters(userId: String): List<SemesterDto> {
+    override suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto> {
         return timetableRepository.findAllByUserId(userId)
-            .map { SemesterDto(it.year, it.semester) }
+            .map { CoursebookDto(it.year, it.semester) }
             .distinctUntilChanged()
             .toList()
             .sortedByDescending { it.order }

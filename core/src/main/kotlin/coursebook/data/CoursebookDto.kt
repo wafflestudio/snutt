@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.timetables.data
+package com.wafflestudio.snu4t.coursebook.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.wafflestudio.snu4t.common.enum.Semester
 
-data class SemesterDto(
+data class CoursebookDto(
     val year: Int,
     val semester: Semester
 ) {

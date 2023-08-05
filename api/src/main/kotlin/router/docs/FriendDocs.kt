@@ -1,8 +1,8 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
-import com.wafflestudio.snu4t.timetables.data.SemesterDto
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -78,7 +78,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "getRegisteredSemesters",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = SemesterDto::class)))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
         ),
     ),
 )
