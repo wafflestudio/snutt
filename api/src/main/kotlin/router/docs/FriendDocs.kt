@@ -3,7 +3,7 @@ package com.wafflestudio.snu4t.router.docs
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
-import com.wafflestudio.snu4t.timetables.dto.TimetableDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -70,7 +70,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
                 Parameter(`in` = ParameterIn.QUERY, name = "year", schema = Schema(implementation = Int::class), required = true),
             ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))])]
         ),
     ),
     RouterOperation(
