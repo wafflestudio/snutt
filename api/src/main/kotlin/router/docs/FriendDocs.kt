@@ -1,9 +1,9 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
-import com.wafflestudio.snu4t.timetables.data.SemesterDto
-import com.wafflestudio.snu4t.timetables.dto.TimetableDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -70,15 +70,15 @@ import org.springframework.web.bind.annotation.RequestMethod
                 Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
                 Parameter(`in` = ParameterIn.QUERY, name = "year", schema = Schema(implementation = Int::class), required = true),
             ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))])]
         ),
     ),
     RouterOperation(
-        path = "/v1/friends/{friendId}/registered-semesters", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/{friendId}/registered-course-books", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "getRegisteredSemesters",
+            operationId = "getRegisteredCourseBooks",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = SemesterDto::class)))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
         ),
     ),
 )

@@ -25,11 +25,11 @@ class FriendTableHandler(
         timetableService.getUserPrimaryTable(friend.getPairUserId(req.userId), year, semester)
     }
 
-    suspend fun getRegisteredSemesters(req: ServerRequest) = handle(req) {
+    suspend fun getRegisteredCourseBooks(req: ServerRequest) = handle(req) {
         val friend = friendService.get(req.pathVariable("friendId"))
             ?.takeIf { it.isAccepted && it.includes(req.userId) }
             ?: throw FriendNotFoundException
 
-        timetableService.getRegisteredSemesters(friend.getPairUserId(req.userId))
+        timetableService.getRegisteredCourseBooks(friend.getPairUserId(req.userId))
     }
 }

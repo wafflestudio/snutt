@@ -142,7 +142,7 @@ class MainRouter(
             POST("/{friendId}/decline", friendHandler::declineFriend)
             DELETE("/{friendId}", friendHandler::breakFriend)
             GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
-            GET("/{friendId}/registered-semesters", friendTableHandler::getRegisteredSemesters)
+            GET("/{friendId}/registered-course-books", friendTableHandler::getRegisteredCourseBooks)
         }
     }
 
