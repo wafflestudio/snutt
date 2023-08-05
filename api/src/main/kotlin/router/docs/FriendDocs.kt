@@ -27,14 +27,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/table", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getPrimaryTableOfFriend",
-            parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableDto::class))])]
-        ),
-    ),
-    RouterOperation(
         path = "/v1/friends", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "requestFriend",
