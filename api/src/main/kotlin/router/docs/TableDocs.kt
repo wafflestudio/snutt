@@ -32,7 +32,7 @@ import timetables.dto.TimetableBriefDto
     RouterOperation(
         path = "/v1/tables/{id}/primary", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "getBrief",
+            operationId = "setPrimary",
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = Unit::class))])]
         ),
     ),
