@@ -74,9 +74,9 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/friends/{friendId}/registered-semesters", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/{friendId}/registered-course-books", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "getRegisteredSemesters",
+            operationId = "getRegisteredCourseBooks",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
         ),
