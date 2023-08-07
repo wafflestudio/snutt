@@ -76,8 +76,8 @@ export async function addLecture(timetable: Timetable, lecture: UserLecture, isF
 
 
 export async function addCustomLecture(timetable: Timetable, lecture: UserLecture, isForced: boolean): Promise<void> {
-  if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
   syncRealTimeWithPeriod(lecture)
+  if (isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
 
   // ios 3.1.3 UUID 넘겨주는 에러 hotfix
   delete lecture.lecture_id
@@ -129,8 +129,8 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
     LectureColorService.validateLectureColor(lecture);
   }
   if (lecture['class_time_json']) {
-    if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
     syncRealTimeWithPeriod(lecture)
+    if(isInvalidClassTime(lecture)) throw new InvalidLectureTimeJsonError()
     validateLectureTime(lecture);
 
     const overlappingLectures = getOverlappingLectures(table, lecture).filter(overlappingLecture => overlappingLecture._id != lecture._id)
@@ -270,7 +270,7 @@ function syncRealTimeWithPeriod(lecture: any): void  {
 
 function isInvalidClassTime(lecture: Lecture): boolean {
   return lecture.class_time_json.some(
-    it => (it.start == null || it.len == null) && (it.startMinute == null || it.endMinute == null) && (it.start_time == null || it.end_time == null)
+    it => it.startMinute == null || it.endMinute == null
   );
 }
 
