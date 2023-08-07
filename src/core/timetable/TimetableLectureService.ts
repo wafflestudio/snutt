@@ -256,12 +256,12 @@ function timesOverlap(time1: TimePlace, time2: TimePlace): boolean {
 
 function syncRealTimeWithPeriod(lecture: any): void  {
   lecture.class_time_json.forEach(it => {
-    if (it.start_time && it.end_time) {
+    if (it.start_time != null && it.end_time != null) {
       const startTime = Time.fromHourMinuteString(it.start_time)
       const endTime = Time.fromHourMinuteString(it.end_time)
       it.startMinute = startTime.totalMinute
       it.endMinute = endTime.totalMinute
-    } else if (it.start && it.len) {
+    } else if (it.start != null && it.len != null) {
       it.startMinute = new Time((it.start + 8) * 60).totalMinute
       it.endMinute = new Time((it.start + it.len + 8) * 60).totalMinute
     }
