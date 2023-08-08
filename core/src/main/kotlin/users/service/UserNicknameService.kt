@@ -45,10 +45,12 @@ class UserNicknameService(
         return NicknameDto(nickname = nicknameWithoutTag, tag = tag)
     }
 
+    private val nicknames = adjectives
+        .flatMap { adj -> nouns.map { "$adj $it" } }
+        .filter { it.length <= 10 }
+
     private fun createRandomNickname(): String {
-        val adj = adjectives.random()
-        val noun = nouns.random()
-        return "$adj $noun"
+        return nicknames.random()
     }
 
     private fun createTag(existingTags: Set<Int>): String =
