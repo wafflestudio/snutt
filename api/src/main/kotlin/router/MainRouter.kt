@@ -5,18 +5,19 @@ import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
+import com.wafflestudio.snu4t.handler.FriendHandler
+import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
-import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
-import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
@@ -34,11 +35,12 @@ class MainRouter(
     private val authHandler: AuthHandler,
     private val adminHandler: AdminHandler,
     private val deviceHandler: DeviceHandler,
-    private val sharedTimetableHandler: SharedTimetableHandler,
     private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val configHandler: ConfigHandler,
+    private val friendHandler: FriendHandler,
+    private val friendTableHandler: FriendTableHandler
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -70,6 +72,7 @@ class MainRouter(
         "/tables".nest {
             GET("", timeTableHandler::getBriefs)
             GET("/{id}/links", timeTableHandler::getLink)
+            POST("/{id}/primary", timeTableHandler::setPrimary)
         }
     }
 
@@ -86,19 +89,6 @@ class MainRouter(
             GET("", bookmarkHandler::getBookmarks)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
-        }
-    }
-
-    @Bean
-    @SharedTimetableDocs
-    fun sharedTimetableRoute() = v1CoRouter {
-        "/shared-tables".nest {
-            GET("", sharedTimetableHandler::getSharedTimetables)
-            GET("/{id}", sharedTimetableHandler::getSharedTimetable)
-            POST("", sharedTimetableHandler::addSharedTimetable)
-            POST("/{id}/copy", sharedTimetableHandler::copySharedTimetable)
-            PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
-            DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
         }
     }
 
@@ -139,6 +129,20 @@ class MainRouter(
     fun configRoute() = v1CoRouter {
         "/configs".nest {
             GET("", configHandler::getConfigs)
+        }
+    }
+
+    @Bean
+    @FriendDocs
+    fun friendRoute() = v1CoRouter {
+        "/friends".nest {
+            GET("", friendHandler::getFriends)
+            POST("", friendHandler::requestFriend)
+            POST("/{friendId}/accept", friendHandler::acceptFriend)
+            POST("/{friendId}/decline", friendHandler::declineFriend)
+            DELETE("/{friendId}", friendHandler::breakFriend)
+            GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
+            GET("/{friendId}/registered-course-books", friendTableHandler::getRegisteredCourseBooks)
         }
     }
 

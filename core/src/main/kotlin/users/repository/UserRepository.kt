@@ -15,6 +15,10 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByCredentialLocalIdAndActiveTrue(localId: String): User?
 
+    suspend fun findByNicknameAndActiveTrue(nickname: String): User?
+
+    suspend fun findAllByIdInAndActiveTrue(ids: List<String>): List<User>
+
     suspend fun existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): Boolean
 
     fun findAllByNicknameStartingWith(nickname: String): Flow<User>

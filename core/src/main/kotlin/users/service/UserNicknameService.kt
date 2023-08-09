@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.users.dto.NicknameDto
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toSet
@@ -8,7 +9,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
-class UserNicknameGenerateService(
+class UserNicknameService(
     private val userRepository: UserRepository,
     @Value("adjectives.txt") adjectivesResource: ClassPathResource,
     @Value("nouns.txt") nounsResource: ClassPathResource,
@@ -39,10 +40,17 @@ class UserNicknameGenerateService(
         return "$nickname$TAG_DELIMITER$uniqueTag"
     }
 
+    fun getNicknameDto(nickname: String): NicknameDto {
+        val (nicknameWithoutTag, tag) = nickname.split(TAG_DELIMITER, limit = 2)
+        return NicknameDto(nickname = nicknameWithoutTag, tag = tag)
+    }
+
+    private val nicknames = adjectives
+        .flatMap { adj -> nouns.map { "$adj $it" } }
+        .filter { it.length <= 10 }
+
     private fun createRandomNickname(): String {
-        val adj = adjectives.random()
-        val noun = nouns.random()
-        return "$adj $noun"
+        return nicknames.random()
     }
 
     private fun createTag(existingTags: Set<Int>): String =
