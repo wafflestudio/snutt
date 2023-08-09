@@ -47,6 +47,7 @@ let TimetableSchema = new mongoose.Schema({
   title: {type: String, required: true},
   lecture_list: [userLectureSchema],
   updated_at: Date,
+  is_primary: Boolean,
   theme: {type: Number, required: true, default: 0, min: 0, max:NUMBER_OF_THEME-1}
 });
 
@@ -72,6 +73,11 @@ export async function findByUserIdAndSemesterAndTitle(userId: string, year: numb
 export async function findByUserIdAndMongooseId(userId: string, mongooseId: string): Promise<Timetable> {
   var doc = await mongooseModel.findOne({'user_id': userId, '_id': mongooseId}).exec();
   return fromMongoose(doc);
+}
+
+export async function existsByUseridAndSemester(userId: string, year: number, semester: number): Promise<Boolean> {
+  let doc = await mongooseModel.findOne({'user_id': userId, 'year': year, 'semester': semester}).exec();
+  return fromMongoose(doc) != null;
 }
 
 export async function findByUserIdAndSemester(userId: string, year: number, semester: number): Promise<Timetable[]> {
@@ -243,6 +249,7 @@ export async function insert(table: Timetable): Promise<Timetable> {
     title: table.title,
     theme: table.theme,
     lecture_list: table.lecture_list,
+    is_primary: table.is_primary,
     updated_at: table.updated_at
   });
   await doc.save();
@@ -283,7 +290,8 @@ function fromMongoose(mongooseDoc): Timetable {
     title: mongooseDoc.title,
     lecture_list: lecture_list,
     theme: mongooseDoc.theme,
-    updated_at: mongooseDoc.updated_at
+    updated_at: mongooseDoc.updated_at,
+    is_primary: mongooseDoc.is_primary,
   }
 }
 

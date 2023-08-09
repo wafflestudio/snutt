@@ -8,6 +8,7 @@ import AbstractTimetable from './model/AbstractTimetable';
 import TimetableNotEnoughParamError from './error/TimetableNotEnoughParamError';
 import ThemeTypeEnum from "@app/core/timetable/model/ThemeTypeEnum";
 import SnuttevLectureKey from "@app/core/lecture/model/SnuttevLectureKey";
+import {existsByUseridAndSemester} from "@app/core/timetable/TimetableRepository";
 
 //deprecated
 export async function copy(timetable: Timetable): Promise<void> {
@@ -93,6 +94,7 @@ export async function addCopyFromSourceId(user, sourceId): Promise<Timetable> {
         title: newTitle,
         theme : source.theme,
         lecture_list: source.lecture_list,
+        is_primary: source.is_primary,
         updated_at: Date.now()
       };
       await validateTimetable(newTimetable)
@@ -108,6 +110,9 @@ export async function addCopyFromSourceId(user, sourceId): Promise<Timetable> {
 }
 
 export async function addFromParam(params): Promise<Timetable> {
+  let isFirstTimeTableOfTheSemester =
+      !await TimetableRepository.existsByUseridAndSemester(params.user_id, params.year, params.semester)
+
   let newTimetable: Timetable = {
     user_id : params.user_id,
     year : params.year,
@@ -115,6 +120,7 @@ export async function addFromParam(params): Promise<Timetable> {
     title : params.title,
     theme : ThemeTypeEnum.SNUTT,
     lecture_list : [],
+    is_primary: isFirstTimeTableOfTheSemester,
     updated_at: Date.now()
   };
 
