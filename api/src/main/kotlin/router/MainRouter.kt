@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
+import com.wafflestudio.snu4t.handler.UserHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
@@ -30,17 +31,18 @@ import org.springframework.web.reactive.function.server.coRouter
 
 @Component
 class MainRouter(
-    private val timeTableHandler: TimetableHandler,
-    private val bookmarkHandler: BookmarkHandler,
+    private val userHandler: UserHandler,
     private val authHandler: AuthHandler,
-    private val adminHandler: AdminHandler,
     private val deviceHandler: DeviceHandler,
     private val notificationHandler: NotificationHandler,
-    private val lectureSearchHandler: LectureSearchHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
-    private val configHandler: ConfigHandler,
+    private val timeTableHandler: TimetableHandler,
+    private val bookmarkHandler: BookmarkHandler,
+    private val lectureSearchHandler: LectureSearchHandler,
     private val friendHandler: FriendHandler,
-    private val friendTableHandler: FriendTableHandler
+    private val friendTableHandler: FriendTableHandler,
+    private val configHandler: ConfigHandler,
+    private val adminHandler: AdminHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -61,8 +63,13 @@ class MainRouter(
     @UserDocs
     fun userRoute() = v1CoRouter {
         "/user".nest {
+            GET("/info", userHandler::getUserInfo)
             POST("/device/{id}", deviceHandler::addRegistrationId)
             DELETE("/device/{id}", deviceHandler::removeRegistrationId)
+        }
+        "/users".nest {
+            GET("/me", userHandler::getUserMe)
+            PATCH("/me", userHandler::patchUserInfo)
         }
     }
 
