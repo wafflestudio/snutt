@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "patchUserInfo",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = UserPatchRequest::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = UserDto::class))])]
         ),
     ),
     RouterOperation(
