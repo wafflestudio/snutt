@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.common.exception.InvalidNicknameException
 import com.wafflestudio.snu4t.users.dto.NicknameDto
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import kotlinx.coroutines.flow.mapNotNull
@@ -17,6 +18,13 @@ class UserNicknameService(
     private val adjectives = readAndSplitByComma(adjectivesResource)
     private val nouns = readAndSplitByComma(nounsResource)
 
+    companion object {
+        private const val TAG_DELIMITER = "#"
+        private const val NICKNAME_TAG_LENGTH = 4
+        private const val NICKNAME_MAX_LENGTH = 10
+        private val nicknameRegex = "^[a-zA-Z가-힣 ]+$".toRegex()
+    }
+
     private fun readAndSplitByComma(resource: ClassPathResource): List<String> {
         return resource.inputStream
             .readBytes()
@@ -26,12 +34,7 @@ class UserNicknameService(
 
     suspend fun generateUniqueRandomNickname(): String {
         val nickname = createRandomNickname()
-        val tagsWithSameNickname = userRepository.findAllByNicknameStartingWith(nickname)
-            .mapNotNull { it.getNicknameTag() }
-            .toSet()
-
-        val uniqueTag = createTag(tagsWithSameNickname)
-        return "$nickname$TAG_DELIMITER$uniqueTag"
+        return appendNewTag(nickname)
     }
 
     fun generateRandomNickname(): String {
@@ -45,9 +48,24 @@ class UserNicknameService(
         return NicknameDto(nickname = nicknameWithoutTag, tag = tag)
     }
 
+    suspend fun appendNewTag(nickname: String): String {
+        if (!isValidNickname(nickname)) throw InvalidNicknameException
+
+        val tagsWithSameNickname = userRepository.findAllByNicknameStartingWith(nickname)
+            .mapNotNull { it.getNicknameTag() }
+            .toSet()
+        val newTag = createTag(tagsWithSameNickname)
+
+        return "$nickname$TAG_DELIMITER$newTag"
+    }
+
+    private fun isValidNickname(nickname: String): Boolean {
+        return nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
+    }
+
     private val nicknames = adjectives
         .flatMap { adj -> nouns.map { "$adj $it" } }
-        .filter { it.length <= 10 }
+        .filter { it.length <= NICKNAME_MAX_LENGTH }
 
     private fun createRandomNickname(): String {
         return nicknames.random()
@@ -58,9 +76,5 @@ class UserNicknameService(
             .filter { it !in existingTags }
             .first()
             .toString()
-            .padStart(4, '0')
-
-    companion object {
-        private const val TAG_DELIMITER = "#"
-    }
+            .padStart(NICKNAME_TAG_LENGTH, '0')
 }
