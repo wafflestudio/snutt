@@ -19,10 +19,15 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import org.springframework.stereotype.Service
 
 interface UserService {
+    suspend fun getUser(userId: String): User
+
+    suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User
+
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
     suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): LoginResponse
@@ -43,6 +48,25 @@ class UserServiceImpl(
     private val userNicknameService: UserNicknameService,
     private val cache: Cache,
 ) : UserService {
+    override suspend fun getUser(userId: String): User {
+        return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+    }
+
+    override suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User {
+        val user = getUser(userId)
+
+        with(userPatchRequest) {
+            nickname?.let {
+                val prevNickname = userNicknameService.getNicknameDto(requireNotNull(user.nickname)).nickname
+                if (it != prevNickname) {
+                    user.nickname = userNicknameService.appendNewTag(it)
+                }
+            }
+        }
+
+        return userRepository.save(user)
+    }
+
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
         userRepository.findByCredentialHashAndActive(credentialHash, true) ?: throw WrongUserTokenException
 
@@ -68,8 +92,7 @@ class UserServiceImpl(
             val credential = authService.buildLocalCredential(localId, password)
             val credentialHash = authService.generateCredentialHash(credential)
 
-            val randomNickname =
-                userNicknameService.generateUniqueRandomNickname()
+            val randomNickname = userNicknameService.generateUniqueRandomNickname()
 
             val user = User(
                 email = email,
