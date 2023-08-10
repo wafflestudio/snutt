@@ -94,6 +94,7 @@ class MainRouter(
     fun bookmarkRoute() = v1CoRouter {
         "/bookmarks".nest {
             GET("", bookmarkHandler::getBookmarks)
+            GET("/lectures/{lectureId}/status", bookmarkHandler::existsBookmarkLecture)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
         }
@@ -126,6 +127,7 @@ class MainRouter(
     fun vacancyNotificationRoute() = v1CoRouter {
         "/vacancy-notifications".nest {
             GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
+            GET("/lectures/{lectureId}/status", vacancyNotificationHandler::existsVacancyNotification)
             POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
             DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
         }
