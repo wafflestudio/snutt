@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.handler
 import com.wafflestudio.snu4t.bookmark.dto.BookmarkLectureModifyRequest
 import com.wafflestudio.snu4t.bookmark.dto.BookmarkResponse
 import com.wafflestudio.snu4t.bookmark.service.BookmarkService
+import com.wafflestudio.snu4t.common.dto.ExistenceResponse
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import org.springframework.stereotype.Component
@@ -20,6 +21,12 @@ class BookmarkHandler(
         val year: Int = req.parseRequiredQueryParam("year")
         val semester: Semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         bookmarkService.getBookmark(userId, year, semester).let(::BookmarkResponse)
+    }
+
+    suspend fun existsBookmarkLecture(req: ServerRequest) = handle(req) {
+        val userId: String = req.userId
+        val lectureId = req.pathVariable("lectureId")
+        ExistenceResponse(bookmarkService.existsBookmarkLecture(userId, lectureId))
     }
 
     suspend fun addLecture(req: ServerRequest) = handle(req) {

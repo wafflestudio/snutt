@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
+import com.wafflestudio.snu4t.common.dto.ExistenceResponse
 import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -20,6 +21,15 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "getVacancyNotificationLectures",
             responses = [
                 ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = VacancyNotificationLecturesResponse::class))]),
+            ]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/vacancy-notifications/lectures/{lectureId}/state", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "existsVacancyNotification",
+            responses = [
+                ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ExistenceResponse::class))]),
             ]
         ),
     ),
