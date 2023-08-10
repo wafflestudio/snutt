@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/vacancy-notifications/lectures/{lectureId}/status", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/vacancy-notifications/lectures/{lectureId}/state", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "existsVacancyNotification",
             responses = [
