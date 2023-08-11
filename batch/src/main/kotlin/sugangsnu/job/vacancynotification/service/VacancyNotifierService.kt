@@ -20,6 +20,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
@@ -127,7 +128,7 @@ class VacancyNotifierServiceImpl(
     }
 
     private suspend fun getRegistrationStatus(pages: List<Int>): List<RegistrationStatus> =
-        coroutineScope {
+        supervisorScope {
             pages.map { page ->
                 async {
                     getSugangSnuSearchContent(page).extractRegistrationStatus()
