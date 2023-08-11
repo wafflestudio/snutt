@@ -8,5 +8,5 @@ interface VacancyNotificationRepository : CoroutineCrudRepository<VacancyNotific
     fun findAllByLectureId(lectureId: String): Flow<VacancyNotification>
     fun findAllByUserId(userId: String): Flow<VacancyNotification>
     suspend fun existsByUserIdAndLectureId(userId: String, lectureId: String): Boolean
-    suspend fun deleteByLectureId(lectureId: String)
+    suspend fun deleteByUserIdAndLectureId(userId: String, lectureId: String)
 }

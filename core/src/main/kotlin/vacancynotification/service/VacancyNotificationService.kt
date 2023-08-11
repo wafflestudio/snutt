@@ -19,7 +19,7 @@ interface VacancyNotificationService {
     suspend fun getVacancyNotificationLectures(userId: String): List<Lecture>
     suspend fun existsVacancyNotification(userId: String, lectureId: String): Boolean
     suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification
-    suspend fun deleteVacancyNotification(lectureId: String)
+    suspend fun deleteVacancyNotification(userId: String, lectureId: String)
     suspend fun deleteAll()
 }
 
@@ -51,8 +51,8 @@ class VacancyNotificationServiceImpl(
             trySave(VacancyNotification(userId = userId, lectureId = lectureId))
         }
 
-    override suspend fun deleteVacancyNotification(lectureId: String) {
-        vacancyNotificationRepository.deleteByLectureId(lectureId)
+    override suspend fun deleteVacancyNotification(userId: String, lectureId: String) {
+        vacancyNotificationRepository.deleteByUserIdAndLectureId(userId, lectureId)
     }
 
     override suspend fun deleteAll() {
