@@ -38,9 +38,10 @@ class VacancyNotifcationHandler(
     }
 
     suspend fun deleteVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.userId
         val lectureId = req.pathVariable("lectureId")
 
-        vacancyNotificationService.deleteVacancyNotification(lectureId)
+        vacancyNotificationService.deleteVacancyNotification(userId, lectureId)
         null
     }
 }
