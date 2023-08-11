@@ -24,6 +24,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 interface VacancyNotifierService {
     suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult
@@ -53,25 +54,22 @@ class VacancyNotifierServiceImpl(
             log.error("부하기간")
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
+        val lectures =
+            lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
+        val lectureMap = lectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
+        val isCurrentStudentRegistrationPeriod =
+            coursebook.semester == Semester.SPRING && LocalDate.now().dayOfMonth < 15
+
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
             val registrationStatus = getRegistrationStatus(chunkedPages)
             if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
-            val lectures =
-                lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
-            val lectureMap = lectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
             val registrationStatusMap =
                 registrationStatus.associateBy { info -> info.courseNumber + "##" + info.lectureNumber }
 
             val lectureAndRegistrationStatus = (lectureMap.keys intersect registrationStatusMap.keys)
                 .map { lectureMap[it]!! to registrationStatusMap[it]!! }
-
-            val isCurrentStudentRegistrationPeriod =
-                coursebook.semester == Semester.SPRING && lectureAndRegistrationStatus.filter { (lecture, _) ->
-                    (lecture.freshmanQuota ?: 0) > 0
-                }
-                    .find { (lecture, status) -> lecture.quota - lecture.freshmanQuota!! < status.registrationCount } == null
 
             val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, _) ->
                 if (isCurrentStudentRegistrationPeriod) {
