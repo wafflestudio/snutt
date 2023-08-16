@@ -98,7 +98,8 @@ class TimetableServiceImpl(
             id = null,
             userId = userId,
             updatedAt = Instant.now(),
-            title = baseTitle + " (${latestCopiedTimetableNumber + 1})"
+            title = baseTitle + " (${latestCopiedTimetableNumber + 1})",
+            isPrimary = false,
         ).let { timetableRepository.save(it) }
     }
 
