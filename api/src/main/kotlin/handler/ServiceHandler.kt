@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
-import com.wafflestudio.snu4t.common.exception.InvalidParameterException
+import com.wafflestudio.snu4t.common.exception.InvalidQueryParameterException
 import com.wafflestudio.snu4t.common.exception.MissingRequiredParameterException
 import com.wafflestudio.snu4t.middleware.Middleware
 import com.wafflestudio.snu4t.middleware.plus
@@ -30,7 +30,7 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
 
     fun <T> ServerRequest.parseQueryParam(name: String, convert: (String) -> T?): T? =
         this.queryParamOrNull(name)?.runCatching { convert(this)!! }
-            ?.getOrElse { throw InvalidParameterException(name) }
+            ?.getOrElse { throw InvalidQueryParameterException(name) }
 
     inline fun <reified T> ServerRequest.parseRequiredQueryParam(name: String): T =
         parseQueryParam<T>(name)

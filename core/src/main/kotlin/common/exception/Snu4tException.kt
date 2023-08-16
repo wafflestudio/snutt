@@ -24,7 +24,10 @@ object UserNotFoundException : Snu4tException(ErrorType.USER_NOT_FOUND)
 class MissingRequiredParameterException(fieldName: String) :
     Snu4tException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
 
-class InvalidParameterException(fieldName: String) :
+class InvalidPathParameterException(fieldName: String) :
+    Snu4tException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (path parameter: $fieldName)")
+
+class InvalidQueryParameterException(fieldName: String) :
     Snu4tException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (query parameter: $fieldName)")
 
 class InvalidBodyFieldValueException(fieldName: String) :
@@ -38,6 +41,7 @@ object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)
 
+object DuplicateTimetableTitleException : Snu4tException(ErrorType.DUPLICATE_TIMETABLE_TITLE)
 object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)

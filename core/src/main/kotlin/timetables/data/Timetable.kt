@@ -24,9 +24,9 @@ data class Timetable(
     @JsonProperty("lecture_list")
     var lectures: List<TimetableLecture> = emptyList(),
     var title: String,
-    val theme: TimetableTheme,
+    var theme: TimetableTheme,
     @Field("is_primary")
-    val isPrimary: Boolean? = null,
+    var isPrimary: Boolean? = null,
     @Field("updated_at")
     @JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
