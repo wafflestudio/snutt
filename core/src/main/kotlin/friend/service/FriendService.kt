@@ -21,11 +21,13 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 interface FriendService {
-    suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>>
+    suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
 
     suspend fun requestFriend(fromUserId: String, toUserNickname: String)
 
     suspend fun acceptFriend(friendId: String, toUserId: String)
+
+    suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String)
 
     suspend fun declineFriend(friendId: String, toUserId: String)
 
@@ -44,10 +46,10 @@ class FriendServiceImpl(
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     }
 
-    override suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>> {
-        val userIdToFriend = friendRepository.findAllFriends(userId, state).associateBy {
-            if (it.fromUserId != userId) it.fromUserId else it.toUserId
-        }.ifEmpty { return emptyList() }
+    override suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>> {
+        val userIdToFriend = friendRepository.findAllFriends(myUserId, state)
+            .associateBy { it.getPartnerUserId(myUserId) }
+            .ifEmpty { return emptyList() }
 
         val userIds = userIdToFriend.keys.toList()
         val users = userRepository.findAllByIdInAndActiveTrue(userIds)
@@ -90,6 +92,14 @@ class FriendServiceImpl(
 
         friend.isAccepted = true
         friend.updatedAt = LocalDateTime.now()
+        friendRepository.save(friend)
+    }
+
+    override suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String) {
+        val friend = friendRepository.findById(friendId) ?: throw FriendNotFoundException
+        if ((friend.fromUserId != userId && friend.toUserId != userId) || !friend.isAccepted) throw FriendNotFoundException
+
+        friend.updatePartnerDisplayName(userId, displayName)
         friendRepository.save(friend)
     }
 

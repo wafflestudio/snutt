@@ -22,7 +22,7 @@ class FriendTableHandler(
 
         val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         val year = req.parseRequiredQueryParam<Int>("year")
-        timetableService.getUserPrimaryTable(friend.getPairUserId(req.userId), year, semester)
+        timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester)
     }
 
     suspend fun getRegisteredCourseBooks(req: ServerRequest) = handle(req) {
@@ -30,6 +30,6 @@ class FriendTableHandler(
             ?.takeIf { it.isAccepted && it.includes(req.userId) }
             ?: throw FriendNotFoundException
 
-        timetableService.getRegisteredCourseBooks(friend.getPairUserId(req.userId))
+        timetableService.getRegisteredCourseBooks(friend.getPartnerUserId(req.userId))
     }
 }

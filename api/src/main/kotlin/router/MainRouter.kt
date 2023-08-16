@@ -163,6 +163,7 @@ class MainRouter(
             POST("", friendHandler::requestFriend)
             POST("/{friendId}/accept", friendHandler::acceptFriend)
             POST("/{friendId}/decline", friendHandler::declineFriend)
+            PATCH("/{friendId}/display-name", friendHandler::updateFriendDisplayName)
             DELETE("/{friendId}", friendHandler::breakFriend)
             GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
             GET("/{friendId}/registered-course-books", friendTableHandler::getRegisteredCourseBooks)
