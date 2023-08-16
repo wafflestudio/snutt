@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.friend.service
 
 import com.wafflestudio.snu4t.common.exception.DuplicateFriendException
 import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
+import com.wafflestudio.snu4t.common.exception.InvalidDisplayNameException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
@@ -44,6 +45,8 @@ class FriendServiceImpl(
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val friendDisplayNameRegex = "^[a-zA-Z가-힣 ]+$".toRegex()
+        private const val DISPLAY_NAME_MAX_LENGTH = 10
     }
 
     override suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>> {
@@ -98,6 +101,12 @@ class FriendServiceImpl(
     override suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String) {
         val friend = friendRepository.findById(friendId) ?: throw FriendNotFoundException
         if ((friend.fromUserId != userId && friend.toUserId != userId) || !friend.isAccepted) throw FriendNotFoundException
+
+        val validDisplayName =
+            displayName.length <= DISPLAY_NAME_MAX_LENGTH &&
+                displayName.matches(friendDisplayNameRegex)
+
+        if (!validDisplayName) throw InvalidDisplayNameException
 
         friend.updatePartnerDisplayName(userId, displayName)
         friendRepository.save(friend)
