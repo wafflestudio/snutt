@@ -3,18 +3,22 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
+import com.wafflestudio.snu4t.handler.FriendHandler
+import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
-import com.wafflestudio.snu4t.handler.SharedTimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
+import com.wafflestudio.snu4t.handler.UserHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
-import com.wafflestudio.snu4t.router.docs.SharedTimetableDocs
 import com.wafflestudio.snu4t.router.docs.TimetableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
@@ -27,15 +31,18 @@ import org.springframework.web.reactive.function.server.coRouter
 
 @Component
 class MainRouter(
+    private val userHandler: UserHandler,
+    private val authHandler: AuthHandler,
+    private val deviceHandler: DeviceHandler,
+    private val notificationHandler: NotificationHandler,
+    private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val timeTableHandler: TimetableHandler,
     private val bookmarkHandler: BookmarkHandler,
-    private val authHandler: AuthHandler,
-    private val adminHandler: AdminHandler,
-    private val deviceHandler: DeviceHandler,
-    private val sharedTimetableHandler: SharedTimetableHandler,
-    private val notificationHandler: NotificationHandler,
     private val lectureSearchHandler: LectureSearchHandler,
-    private val vacancyNotificationHandler: VacancyNotifcationHandler,
+    private val friendHandler: FriendHandler,
+    private val friendTableHandler: FriendTableHandler,
+    private val configHandler: ConfigHandler,
+    private val adminHandler: AdminHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -56,8 +63,13 @@ class MainRouter(
     @UserDocs
     fun userRoute() = v1CoRouter {
         "/user".nest {
+            GET("/info", userHandler::getUserInfo)
             POST("/device/{id}", deviceHandler::addRegistrationId)
             DELETE("/device/{id}", deviceHandler::removeRegistrationId)
+        }
+        "/users".nest {
+            GET("/me", userHandler::getUserMe)
+            PATCH("/me", userHandler::patchUserInfo)
         }
     }
 
@@ -72,9 +84,9 @@ class MainRouter(
             GET("/{timetableId}", timeTableHandler::getTimetable)
             PUT("/{timetableId}", timeTableHandler::modifyTimetable)
             DELETE("/{timetableId}", timeTableHandler::deleteTimetable)
-            GET("/{timetableId}/links", timeTableHandler::getTimetableLink)
             POST("/{timetableId}/copy", timeTableHandler::copyTimetable)
             PUT("/{timetableId}/theme", timeTableHandler::modifyTimetableTheme)
+            POST("/{timetableId}/primary", timeTableHandler::setPrimary)
             "{timetableId}/lecture".nest {
                 POST("", timeTableHandler::addCustomLecture)
                 POST("/{lectureId}", timeTableHandler::addLecture)
@@ -96,24 +108,13 @@ class MainRouter(
     fun bookmarkRoute() = v1CoRouter {
         "/bookmarks".nest {
             GET("", bookmarkHandler::getBookmarks)
+            GET("/lectures/{lectureId}/state", bookmarkHandler::existsBookmarkLecture)
             POST("/lecture", bookmarkHandler::addLecture)
             DELETE("/lecture", bookmarkHandler::deleteBookmark)
         }
     }
 
     @Bean
-    @SharedTimetableDocs
-    fun sharedTimetableRoute() = v1CoRouter {
-        "/shared-tables".nest {
-            GET("", sharedTimetableHandler::getSharedTimetables)
-            GET("/{id}", sharedTimetableHandler::getSharedTimetable)
-            POST("", sharedTimetableHandler::addSharedTimetable)
-            POST("/{id}/copy", sharedTimetableHandler::copySharedTimetable)
-            PUT("/{id}", sharedTimetableHandler::updateSharedTimetable)
-            DELETE("/{id}", sharedTimetableHandler::deleteSharedTimetable)
-        }
-    }
-
     @NotificationDocs
     fun notificationRoute() = v1CoRouter {
         "/notification".nest {
@@ -122,10 +123,16 @@ class MainRouter(
         }
     }
 
+    @Bean
     @AdminDocs
     fun adminRoute() = v1CoRouter {
         "/admin".nest {
             POST("/insert_noti", adminHandler::insertNotification)
+
+            POST("/configs/{name}", adminHandler::postConfig)
+            GET("/configs/{name}", adminHandler::getConfigs)
+            DELETE("/configs/{name}/{id}", adminHandler::deleteConfig)
+            PATCH("/configs/{name}/{id}", adminHandler::patchConfig)
         }
     }
 
@@ -134,8 +141,31 @@ class MainRouter(
     fun vacancyNotificationRoute() = v1CoRouter {
         "/vacancy-notifications".nest {
             GET("/lectures", vacancyNotificationHandler::getVacancyNotificationLectures)
+            GET("/lectures/{lectureId}/state", vacancyNotificationHandler::existsVacancyNotification)
             POST("/lectures/{lectureId}", vacancyNotificationHandler::addVacancyNotification)
             DELETE("/lectures/{lectureId}", vacancyNotificationHandler::deleteVacancyNotification)
+        }
+    }
+
+    @Bean
+    @ConfigDocs
+    fun configRoute() = v1CoRouter {
+        "/configs".nest {
+            GET("", configHandler::getConfigs)
+        }
+    }
+
+    @Bean
+    @FriendDocs
+    fun friendRoute() = v1CoRouter {
+        "/friends".nest {
+            GET("", friendHandler::getFriends)
+            POST("", friendHandler::requestFriend)
+            POST("/{friendId}/accept", friendHandler::acceptFriend)
+            POST("/{friendId}/decline", friendHandler::declineFriend)
+            DELETE("/{friendId}", friendHandler::breakFriend)
+            GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
+            GET("/{friendId}/registered-course-books", friendTableHandler::getRegisteredCourseBooks)
         }
     }
 

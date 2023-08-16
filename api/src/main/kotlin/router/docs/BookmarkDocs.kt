@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.bookmark.dto.BookmarkLectureModifyRequest
 import com.wafflestudio.snu4t.bookmark.dto.BookmarkResponse
+import com.wafflestudio.snu4t.common.dto.ExistenceResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -24,6 +25,15 @@ import org.springframework.web.bind.annotation.RequestMethod
                 Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
             ],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = BookmarkResponse::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/bookmarks/lectures/{lectureId}/state", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "existsBookmarkLecture",
+            responses = [
+                ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ExistenceResponse::class))]),
+            ]
         ),
     ),
     RouterOperation(

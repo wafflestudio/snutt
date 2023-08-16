@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service
 
 interface VacancyNotificationService {
     suspend fun getVacancyNotificationLectures(userId: String): List<Lecture>
+    suspend fun existsVacancyNotification(userId: String, lectureId: String): Boolean
     suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification
-    suspend fun deleteVacancyNotification(lectureId: String)
+    suspend fun deleteVacancyNotification(userId: String, lectureId: String)
     suspend fun deleteAll()
 }
 
@@ -31,6 +32,10 @@ class VacancyNotificationServiceImpl(
     override suspend fun getVacancyNotificationLectures(userId: String): List<Lecture> =
         vacancyNotificationRepository.findAllByUserId(userId).map { it.lectureId }
             .let { lectureRepository.findAllById(it) }.toList()
+
+    override suspend fun existsVacancyNotification(userId: String, lectureId: String): Boolean {
+        return vacancyNotificationRepository.existsByUserIdAndLectureId(userId, lectureId)
+    }
 
     override suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification =
         coroutineScope {
@@ -46,8 +51,8 @@ class VacancyNotificationServiceImpl(
             trySave(VacancyNotification(userId = userId, lectureId = lectureId))
         }
 
-    override suspend fun deleteVacancyNotification(lectureId: String) {
-        vacancyNotificationRepository.deleteByLectureId(lectureId)
+    override suspend fun deleteVacancyNotification(userId: String, lectureId: String) {
+        vacancyNotificationRepository.deleteByUserIdAndLectureId(userId, lectureId)
     }
 
     override suspend fun deleteAll() {

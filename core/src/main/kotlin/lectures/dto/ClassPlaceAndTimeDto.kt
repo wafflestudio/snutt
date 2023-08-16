@@ -32,3 +32,25 @@ fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTim
     startPeriod = classPlaceAndTime.startPeriod,
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
 )
+
+data class ClassPlaceAndTimeCamelDto(
+    val day: DayOfWeek,
+    val place: String?,
+    val startMinute: Int,
+    val endMinute: Int,
+    val startTime: String,
+    val endTime: String,
+    val periodLength: Double,
+    val startPeriod: Double,
+)
+
+fun ClassPlaceAndTimeCamelDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeCamelDto = ClassPlaceAndTimeCamelDto(
+    day = classPlaceAndTime.day,
+    place = classPlaceAndTime.place,
+    startMinute = classPlaceAndTime.startMinute,
+    endMinute = classPlaceAndTime.endMinute,
+    startTime = minuteToString(classPlaceAndTime.startMinute),
+    endTime = minuteToString(classPlaceAndTime.endMinute),
+    startPeriod = classPlaceAndTime.startPeriod,
+    periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
+)

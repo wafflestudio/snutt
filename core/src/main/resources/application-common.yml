@@ -5,6 +5,8 @@ spring:
     mongodb:
       uri:
     redis:
+      repositories:
+        enabled: false
       host:
       database:
 logging:

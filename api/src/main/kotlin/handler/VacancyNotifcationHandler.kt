@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.common.dto.ExistenceResponse
 import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
@@ -22,6 +23,12 @@ class VacancyNotifcationHandler(
             .let { VacancyNotificationLecturesResponse(it) }
     }
 
+    suspend fun existsVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.userId
+        val lectureId = req.pathVariable("lectureId")
+        ExistenceResponse(vacancyNotificationService.existsVacancyNotification(userId, lectureId))
+    }
+
     suspend fun addVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
         val lectureId = req.pathVariable("lectureId")
@@ -31,9 +38,10 @@ class VacancyNotifcationHandler(
     }
 
     suspend fun deleteVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
+        val userId = req.userId
         val lectureId = req.pathVariable("lectureId")
 
-        vacancyNotificationService.deleteVacancyNotification(lectureId)
+        vacancyNotificationService.deleteVacancyNotification(userId, lectureId)
         null
     }
 }

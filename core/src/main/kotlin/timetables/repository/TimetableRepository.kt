@@ -11,5 +11,7 @@ interface TimetableRepository : CoroutineCrudRepository<Timetable, String>, Time
     suspend fun findByUserIdAndId(userId: String, id: String): Timetable?
     suspend fun findByUserIdOrderByUpdatedAtDesc(userId: String): Timetable?
     suspend fun findByUserIdAndYearAndSemesterAndTitle(userId: String, year: Int, semester: Semester, title: String): Timetable?
+    fun findByUserIdAndYearAndSemester(userId: String, year: Int, semester: Semester): Flow<Timetable>
+    suspend fun findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId: String, year: Int, semester: Semester): Timetable?
     suspend fun existsByUserIdAndYearAndSemesterAndTitle(userId: String, year: Int, semester: Semester, title: String): Boolean
 }

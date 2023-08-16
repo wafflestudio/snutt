@@ -135,4 +135,9 @@ class TimetableHandler(
         val lectureId = req.pathVariable("timetableLectureId")
         TODO("Not yet implemented")
     }
+
+    suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
+        val timetableId = req.pathVariable("id")
+        timeTableService.setPrimary(req.userId, timetableId)
+    }
 }

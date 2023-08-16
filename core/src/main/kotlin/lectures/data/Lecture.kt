@@ -34,7 +34,8 @@ data class Lecture(
     var courseNumber: String,
     @Field("course_title")
     var courseTitle: String,
-    var registrationCount: Int = 0
+    var registrationCount: Int = 0,
+    var wasFull: Boolean = false,
 ) {
     infix fun equalsMetadata(other: Lecture): Boolean {
         return this === other ||

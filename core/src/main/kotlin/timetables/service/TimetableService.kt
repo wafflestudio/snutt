@@ -6,11 +6,16 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
+import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -26,7 +31,10 @@ interface TimetableService {
     suspend fun deleteTimetable(userId: String, timetableId: String)
     suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable
     suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
+    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto
+    suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto>
     suspend fun createDefaultTable(userId: String)
+    suspend fun setPrimary(userId: String, timetableId: String)
 }
 
 @Service
@@ -82,6 +90,24 @@ class TimetableServiceImpl(
     override suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable =
         getTimetable(userId, timetableId).apply { this.theme = theme }.let { timetableRepository.save(it) }
 
+    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): TimetableDto {
+        val tables = timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
+            .map(::TimetableDto)
+            .toList()
+            .ifEmpty { throw TimetableNotFoundException }
+
+        return tables.find { it.isPrimary }
+            ?: tables.first().copy(isPrimary = true)
+    }
+
+    override suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto> {
+        return timetableRepository.findAllByUserId(userId)
+            .map { CoursebookDto(it.year, it.semester) }
+            .distinctUntilChanged()
+            .toList()
+            .sortedByDescending { it.order }
+    }
+
     override suspend fun copyTimetable(userId: String, timetableId: String, title: String?): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
@@ -121,5 +147,28 @@ class TimetableServiceImpl(
     private suspend fun validateTimetableTitle(userId: String, year: Int, semester: Semester, title: String) {
         timetableRepository.findByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)
             ?.let { throw DuplicateTimetableTitleException }
+    }
+
+    override suspend fun setPrimary(userId: String, timetableId: String) {
+        val newPrimaryTable = timetableRepository.findById(timetableId)
+            ?: throw TimetableNotFoundException
+
+        if (newPrimaryTable.isPrimary == true) {
+            return
+        }
+
+        val primaryTableBefore = timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(
+            userId,
+            newPrimaryTable.year,
+            newPrimaryTable.semester
+        )
+
+        if (primaryTableBefore == null) {
+            timetableRepository.save(newPrimaryTable.copy(isPrimary = true))
+        } else {
+            timetableRepository
+                .saveAll(listOf(newPrimaryTable.copy(isPrimary = true), primaryTableBefore.copy(isPrimary = false)))
+                .collect()
+        }
     }
 }

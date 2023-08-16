@@ -4,7 +4,7 @@ data class ClientInfo(
     val osType: OsType,
     val osVersion: String?,
     val appType: AppType?,
-    val appVersion: String?,
+    val appVersion: AppVersion?,
     val deviceId: String?,
     val deviceModel: String?,
 )

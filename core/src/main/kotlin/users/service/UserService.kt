@@ -1,7 +1,8 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
-import com.wafflestudio.snu4t.common.cache.CacheRepository
+import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
@@ -18,10 +19,15 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import org.springframework.stereotype.Service
 
 interface UserService {
+    suspend fun getUser(userId: String): User
+
+    suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User
+
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
     suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): LoginResponse
@@ -39,8 +45,28 @@ class UserServiceImpl(
     private val timetableService: TimetableService,
     private val deviceService: DeviceService,
     private val userRepository: UserRepository,
-    private val cacheRepository: CacheRepository,
+    private val userNicknameService: UserNicknameService,
+    private val cache: Cache,
 ) : UserService {
+    override suspend fun getUser(userId: String): User {
+        return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+    }
+
+    override suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User {
+        val user = getUser(userId)
+
+        with(userPatchRequest) {
+            nickname?.let {
+                val prevNickname = userNicknameService.getNicknameDto(requireNotNull(user.nickname)).nickname
+                if (it != prevNickname) {
+                    user.nickname = userNicknameService.appendNewTag(it)
+                }
+            }
+        }
+
+        return userRepository.save(user)
+    }
+
     override suspend fun getUserByCredentialHash(credentialHash: String): User =
         userRepository.findByCredentialHashAndActive(credentialHash, true) ?: throw WrongUserTokenException
 
@@ -52,26 +78,30 @@ class UserServiceImpl(
         val cacheKey = CacheKey.LOCK_REGISTER_LOCAL.build(localId)
 
         runCatching {
-            if (!cacheRepository.acquireLock(cacheKey)) throw DuplicateLocalIdException
+            if (!cache.acquireLock(cacheKey)) throw DuplicateLocalIdException
 
             if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
-            email?.let { if (!authService.isValidEmail(email)) throw InvalidEmailException }
+            email?.let {
+                if (!authService.isValidEmail(email)) throw InvalidEmailException
+                if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
+            }
 
             if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
             val credential = authService.buildLocalCredential(localId, password)
             val credentialHash = authService.generateCredentialHash(credential)
 
-            val user = userRepository.save(
-                User(
-                    email = email,
-                    isEmailVerified = false,
-                    credential = credential,
-                    credentialHash = credentialHash,
-                    fcmKey = null,
-                )
-            )
+            val randomNickname = userNicknameService.generateUniqueRandomNickname()
+
+            val user = User(
+                email = email,
+                isEmailVerified = false,
+                credential = credential,
+                credentialHash = credentialHash,
+                nickname = randomNickname,
+                fcmKey = null,
+            ).let { userRepository.save(it) }
 
             timetableService.createDefaultTable(user.id!!)
 
@@ -80,7 +110,7 @@ class UserServiceImpl(
                 token = credentialHash,
             )
         }.getOrElse {
-            if (it is Snu4tException) cacheRepository.releaseLock(cacheKey)
+            if (it is Snu4tException) cache.releaseLock(cacheKey)
             throw it
         }
     }
