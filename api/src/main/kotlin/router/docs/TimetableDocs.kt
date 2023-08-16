@@ -22,14 +22,6 @@ import timetables.dto.TimetableBriefDto
         ),
     ),
     RouterOperation(
-        path = "/v1/tables/{id}/links", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getLink",
-            parameters = [Parameter(`in` = ParameterIn.PATH, name = "id", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = DynamicLinkResponse::class))])]
-        ),
-    ),
-    RouterOperation(
         path = "/v1/tables/{id}/primary", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "setPrimary",

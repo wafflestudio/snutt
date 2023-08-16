@@ -25,7 +25,7 @@ class TimetableHandler(
     suspend fun getTimetableBriefs(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
 
-        timeTableService.getTimetables(userId = userId).toList().map(::TimetableBriefDto)
+        timeTableService.getTimetables(userId = userId).map(::TimetableBriefDto)
     }
 
     suspend fun getMostRecentlyUpdatedTimetables(req: ServerRequest): ServerResponse = handle(req) {
@@ -53,7 +53,7 @@ class TimetableHandler(
         } else {
             timeTableService.copyTimetable(userId, sourceTimetableId)
         }
-        timeTableService.getTimetables(userId = userId).toList().map(::TimetableBriefDto)
+        timeTableService.getTimetables(userId = userId).map(::TimetableBriefDto)
     }
 
     suspend fun getTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -69,7 +69,7 @@ class TimetableHandler(
         val body = req.awaitBody<TimetableModifyRequestDto>()
 
         timeTableService.modifyTimetableTitle(userId, timetableId, body.title)
-        timeTableService.getTimetables(userId = userId).toList().map(::TimetableBriefDto)
+        timeTableService.getTimetables(userId = userId).map(::TimetableBriefDto)
     }
 
     suspend fun deleteTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -77,7 +77,7 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
 
         timeTableService.deleteTimetable(userId, timetableId)
-        timeTableService.getTimetables(userId = userId).toList().map(::TimetableBriefDto)
+        timeTableService.getTimetables(userId = userId).map(::TimetableBriefDto)
     }
 
     suspend fun getTimetableLink(req: ServerRequest): ServerResponse = handle(req) {
@@ -91,7 +91,7 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
 
         timeTableService.copyTimetable(userId, timetableId)
-        timeTableService.getTimetables(userId = userId).toList().map(::TimetableBriefDto)
+        timeTableService.getTimetables(userId = userId).map(::TimetableBriefDto)
     }
 
     suspend fun modifyTimetableTheme(req: ServerRequest): ServerResponse = handle(req) {
@@ -137,7 +137,7 @@ class TimetableHandler(
     }
 
     suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
-        val timetableId = req.pathVariable("id")
+        val timetableId = req.pathVariable("timetableId")
         timeTableService.setPrimary(req.userId, timetableId)
     }
 }

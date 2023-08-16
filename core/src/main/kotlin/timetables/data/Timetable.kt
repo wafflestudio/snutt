@@ -26,7 +26,7 @@ data class Timetable(
     var title: String,
     var theme: TimetableTheme,
     @Field("is_primary")
-    val isPrimary: Boolean? = null,
+    var isPrimary: Boolean? = null,
     @Field("updated_at")
     @JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),

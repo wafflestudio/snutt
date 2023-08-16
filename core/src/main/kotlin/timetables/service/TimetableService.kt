@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.toSet
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 interface TimetableService {
-    fun getTimetables(userId: String): Flow<Timetable>
+    suspend fun getTimetables(userId: String): List<Timetable>
     suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable
     fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable>
     suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable
@@ -44,8 +45,9 @@ class TimetableServiceImpl(
     private val coursebookService: CoursebookService,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
-    override fun getTimetables(userId: String): Flow<Timetable> =
-        timetableRepository.findAllByUserId(userId)
+    override suspend fun getTimetables(userId: String): List<Timetable> =
+        timetableRepository.findAllByUserId(userId).toList()
+            .apply { this.first().isPrimary = this.none { it.isPrimary ?: false } }
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
@@ -87,6 +89,19 @@ class TimetableServiceImpl(
         timetableRepository.deleteById(timetableId)
     }
 
+    override suspend fun copyTimetable(userId: String, timetableId: String, title: String?): Timetable {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
+        val latestCopiedTimetableNumber =
+            getLatestCopiedTimetableNumber(userId, timetable.year, timetable.semester, title ?: timetable.title)
+        return timetable.copy(
+            id = null,
+            userId = userId,
+            updatedAt = Instant.now(),
+            title = baseTitle + " (${latestCopiedTimetableNumber + 1})"
+        ).let { timetableRepository.save(it) }
+    }
+
     override suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable =
         getTimetable(userId, timetableId).apply { this.theme = theme }.let { timetableRepository.save(it) }
 
@@ -103,22 +118,8 @@ class TimetableServiceImpl(
     override suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto> {
         return timetableRepository.findAllByUserId(userId)
             .map { CoursebookDto(it.year, it.semester) }
-            .distinctUntilChanged()
-            .toList()
+            .toSet()
             .sortedByDescending { it.order }
-    }
-
-    override suspend fun copyTimetable(userId: String, timetableId: String, title: String?): Timetable {
-        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
-        val latestCopiedTimetableNumber =
-            getLatestCopiedTimetableNumber(userId, timetable.year, timetable.semester, title ?: timetable.title)
-        return timetable.copy(
-            id = null,
-            userId = userId,
-            updatedAt = Instant.now(),
-            title = baseTitle + " (${latestCopiedTimetableNumber + 1})"
-        ).let { timetableRepository.save(it) }
     }
 
     override suspend fun createDefaultTable(userId: String) {
