@@ -9,7 +9,7 @@ object ClassTimeUtils {
     fun classTimeToBitmask(classPlaceAndTimes: List<ClassPlaceAndTime>): List<Int> {
         val bitTable = Array(7) { Array(30) { 0 } }
 
-        classPlaceAndTimes.map { classTime ->
+        classPlaceAndTimes.filter { it.startMinute >= 480 && it.endMinute <= 1380 }.map { classTime ->
             val dayValue = classTime.day.value
             val startPeriod = classTime.startPeriod
             val endPeriod = classTime.endPeriod
