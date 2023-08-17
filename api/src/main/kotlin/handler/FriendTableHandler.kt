@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.friend.service.FriendService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -23,6 +24,7 @@ class FriendTableHandler(
         val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         val year = req.parseRequiredQueryParam<Int>("year")
         timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester)
+            .let(::TimetableDto)
     }
 
     suspend fun getRegisteredCourseBooks(req: ServerRequest) = handle(req) {
