@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snu4t.common.exception.TableDeleteErrorException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
@@ -84,6 +85,7 @@ class TimetableServiceImpl(
             .let { timetableRepository.save(it) }
 
     override suspend fun deleteTimetable(userId: String, timetableId: String) {
+        if(timetableRepository.countAllByUserId(userId) == 0L) throw TableDeleteErrorException
         getTimetable(userId, timetableId)
         timetableRepository.deleteById(timetableId)
     }
