@@ -34,6 +34,7 @@ enum class ErrorType(
     INVALID_APP_TYPE(HttpStatus.BAD_REQUEST, 40007, "잘못된 APP 타입입니다."),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, 40008, "nickname이 유효하지 않습니다."),
     INVALID_DISPLAY_NAME(HttpStatus.BAD_REQUEST, 40009, "displayName이 유효하지 않습니다."),
+    TABLE_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40010, "하나 남은 시간표는 삭제할 수 없습니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     NO_USER_FCM_KEY(HttpStatus.NOT_FOUND, 40402, "유저 FCM 키가 존재하지 않습니다."),

@@ -12,7 +12,7 @@ data class LectureDto(
     val academicYear: String?,
     val category: String?,
     @JsonProperty("class_time_json")
-    val classPlaceAndTimes: List<ClassPlaceAndTimeDto>,
+    val classPlaceAndTimes: List<ClassPlaceAndTimeLegacyDto>,
     val classification: String?,
     val credit: Long,
     val department: String?,
@@ -40,7 +40,7 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
-    classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
+    classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
     classification = lecture.classification,
     credit = lecture.credit,
     department = lecture.department,

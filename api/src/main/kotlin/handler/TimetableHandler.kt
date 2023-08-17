@@ -3,7 +3,7 @@ package com.wafflestudio.snu4t.handler
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.dto.TimetableDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyThemeRequestDto
@@ -31,7 +31,7 @@ class TimetableHandler(
     suspend fun getMostRecentlyUpdatedTimetables(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
 
-        timeTableService.getMostRecentlyUpdatedTimetable(userId).let(::TimetableDto)
+        timeTableService.getMostRecentlyUpdatedTimetable(userId).let(::TimetableLegacyDto)
     }
 
     suspend fun getTimetablesBySemester(req: ServerRequest): ServerResponse = handle(req) {
@@ -40,7 +40,7 @@ class TimetableHandler(
         val semester =
             Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
 
-        timeTableService.getTimetablesBySemester(userId, year, semester).toList().map(::TimetableDto)
+        timeTableService.getTimetablesBySemester(userId, year, semester).toList().map(::TimetableLegacyDto)
     }
 
     suspend fun addTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -60,7 +60,7 @@ class TimetableHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
 
-        timeTableService.getTimetable(userId, timetableId).let(::TimetableDto)
+        timeTableService.getTimetable(userId, timetableId).let(::TimetableLegacyDto)
     }
 
     suspend fun modifyTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -99,7 +99,7 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
         val theme = req.awaitBody<TimetableModifyThemeRequestDto>().theme
 
-        timeTableService.modifyTimetableTheme(userId, timetableId, theme).let(::TimetableDto)
+        timeTableService.modifyTimetableTheme(userId, timetableId, theme).let(::TimetableLegacyDto)
     }
 
     suspend fun addCustomLecture(req: ServerRequest): ServerResponse = handle(req) {
