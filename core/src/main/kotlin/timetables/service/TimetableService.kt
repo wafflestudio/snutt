@@ -50,7 +50,7 @@ class TimetableServiceImpl(
             .apply { this.firstOrNull()?.isPrimary = this.none { it.isPrimary ?: false } }
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
-        timetableRepository.findByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
+        timetableRepository.findFirstByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
 
     override fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable> =
         timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester)
