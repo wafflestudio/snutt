@@ -36,6 +36,7 @@ class InvalidBodyFieldValueException(fieldName: String) :
 object InvalidOsTypeException : Snu4tException(ErrorType.INVALID_OS_TYPE)
 object InvalidAppTypeException : Snu4tException(ErrorType.INVALID_APP_TYPE)
 object InvalidNicknameException : Snu4tException(ErrorType.INVALID_NICKNAME)
+object InvalidDisplayNameException : Snu4tException(ErrorType.INVALID_DISPLAY_NAME)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :

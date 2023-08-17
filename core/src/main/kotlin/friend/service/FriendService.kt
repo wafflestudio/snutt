@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.friend.service
 
 import com.wafflestudio.snu4t.common.exception.DuplicateFriendException
 import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
+import com.wafflestudio.snu4t.common.exception.InvalidDisplayNameException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
@@ -21,11 +22,13 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 interface FriendService {
-    suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>>
+    suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
 
     suspend fun requestFriend(fromUserId: String, toUserNickname: String)
 
     suspend fun acceptFriend(friendId: String, toUserId: String)
+
+    suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String)
 
     suspend fun declineFriend(friendId: String, toUserId: String)
 
@@ -42,12 +45,14 @@ class FriendServiceImpl(
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val friendDisplayNameRegex = "^[a-zA-Z가-힣 ]+$".toRegex()
+        private const val DISPLAY_NAME_MAX_LENGTH = 10
     }
 
-    override suspend fun getFriendUsers(userId: String, state: FriendState): List<Pair<Friend, User>> {
-        val userIdToFriend = friendRepository.findAllFriends(userId, state).associateBy {
-            if (it.fromUserId != userId) it.fromUserId else it.toUserId
-        }.ifEmpty { return emptyList() }
+    override suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>> {
+        val userIdToFriend = friendRepository.findAllFriends(myUserId, state)
+            .associateBy { it.getPartnerUserId(myUserId) }
+            .ifEmpty { return emptyList() }
 
         val userIds = userIdToFriend.keys.toList()
         val users = userRepository.findAllByIdInAndActiveTrue(userIds)
@@ -90,6 +95,20 @@ class FriendServiceImpl(
 
         friend.isAccepted = true
         friend.updatedAt = LocalDateTime.now()
+        friendRepository.save(friend)
+    }
+
+    override suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String) {
+        val friend = friendRepository.findById(friendId) ?: throw FriendNotFoundException
+        if ((friend.fromUserId != userId && friend.toUserId != userId) || !friend.isAccepted) throw FriendNotFoundException
+
+        val validDisplayName =
+            displayName.length <= DISPLAY_NAME_MAX_LENGTH &&
+                displayName.matches(friendDisplayNameRegex)
+
+        if (!validDisplayName) throw InvalidDisplayNameException
+
+        friend.updatePartnerDisplayName(userId, displayName)
         friendRepository.save(friend)
     }
 
