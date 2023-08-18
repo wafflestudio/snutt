@@ -47,7 +47,9 @@ class TimetableServiceImpl(
 ) : TimetableService {
     override suspend fun getTimetables(userId: String): List<Timetable> =
         timetableRepository.findAllByUserId(userId).toList()
-            .apply { this.firstOrNull()?.isPrimary = this.none { it.isPrimary ?: false } }
+            .apply {
+                if (this.none { it.isPrimary == true }) this.firstOrNull()?.apply { isPrimary = true }
+            }
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findFirstByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException

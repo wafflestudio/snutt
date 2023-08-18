@@ -1,8 +1,6 @@
 package timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import java.time.Instant
 
