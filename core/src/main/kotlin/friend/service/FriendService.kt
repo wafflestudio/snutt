@@ -45,7 +45,7 @@ class FriendServiceImpl(
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-        private val friendDisplayNameRegex = "^[a-zA-Z가-힣 ]+$".toRegex()
+        private val friendDisplayNameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
         private const val DISPLAY_NAME_MAX_LENGTH = 10
     }
 
