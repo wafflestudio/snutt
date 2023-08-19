@@ -33,7 +33,7 @@ interface TimetableService {
     suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable
     suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable
-    suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto>
+    suspend fun getCoursebooks(userId: String): List<CoursebookDto>
     suspend fun createDefaultTable(userId: String)
     suspend fun setPrimary(userId: String, timetableId: String)
 }
@@ -117,7 +117,7 @@ class TimetableServiceImpl(
         return tables.find { it.isPrimary == true } ?: tables.first().copy(isPrimary = true)
     }
 
-    override suspend fun getRegisteredCourseBooks(userId: String): List<CoursebookDto> {
+    override suspend fun getCoursebooks(userId: String): List<CoursebookDto> {
         return timetableRepository.findAllByUserId(userId)
             .map { CoursebookDto(it.year, it.semester) }
             .toSet()
