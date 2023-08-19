@@ -125,11 +125,11 @@ class TimetableServiceImpl(
     }
 
     override suspend fun createDefaultTable(userId: String) {
-        val courseBook = coursebookService.getLatestCoursebook()
+        val coursebook = coursebookService.getLatestCoursebook()
         val timetable = Timetable(
             userId = userId,
-            year = courseBook.year,
-            semester = courseBook.semester,
+            year = coursebook.year,
+            semester = coursebook.semester,
             title = "나의 시간표",
             theme = TimetableTheme.SNUTT,
         )
