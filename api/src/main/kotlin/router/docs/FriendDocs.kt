@@ -87,12 +87,12 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/friends/{friendId}/registered-course-books", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/{friendId}/coursebooks", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "getRegisteredCourseBooks",
+            operationId = "getCoursebooks",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
         ),
     ),
 )
-annotation class FriendDocs()
+annotation class FriendDocs

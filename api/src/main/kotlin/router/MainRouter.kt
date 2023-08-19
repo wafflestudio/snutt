@@ -166,7 +166,8 @@ class MainRouter(
             PATCH("/{friendId}/display-name", friendHandler::updateFriendDisplayName)
             DELETE("/{friendId}", friendHandler::breakFriend)
             GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
-            GET("/{friendId}/registered-course-books", friendTableHandler::getRegisteredCourseBooks)
+            GET("/{friendId}/coursebooks", friendTableHandler::getCoursebooks)
+            GET("/{friendId}/registered-course-books", friendTableHandler::getCoursebooks) // TODO: delete
         }
     }
 
