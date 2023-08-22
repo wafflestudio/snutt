@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.timetables.repository
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.common.extension.elemMatch
 import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.common.extension.regex
@@ -9,7 +10,6 @@ import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
@@ -87,8 +87,8 @@ class TimetableCustomRepositoryImpl(
             Timetable::userId isEqualTo userId and
                 Timetable::year isEqualTo year and
                 Timetable::semester isEqualTo semester and
-                Timetable::title regex """$title(\s+\(\d+\))?"""
-        ).with(Sort.by(Sort.Direction.DESC, "title")),
+                Timetable::title regex """${Regex.escape(title)}(\s+\(\d+\))?"""
+        ).with(Timetable::title.desc()),
         Timetable::class.java
     ).awaitSingleOrNull()
 }
