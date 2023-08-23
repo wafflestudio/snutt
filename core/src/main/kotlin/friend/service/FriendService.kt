@@ -13,6 +13,7 @@ import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import com.wafflestudio.snu4t.users.service.UserNicknameService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,6 +41,7 @@ interface FriendService {
 @Service
 class FriendServiceImpl(
     private val pushWithNotificationService: PushWithNotificationService,
+    private val userNicknameService: UserNicknameService,
     private val friendRepository: FriendRepository,
     private val userRepository: UserRepository,
 ) : FriendService {
@@ -76,17 +78,17 @@ class FriendServiceImpl(
 
         coroutineScope.launch {
             val fromUser = requireNotNull(userRepository.findByIdAndActiveTrue(fromUserId))
-            sendFriendRequestPush(fromUser, toUser)
+            sendFriendRequestPush(fromUser, toUser.id)
         }
     }
 
-    private suspend fun sendFriendRequestPush(fromUser: User, toUser: User) {
-        val fromUserNickname = requireNotNull(fromUser.nickname)
+    private suspend fun sendFriendRequestPush(fromUser: User, toUserId: String) {
+        val fromUserNickname = userNicknameService.getNicknameDto(fromUser.nickname).nickname
         val pushMessage = PushMessage(
-            title = "'$fromUserNickname'님이 친구 요청을 보냈어요",
-            body = "'$fromUserNickname'님과 친구를 맺고 서로 대표 시간표를 확인해보세요!",
+            title = "친구 요청",
+            body = "'$fromUserNickname'님의 친구 요청을 수락하고 서로의 대표 시간표를 확인해보세요!",
         )
-        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, toUser.id!!)
+        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, toUserId)
     }
 
     override suspend fun acceptFriend(friendId: String, toUserId: String) {
@@ -96,6 +98,20 @@ class FriendServiceImpl(
         friend.isAccepted = true
         friend.updatedAt = LocalDateTime.now()
         friendRepository.save(friend)
+
+        coroutineScope.launch {
+            val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.toUserId))
+            sendFriendAcceptPush(friend.fromUserId, toUser)
+        }
+    }
+
+    private suspend fun sendFriendAcceptPush(fromUserId: String, toUser: User) {
+        val toUserNickname = userNicknameService.getNicknameDto(toUser.nickname).nickname
+        val pushMessage = PushMessage(
+            title = "친구 요청 수락",
+            body = "'$toUserNickname'님과 친구가 되었어요.",
+        )
+        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, fromUserId)
     }
 
     override suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String) {
