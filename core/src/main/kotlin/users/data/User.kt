@@ -12,7 +12,7 @@ data class User(
     val id: String? = null,
     var email: String?,
     @Indexed(unique = true, sparse = true)
-    var nickname: String?,
+    var nickname: String,
     var isEmailVerified: Boolean?,
     var credential: Credential,
     var credentialHash: String,

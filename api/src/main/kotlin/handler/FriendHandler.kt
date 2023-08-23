@@ -24,13 +24,12 @@ class FriendHandler(
         val state = FriendState.from(req.parseRequiredQueryParam<String>("state")) ?: throw ServerWebInputException("Invalid state")
 
         val content = friendService.getMyFriends(userId, state).map { (friend, partner) ->
-            val nickname = requireNotNull(partner.nickname)
             val partnerDisplayName = friend.getPartnerDisplayName(userId)
             FriendResponse(
                 id = friend.id!!,
                 userId = partner.id!!,
                 displayName = partnerDisplayName,
-                nickname = userNicknameService.getNicknameDto(nickname),
+                nickname = userNicknameService.getNicknameDto(partner.nickname),
                 createdAt = friend.createdAt,
             )
         }
