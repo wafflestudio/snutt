@@ -17,7 +17,7 @@ let userLectureSchema = new mongoose.Schema({
   classification: String,                           // 교과 구분
   department: String,                               // 학부
   academic_year: String,                            // 학년
-  course_title: {type: String, required: true},   // 과목명
+  course_title: {type: String, required: true, default: ""},   // 과목명
   credit: Number,                                   // 학점
   class_time: String,
   real_class_time: String,
