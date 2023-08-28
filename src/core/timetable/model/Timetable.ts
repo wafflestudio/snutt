@@ -8,5 +8,6 @@ export default interface Timetable {
     title: string;
     lecture_list: UserLecture[];
     theme: number;
+    is_primary: boolean;
     updated_at: number;
 };
