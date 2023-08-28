@@ -121,6 +121,8 @@ export async function partialModifyUserLecture(userId: string, tableId: string, 
     throw new TimetableNotFoundError();
   }
 
+  if (!lecture.course_title) throw new InvalidLectureUpdateRequestError(lecture);
+
   if (lecture.course_number || lecture.lecture_number) {
     throw new InvalidLectureUpdateRequestError(lecture);
   }
