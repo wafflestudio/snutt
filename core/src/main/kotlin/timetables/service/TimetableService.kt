@@ -7,6 +7,7 @@ import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.TableDeleteErrorException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
+import com.wafflestudio.snu4t.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.timetables.data.Timetable
@@ -32,10 +33,11 @@ interface TimetableService {
     suspend fun deleteTimetable(userId: String, timetableId: String)
     suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable
     suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
-    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable
+    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable?
     suspend fun getCoursebooks(userId: String): List<CoursebookDto>
     suspend fun createDefaultTable(userId: String)
     suspend fun setPrimary(userId: String, timetableId: String)
+    suspend fun unSetPrimary(userId: String, timetableId: String)
 }
 
 @Service
@@ -47,9 +49,6 @@ class TimetableServiceImpl(
 ) : TimetableService {
     override suspend fun getTimetables(userId: String): List<Timetable> =
         timetableRepository.findAllByUserId(userId).toList()
-            .apply {
-                if (this.none { it.isPrimary == true }) this.firstOrNull()?.apply { isPrimary = true }
-            }
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findFirstByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
@@ -65,6 +64,10 @@ class TimetableServiceImpl(
             semester = timetableRequest.semester,
             title = timetableRequest.title,
             theme = TimetableTheme.SNUTT,
+            isPrimary = timetableRepository
+                    .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
+                    .toList()
+                    .isEmpty()
         ).let { timetableRepository.save(it) }
     }
 
@@ -109,12 +112,11 @@ class TimetableServiceImpl(
     override suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable =
         getTimetable(userId, timetableId).apply { this.theme = theme }.let { timetableRepository.save(it) }
 
-    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable {
-        val tables = timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
+    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable? {
+        return timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
             .toList()
             .ifEmpty { throw TimetableNotFoundException }
-
-        return tables.find { it.isPrimary == true } ?: tables.first().copy(isPrimary = true)
+            .find { it.isPrimary == true }
     }
 
     override suspend fun getCoursebooks(userId: String): List<CoursebookDto> {
@@ -173,5 +175,11 @@ class TimetableServiceImpl(
                 .saveAll(listOf(newPrimaryTable.copy(isPrimary = true), primaryTableBefore.copy(isPrimary = false)))
                 .collect()
         }
+    }
+
+    override suspend fun unSetPrimary(userId: String, timetableId: String) {
+        val table = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        if (table.isPrimary != true) throw TimetableNotPrimaryException
+        timetableRepository.save(table.copy(isPrimary = false))
     }
 }

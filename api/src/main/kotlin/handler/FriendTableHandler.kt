@@ -23,8 +23,7 @@ class FriendTableHandler(
 
         val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
         val year = req.parseRequiredQueryParam<Int>("year")
-        timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester)
-            .let(::TimetableDto)
+        timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester)?.let(::TimetableDto)
     }
 
     suspend fun getCoursebooks(req: ServerRequest) = handle(req) {

@@ -140,4 +140,9 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
         timetableService.setPrimary(req.userId, timetableId)
     }
+
+    suspend fun unSetPrimary(req: ServerRequest): ServerResponse = handle(req) {
+        val timetableId = req.pathVariable("timetableId")
+        timetableService.unSetPrimary(req.userId, timetableId)
+    }
 }
