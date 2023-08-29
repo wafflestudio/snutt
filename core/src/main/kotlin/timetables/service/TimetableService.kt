@@ -65,9 +65,9 @@ class TimetableServiceImpl(
             title = timetableRequest.title,
             theme = TimetableTheme.SNUTT,
             isPrimary = timetableRepository
-                    .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
-                    .toList()
-                    .isEmpty()
+                .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
+                .toList()
+                .isEmpty()
         ).let { timetableRepository.save(it) }
     }
 
