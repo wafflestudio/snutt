@@ -90,7 +90,7 @@ class TimetableServiceImpl(
             .let { timetableRepository.save(it) }
 
     override suspend fun deleteTimetable(userId: String, timetableId: String) {
-        if (timetableRepository.countAllByUserId(userId) == 0L) throw TableDeleteErrorException
+        if (timetableRepository.countAllByUserId(userId) <= 1L) throw TableDeleteErrorException
         getTimetable(userId, timetableId)
         timetableRepository.deleteById(timetableId)
     }
