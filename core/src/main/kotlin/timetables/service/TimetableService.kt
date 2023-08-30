@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snu4t.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.TableDeleteErrorException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.TimetableNotPrimaryException
@@ -33,8 +34,8 @@ interface TimetableService {
     suspend fun deleteTimetable(userId: String, timetableId: String)
     suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable
     suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
-    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable?
-    suspend fun getCoursebooks(userId: String): List<CoursebookDto>
+    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable
+    suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto>
     suspend fun createDefaultTable(userId: String)
     suspend fun setPrimary(userId: String, timetableId: String)
     suspend fun unSetPrimary(userId: String, timetableId: String)
@@ -112,15 +113,15 @@ class TimetableServiceImpl(
     override suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable =
         getTimetable(userId, timetableId).apply { this.theme = theme }.let { timetableRepository.save(it) }
 
-    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable? {
+    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable {
         return timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
             .toList()
             .ifEmpty { throw TimetableNotFoundException }
-            .find { it.isPrimary == true }
+            .find { it.isPrimary == true } ?: throw PrimaryTimetableNotFoundException
     }
 
-    override suspend fun getCoursebooks(userId: String): List<CoursebookDto> {
-        return timetableRepository.findAllByUserId(userId)
+    override suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto> {
+        return timetableRepository.findAllByUserIdAndIsPrimaryTrue(userId)
             .map { CoursebookDto(it.year, it.semester) }
             .toSet()
             .sortedByDescending { it.order }

@@ -45,6 +45,7 @@ object InvalidRegistrationForPreviousSemesterCourseException :
 
 object DuplicateTimetableTitleException : Snu4tException(ErrorType.DUPLICATE_TIMETABLE_TITLE)
 object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
+object PrimaryTimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object TimetableNotPrimaryException : Snu4tException(ErrorType.DEFAULT_ERROR)
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
