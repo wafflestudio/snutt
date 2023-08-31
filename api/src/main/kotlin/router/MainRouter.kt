@@ -87,6 +87,7 @@ class MainRouter(
             POST("/{timetableId}/copy", timeTableHandler::copyTimetable)
             PUT("/{timetableId}/theme", timeTableHandler::modifyTimetableTheme)
             POST("/{timetableId}/primary", timeTableHandler::setPrimary)
+            DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
             "{timetableId}/lecture".nest {
                 POST("", timeTableHandler::addCustomLecture)
                 POST("/{lectureId}", timeTableHandler::addLecture)
