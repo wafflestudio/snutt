@@ -26,6 +26,7 @@ import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.seconds
 
 interface VacancyNotifierService {
     suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult
@@ -53,7 +54,7 @@ class VacancyNotifierServiceImpl(
             getPageCount()
         }.getOrElse {
             log.error(it.message, it)
-            delay(5000)
+            delay(30L.seconds)
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
         val lectures =
