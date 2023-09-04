@@ -52,7 +52,7 @@ class VacancyNotifierServiceImpl(
         val pageCount = runCatching {
             getPageCount()
         }.getOrElse {
-            log.error("부하기간")
+            log.error(it.message, it)
             delay(5000)
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
