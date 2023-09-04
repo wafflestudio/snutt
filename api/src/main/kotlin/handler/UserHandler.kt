@@ -55,6 +55,6 @@ class UserHandler(
         email = user.email,
         localId = user.credential.localId,
         fbName = user.credential.fbName,
-        nickname = userNicknameService.getNicknameDto(user.nickname),
+        nickname = userNicknameService.getNicknameDto(user.nickname!!),
     )
 }

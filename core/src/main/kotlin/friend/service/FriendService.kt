@@ -83,7 +83,7 @@ class FriendServiceImpl(
     }
 
     private suspend fun sendFriendRequestPush(fromUser: User, toUserId: String) {
-        val fromUserNickname = userNicknameService.getNicknameDto(fromUser.nickname).nickname
+        val fromUserNickname = userNicknameService.getNicknameDto(fromUser.nickname!!).nickname
         val pushMessage = PushMessage(
             title = "친구 요청",
             body = "'$fromUserNickname'님의 친구 요청을 수락하고 서로의 대표 시간표를 확인해보세요!",
@@ -106,7 +106,7 @@ class FriendServiceImpl(
     }
 
     private suspend fun sendFriendAcceptPush(fromUserId: String, toUser: User) {
-        val toUserNickname = userNicknameService.getNicknameDto(toUser.nickname).nickname
+        val toUserNickname = userNicknameService.getNicknameDto(toUser.nickname!!).nickname
         val pushMessage = PushMessage(
             title = "친구 요청 수락",
             body = "'$toUserNickname'님과 친구가 되었어요.",
