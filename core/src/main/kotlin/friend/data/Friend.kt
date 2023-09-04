@@ -19,6 +19,8 @@ data class Friend(
     @Indexed
     @Field(targetType = FieldType.OBJECT_ID)
     val toUserId: String,
+    var fromUserDisplayName: String? = null,
+    var toUserDisplayName: String? = null,
     var isAccepted: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
@@ -27,12 +29,32 @@ data class Friend(
         return fromUserId == userId || toUserId == userId
     }
 
-    fun getPairUserId(userId: String): String {
+    fun getPartnerUserId(userId: String): String {
         check(this.includes(userId))
         return when (userId) {
             fromUserId -> toUserId
             toUserId -> fromUserId
             else -> throw IllegalArgumentException("UNREACHABLE")
         }
+    }
+
+    fun getPartnerDisplayName(userId: String): String? {
+        check(this.includes(userId))
+        return when (userId) {
+            fromUserId -> toUserDisplayName
+            toUserId -> fromUserDisplayName
+            else -> throw IllegalArgumentException("UNREACHABLE")
+        }
+    }
+
+    fun updatePartnerDisplayName(userId: String, displayName: String) {
+        check(this.includes(userId))
+        when (userId) {
+            fromUserId -> toUserDisplayName = displayName
+            toUserId -> fromUserDisplayName = displayName
+            else -> throw IllegalArgumentException("UNREACHABLE")
+        }
+
+        updatedAt = LocalDateTime.now()
     }
 }

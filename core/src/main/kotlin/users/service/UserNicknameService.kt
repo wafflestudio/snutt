@@ -22,7 +22,7 @@ class UserNicknameService(
         private const val TAG_DELIMITER = "#"
         private const val NICKNAME_TAG_LENGTH = 4
         private const val NICKNAME_MAX_LENGTH = 10
-        private val nicknameRegex = "^[a-zA-Z가-힣 ]+$".toRegex()
+        private val nicknameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
     }
 
     private fun readAndSplitByComma(resource: ClassPathResource): List<String> {

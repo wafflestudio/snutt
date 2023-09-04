@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
 import com.wafflestudio.snu4t.friend.dto.FriendState
+import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
 import com.wafflestudio.snu4t.friend.service.FriendService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.users.service.UserNicknameService
@@ -22,12 +23,13 @@ class FriendHandler(
         val userId = req.userId
         val state = FriendState.from(req.parseRequiredQueryParam<String>("state")) ?: throw ServerWebInputException("Invalid state")
 
-        val content = friendService.getFriendUsers(userId, state).map { (friend, toUser) ->
-            val nickname = requireNotNull(toUser.nickname)
+        val content = friendService.getMyFriends(userId, state).map { (friend, partner) ->
+            val partnerDisplayName = friend.getPartnerDisplayName(userId)
             FriendResponse(
                 id = friend.id!!,
-                userId = toUser.id!!,
-                nickname = userNicknameService.getNicknameDto(nickname),
+                userId = partner.id!!,
+                displayName = partnerDisplayName,
+                nickname = userNicknameService.getNicknameDto(partner.nickname),
                 createdAt = friend.createdAt,
             )
         }
@@ -58,6 +60,14 @@ class FriendHandler(
         val friendId = req.pathVariable("friendId")
 
         friendService.declineFriend(friendId, toUserId)
+    }
+
+    suspend fun updateFriendDisplayName(req: ServerRequest) = handle(req) {
+        val userId = req.userId
+        val friendId = req.pathVariable("friendId")
+        val body = req.awaitBody<UpdateFriendDisplayNameRequest>()
+
+        friendService.updateFriendDisplayName(userId, friendId, body.displayName)
     }
 
     suspend fun breakFriend(req: ServerRequest) = handle(req) {

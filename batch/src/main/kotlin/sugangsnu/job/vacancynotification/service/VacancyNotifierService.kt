@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -52,6 +53,7 @@ class VacancyNotifierServiceImpl(
             getPageCount()
         }.getOrElse {
             log.error("부하기간")
+            delay(5000)
             return VacancyNotificationJobResult.OVERLOAD_PERIOD
         }
         val lectures =

@@ -4,6 +4,10 @@ data class FriendRequest(
     val nickname: String,
 )
 
+data class UpdateFriendDisplayNameRequest(
+    val displayName: String,
+)
+
 enum class FriendState {
     ACTIVE,
     REQUESTING,

@@ -12,6 +12,20 @@ data class ClassPlaceAndTimeDto(
     val place: String?,
     val startMinute: Int,
     val endMinute: Int,
+)
+
+fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeDto = ClassPlaceAndTimeDto(
+    day = classPlaceAndTime.day,
+    place = classPlaceAndTime.place,
+    startMinute = classPlaceAndTime.startMinute,
+    endMinute = classPlaceAndTime.endMinute,
+)
+
+data class ClassPlaceAndTimeLegacyDto(
+    val day: DayOfWeek,
+    val place: String?,
+    val startMinute: Int,
+    val endMinute: Int,
     @JsonProperty("start_time")
     val startTime: String,
     @JsonProperty("end_time")
@@ -22,29 +36,7 @@ data class ClassPlaceAndTimeDto(
     val startPeriod: Double,
 )
 
-fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeDto = ClassPlaceAndTimeDto(
-    day = classPlaceAndTime.day,
-    place = classPlaceAndTime.place,
-    startMinute = classPlaceAndTime.startMinute,
-    endMinute = classPlaceAndTime.endMinute,
-    startTime = minuteToString(classPlaceAndTime.startMinute),
-    endTime = minuteToString(classPlaceAndTime.endMinute),
-    startPeriod = classPlaceAndTime.startPeriod,
-    periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
-)
-
-data class ClassPlaceAndTimeCamelDto(
-    val day: DayOfWeek,
-    val place: String?,
-    val startMinute: Int,
-    val endMinute: Int,
-    val startTime: String,
-    val endTime: String,
-    val periodLength: Double,
-    val startPeriod: Double,
-)
-
-fun ClassPlaceAndTimeCamelDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeCamelDto = ClassPlaceAndTimeCamelDto(
+fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeLegacyDto = ClassPlaceAndTimeLegacyDto(
     day = classPlaceAndTime.day,
     place = classPlaceAndTime.place,
     startMinute = classPlaceAndTime.startMinute,

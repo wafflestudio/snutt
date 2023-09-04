@@ -1,12 +1,9 @@
 package timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import java.time.Instant
 
-@JsonNaming(SnakeCaseStrategy::class)
 data class TimetableBriefDto(
     @JsonProperty("_id")
     val id: String,
@@ -14,7 +11,9 @@ data class TimetableBriefDto(
     val semester: Int,
     val title: String,
     val isPrimary: Boolean,
+    @JsonProperty("updated_at")
     val updatedAt: Instant,
+    @JsonProperty("total_credit")
     val totalCredit: Long,
 )
 fun TimetableBriefDto(timeTable: Timetable): TimetableBriefDto = TimetableBriefDto(

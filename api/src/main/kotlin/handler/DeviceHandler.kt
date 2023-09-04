@@ -30,7 +30,7 @@ class DeviceHandler(
     // TODO 회원가입 API (SNUTT -> SNU4T) 마이그레이션 완료 이후 삭제
     //   context: https://wafflestudio.slack.com/archives/C0PAVPS5T/p1690711859658779
     private suspend fun updateIfUserNicknameNull(user: User) {
-        if (user.nickname.isNullOrEmpty()) {
+        if (user.nickname.isEmpty()) {
             val nickname = userNicknameService.generateUniqueRandomNickname()
             userService.update(user.copy(nickname = nickname))
         }

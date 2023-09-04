@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.router.docs
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
+import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -54,6 +55,18 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
+        path = "v1/friends/{friendId}/display-name", method = [RequestMethod.PATCH], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "updateFriendDisplayName",
+            requestBody = RequestBody(
+                content = [Content(schema = Schema(implementation = UpdateFriendDisplayNameRequest::class))],
+                required = true,
+            ),
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
+        ),
+    ),
+    RouterOperation(
         path = "/v1/friends/{friendId}", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "breakFriend",
@@ -74,12 +87,12 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/friends/{friendId}/registered-course-books", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/{friendId}/coursebooks", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "getRegisteredCourseBooks",
+            operationId = "getCoursebooks",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
         ),
     ),
 )
-annotation class FriendDocs()
+annotation class FriendDocs
