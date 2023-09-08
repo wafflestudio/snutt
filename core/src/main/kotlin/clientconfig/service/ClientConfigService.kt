@@ -9,7 +9,9 @@ import com.wafflestudio.snu4t.clientconfig.repository.findByNameAndVersions
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.cache.get
+import com.wafflestudio.snu4t.common.client.AppVersion
 import com.wafflestudio.snu4t.common.client.ClientInfo
+import com.wafflestudio.snu4t.common.client.OsType
 import com.wafflestudio.snu4t.common.exception.ConfigNotFoundException
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -21,15 +23,22 @@ class ClientConfigService(
     private val objectMapper: ObjectMapper,
     private val cache: Cache,
 ) {
-    suspend fun getConfigs(clientInfo: ClientInfo): List<ClientConfig> {
+    suspend fun getConfigs(clientInfo: ClientInfo, useCache: Boolean): List<ClientConfig> {
         val (osType, appVersion) = clientInfo.osType to requireNotNull(clientInfo.appVersion)
 
-        return CacheKey.CLIENT_CONFIGS.build(osType, appVersion).let { cacheKey ->
-            cache.get(cacheKey) {
-                clientConfigRepository.findAll().toList()
-                    .filter { it.isAdaptable(osType, appVersion) }.distinctBy { it.name }
-            }
-        } ?: emptyList()
+        if (!useCache) {
+            return getAdaptableConfigs(osType, appVersion)
+        }
+
+        val cacheKey = CacheKey.CLIENT_CONFIGS.build(osType, appVersion)
+        return cache.get(cacheKey) { getAdaptableConfigs(osType, appVersion) } ?: emptyList()
+    }
+
+    private suspend fun getAdaptableConfigs(osType: OsType, appVersion: AppVersion): List<ClientConfig> {
+        return clientConfigRepository.findAll()
+            .toList()
+            .filter { it.isAdaptable(osType, appVersion) }
+            .distinctBy { it.name }
     }
 
     suspend fun getConfigsByName(name: String): List<ClientConfig> {
