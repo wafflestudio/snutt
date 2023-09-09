@@ -13,6 +13,7 @@ import com.wafflestudio.snu4t.common.client.AppVersion
 import com.wafflestudio.snu4t.common.client.ClientInfo
 import com.wafflestudio.snu4t.common.client.OsType
 import com.wafflestudio.snu4t.common.exception.ConfigNotFoundException
+import com.wafflestudio.snu4t.config.Phase
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,11 +23,12 @@ class ClientConfigService(
     private val clientConfigRepository: ClientConfigRepository,
     private val objectMapper: ObjectMapper,
     private val cache: Cache,
+    private val phase: Phase
 ) {
-    suspend fun getConfigs(clientInfo: ClientInfo, useCache: Boolean): List<ClientConfig> {
+    suspend fun getConfigs(clientInfo: ClientInfo): List<ClientConfig> {
         val (osType, appVersion) = clientInfo.osType to requireNotNull(clientInfo.appVersion)
 
-        if (!useCache) {
+        if (!phase.isProd) {
             return getAdaptableConfigs(osType, appVersion)
         }
 

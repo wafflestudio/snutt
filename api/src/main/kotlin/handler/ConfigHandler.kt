@@ -15,9 +15,8 @@ class ConfigHandler(
 ) : ServiceHandler(snuttRestApiNoAuthMiddleware) {
     suspend fun getConfigs(req: ServerRequest) = handle<Map<String, JsonNode>>(req) {
         val clientInfo = req.clientInfo!!
-        val useCache = req.parseQueryParam<Boolean>("cache") ?: true
 
-        configService.getConfigs(clientInfo, useCache).associate {
+        configService.getConfigs(clientInfo).associate {
             it.name to objectMapper.readTree(it.value)
         }
     }

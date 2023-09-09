@@ -27,4 +27,7 @@ enum class Phase {
     LOCAL,
     TEST
     ;
+
+    val isProd: Boolean
+        get() = this == PROD
 }
