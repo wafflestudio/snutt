@@ -49,6 +49,7 @@ object PrimaryTimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NO
 object TimetableNotPrimaryException : Snu4tException(ErrorType.DEFAULT_ERROR)
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
+object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
