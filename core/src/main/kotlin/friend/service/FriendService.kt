@@ -4,7 +4,8 @@ import com.wafflestudio.snu4t.common.exception.DuplicateFriendException
 import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.common.exception.InvalidDisplayNameException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
-import com.wafflestudio.snu4t.common.exception.UserNotFoundException
+import com.wafflestudio.snu4t.common.exception.UserNotFoundByNicknameException
+import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.friend.data.Friend
 import com.wafflestudio.snu4t.friend.dto.FriendState
@@ -66,7 +67,7 @@ class FriendServiceImpl(
     }
 
     override suspend fun requestFriend(fromUserId: String, toUserNickname: String): Unit = coroutineScope {
-        val toUser = userRepository.findByNicknameAndActiveTrue(toUserNickname) ?: throw UserNotFoundException
+        val toUser = userRepository.findByNicknameAndActiveTrue(toUserNickname) ?: throw UserNotFoundByNicknameException
         val toUserId = toUser.id!!
 
         if (fromUserId == toUserId) throw InvalidFriendException
@@ -87,6 +88,7 @@ class FriendServiceImpl(
         val pushMessage = PushMessage(
             title = "친구 요청",
             body = "'$fromUserNickname'님의 친구 요청을 수락하고 서로의 대표 시간표를 확인해보세요!",
+            urlScheme = UrlScheme.FRIENDS,
         )
         pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, toUserId)
     }
@@ -110,6 +112,7 @@ class FriendServiceImpl(
         val pushMessage = PushMessage(
             title = "친구 요청 수락",
             body = "'$toUserNickname'님과 친구가 되었어요.",
+            urlScheme = UrlScheme.FRIENDS,
         )
         pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, fromUserId)
     }
