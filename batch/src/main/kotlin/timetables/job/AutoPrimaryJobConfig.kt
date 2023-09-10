@@ -2,11 +2,11 @@ package com.wafflestudio.snu4t.timetables.job
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import io.github.resilience4j.kotlin.ratelimiter.RateLimiterConfig
+import io.github.resilience4j.kotlin.ratelimiter.executeSuspendFunction
 import io.github.resilience4j.kotlin.ratelimiter.rateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
-import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
@@ -55,13 +55,18 @@ class AutoPrimaryJobConfig(
     data class AggResult(val id: Key)
     data class Key(val user_id: String, val semester: Semester, val year: Int)
     private fun autoSetPrimaryTimetable() = runBlocking {
-        val rateLimiter = RateLimiter.ofDefaults("")
+        val rateLimiter = RateLimiter.of(
+            "autoSetPrimaryTimetable",
+            RateLimiterConfig {
+                limitRefreshPeriod(Duration.ofSeconds(1))
+                limitForPeriod(100)
+                timeoutDuration(Duration.ofMinutes(1))
+            }
+        )
         val agg = Aggregation.newAggregation(Key::class.java, Aggregation.group("user_id", "semester", "year"))
         reactiveMongoTemplate.aggregate(agg, "timetables", AggResult::class.java)
             .asFlow()
-            .map { autoSetPrimary(it.id) }
-            .rateLimiter(rateLimiter)
-            .collect { }
+            .collect { rateLimiter.executeSuspendFunction { autoSetPrimary(it.id) } }
     }
 
     private suspend fun autoSetPrimary(key: Key) {
