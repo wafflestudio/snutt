@@ -107,7 +107,7 @@ class AutoPrimaryJobConfig(
                         BulkOperations.BulkMode.ORDERED, "timetables"
                     ).updateMulti(
                         Query.query(Criteria.where("_id").`in`(ids)),
-                        Update.update("isPrimary", true)
+                        Update.update("is_primary", true)
                     ).execute().block()
                 }.join()
                 log.info("updated ${ids.size} docs")
