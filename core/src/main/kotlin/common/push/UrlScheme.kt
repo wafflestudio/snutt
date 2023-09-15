@@ -9,6 +9,7 @@ enum class UrlScheme(
 ) {
     NOTIFICATIONS(Protocol.SNUTT, "notifications"),
     VACANCY(Protocol.SNUTT, "vacancy"),
+    FRIENDS(Protocol.SNUTT, "friends"),
     ;
 
     fun compileWith(
