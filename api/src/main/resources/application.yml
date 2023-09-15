@@ -1,6 +1,8 @@
 spring:
   config:
     import: application-common.yml
+  jackson:
+    default-property-inclusion: non_null
 
 snutt:
   secret-key:
