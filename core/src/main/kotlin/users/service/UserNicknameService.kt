@@ -60,7 +60,7 @@ class UserNicknameService(
     }
 
     private fun isValidNickname(nickname: String): Boolean {
-        return nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
+        return nickname.isNotBlank() && nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
     }
 
     private val nicknames = adjectives
