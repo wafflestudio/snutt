@@ -151,7 +151,7 @@ class TimetableServiceImpl(
     }
 
     private suspend fun validateTimetableTitle(userId: String, year: Int, semester: Semester, title: String) {
-        if(timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)) {
+        if (timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)) {
             throw DuplicateTimetableTitleException
         }
     }
