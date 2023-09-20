@@ -56,7 +56,7 @@ class UserServiceImpl(
         val user = getUser(userId)
 
         with(userPatchRequest) {
-            nickname?.let {
+            nickname?.trim()?.let {
                 val prevNickname = userNicknameService.getNicknameDto(user.nickname!!).nickname
                 if (it != prevNickname) {
                     user.nickname = userNicknameService.appendNewTag(it)
