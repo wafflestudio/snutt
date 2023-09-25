@@ -80,7 +80,6 @@ class TimetableIntegTest(
                 .jsonPath("$.[0].updated_at").exists()
                 .jsonPath("$.[0].total_credit").exists()
         }
-
     }
     "GET /v1/tables/{tableId} 요청 시" should {
         val table = timetableFixture.getTimetable("test").let { timetableRepository.save(it) }
@@ -99,7 +98,6 @@ class TimetableIntegTest(
                     body.userId shouldBe table.userId
                     body.lectures shouldBe emptyList()
                 }
-
         }
         "json 형태 확인" {
             println("아아아")
