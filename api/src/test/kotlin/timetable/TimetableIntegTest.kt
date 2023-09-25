@@ -35,10 +35,7 @@ class TimetableIntegTest(
         }.build()
 
     coEvery { mockMiddleware.invoke(any(), any()) } returns RequestContext(user = userFixture.testUser)
-    afterContainer {
-        repositories.forEach { it.deleteAll() }
-        println("faa")
-    }
+    afterContainer { repositories.forEach { it.deleteAll() } }
 
     "POST /v1/tables" should {
         "success" {
@@ -84,7 +81,6 @@ class TimetableIntegTest(
     "GET /v1/tables/{tableId} 요청 시" should {
         val table = timetableFixture.getTimetable("test").let { timetableRepository.save(it) }
         "정상 반환" {
-            println(table.id)
             timetableServer.get().uri("/v1/tables/${table.id}").exchange()
                 .expectStatus().isOk.expectBody<TimetableLegacyDto>()
                 .returnResult().responseBody.should { body ->
@@ -100,8 +96,6 @@ class TimetableIntegTest(
                 }
         }
         "json 형태 확인" {
-            println("아아아")
-            println(table.id)
             timetableServer.get().uri("/v1/tables/${table.id}").exchange().expectStatus().isOk.expectBody()
                 .jsonPath("$._id").exists()
                 .jsonPath("$.user_id").exists()
