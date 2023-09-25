@@ -4,7 +4,7 @@ import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
 import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithTopic
 
-internal interface PushClient {
+interface PushClient {
     suspend fun sendMessage(pushMessage: TargetedPushMessageWithToken)
 
     suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>)
