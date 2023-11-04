@@ -32,8 +32,8 @@ enum class ErrorType(
     INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(HttpStatus.BAD_REQUEST, 40005, "이전 학기에는 빈자리 알림을 등록할 수 없습니다."),
     INVALID_OS_TYPE(HttpStatus.BAD_REQUEST, 40006, "잘못된 OS 타입입니다."),
     INVALID_APP_TYPE(HttpStatus.BAD_REQUEST, 40007, "잘못된 APP 타입입니다."),
-    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, 40008, "nickname이 유효하지 않습니다."),
-    INVALID_DISPLAY_NAME(HttpStatus.BAD_REQUEST, 40009, "displayName이 유효하지 않습니다."),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, 40008, "nickname이 유효하지 않습니다.", "조건에 맞지 않는 이름입니다."),
+    INVALID_DISPLAY_NAME(HttpStatus.BAD_REQUEST, 40009, "displayName이 유효하지 않습니다.", "조건에 맞지 않는 이름입니다."),
     TABLE_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40010, "하나 남은 시간표는 삭제할 수 없습니다."),
     TIMETABLE_NOT_PRIMARY(HttpStatus.BAD_REQUEST, 40011, "대표 시간표가 아닙니다."),
 
