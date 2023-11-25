@@ -47,7 +47,7 @@ class VacancyNotifierServiceImpl(
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
-
+ㅁ
     override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
         log.info("시작")
         val pageCount = runCatching {
