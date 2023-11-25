@@ -90,7 +90,7 @@ class FriendServiceImpl(
             body = "'$fromUserNickname'님의 친구 요청을 수락하고 서로의 대표 시간표를 확인해보세요!",
             urlScheme = UrlScheme.FRIENDS,
         )
-        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, toUserId)
+        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.FRIEND, toUserId)
     }
 
     override suspend fun acceptFriend(friendId: String, toUserId: String) {
@@ -114,7 +114,7 @@ class FriendServiceImpl(
             body = "'$toUserNickname'님과 친구가 되었어요.",
             urlScheme = UrlScheme.FRIENDS,
         )
-        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.NORMAL, fromUserId)
+        pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.FRIEND, fromUserId)
     }
 
     override suspend fun updateFriendDisplayName(userId: String, friendId: String, displayName: String) {

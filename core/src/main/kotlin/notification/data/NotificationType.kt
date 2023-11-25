@@ -13,7 +13,8 @@ enum class NotificationType(
     NORMAL(0),
     COURSEBOOK(1),
     LECTURE_UPDATE(2),
-    LECTURE_REMOVE(3);
+    LECTURE_REMOVE(3),
+    FRIEND(4);
 
     companion object {
         private val valueMap = NotificationType.values().associateBy { e -> e.value }
