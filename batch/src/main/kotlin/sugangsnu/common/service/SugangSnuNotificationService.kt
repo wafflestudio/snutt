@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.sugangsnu.common.service
 
 import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
@@ -30,7 +29,6 @@ class SugangSnuNotificationServiceImpl(
     private val pushWithNotificationService: PushWithNotificationService,
     private val notificationService: NotificationService,
     private val pushService: PushService,
-    private val phase: Phase,
 ) : SugangSnuNotificationService {
     override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = coroutineScope {
         val notifications = userLectureSyncResults.map { it.toNotification() }
@@ -123,6 +121,12 @@ class SugangSnuNotificationServiceImpl(
             }
         }
 
-        return Notification(userId = userId, title = "수강편람 업데이트", message = message, type = notificationType)
+        return Notification(
+            userId = userId,
+            title = "수강편람 업데이트",
+            message = message,
+            type = notificationType,
+            urlScheme = UrlScheme.NOTIFICATIONS.compileWith().value,
+        )
     }
 }

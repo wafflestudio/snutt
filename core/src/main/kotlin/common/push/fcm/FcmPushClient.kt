@@ -11,7 +11,6 @@ import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessage
 import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
 import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithTopic
-import com.wafflestudio.snu4t.config.Phase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service
 internal class FcmPushClient(
     @Value("\${google.firebase.project-id}") private val projectId: String,
     @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
-    private val phase: Phase,
 ) : PushClient {
     private object PayloadKeys {
         const val URL_SCHEME = "url_scheme"
@@ -106,7 +104,7 @@ internal class FcmPushClient(
                 is TargetedPushMessageWithToken -> setToken(targetToken)
                 is TargetedPushMessageWithTopic -> setTopic(topic)
             }
-            message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.compileWith(phase).value) }
+            message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.compileWith().value) }
             setNotification(notification)
             putAllData(message.data.payload)
             build()

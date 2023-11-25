@@ -41,6 +41,7 @@ data class PushMessage(
             title = title,
             message = body,
             type = notificationType,
+            urlScheme = urlScheme?.compileWith()?.value,
         )
     }
 }
