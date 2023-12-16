@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.and
+import org.springframework.data.mongodb.core.query.elemMatch
 import org.springframework.data.mongodb.core.query.gt
 import org.springframework.data.mongodb.core.query.inValues
 import org.springframework.data.mongodb.core.query.lt
@@ -26,13 +27,16 @@ interface LectureCustomRepository {
 class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
+    companion object {
+        private val placeRegex = """^\d+(?:-\d+)?(?:-\d+)?$""".toRegex()
+    }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
         Query.query(
             Criteria().andOperator(
                 listOfNotNull(
                     Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() }
+                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '.' || it == '-' }
                         ?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
                     searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
@@ -116,6 +120,11 @@ class LectureCustomRepositoryImpl(
                             }
                         )
                     )
+                    placeRegex.matches(keyword) -> {
+                        Lecture::classPlaceAndTimes elemMatch Criteria().orOperator(
+                            ClassPlaceAndTime::place.regex("^$keyword[^\\d]*", "i")
+                        )
+                    }
 
                     else -> Criteria().orOperator(
                         Lecture::courseTitle.regex(keyword, "i"),
