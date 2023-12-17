@@ -28,7 +28,8 @@ class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
     companion object {
-        private val placeRegex = """^\d+(?:-\d+)?(?:-\d+)?$""".toRegex()
+        private val placeRegex = """^\d+-\d+(?:-\d+)?(?:-\d+)?$""".toRegex()
+        private val buildingRegex = """^\d+(?:-\d+)?동$""".toRegex()
     }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
@@ -101,6 +102,14 @@ class LectureCustomRepositoryImpl(
                     keyword == "체육" -> Lecture::category isEqualTo "체육"
                     keyword in listOf("영강", "영어강의") -> Lecture::remark regex ".*ⓔ.*"
                     keyword in listOf("군휴학", "군휴학원격") -> Lecture::remark regex ".*ⓜⓞ.*"
+
+                    placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
+                        val placeKeyword = keyword.replace("동", "")
+                        Lecture::classPlaceAndTimes elemMatch Criteria().orOperator(
+                            ClassPlaceAndTime::place.regex("^$placeKeyword[^\\d]*", "i")
+                        )
+                    }
+
                     keyword.hasKorean() -> Criteria().orOperator(
                         listOfNotNull(
                             Lecture::courseTitle.regex(fuzzyKeyword, "i"),
@@ -120,11 +129,6 @@ class LectureCustomRepositoryImpl(
                             }
                         )
                     )
-                    placeRegex.matches(keyword) -> {
-                        Lecture::classPlaceAndTimes elemMatch Criteria().orOperator(
-                            ClassPlaceAndTime::place.regex("^$keyword[^\\d]*", "i")
-                        )
-                    }
 
                     else -> Criteria().orOperator(
                         Lecture::courseTitle.regex(keyword, "i"),
