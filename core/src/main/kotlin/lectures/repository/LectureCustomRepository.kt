@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.and
+import org.springframework.data.mongodb.core.query.elemMatch
 import org.springframework.data.mongodb.core.query.gt
 import org.springframework.data.mongodb.core.query.inValues
 import org.springframework.data.mongodb.core.query.lt
@@ -26,13 +27,17 @@ interface LectureCustomRepository {
 class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
+    companion object {
+        private val placeRegex = """^\d+-\d+(?:-\d+)?(?:-\d+)?$""".toRegex()
+        private val buildingRegex = """^\d+(?:-\d+)?동$""".toRegex()
+    }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> = reactiveMongoTemplate.find<Lecture>(
         Query.query(
             Criteria().andOperator(
                 listOfNotNull(
                     Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() }
+                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '.' || it == '-' }
                         ?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
                     searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
@@ -97,6 +102,14 @@ class LectureCustomRepositoryImpl(
                     keyword == "체육" -> Lecture::category isEqualTo "체육"
                     keyword in listOf("영강", "영어강의") -> Lecture::remark regex ".*ⓔ.*"
                     keyword in listOf("군휴학", "군휴학원격") -> Lecture::remark regex ".*ⓜⓞ.*"
+
+                    placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
+                        val placeKeyword = keyword.replace("동", "")
+                        Lecture::classPlaceAndTimes elemMatch Criteria().orOperator(
+                            ClassPlaceAndTime::place.regex("^$placeKeyword[^\\d]*", "i")
+                        )
+                    }
+
                     keyword.hasKorean() -> Criteria().orOperator(
                         listOfNotNull(
                             Lecture::courseTitle.regex(fuzzyKeyword, "i"),
