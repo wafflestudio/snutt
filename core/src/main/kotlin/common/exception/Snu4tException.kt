@@ -6,6 +6,7 @@ open class Snu4tException(
     val displayMessage: String = error.displayMessage,
 ) : RuntimeException(errorMessage)
 
+object InvalidTimeException : Snu4tException(ErrorType.INVALID_TIME)
 object WrongApiKeyException : Snu4tException(ErrorType.WRONG_API_KEY)
 object NoUserTokenException : Snu4tException(ErrorType.NO_USER_TOKEN)
 object WrongUserTokenException : Snu4tException(ErrorType.WRONG_USER_TOKEN)
@@ -44,6 +45,10 @@ object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)
 
 object DuplicateTimetableTitleException : Snu4tException(ErrorType.DUPLICATE_TIMETABLE_TITLE)
+object DuplicateTimetableLectureException : Snu4tException(ErrorType.DUPLICATE_LECTURE)
+object WrongSemesterException : Snu4tException(ErrorType.WRONG_SEMESTER)
+class LectureTimeOverlapException(confirmMessage: String) : Snu4tException(ErrorType.LECTURE_TIME_OVERLAP, confirmMessage, confirmMessage)
+object CustomLectureResetException : Snu4tException(ErrorType.CANNOT_RESET_CUSTOM_LECTURE)
 object TimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object PrimaryTimetableNotFoundException : Snu4tException(ErrorType.TIMETABLE_NOT_FOUND)
 object TimetableNotPrimaryException : Snu4tException(ErrorType.DEFAULT_ERROR)

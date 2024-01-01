@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
+import com.wafflestudio.snu4t.handler.TimetableLectureHandler
 import com.wafflestudio.snu4t.handler.UserHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
@@ -37,6 +38,7 @@ class MainRouter(
     private val notificationHandler: NotificationHandler,
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val timeTableHandler: TimetableHandler,
+    private val timeTableLectureHandler: TimetableLectureHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val friendHandler: FriendHandler,
@@ -89,11 +91,11 @@ class MainRouter(
             POST("/{timetableId}/primary", timeTableHandler::setPrimary)
             DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
             "{timetableId}/lecture".nest {
-                POST("", timeTableHandler::addCustomLecture)
-                POST("/{lectureId}", timeTableHandler::addLecture)
-                PUT("/{timetableLectureId}/reset", timeTableHandler::resetTimetableLecture)
-                PUT("/{timetableLectureId}", timeTableHandler::modifyTimetableLecture)
-                DELETE("/{timetableLectureId}", timeTableHandler::deleteTimetableLecture)
+                POST("", timeTableLectureHandler::addCustomLecture)
+                POST("/{lectureId}", timeTableLectureHandler::addLecture)
+                PUT("/{timetableLectureId}/reset", timeTableLectureHandler::resetTimetableLecture)
+                PUT("/{timetableLectureId}", timeTableLectureHandler::modifyTimetableLecture)
+                DELETE("/{timetableLectureId}", timeTableLectureHandler::deleteTimetableLecture)
             }
         }
     }
