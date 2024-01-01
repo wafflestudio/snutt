@@ -1,6 +1,5 @@
 package com.wafflestudio.snu4t.timetables.service
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.exception.CustomLectureResetException
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableLectureException
 import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
@@ -9,10 +8,8 @@ import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongSemesterException
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.timetables.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
-import com.wafflestudio.snu4t.timetables.dto.request.ClassPlaceAndTimeLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
@@ -91,7 +88,7 @@ class TimetableLectureServiceImpl(
     ) {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetable.lectures.find { it.id == modifyTimetableLectureRequestDto.id } ?: throw LectureNotFoundException
-        timetableLecture.apply{
+        timetableLecture.apply {
             courseTitle = modifyTimetableLectureRequestDto.courseTitle
             instructor = modifyTimetableLectureRequestDto.instructor ?: instructor
             credit = modifyTimetableLectureRequestDto.credit ?: credit
@@ -115,9 +112,9 @@ class TimetableLectureServiceImpl(
     ) {
         val overlappingLectures = timetable.lectures.filter {
             timetableLecture.id !== it.id &&
-                    ClassTimeUtils.timesOverlap(
-                        timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes
-                    )
+                ClassTimeUtils.timesOverlap(
+                    timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes
+                )
         }
         when {
             overlappingLectures.isNotEmpty() && !isForced -> {

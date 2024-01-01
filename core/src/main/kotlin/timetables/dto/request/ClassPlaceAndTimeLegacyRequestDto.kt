@@ -31,9 +31,9 @@ data class ClassPlaceAndTimeLegacyRequestDto(
             ?: periodLength?.plus(startPeriod!!)?.let(::periodToMinute)
             ?: throw InvalidTimeException
         // 23:55 이후에 끝나는 수업
-        if(endMinute > 23 * 60 + 55) throw InvalidTimeException
+        if (endMinute > 23 * 60 + 55) throw InvalidTimeException
         // 5분 미만 수업
-        if(endMinute - startMinute < 5) throw InvalidTimeException
+        if (endMinute - startMinute < 5) throw InvalidTimeException
 
         return ClassPlaceAndTime(
             day = day,
