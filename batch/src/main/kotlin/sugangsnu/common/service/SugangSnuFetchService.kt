@@ -32,7 +32,7 @@ class SugangSnuFetchServiceImpl(
         }.also {
             koreanLectureXlsx.release()
             englishLectureXlsx.release()
-        }.map{ lecture ->
+        }.map { lecture ->
             val extraLectureInfo =
                 sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
             lecture.apply {

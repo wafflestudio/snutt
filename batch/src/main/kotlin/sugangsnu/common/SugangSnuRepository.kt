@@ -48,17 +48,17 @@ class SugangSnuRepository(
         courseNumber: String,
         lectureNumber: String
     ): SugangSnuLectureInfo = sugangSnuApi.get().uri { builder ->
-            val semesterSearchString = semester.toSugangSnuSearchString()
-            builder.path(SUGANG_SNU_SEARCH_POPUP_PATH)
-                .query(DEFAULT_SEARCH_POPUP_PARAMS)
-                .queryParam("openSchyy", year)
-                .queryParam("openShtmFg", semesterSearchString.substring(0..9))
-                .queryParam("openDetaShtmFg", semesterSearchString.substring(10))
-                .queryParam("sbjtCd", courseNumber)
-                .queryParam("ltNo", lectureNumber)
-                .build()
-        }.accept(MediaType.APPLICATION_JSON).retrieve().awaitBody<String>()
-            .let { objectMapper.readValue<SugangSnuLectureInfo>(it) }
+        val semesterSearchString = semester.toSugangSnuSearchString()
+        builder.path(SUGANG_SNU_SEARCH_POPUP_PATH)
+            .query(DEFAULT_SEARCH_POPUP_PARAMS)
+            .queryParam("openSchyy", year)
+            .queryParam("openShtmFg", semesterSearchString.substring(0..9))
+            .queryParam("openDetaShtmFg", semesterSearchString.substring(10))
+            .queryParam("sbjtCd", courseNumber)
+            .queryParam("ltNo", lectureNumber)
+            .build()
+    }.accept(MediaType.APPLICATION_JSON).retrieve().awaitBody<String>()
+        .let { objectMapper.readValue<SugangSnuLectureInfo>(it) }
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
         sugangSnuApi.get().uri { builder ->
