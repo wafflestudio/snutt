@@ -46,7 +46,7 @@ class SugangSnuFetchServiceImpl(
             lecture.apply {
                 classPlaceAndTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(
                     extraLectureInfo.ltTime,
-                    extraLectureInfo.ltRoom
+                    extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") }
                 )
                 courseTitle = extraCourseTitle ?: courseTitle
                 instructor = extraLectureInfo.subInfo.professorName ?: instructor
