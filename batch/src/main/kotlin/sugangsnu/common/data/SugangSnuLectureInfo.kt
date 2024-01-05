@@ -42,14 +42,14 @@ data class SugangSnuLectureSubInfo(
     val courseSubName: String? = null,
     @JsonProperty("profNm")
     val professorName: String? = null,
+    @JsonProperty("sbjtFldNm")
+    val category: String? = null,
     @JsonProperty("departmentKorNm")
     val departmentKorNm: String? = null,
     @JsonProperty("deptKorNm")
     val deptKorNm: String? = null,
     @JsonProperty("majorKorNm")
     val majorKorNm: String? = null,
-    @JsonProperty("sbjtFldNm")
-    val sbjtFldNm: String? = null,
     @JsonProperty("departmentEngNm")
     val departmentEngNm: String? = null,
     @JsonProperty("deptEngNm")
@@ -58,6 +58,18 @@ data class SugangSnuLectureSubInfo(
     val majorEngNm: String? = null,
     @JsonProperty("upSbjtFldEngNm")
     val upSbjtFldEngNm: String? = null,
+    // 학사 석사
+    @JsonProperty("cptnCorsFgNm")
+    val academicCourse: String? = null,
+    // 학년
+    @JsonProperty("openShyr")
+    val academicYear: String? = null,
+    // 정원
+    @JsonProperty("tlsnAplyCapaCnt")
+    val quota: Int? = null,
+    // 비고
+    @JsonProperty("openLtRemk")
+    val remark: String? = null,
 //    @JsonProperty("openLtEngRemk")
 //    val openLtEngRemk: String? = null,
 //    @JsonProperty("frnStdTlsnLmtYn")
@@ -116,8 +128,6 @@ data class SugangSnuLectureSubInfo(
 //    val mrksRelevalYn: String? = null,
 //    @JsonProperty("theoryLtTmCnt")
 //    val theoryLtTmCnt: Int? = null,
-//    @JsonProperty("cptnCorsFgNm")
-//    val cptnCorsFgNm: String? = null,
 //    @JsonProperty("univsKorNm")
 //    val univsKorNm: String? = null,
 //    @JsonProperty("submattFgNm")
@@ -156,10 +166,6 @@ data class SugangSnuLectureSubInfo(
 //    val sbjtSubhCd: String? = null,
 //    @JsonProperty("sbjtFldEngNm")
 //    val sbjtFldEngNm: String? = null,
-//    @JsonProperty("openLtRemk")
-//    val openLtRemk: String? = null,
-//    @JsonProperty("tlsnAplyCapaCnt")
-//    val tlsnAplyCapaCnt: Int? = null,
 //    @JsonProperty("mrksGvMthdEng")
 //    val mrksGvMthdEng: String? = null,
 //    @JsonProperty("tlsnAddSltTypeFg")
@@ -170,8 +176,6 @@ data class SugangSnuLectureSubInfo(
 //    val submattPart: String? = null,
 //    @JsonProperty("submattFgEngNm")
 //    val submattFgEngNm: String? = null,
-//    @JsonProperty("openShyr")
-//    val openShyr: String? = null,
 //    @JsonProperty("openSchyy")
 //    val openSchyy: String? = null,
 //    @JsonProperty("rowCnt")
