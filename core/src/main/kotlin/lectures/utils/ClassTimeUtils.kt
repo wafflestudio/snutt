@@ -22,8 +22,8 @@ object ClassTimeUtils {
 
     fun timesOverlap(times: List<ClassPlaceAndTime>) =
         times.any { classTime1 ->
-            times.any { classTime2 ->
-                classTime1 !== classTime2 && twoTimesOverlap(classTime1, classTime2)
+            times.dropWhile { it === classTime1 }.any { classTime2 ->
+                twoTimesOverlap(classTime1, classTime2)
             }
         }
 

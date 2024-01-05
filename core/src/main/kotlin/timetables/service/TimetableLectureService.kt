@@ -111,7 +111,7 @@ class TimetableLectureServiceImpl(
         isForced: Boolean
     ) {
         val overlappingLectures = timetable.lectures.filter {
-            timetableLecture.id !== it.id &&
+            timetableLecture.id != it.id &&
                 ClassTimeUtils.timesOverlap(
                     timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes
                 )
