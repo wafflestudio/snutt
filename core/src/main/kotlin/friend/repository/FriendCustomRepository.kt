@@ -1,11 +1,11 @@
 package com.wafflestudio.snu4t.friend.repository
 
+import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.friend.data.Friend
 import com.wafflestudio.snu4t.friend.dto.FriendState
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
-import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
@@ -47,7 +47,7 @@ class FriendCustomRepositoryImpl(
                         )
                     }
                 }
-            ).with(Sort.by(Sort.Direction.DESC, "createdAt"))
+            ).with(Friend::createdAt.desc())
         ).asFlow().toList()
     }
 

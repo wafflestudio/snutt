@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.sugangsnu.common.service
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
-import com.wafflestudio.snu4t.sugangsnu.common.enum.LectureCategory
 import com.wafflestudio.snu4t.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -21,24 +20,33 @@ class SugangSnuFetchServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
-    override suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture> =
-        LectureCategory.values().flatMap { category ->
-            val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, category, "ko")
-            val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, category, "en")
-            runCatching {
-                val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
-                val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
-                val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
-                val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
-                fullSheet.filterIndexed { index, _ -> index > 2 }
-                    .map { row ->
-                        convertSugangSnuRowToLecture(row, columnNameIndex, category, year, semester)
-                    }
-            }.getOrDefault(listOf()).also {
-                koreanLectureXlsx.release()
-                englishLectureXlsx.release()
+    override suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture> {
+        val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "ko")
+        val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "en")
+        val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
+        val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
+        val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
+        val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
+        return fullSheet.filterIndexed { index, _ -> index > 2 }.map { row ->
+            convertSugangSnuRowToLecture(row, columnNameIndex, year, semester)
+        }.also {
+            koreanLectureXlsx.release()
+            englishLectureXlsx.release()
+        }.map { lecture ->
+            val extraLectureInfo =
+                sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
+            lecture.apply {
+                classPlaceAndTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(
+                    extraLectureInfo.ltTime,
+                    extraLectureInfo.ltRoom
+                )
+                category = extraLectureInfo.subInfo.sbjtFldNm ?: category
+                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
+                    department = "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
+                }
             }
-        }.distinctBy { it.courseNumber + it.lectureNumber }
+        }
+    }
 
     /*
     엑셀 항목 (2023/01/26): 교과구분, 개설대학, 개설학과, 이수과정, 학년, 교과목번호, 강좌번호, 교과목명,
@@ -48,14 +56,12 @@ class SugangSnuFetchServiceImpl(
     private fun convertSugangSnuRowToLecture(
         row: List<Cell>,
         columnNameIndex: Map<String, Int>,
-        category: LectureCategory = LectureCategory.NONE,
         year: Int,
         semester: Semester,
     ): Lecture {
         fun List<Cell>.getCellByColumnName(key: String): String =
             this[
                 columnNameIndex.getOrElse(key) {
-                    // TODO: slack 메시지로 보내기
                     log.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
                     this.size
                 }
@@ -75,12 +81,14 @@ class SugangSnuFetchServiceImpl(
         val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
         val instructor = row.getCellByColumnName("주담당교수")
         val (quota, quotaForCurrentStudent) = row.getCellByColumnName("정원")
-            .takeIf { quotaRegex.matches(it) }!!.let { quotaRegex.find(it)!!.groups }
-            .let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) }
+            .takeIf { quotaRegex.matches(it) }
+            ?.let { quotaRegex.find(it)!!.groups }
+            ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)
         val remark = row.getCellByColumnName("비고")
         val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
-        val classTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText, location)
+        val classTimes =
+            SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText.split("/"), location.split("/"))
 
         val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
 
@@ -99,7 +107,7 @@ class SugangSnuFetchServiceImpl(
             freshmanQuota = (quota - quotaForCurrentStudent).takeIf { it > 0 },
             year = year,
             semester = semester,
-            category = category.koreanName,
+            category = "",
             classPlaceAndTimes = classTimes,
             registrationCount = registrationCount
         )
