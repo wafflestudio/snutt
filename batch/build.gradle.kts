@@ -15,7 +15,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.16.1")
 
     // excel
-    implementation("org.apache.poi:poi-ooxml:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
 
     testImplementation("org.springframework.batch:spring-batch-test")
 }

@@ -34,7 +34,10 @@ class SugangSnuFetchServiceImpl(
                     .map { row ->
                         convertSugangSnuRowToLecture(row, columnNameIndex, category, year, semester)
                     }
-            }.getOrDefault(listOf()).also {
+            }.getOrElse { throwable ->
+                log.error(throwable.message, throwable)
+                listOf()
+            }.also {
                 koreanLectureXlsx.release()
                 englishLectureXlsx.release()
             }
@@ -75,8 +78,9 @@ class SugangSnuFetchServiceImpl(
         val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
         val instructor = row.getCellByColumnName("주담당교수")
         val (quota, quotaForCurrentStudent) = row.getCellByColumnName("정원")
-            .takeIf { quotaRegex.matches(it) }!!.let { quotaRegex.find(it)!!.groups }
-            .let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) }
+            .takeIf { quotaRegex.matches(it) }
+            ?.let { quotaRegex.find(it)!!.groups }
+            ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)
         val remark = row.getCellByColumnName("비고")
         val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
