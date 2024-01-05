@@ -22,7 +22,7 @@ data class TimetableLectureDto(
     var remark: String?,
     var courseNumber: String?,
     var courseTitle: String,
-    var color: ColorSet = ColorSet(),
+    var color: ColorSet?,
     var colorIndex: Int = 0,
     var lectureId: String? = null,
 )
@@ -69,7 +69,7 @@ data class TimetableLectureLegacyDto(
     var courseNumber: String?,
     @JsonProperty("course_title")
     var courseTitle: String,
-    var color: ColorSet = ColorSet(),
+    var color: ColorSet?,
     var colorIndex: Int = 0,
     @JsonProperty("lecture_id")
     var lectureId: String? = null,

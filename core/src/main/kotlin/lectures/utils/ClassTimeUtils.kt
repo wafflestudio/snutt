@@ -20,6 +20,13 @@ object ClassTimeUtils {
         return bitTable.map { day -> day.reduce { res, i -> res.shl(1) + i } }
     }
 
+    fun timesOverlap(times: List<ClassPlaceAndTime>) =
+        times.indices.any { i ->
+            times.subList(i + 1, times.size).any { comparedTime ->
+                twoTimesOverlap(times[i], comparedTime)
+            }
+        }
+
     fun timesOverlap(times1: List<ClassPlaceAndTime>, times2: List<ClassPlaceAndTime>) =
         times1.any { classTime1 ->
             times2.any { classTime2 ->
