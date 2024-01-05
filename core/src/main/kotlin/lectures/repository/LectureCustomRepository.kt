@@ -37,8 +37,7 @@ class LectureCustomRepositoryImpl(
             Criteria().andOperator(
                 listOfNotNull(
                     Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                    searchCondition.query?.filter { it.isLetterOrDigit() || it.isWhitespace() || it == '.' || it == '-' }
-                        ?.let { makeSearchCriteriaFromQuery(it) },
+                    searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
                     searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
                     searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
                     searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
@@ -94,7 +93,7 @@ class LectureCustomRepositoryImpl(
     private fun makeSearchCriteriaFromQuery(query: String): Criteria =
         Criteria().andOperator(
             query.split(' ').map { keyword ->
-                val fuzzyKeyword = keyword.toCharArray().joinToString(".*")
+                val fuzzyKeyword = keyword.toCharArray().joinToString(".*") { Regex.escapeReplacement(it.toString()) }
                 when {
                     keyword == "전공" -> Lecture::classification.inValues("전선", "전필")
                     keyword in listOf("석박", "대학원") -> Lecture::academicYear.inValues("석사", "박사", "석박사통합")
@@ -106,7 +105,7 @@ class LectureCustomRepositoryImpl(
                     placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
                         val placeKeyword = keyword.replace("동", "")
                         Lecture::classPlaceAndTimes elemMatch Criteria().orOperator(
-                            ClassPlaceAndTime::place.regex("^$placeKeyword[^\\d]*", "i")
+                            ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}[^\\d]*", "i")
                         )
                     }
 
@@ -122,7 +121,11 @@ class LectureCustomRepositoryImpl(
                                 '컴공과', '전기과' 등으로 검색할 때, 실제 학과명은 '컴퓨터공학부', '전기공학부'이므로 검색이 안됨.
                                 만약 '과' 혹은 '부'로 끝나는 단어라면 regex의 마지막 단어를 빼버린다.
                                 */
-                                '과', '부' -> Lecture::department.regex("^${fuzzyKeyword.dropLast(1)}", "i")
+                                '과', '부' -> {
+                                    val fuzzyWithoutLastChar = keyword.dropLast(1).toCharArray()
+                                        .joinToString(".*") { Regex.escapeReplacement(it.toString()) }
+                                    Lecture::department.regex("^$fuzzyWithoutLastChar", "i")
+                                }
                                 // 마지막 글자가 '학'이라면 해당 학과의 수업이 모두 포함될 확률이 높다. 수학, 물리학, 경제학 etc
                                 '학' -> null
                                 else -> Lecture::department.regex("^$fuzzyKeyword", "i")
@@ -131,8 +134,8 @@ class LectureCustomRepositoryImpl(
                     )
 
                     else -> Criteria().orOperator(
-                        Lecture::courseTitle.regex(keyword, "i"),
-                        Lecture::instructor.regex(keyword, "i"),
+                        Lecture::courseTitle.regex(Regex.escape(keyword), "i"),
+                        Lecture::instructor.regex(Regex.escape(keyword), "i"),
                         Lecture::courseNumber isEqualTo keyword,
                         Lecture::lectureNumber isEqualTo keyword,
                     )
