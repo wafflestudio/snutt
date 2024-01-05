@@ -35,6 +35,7 @@ class SugangSnuFetchServiceImpl(
         }.map { lecture ->
             val extraLectureInfo =
                 sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
+
             val extraCourseTitle =
                 if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) extraLectureInfo.subInfo.courseName
                 else "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
@@ -48,10 +49,14 @@ class SugangSnuFetchServiceImpl(
                     extraLectureInfo.ltTime,
                     extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") }
                 )
+                academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
+                    ?: "${extraLectureInfo.subInfo.academicYear}학년"
                 courseTitle = extraCourseTitle ?: courseTitle
                 instructor = extraLectureInfo.subInfo.professorName ?: instructor
-                category = extraLectureInfo.subInfo.sbjtFldNm ?: category
+                category = extraLectureInfo.subInfo.category ?: category
                 department = extraDepartment ?: department
+                quota = extraLectureInfo.subInfo.quota ?: quota
+                remark = extraLectureInfo.subInfo.remark ?: remark
             }
         }
     }
