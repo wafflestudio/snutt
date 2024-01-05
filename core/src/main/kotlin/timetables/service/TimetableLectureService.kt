@@ -47,7 +47,7 @@ class TimetableLectureServiceImpl(
         if (!(timetable.year == lecture.year && timetable.semester == lecture.semester)) {
             throw WrongSemesterException
         }
-        val colorIndex = ColorUtils.getRandomColorIndex(timetable.lectures.map { it.colorIndex })
+        val colorIndex = ColorUtils.getLeastUsedColorIndexByRandom(timetable.lectures.map { it.colorIndex })
         if (timetable.lectures.any { it.lectureId == lectureId }) throw DuplicateTimetableLectureException
         addTimetableLecture(timetable, TimetableLecture(lecture, colorIndex), isForced)
     }
