@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
@@ -34,11 +35,31 @@ data class TimetableLecture(
     var courseNumber: String?,
     @Field("course_title")
     var courseTitle: String,
-    var color: ColorSet = ColorSet(),
+    var color: ColorSet? = null,
     @JsonProperty("color_index")
     var colorIndex: Int = 0,
     @JsonProperty("lecture_id")
     @Field("lecture_id", targetType = FieldType.OBJECT_ID)
     @Indexed
     var lectureId: String? = null,
+)
+
+fun TimetableLecture(lecture: Lecture, colorIndex: Int) = TimetableLecture(
+    id = null,
+    lectureId = lecture.id,
+    academicYear = lecture.academicYear,
+    category = lecture.category,
+    classPlaceAndTimes = lecture.classPlaceAndTimes,
+    classification = lecture.classification,
+    credit = lecture.credit,
+    department = lecture.department,
+    instructor = lecture.instructor,
+    lectureNumber = lecture.lectureNumber,
+    quota = lecture.quota,
+    freshmanQuota = lecture.freshmanQuota,
+    remark = lecture.remark,
+    courseNumber = lecture.courseNumber,
+    courseTitle = lecture.courseTitle,
+    colorIndex = colorIndex,
+    color = null,
 )

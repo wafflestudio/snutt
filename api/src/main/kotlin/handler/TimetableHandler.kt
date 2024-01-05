@@ -102,40 +102,6 @@ class TimetableHandler(
         timetableService.modifyTimetableTheme(userId, timetableId, theme).let(::TimetableLegacyDto)
     }
 
-    suspend fun addCustomLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        TODO("Not yet implemented")
-    }
-
-    suspend fun addLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val lectureId = req.pathVariable("lectureId")
-        TODO("Not yet implemented")
-    }
-
-    suspend fun resetTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val timetableLectureId = req.pathVariable("timetableLectureId")
-        TODO("Not yet implemented")
-    }
-
-    suspend fun modifyTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val timetableLectureId = req.pathVariable("timetableLectureId")
-        TODO("Not yet implemented")
-    }
-
-    suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val lectureId = req.pathVariable("timetableLectureId")
-        TODO("Not yet implemented")
-    }
-
     suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
         val timetableId = req.pathVariable("timetableId")
         timetableService.setPrimary(req.userId, timetableId)
