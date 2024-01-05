@@ -43,8 +43,7 @@ class LectureCustomRepositoryImpl(
                     searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
                     searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
                     searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
-                    searchCondition.department?.takeIf { it.isNotEmpty() }
-                        ?.let { departments -> Lecture::department regex departments.joinToString("|") { Regex.escape(it) } },
+                    searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
                     searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
                         Criteria().andOperator(
                             Lecture::classPlaceAndTimes ne listOf(),
