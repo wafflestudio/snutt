@@ -40,7 +40,7 @@ class SugangSnuFetchServiceImpl(
                     extraLectureInfo.ltTime,
                     extraLectureInfo.ltRoom
                 )
-                category = extraLectureInfo.subInfo.sbjtFldNm
+                category = extraLectureInfo.subInfo.sbjtFldNm ?: category
                 if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
                     department = "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
                 }
@@ -107,7 +107,7 @@ class SugangSnuFetchServiceImpl(
             freshmanQuota = (quota - quotaForCurrentStudent).takeIf { it > 0 },
             year = year,
             semester = semester,
-            category = null,
+            category = "",
             classPlaceAndTimes = classTimes,
             registrationCount = registrationCount
         )
