@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
@@ -83,5 +84,8 @@ class TimetableLectureHandler(
         )
     }
 
-    data class ForcedReq(val isForced: Boolean)
+    data class ForcedReq(
+        @JsonProperty("is_forced")
+        val isForced: Boolean
+    )
 }

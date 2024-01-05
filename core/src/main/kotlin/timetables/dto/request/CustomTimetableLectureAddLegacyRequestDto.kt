@@ -16,6 +16,7 @@ data class CustomTimetableLectureAddLegacyRequestDto(
     val remark: String?,
     val color: ColorSet?,
     val colorIndex: Int?,
+    @JsonProperty("is_forced")
     val isForced: Boolean = false,
 ) {
     fun toTimetableLecture(): TimetableLecture {
