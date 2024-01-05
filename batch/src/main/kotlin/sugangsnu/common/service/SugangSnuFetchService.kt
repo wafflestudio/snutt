@@ -35,15 +35,23 @@ class SugangSnuFetchServiceImpl(
         }.map { lecture ->
             val extraLectureInfo =
                 sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
+            val extraCourseTitle =
+                if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) extraLectureInfo.subInfo.courseName
+                else "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
+            val extraDepartment =
+                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null)
+                    "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
+                else null
+
             lecture.apply {
                 classPlaceAndTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(
                     extraLectureInfo.ltTime,
                     extraLectureInfo.ltRoom
                 )
+                courseTitle = extraCourseTitle ?: courseTitle
+                instructor = extraLectureInfo.subInfo.professorName ?: instructor
                 category = extraLectureInfo.subInfo.sbjtFldNm ?: category
-                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
-                    department = "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
-                }
+                department = extraDepartment ?: department
             }
         }
     }

@@ -37,7 +37,11 @@ data class SugangSnuLectureInfo(
 
 data class SugangSnuLectureSubInfo(
     @JsonProperty("sbjtNm")
-    val sbjtNm: String? = null,
+    val courseName: String? = null,
+    @JsonProperty("sbjtSubhNm")
+    val courseSubName: String? = null,
+    @JsonProperty("profNm")
+    val professorName: String? = null,
     @JsonProperty("departmentKorNm")
     val departmentKorNm: String? = null,
     @JsonProperty("deptKorNm")
@@ -110,8 +114,6 @@ data class SugangSnuLectureSubInfo(
 //    val openPnt: Int? = null,
 //    @JsonProperty("mrksRelevalYn")
 //    val mrksRelevalYn: String? = null,
-//    @JsonProperty("sbjtSubhNm")
-//    val sbjtSubhNm: String? = null,
 //    @JsonProperty("theoryLtTmCnt")
 //    val theoryLtTmCnt: Int? = null,
 //    @JsonProperty("cptnCorsFgNm")
@@ -150,8 +152,6 @@ data class SugangSnuLectureSubInfo(
 //    val ltNo: String? = null,
 //    @JsonProperty("lsnProgLangEng")
 //    val lsnProgLangEng: String? = null,
-//    @JsonProperty("profNm")
-//    val profNm: String? = null,
 //    @JsonProperty("sbjtSubhCd")
 //    val sbjtSubhCd: String? = null,
 //    @JsonProperty("sbjtFldEngNm")
