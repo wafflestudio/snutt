@@ -94,7 +94,7 @@ class LectureCustomRepositoryImpl(
     private fun makeSearchCriteriaFromQuery(query: String): Criteria =
         Criteria().andOperator(
             query.split(' ').map { keyword ->
-                val fuzzyKeyword = keyword.toCharArray().joinToString(".*") { Regex.escapeReplacement(it.toString()) }
+                val fuzzyKeyword = keyword.toCharArray().joinToString(".*") { Regex.escape(it.toString()) }
                 when {
                     keyword == "전공" -> Lecture::classification.inValues("전선", "전필")
                     keyword in listOf("석박", "대학원") -> Lecture::academicYear.inValues("석사", "박사", "석박사통합")
@@ -124,7 +124,7 @@ class LectureCustomRepositoryImpl(
                                 */
                                 '과', '부' -> {
                                     val fuzzyWithoutLastChar = keyword.dropLast(1).toCharArray()
-                                        .joinToString(".*") { Regex.escapeReplacement(it.toString()) }
+                                        .joinToString(".*") { Regex.escape(it.toString()) }
                                     Lecture::department.regex("^$fuzzyWithoutLastChar", "i")
                                 }
                                 // 마지막 글자가 '학'이라면 해당 학과의 수업이 모두 포함될 확률이 높다. 수학, 물리학, 경제학 etc
