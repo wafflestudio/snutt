@@ -122,8 +122,9 @@ class LectureCustomRepositoryImpl(
                                 만약 '과' 혹은 '부'로 끝나는 단어라면 regex의 마지막 단어를 빼버린다.
                                 */
                                 '과', '부' -> {
-                                    val fuzzyWithoutLastChar = Regex.escape(keyword.dropLast(1)).toCharArray().joinToString(".*")
-                                    Lecture::department.regex("^${fuzzyWithoutLastChar}", "i")
+                                    val fuzzyWithoutLastChar = keyword.dropLast(1).toCharArray()
+                                        .joinToString(".*") { Regex.escapeReplacement(it.toString()) }
+                                    Lecture::department.regex("^$fuzzyWithoutLastChar", "i")
                                 }
                                 // 마지막 글자가 '학'이라면 해당 학과의 수업이 모두 포함될 확률이 높다. 수학, 물리학, 경제학 etc
                                 '학' -> null
