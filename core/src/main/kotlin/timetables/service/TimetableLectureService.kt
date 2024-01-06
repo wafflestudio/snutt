@@ -133,7 +133,7 @@ class TimetableLectureServiceImpl(
 
     private fun makeOverwritingConfirmMessage(overlappingLectures: List<TimetableLecture>): String {
         val overlappingLectureTitles =
-            overlappingLectures.map { "'${it.courseTitle}'" }.subList(0, 2).joinToString(", ")
+            overlappingLectures.map { "'${it.courseTitle}'" }.take(2).joinToString(", ")
         val shortFormOfTitles = if (overlappingLectures.size < 3) "" else "외 ${overlappingLectures.size - 2}개의 "
         return "$overlappingLectureTitles ${shortFormOfTitles}강의가 중복되어 있습니다. 강의를 덮어쓰시겠습니까?"
     }
