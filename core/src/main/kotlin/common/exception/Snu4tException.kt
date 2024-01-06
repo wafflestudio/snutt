@@ -7,6 +7,7 @@ open class Snu4tException(
 ) : RuntimeException(errorMessage)
 
 object InvalidTimeException : Snu4tException(ErrorType.INVALID_TIME)
+object InvalidTimetableTitleException : Snu4tException(ErrorType.INVALID_TIMETABLE_TITLE)
 object WrongApiKeyException : Snu4tException(ErrorType.WRONG_API_KEY)
 object NoUserTokenException : Snu4tException(ErrorType.NO_USER_TOKEN)
 object WrongUserTokenException : Snu4tException(ErrorType.WRONG_USER_TOKEN)
