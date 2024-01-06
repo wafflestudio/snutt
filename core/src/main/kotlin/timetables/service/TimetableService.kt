@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snu4t.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.TableDeleteErrorException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
@@ -151,6 +152,9 @@ class TimetableServiceImpl(
     }
 
     private suspend fun validateTimetableTitle(userId: String, year: Int, semester: Semester, title: String) {
+        if (title.isEmpty()) {
+            throw InvalidTimetableTitleException
+        }
         if (timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)) {
             throw DuplicateTimetableTitleException
         }

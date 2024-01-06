@@ -50,7 +50,7 @@ class SugangSnuFetchServiceImpl(
                     extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") }
                 )
                 academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
-                    ?: "${extraLectureInfo.subInfo.academicYear}학년"
+                    ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
                 courseTitle = extraCourseTitle ?: courseTitle
                 instructor = extraLectureInfo.subInfo.professorName ?: instructor
                 category = extraLectureInfo.subInfo.category ?: category
