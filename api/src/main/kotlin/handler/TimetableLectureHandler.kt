@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.service.TimetableLectureService
@@ -28,7 +29,7 @@ class TimetableLectureHandler(
             timetableId = timetableId,
             timetableLectureRequest = customTimetable,
             isForced = isForced,
-        )
+        ).let(::TimetableLegacyDto)
     }
 
     suspend fun addLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -42,7 +43,7 @@ class TimetableLectureHandler(
             timetableId = timetableId,
             lectureId = lectureId,
             isForced = isForced,
-        )
+        ).let(::TimetableLegacyDto)
     }
 
     suspend fun resetTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -54,7 +55,7 @@ class TimetableLectureHandler(
             userId = userId,
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
-        )
+        ).let(::TimetableLegacyDto)
     }
 
     suspend fun modifyTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -67,9 +68,10 @@ class TimetableLectureHandler(
         timetableLectureService.modifyTimetableLecture(
             userId = userId,
             timetableId = timetableId,
+            timetableLectureId = timetableLectureId,
             modifyTimetableLectureRequestDto = modifyRequestDto,
             isForced = isForced,
-        )
+        ).let(::TimetableLegacyDto)
     }
 
     suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -81,7 +83,7 @@ class TimetableLectureHandler(
             userId = userId,
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
-        )
+        ).let(::TimetableLegacyDto)
     }
 
     data class ForcedReq(
