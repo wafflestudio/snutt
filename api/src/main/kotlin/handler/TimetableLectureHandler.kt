@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
+import org.springframework.web.reactive.function.server.awaitBodyOrNull
 
 @Component
 class TimetableLectureHandler(
@@ -36,7 +37,7 @@ class TimetableLectureHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val lectureId = req.pathVariable("lectureId")
-        val isForced = req.awaitBody<ForcedReq>().isForced
+        val isForced = req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
 
         timetableLectureService.addLecture(
             userId = userId,
@@ -88,6 +89,6 @@ class TimetableLectureHandler(
 
     data class ForcedReq(
         @JsonProperty("is_forced")
-        val isForced: Boolean
+        val isForced: Boolean?
     )
 }
