@@ -91,7 +91,10 @@ class TimetableLectureServiceImpl(
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw LectureNotFoundException
         timetableLecture.apply {
-            courseTitle = modifyTimetableLectureRequestDto.courseTitle
+            courseTitle = modifyTimetableLectureRequestDto.courseTitle ?: courseTitle
+            academicYear = modifyTimetableLectureRequestDto.academicYear ?: academicYear
+            category = modifyTimetableLectureRequestDto.category ?: category
+            classification = modifyTimetableLectureRequestDto.classification ?: classification
             instructor = modifyTimetableLectureRequestDto.instructor ?: instructor
             credit = modifyTimetableLectureRequestDto.credit ?: credit
             remark = modifyTimetableLectureRequestDto.remark ?: remark
@@ -125,7 +128,7 @@ class TimetableLectureServiceImpl(
             }
 
             overlappingLectures.isNotEmpty() && isForced -> {
-                timetableRepository.pullLectures(timetable.id!!, overlappingLectures.map { it.id!! })
+                timetableRepository.pullLectures(timetable.id!!, overlappingLectures.map { it.id })
             }
         }
         return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
