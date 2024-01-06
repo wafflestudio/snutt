@@ -1,8 +1,6 @@
 package com.wafflestudio.snu4t.timetables.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.exception.InvalidTimeException
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.timetables.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 
@@ -21,8 +19,6 @@ data class CustomTimetableLectureAddLegacyRequestDto(
 ) {
     fun toTimetableLecture(): TimetableLecture {
         val classPlaceAndTimes = this.classPlaceAndTimes.map { it.toClassPlaceAndTime() }
-        val isTimesOverlapped = ClassTimeUtils.timesOverlap(classPlaceAndTimes)
-        if (isTimesOverlapped) throw InvalidTimeException
         return TimetableLecture(
             courseTitle = courseTitle,
             instructor = instructor,
