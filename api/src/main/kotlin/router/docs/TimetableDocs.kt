@@ -25,10 +25,12 @@ import timetables.dto.TimetableBriefDto
         path = "/v1/tables", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getBrief",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -37,10 +39,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getMostRecentlyUpdatedTimetables",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -49,10 +53,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTimetablesBySemester",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableLegacyDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableLegacyDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -62,10 +68,12 @@ import timetables.dto.TimetableBriefDto
         operation = Operation(
             operationId = "addTimetable",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableAddRequestDto::class))]),
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -74,10 +82,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTimetable",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -87,10 +97,12 @@ import timetables.dto.TimetableBriefDto
         operation = Operation(
             operationId = "modifyTimetable",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyRequestDto::class))]),
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -99,10 +111,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteTimetable",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -111,10 +125,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "copyTimetable",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -124,10 +140,12 @@ import timetables.dto.TimetableBriefDto
         operation = Operation(
             operationId = "modifyTimetableTheme",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyThemeRequestDto::class))]),
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -136,10 +154,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "setPrimary",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = Unit::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = Unit::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -148,10 +168,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "unSetPrimary",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = Unit::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = Unit::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -169,10 +191,12 @@ import timetables.dto.TimetableBriefDto
                 ),
             ],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = CustomTimetableLectureAddLegacyRequestDto::class))]),
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -189,10 +213,12 @@ import timetables.dto.TimetableBriefDto
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
                 ),
             ],
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -209,10 +235,12 @@ import timetables.dto.TimetableBriefDto
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
                 ),
             ],
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -230,10 +258,12 @@ import timetables.dto.TimetableBriefDto
                 ),
             ],
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableLectureModifyLegacyRequestDto::class))]),
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
     RouterOperation(
@@ -242,10 +272,12 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteTimetableLecture",
-            responses = [ApiResponse(
-                responseCode = "200",
-                content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-            )]
+            responses = [
+                ApiResponse(
+                    responseCode = "200",
+                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
+                )
+            ]
         ),
     ),
 )
