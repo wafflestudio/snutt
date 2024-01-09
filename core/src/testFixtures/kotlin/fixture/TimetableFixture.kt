@@ -15,6 +15,7 @@ class TimetableFixture(val userFixture: UserFixture) {
             semester = Semester.AUTUMN,
             title = title,
             theme = BasicThemeType.SNUTT,
+            themeId = null,
         )
     }
 }
