@@ -2,8 +2,8 @@ package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.common.exception.DuplicateTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snu4t.common.exception.PrimaryTimetableNotFoundException
@@ -33,7 +33,7 @@ interface TimetableService {
     suspend fun getTimetable(userId: String, timetableId: String): Timetable
     suspend fun modifyTimetableTitle(userId: String, timetableId: String, title: String): Timetable
     suspend fun deleteTimetable(userId: String, timetableId: String)
-    suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable
+    suspend fun modifyTimetableTheme(userId: String, timetableId: String, basicThemeType: BasicThemeType?, themeId: String?): Timetable
     suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
     suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable
     suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto>
@@ -44,9 +44,10 @@ interface TimetableService {
 
 @Service
 class TimetableServiceImpl(
+    private val coursebookService: CoursebookService,
+    private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
     private val dynamicLinkClient: DynamicLinkClient,
-    private val coursebookService: CoursebookService,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
     override suspend fun getTimetables(userId: String): List<Timetable> =
@@ -60,12 +61,15 @@ class TimetableServiceImpl(
 
     override suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable {
         validateTimetableTitle(userId, timetableRequest.year, timetableRequest.semester, timetableRequest.title)
+
+        val defaultTheme = timetableThemeService.getDefaultTheme(userId)
         return Timetable(
             userId = userId,
             year = timetableRequest.year,
             semester = timetableRequest.semester,
             title = timetableRequest.title,
-            theme = TimetableTheme.SNUTT,
+            theme = defaultTheme.toBasicThemeType(),
+            themeId = defaultTheme?.id,
             isPrimary = timetableRepository
                 .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
                 .toList()
@@ -111,8 +115,27 @@ class TimetableServiceImpl(
         ).let { timetableRepository.save(it) }
     }
 
-    override suspend fun modifyTimetableTheme(userId: String, timetableId: String, theme: TimetableTheme): Timetable =
-        getTimetable(userId, timetableId).apply { this.theme = theme }.let { timetableRepository.save(it) }
+    override suspend fun modifyTimetableTheme(userId: String, timetableId: String, basicThemeType: BasicThemeType?, themeId: String?): Timetable {
+        require((themeId == null) xor (basicThemeType == null))
+
+        val timetable = getTimetable(userId, timetableId)
+        val theme = timetableThemeService.getTheme(userId, themeId, basicThemeType)
+
+        timetable.theme = theme.toBasicThemeType()
+        timetable.themeId = theme.id
+
+        val colorCount = if (theme.isCustom) requireNotNull(theme.colors).size else BasicThemeType.COLOR_COUNT
+        timetable.lectures.forEachIndexed { index, lecture ->
+            if (theme.isCustom) {
+                lecture.color = theme.colors!![index % colorCount]
+                lecture.colorIndex = 0
+            } else {
+                lecture.color = null
+                lecture.colorIndex = (index % colorCount) + 1
+            }
+        }
+        return timetableRepository.save(timetable)
+    }
 
     override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable {
         return timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
@@ -130,12 +153,15 @@ class TimetableServiceImpl(
 
     override suspend fun createDefaultTable(userId: String) {
         val coursebook = coursebookService.getLatestCoursebook()
+        val defaultTheme = timetableThemeService.getDefaultTheme(userId)
+
         val timetable = Timetable(
             userId = userId,
             year = coursebook.year,
             semester = coursebook.semester,
             title = "나의 시간표",
-            theme = TimetableTheme.SNUTT,
+            theme = defaultTheme.toBasicThemeType(),
+            themeId = defaultTheme?.id,
         )
         timetableRepository.save(timetable)
     }

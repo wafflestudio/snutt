@@ -181,9 +181,11 @@ class MainRouter(
         "/themes".nest {
             GET("", timetableThemeHandler::getThemes)
             POST("", timetableThemeHandler::createTheme)
-            POST("{themeId}/copy", timetableThemeHandler::copyTheme)
+            PATCH("{themeId}", timetableThemeHandler::modifyTheme)
             DELETE("{themeId}", timetableThemeHandler::deleteTheme)
+            POST("{themeId}/copy", timetableThemeHandler::copyTheme)
             POST("{themeId}/default", timetableThemeHandler::setDefault)
+            POST("basic/{basicThemeTypeValue}/default", timetableThemeHandler::setBasicThemeTypeDefault)
             DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
         }
     }

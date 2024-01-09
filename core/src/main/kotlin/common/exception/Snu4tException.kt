@@ -42,7 +42,7 @@ object InvalidAppTypeException : Snu4tException(ErrorType.INVALID_APP_TYPE)
 object InvalidNicknameException : Snu4tException(ErrorType.INVALID_NICKNAME)
 object InvalidDisplayNameException : Snu4tException(ErrorType.INVALID_DISPLAY_NAME)
 object TableDeleteErrorException : Snu4tException(ErrorType.TABLE_DELETE_ERROR)
-object TooManyThemeColorsException: Snu4tException(ErrorType.TOO_MANY_THEME_COLORS)
+object InvalidThemeColorCountException : Snu4tException(ErrorType.INVALID_THEME_COLOR_COUNT)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
@@ -70,5 +70,6 @@ object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
 object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)
 object InvalidFriendException : Snu4tException(ErrorType.INVALID_FRIEND)
 object DuplicateThemeNameException : Snu4tException(ErrorType.DUPLICATE_THEME_NAME)
+object InvalidThemeTypeException : Snu4tException(ErrorType.INVALID_THEME_TYPE)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

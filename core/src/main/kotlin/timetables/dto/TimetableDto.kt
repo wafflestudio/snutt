@@ -1,8 +1,8 @@
 package com.wafflestudio.snu4t.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import java.time.Instant
 
@@ -13,7 +13,8 @@ data class TimetableDto(
     var semester: Semester,
     var lectures: List<TimetableLectureDto> = emptyList(),
     var title: String,
-    val theme: TimetableTheme,
+    val theme: BasicThemeType,
+    val themeId: String?,
     val isPrimary: Boolean,
     var updatedAt: Instant = Instant.now(),
 )
@@ -26,6 +27,7 @@ fun TimetableDto(timetable: Timetable) = TimetableDto(
     lectures = timetable.lectures.map { TimetableLectureDto(it) },
     title = timetable.title,
     theme = timetable.theme,
+    themeId = timetable.themeId,
     isPrimary = timetable.isPrimary ?: false,
     updatedAt = timetable.updatedAt,
 )
@@ -40,7 +42,8 @@ data class TimetableLegacyDto(
     @JsonProperty("lecture_list")
     var lectures: List<TimetableLectureLegacyDto> = emptyList(),
     var title: String,
-    val theme: TimetableTheme,
+    val theme: BasicThemeType,
+    val themeId: String?,
     val isPrimary: Boolean,
     @JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
@@ -54,6 +57,7 @@ fun TimetableLegacyDto(timetable: Timetable) = TimetableLegacyDto(
     lectures = timetable.lectures.map { TimetableLectureLegacyDto(it) },
     title = timetable.title,
     theme = timetable.theme,
+    themeId = timetable.themeId,
     isPrimary = timetable.isPrimary ?: false,
     updatedAt = timetable.updatedAt,
 )

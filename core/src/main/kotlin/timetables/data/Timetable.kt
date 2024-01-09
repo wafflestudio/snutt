@@ -1,8 +1,8 @@
 package com.wafflestudio.snu4t.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.enum.TimetableTheme
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -24,7 +24,8 @@ data class Timetable(
     @JsonProperty("lecture_list")
     var lectures: List<TimetableLecture> = emptyList(),
     var title: String,
-    var theme: TimetableTheme,
+    var theme: BasicThemeType,
+    var themeId: String?,
     @Field("is_primary")
     var isPrimary: Boolean? = null,
     @Field("updated_at")

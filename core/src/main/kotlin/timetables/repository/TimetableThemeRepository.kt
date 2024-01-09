@@ -8,9 +8,7 @@ interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, Str
 
     suspend fun findByUserIdAndIsDefaultTrue(userId: String): TimetableTheme?
 
-    suspend fun findByUserIdOrderByCreatedAtDesc(userId: String): List<TimetableTheme>
+    suspend fun findByUserIdAndIsCustomTrueOrderByCreatedAtDesc(userId: String): List<TimetableTheme>
 
     suspend fun existsByUserIdAndName(userId: String, name: String): Boolean
-
-    suspend fun deleteByIdAndUserId(id: String, userId: String): Long
 }

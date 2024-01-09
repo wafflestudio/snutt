@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.timetables.repository
 import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.common.extension.regex
-import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.data.TimetableTheme
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -20,8 +19,8 @@ class TimetableThemeCustomRepositoryImpl(
     override suspend fun findLastChild(userId: String, name: String): TimetableTheme? {
         return reactiveMongoTemplate.findOne(
             Query.query(
-                Timetable::userId isEqualTo userId and
-                        Timetable::title regex """${Regex.escape(name)}(\s+\(\d+\))?"""
+                TimetableTheme::userId isEqualTo userId and
+                    TimetableTheme::name regex """${Regex.escape(name)}(\s+\(\d+\))?"""
             ).with(TimetableTheme::name.desc()),
             TimetableTheme::class.java
         ).awaitSingleOrNull()
