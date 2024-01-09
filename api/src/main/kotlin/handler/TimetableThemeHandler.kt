@@ -22,11 +22,11 @@ class TimetableThemeHandler(
         timetableThemeService.getThemes(userId).map(::TimetableThemeDto)
     }
 
-    suspend fun createTheme(req: ServerRequest) = handle(req) {
+    suspend fun addTheme(req: ServerRequest) = handle(req) {
         val userId = req.userId
         val body = req.awaitBody<TimetableThemeAddRequestDto>()
 
-        timetableThemeService.createTheme(userId, body.name, body.colors).let(::TimetableThemeDto)
+        timetableThemeService.addTheme(userId, body.name, body.colors).let(::TimetableThemeDto)
     }
 
     suspend fun modifyTheme(req: ServerRequest) = handle(req) {
@@ -69,6 +69,6 @@ class TimetableThemeHandler(
         val userId = req.userId
         val themeId = req.pathVariable("themeId")
 
-        timetableThemeService.unsetDefault(userId, themeId)
+        timetableThemeService.unsetDefault(userId, themeId).let(::TimetableThemeDto)
     }
 }

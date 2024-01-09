@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 interface TimetableThemeService {
     suspend fun getThemes(userId: String): List<TimetableTheme>
 
-    suspend fun createTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme
+    suspend fun addTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme
 
     suspend fun modifyTheme(userId: String, themeId: String, name: String?, colors: List<ColorSet>?): TimetableTheme
 
@@ -24,11 +24,11 @@ interface TimetableThemeService {
 
     suspend fun setDefault(userId: String, themeId: String? = null, basicThemeType: BasicThemeType? = null): TimetableTheme
 
-    suspend fun unsetDefault(userId: String, themeId: String)
+    suspend fun unsetDefault(userId: String, themeId: String): TimetableTheme
 
     suspend fun getDefaultTheme(userId: String): TimetableTheme?
 
-    suspend fun getTheme(userId: String, themeId: String?, basicThemeType: BasicThemeType?): TimetableTheme
+    suspend fun getTheme(userId: String, themeId: String? = null, basicThemeType: BasicThemeType? = null): TimetableTheme
 }
 
 @Service
@@ -50,7 +50,7 @@ class TimetableThemeServiceImpl(
             )
     }
 
-    override suspend fun createTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme {
+    override suspend fun addTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme {
         if (colors.size !in 1..MAX_COLOR_COUNT) throw InvalidThemeColorCountException
         if (timetableThemeRepository.existsByUserIdAndName(userId, name)) throw DuplicateThemeNameException
 
@@ -126,9 +126,9 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.save(theme)
     }
 
-    override suspend fun unsetDefault(userId: String, themeId: String) {
+    override suspend fun unsetDefault(userId: String, themeId: String): TimetableTheme {
         val theme = timetableThemeRepository.findByIdAndUserId(themeId, userId) ?: throw ThemeNotFoundException
-        if (!theme.isDefault) return
+        if (!theme.isDefault) return theme
 
         if (theme.isCustom) {
             theme.isDefault = false
@@ -138,7 +138,7 @@ class TimetableThemeServiceImpl(
             timetableThemeRepository.delete(theme)
         }
 
-        timetableThemeRepository.save(buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true))
+        return timetableThemeRepository.save(buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true))
     }
 
     override suspend fun getDefaultTheme(userId: String): TimetableTheme? {

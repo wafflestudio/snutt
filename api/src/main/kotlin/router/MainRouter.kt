@@ -21,6 +21,7 @@ import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
+import com.wafflestudio.snu4t.router.docs.ThemeDocs
 import com.wafflestudio.snu4t.router.docs.TimetableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
 import com.wafflestudio.snu4t.router.docs.VacancyNotificationDocs
@@ -177,10 +178,11 @@ class MainRouter(
     }
 
     @Bean
+    @ThemeDocs
     fun timetableThemeRoute() = v1CoRouter {
         "/themes".nest {
             GET("", timetableThemeHandler::getThemes)
-            POST("", timetableThemeHandler::createTheme)
+            POST("", timetableThemeHandler::addTheme)
             PATCH("{themeId}", timetableThemeHandler::modifyTheme)
             DELETE("{themeId}", timetableThemeHandler::deleteTheme)
             POST("{themeId}/copy", timetableThemeHandler::copyTheme)

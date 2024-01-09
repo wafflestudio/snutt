@@ -45,6 +45,7 @@ interface TimetableLectureService {
 
 @Service
 class TimetableLectureServiceImpl(
+    private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
     private val lectureRepository: LectureRepository,
 ) : TimetableLectureService {
@@ -52,9 +53,16 @@ class TimetableLectureServiceImpl(
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val lecture = lectureRepository.findById(lectureId) ?: throw LectureNotFoundException
         if (!(timetable.year == lecture.year && timetable.semester == lecture.semester)) throw WrongSemesterException
-        val colorIndex = ColorUtils.getLeastUsedColorIndexByRandom(timetable.lectures.map { it.colorIndex })
+
+        val (colorIndex, color) = if (timetable.themeId == null) {
+            ColorUtils.getLeastUsedColorIndexByRandom(timetable.lectures.map { it.colorIndex }) to null
+        } else {
+            val theme = timetableThemeService.getTheme(userId, timetable.themeId)
+            0 to requireNotNull(theme.colors).random()
+        }
+
         if (timetable.lectures.any { it.lectureId == lectureId }) throw DuplicateTimetableLectureException
-        val timetableLecture = TimetableLecture(lecture, colorIndex)
+        val timetableLecture = TimetableLecture(lecture, colorIndex, color)
         resolveTimeConflict(timetable, timetableLecture, isForced)
         return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
     }
