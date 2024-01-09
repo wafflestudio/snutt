@@ -11,6 +11,7 @@ import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
+import com.wafflestudio.snu4t.handler.TimetableThemeHandler
 import com.wafflestudio.snu4t.handler.UserHandler
 import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
@@ -39,6 +40,7 @@ class MainRouter(
     private val vacancyNotificationHandler: VacancyNotifcationHandler,
     private val timeTableHandler: TimetableHandler,
     private val timeTableLectureHandler: TimetableLectureHandler,
+    private val timetableThemeHandler: TimetableThemeHandler,
     private val bookmarkHandler: BookmarkHandler,
     private val lectureSearchHandler: LectureSearchHandler,
     private val friendHandler: FriendHandler,
@@ -171,6 +173,18 @@ class MainRouter(
             GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
             GET("/{friendId}/coursebooks", friendTableHandler::getCoursebooks)
             GET("/{friendId}/registered-course-books", friendTableHandler::getCoursebooks) // TODO: delete
+        }
+    }
+
+    @Bean
+    fun timetableThemeRoute() = v1CoRouter {
+        "/themes".nest {
+            GET("", timetableThemeHandler::getThemes)
+            POST("", timetableThemeHandler::createTheme)
+            POST("{themeId}/copy", timetableThemeHandler::copyTheme)
+            DELETE("{themeId}", timetableThemeHandler::deleteTheme)
+            POST("{themeId}/default", timetableThemeHandler::setDefault)
+            DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
         }
     }
 
