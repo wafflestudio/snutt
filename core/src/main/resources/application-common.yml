@@ -11,7 +11,7 @@ spring:
       database:
 logging:
   level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 google:
   firebase:

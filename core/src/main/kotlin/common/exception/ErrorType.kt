@@ -11,6 +11,7 @@ enum class ErrorType(
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 0x0000, "API 호출에 실패하였습니다."),
 
     INVALID_TIME(HttpStatus.BAD_REQUEST, 0x100C, "time이 유효하지 않습니다."),
+    INVALID_TIMETABLE_TITLE(HttpStatus.BAD_REQUEST, 0x1007, "should provide title"),
 
     WRONG_API_KEY(HttpStatus.FORBIDDEN, 0x2000, "API 키가 잘못되었습니다."),
     NO_USER_TOKEN(HttpStatus.UNAUTHORIZED, 0x2001, "유저 토큰이 존재하지 않습니다."),
