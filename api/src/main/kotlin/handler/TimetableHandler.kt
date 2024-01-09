@@ -97,9 +97,9 @@ class TimetableHandler(
     suspend fun modifyTimetableTheme(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
-        val theme = req.awaitBody<TimetableModifyThemeRequestDto>().theme
+        val body = req.awaitBody<TimetableModifyThemeRequestDto>()
 
-        timetableService.modifyTimetableTheme(userId, timetableId, theme).let(::TimetableLegacyDto)
+        timetableService.modifyTimetableTheme(userId, timetableId, body.theme, body.themeId).let(::TimetableLegacyDto)
     }
 
     suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {

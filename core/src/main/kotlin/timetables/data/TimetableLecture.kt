@@ -45,7 +45,7 @@ data class TimetableLecture(
     var lectureId: String? = null,
 )
 
-fun TimetableLecture(lecture: Lecture, colorIndex: Int) = TimetableLecture(
+fun TimetableLecture(lecture: Lecture, colorIndex: Int, color: ColorSet?) = TimetableLecture(
     lectureId = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
@@ -61,5 +61,5 @@ fun TimetableLecture(lecture: Lecture, colorIndex: Int) = TimetableLecture(
     courseNumber = lecture.courseNumber,
     courseTitle = lecture.courseTitle,
     colorIndex = colorIndex,
-    color = null,
+    color = color,
 )

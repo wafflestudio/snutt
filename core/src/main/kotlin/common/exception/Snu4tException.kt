@@ -42,6 +42,7 @@ object InvalidAppTypeException : Snu4tException(ErrorType.INVALID_APP_TYPE)
 object InvalidNicknameException : Snu4tException(ErrorType.INVALID_NICKNAME)
 object InvalidDisplayNameException : Snu4tException(ErrorType.INVALID_DISPLAY_NAME)
 object TableDeleteErrorException : Snu4tException(ErrorType.TABLE_DELETE_ERROR)
+object InvalidThemeColorCountException : Snu4tException(ErrorType.INVALID_THEME_COLOR_COUNT)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
@@ -62,10 +63,13 @@ object TimetableNotPrimaryException : Snu4tException(ErrorType.DEFAULT_ERROR)
 object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
+object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
 object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)
 object InvalidFriendException : Snu4tException(ErrorType.INVALID_FRIEND)
+object DuplicateThemeNameException : Snu4tException(ErrorType.DUPLICATE_THEME_NAME)
+object InvalidThemeTypeException : Snu4tException(ErrorType.INVALID_THEME_TYPE)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
