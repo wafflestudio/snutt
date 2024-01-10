@@ -80,7 +80,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/themes/{themeId}/copy", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/themes/{themeId}/default", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "unsetDefault",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
