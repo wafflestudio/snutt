@@ -64,7 +64,7 @@ class TimetableLectureServiceImpl(
         if (timetable.lectures.any { it.lectureId == lectureId }) throw DuplicateTimetableLectureException
         val timetableLecture = TimetableLecture(lecture, colorIndex, color)
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
+        return timetableRepository.pushTimetableLecture(timetable.id!!, timetableLecture)
     }
 
     override suspend fun addCustomTimetableLecture(
@@ -77,7 +77,7 @@ class TimetableLectureServiceImpl(
         val timetableLecture = timetableLectureRequest.toTimetableLecture()
         if (ClassTimeUtils.timesOverlap(timetableLecture.classPlaceAndTimes)) throw InvalidTimeException
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
+        return timetableRepository.pushTimetableLecture(timetable.id!!, timetableLecture)
     }
 
     override suspend fun resetTimetableLecture(
@@ -100,7 +100,7 @@ class TimetableLectureServiceImpl(
             classPlaceAndTimes = originalLecture.classPlaceAndTimes
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateLecture(timetableId, timetableLecture)
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
     override suspend fun modifyTimetableLecture(
@@ -126,12 +126,12 @@ class TimetableLectureServiceImpl(
             classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() } ?: classPlaceAndTimes
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateLecture(timetableId, timetableLecture)
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
     override suspend fun deleteTimetableLecture(userId: String, timetableId: String, timetableLectureId: String): Timetable {
         timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
-        return timetableRepository.pullLecture(timetableId, timetableLectureId)
+        return timetableRepository.pullTimetableLecture(timetableId, timetableLectureId)
     }
 
     private suspend fun resolveTimeConflict(
@@ -152,7 +152,7 @@ class TimetableLectureServiceImpl(
             }
 
             overlappingLectures.isNotEmpty() && isForced -> {
-                timetableRepository.pullLectures(timetable.id!!, overlappingLectures.map { it.id })
+                timetableRepository.pullTimetableLectures(timetable.id!!, overlappingLectures.map { it.id })
             }
         }
     }
