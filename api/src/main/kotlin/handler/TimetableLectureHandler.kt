@@ -23,7 +23,7 @@ class TimetableLectureHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val customTimetable = req.awaitBody<CustomTimetableLectureAddLegacyRequestDto>()
-        val isForced = customTimetable.isForced
+        val isForced = req.parseQueryParam<Boolean>("isForced") ?: customTimetable.isForced
 
         timetableLectureService.addCustomTimetableLecture(
             userId = userId,
@@ -37,7 +37,7 @@ class TimetableLectureHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val lectureId = req.pathVariable("lectureId")
-        val isForced = req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
+        val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
 
         timetableLectureService.addLecture(
             userId = userId,
@@ -51,7 +51,7 @@ class TimetableLectureHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
         val timetableLectureId = req.pathVariable("timetableLectureId")
-        val isForced = req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
+        val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
 
         timetableLectureService.resetTimetableLecture(
             userId = userId,
@@ -66,7 +66,7 @@ class TimetableLectureHandler(
         val timetableId = req.pathVariable("timetableId")
         val timetableLectureId = req.pathVariable("timetableLectureId")
         val modifyRequestDto = req.awaitBody<TimetableLectureModifyLegacyRequestDto>()
-        val isForced = modifyRequestDto.isForced
+        val isForced = req.parseQueryParam<Boolean>("isForced") ?: modifyRequestDto.isForced
 
         timetableLectureService.modifyTimetableLecture(
             userId = userId,
