@@ -257,13 +257,8 @@ class SugangSnuSyncServiceImpl(
     fun dropOverlappingLectures(
         timetables: Flow<Timetable>,
         updatedLecture: UpdatedLecture
-    ) = timetables.map {
-        it.apply {
-            lectures = lectures.filter { lecture -> lecture.lectureId != updatedLecture.oldData.id }
-        }
-    }.let {
-        timeTableRepository.saveAll(it)
-    }.map { timetable ->
+    ) = timetables.map { timetable ->
+        timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, updatedLecture.oldData.id!!)
         TimetableLectureDeleteByOverlapResult(
             year = timetable.year,
             semester = timetable.semester,
@@ -299,7 +294,7 @@ class SugangSnuSyncServiceImpl(
         timeTableRepository.findAllContainsLectureId(
             deletedLecture.year, deletedLecture.semester, deletedLecture.id!!
         ).map { timetable ->
-            timeTableRepository.pullLecture(timetable.id!!, deletedLecture.id!!)
+            timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, deletedLecture.id!!)
             TimetableLectureDeleteResult(
                 timetable.year,
                 timetable.semester,

@@ -10,7 +10,9 @@ import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import org.bson.types.ObjectId
 import org.springframework.data.mapping.toDotPath
+import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.findModifyAndAwait
@@ -29,16 +31,12 @@ interface TimetableCustomRepository {
         lectureNumber: String
     ): Flow<Timetable>
 
-    suspend fun pushLecture(timeTableId: String, lecture: TimetableLecture): Timetable
-    suspend fun pullLecture(timeTableId: String, lectureId: String): Timetable
-    suspend fun pullLectures(timeTableId: String, lectureIds: List<String>): Timetable
-    suspend fun updateLecture(timeTableId: String, timetableLecture: TimetableLecture): Timetable
-    suspend fun findLatestChildTimetable(
-        userId: String,
-        year: Int,
-        semester: Semester,
-        title: String
-    ): Timetable?
+    suspend fun pushTimetableLecture(timeTableId: String, timetableLecture: TimetableLecture): Timetable
+    suspend fun pullTimetableLecture(timeTableId: String, timetableLectureId: String): Timetable
+    suspend fun pullTimetableLectureByLectureId(timeTableId: String, lectureId: String): Timetable
+    suspend fun pullTimetableLectures(timeTableId: String, timetableLectureIds: List<String>): Timetable
+    suspend fun updateTimetableLecture(timeTableId: String, timetableLecture: TimetableLecture): Timetable
+    suspend fun findLatestChildTimetable(userId: String, year: Int, semester: Semester, title: String): Timetable?
 }
 
 class TimetableCustomRepositoryImpl(
@@ -72,35 +70,40 @@ class TimetableCustomRepositoryImpl(
         ).asFlow()
     }
 
-    override suspend fun pushLecture(timeTableId: String, lecture: TimetableLecture): Timetable =
+    override suspend fun pushTimetableLecture(timeTableId: String, timetableLecture: TimetableLecture): Timetable =
         reactiveMongoTemplate.update<Timetable>().matching(Timetable::id isEqualTo timeTableId).apply(
-            Update().push(Timetable::lectures.toDotPath(), lecture).currentDate(Timetable::updatedAt.toDotPath()),
-        ).findModifyAndAwait()
+            Update().push(Timetable::lectures.toDotPath(), timetableLecture)
+                .currentDate(Timetable::updatedAt.toDotPath()),
+        ).withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
+    override suspend fun pullTimetableLecture(timeTableId: String, timetableLectureId: String): Timetable =
+        reactiveMongoTemplate.update<Timetable>().matching(Timetable::id isEqualTo timeTableId).apply(
+            Update().pull(
+                Timetable::lectures.toDotPath(),
+                Query.query(TimetableLecture::id isEqualTo timetableLectureId)
+            ).currentDate(Timetable::updatedAt.toDotPath()),
+        ).withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
 
-    override suspend fun pullLecture(timeTableId: String, lectureId: String): Timetable =
+    override suspend fun pullTimetableLectureByLectureId(timeTableId: String, lectureId: String): Timetable =
         reactiveMongoTemplate.update<Timetable>().matching(Timetable::id isEqualTo timeTableId).apply(
             Update().pull(
                 Timetable::lectures.toDotPath(),
                 Query.query(TimetableLecture::lectureId isEqualTo lectureId)
             ).currentDate(Timetable::updatedAt.toDotPath()),
-        ).findModifyAndAwait()
+        ).withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
 
-    override suspend fun pullLectures(timeTableId: String, lectureIds: List<String>): Timetable =
+    override suspend fun pullTimetableLectures(timeTableId: String, timetableLectureIds: List<String>): Timetable =
         reactiveMongoTemplate.update<Timetable>().matching(Timetable::id isEqualTo timeTableId).apply(
             Update().pull(
                 Timetable::lectures.toDotPath(),
-                Query.query(TimetableLecture::lectureId.inValues(lectureIds))
+                Query.query(TimetableLecture::id.inValues(timetableLectureIds.map { ObjectId(it) }))
             ).currentDate(Timetable::updatedAt.toDotPath()),
-        ).findModifyAndAwait()
+        ).withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
 
-    override suspend fun updateLecture(
-        timeTableId: String,
-        timetableLecture: TimetableLecture
-    ): Timetable =
-        reactiveMongoTemplate.update<Timetable>()
-            .matching(Timetable::id.isEqualTo(timeTableId).and("lecture_list._id").isEqualTo(timetableLecture.id)).apply(
-                Update().apply { set("""lecture_list.$""", timetableLecture) }
-            ).findModifyAndAwait()
+    override suspend fun updateTimetableLecture(timeTableId: String, timetableLecture: TimetableLecture): Timetable =
+        reactiveMongoTemplate.update<Timetable>().matching(
+            Timetable::id.isEqualTo(timeTableId).and("lecture_list._id").isEqualTo(ObjectId(timetableLecture.id))
+        ).apply(Update().apply { set("""lecture_list.$""", timetableLecture) })
+            .withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
 
     override suspend fun findLatestChildTimetable(
         userId: String,
