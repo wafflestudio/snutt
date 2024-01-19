@@ -43,6 +43,8 @@ object InvalidNicknameException : Snu4tException(ErrorType.INVALID_NICKNAME)
 object InvalidDisplayNameException : Snu4tException(ErrorType.INVALID_DISPLAY_NAME)
 object TableDeleteErrorException : Snu4tException(ErrorType.TABLE_DELETE_ERROR)
 object InvalidThemeColorCountException : Snu4tException(ErrorType.INVALID_THEME_COLOR_COUNT)
+object DefaultThemeDeleteErrorException : Snu4tException(ErrorType.DEFAULT_THEME_DELETE_ERROR)
+object NotDefaultThemeErrorException : Snu4tException(ErrorType.NOT_DEFAULT_THEME_ERROR)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
