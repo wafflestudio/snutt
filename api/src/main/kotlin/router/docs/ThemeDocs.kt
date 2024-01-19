@@ -87,5 +87,13 @@ import org.springframework.web.bind.annotation.RequestMethod
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableThemeDto::class))])],
         ),
     ),
+    RouterOperation(
+        path = "/v1/themes/basic/{basicThemeTypeValue}/default", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "unsetBasicThemeTypeDefault",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "basicThemeTypeValue", required = true)],
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableThemeDto::class))])],
+        ),
+    ),
 )
 annotation class ThemeDocs

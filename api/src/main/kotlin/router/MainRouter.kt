@@ -189,6 +189,7 @@ class MainRouter(
             POST("{themeId}/default", timetableThemeHandler::setDefault)
             POST("basic/{basicThemeTypeValue}/default", timetableThemeHandler::setBasicThemeTypeDefault)
             DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
+            DELETE("basic/{basicThemeTypeValue}/default", timetableThemeHandler::unsetBasicThemeTypeDefault)
         }
     }
 
