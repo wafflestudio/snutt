@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lecturehalls.data
+package com.wafflestudio.snu4t.lecturebuildings.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -18,10 +18,10 @@ data class LectureBuilding(
     val buildingNameEng: String? = null,
 
     // 위경도 - 37.4592190840394, 126.948120067187
-    val locationInDMS: GeoCoordinate,
+    val locationInDMS: GeoCoordinate?,
 
     // 위경도(십진표기) - 488525, 1099948
-    val locationInDecimal: GeoCoordinate,
+    val locationInDecimal: GeoCoordinate?,
 
     // 캠퍼스 - 관악
     val campus: Campus,

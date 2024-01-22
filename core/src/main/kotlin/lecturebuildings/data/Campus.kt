@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lecturehalls.data
+package com.wafflestudio.snu4t.lecturebuildings.data
 
 enum class Campus {
     GWANAK,

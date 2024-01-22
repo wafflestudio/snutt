@@ -2,9 +2,9 @@ package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import com.wafflestudio.snu4t.lecturehalls.data.Campus
-import com.wafflestudio.snu4t.lecturehalls.data.GeoCoordinate
-import com.wafflestudio.snu4t.lecturehalls.data.LectureBuilding
+import com.wafflestudio.snu4t.lecturebuildings.data.Campus
+import com.wafflestudio.snu4t.lecturebuildings.data.GeoCoordinate
+import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuilding
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.utils.endPeriod
 import com.wafflestudio.snu4t.lectures.utils.minuteToString
