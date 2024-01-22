@@ -40,7 +40,7 @@ data class ClassPlaceAndTimeLegacyRequestDto(
             place = place ?: "",
             startMinute = startMinute,
             endMinute = endMinute,
-            lectureHall = null
+            lectureBuilding = null
         )
     }
 

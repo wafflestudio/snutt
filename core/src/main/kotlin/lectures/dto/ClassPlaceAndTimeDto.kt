@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.lecturehalls.data.Campus
 import com.wafflestudio.snu4t.lecturehalls.data.GeoCoordinate
-import com.wafflestudio.snu4t.lecturehalls.data.LectureHall
+import com.wafflestudio.snu4t.lecturehalls.data.LectureBuilding
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.utils.endPeriod
 import com.wafflestudio.snu4t.lectures.utils.minuteToString
 import com.wafflestudio.snu4t.lectures.utils.startPeriod
-import java.util.UUID
+import org.bson.types.ObjectId
 
 data class ClassPlaceAndTimeDto(
     val day: DayOfWeek,
@@ -38,7 +38,7 @@ data class ClassPlaceAndTimeLegacyDto(
     val periodLength: Double,
     @JsonProperty("start")
     val startPeriod: Double,
-    val lectureHall: LectureHall?
+    val lectureBuilding: LectureBuilding?
 )
 
 fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeLegacyDto = ClassPlaceAndTimeLegacyDto(
@@ -50,11 +50,11 @@ fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlace
     endTime = minuteToString(classPlaceAndTime.endMinute),
     startPeriod = classPlaceAndTime.startPeriod,
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
-    lectureHall = MockLectureHall()
+    lectureBuilding = MockLectureBuilding()
 )
 
-private fun MockLectureHall() = LectureHall(
-    id = UUID.randomUUID().toString(),
+private fun MockLectureBuilding() = LectureBuilding(
+    id = ObjectId.get().toHexString(),
     buildingNumber = "500",
     buildingNameKor = "자연과학대학(500)",
     buildingNameEng = "College of Natural Sciences(500)",

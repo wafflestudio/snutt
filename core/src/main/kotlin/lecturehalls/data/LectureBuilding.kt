@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-data class LectureHall(
+data class LectureBuilding(
     @Id
     val id: String? = null,
 
