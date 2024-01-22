@@ -14,7 +14,6 @@ import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
-import com.wafflestudio.snu4t.timetables.utils.ColorUtils
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {
@@ -54,17 +53,12 @@ class TimetableLectureServiceImpl(
         val lecture = lectureRepository.findById(lectureId) ?: throw LectureNotFoundException
         if (!(timetable.year == lecture.year && timetable.semester == lecture.semester)) throw WrongSemesterException
 
-        val (colorIndex, color) = if (timetable.themeId == null) {
-            ColorUtils.getLeastUsedColorIndexByRandom(timetable.lectures.map { it.colorIndex }) to null
-        } else {
-            val theme = timetableThemeService.getTheme(userId, timetable.themeId)
-            0 to requireNotNull(theme.colors).random()
-        }
+        val (colorIndex, color) = timetableThemeService.getNewColorIndexAndColor(timetable)
 
         if (timetable.lectures.any { it.lectureId == lectureId }) throw DuplicateTimetableLectureException
         val timetableLecture = TimetableLecture(lecture, colorIndex, color)
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
+        return timetableRepository.pushTimetableLecture(timetable.id!!, timetableLecture)
     }
 
     override suspend fun addCustomTimetableLecture(
@@ -77,7 +71,7 @@ class TimetableLectureServiceImpl(
         val timetableLecture = timetableLectureRequest.toTimetableLecture()
         if (ClassTimeUtils.timesOverlap(timetableLecture.classPlaceAndTimes)) throw InvalidTimeException
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.pushLecture(timetable.id!!, timetableLecture)
+        return timetableRepository.pushTimetableLecture(timetable.id!!, timetableLecture)
     }
 
     override suspend fun resetTimetableLecture(
@@ -100,7 +94,7 @@ class TimetableLectureServiceImpl(
             classPlaceAndTimes = originalLecture.classPlaceAndTimes
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateLecture(timetableId, timetableLecture)
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
     override suspend fun modifyTimetableLecture(
@@ -126,12 +120,12 @@ class TimetableLectureServiceImpl(
             classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() } ?: classPlaceAndTimes
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateLecture(timetableId, timetableLecture)
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
     override suspend fun deleteTimetableLecture(userId: String, timetableId: String, timetableLectureId: String): Timetable {
         timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
-        return timetableRepository.pullLecture(timetableId, timetableLectureId)
+        return timetableRepository.pullTimetableLecture(timetableId, timetableLectureId)
     }
 
     private suspend fun resolveTimeConflict(
@@ -152,7 +146,7 @@ class TimetableLectureServiceImpl(
             }
 
             overlappingLectures.isNotEmpty() && isForced -> {
-                timetableRepository.pullLectures(timetable.id!!, overlappingLectures.map { it.id })
+                timetableRepository.pullTimetableLectures(timetable.id!!, overlappingLectures.map { it.id })
             }
         }
     }
