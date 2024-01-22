@@ -61,7 +61,7 @@ class LectureBuildingPopulateJobConfig(
             if (lecture.classPlaceAndTimes.map { it.place }.isEmpty()) {
                 log.info("강의(id: #${lecture.id}, title: ${lecture.courseTitle})의 강의동 데이터가 없습니다.")
             } else {
-                log.error("강의(id: #${lecture.id}, title: ${lecture.courseTitle})의 강의동 데이터 데이터를 불러오는데 실패했습니다..")
+                log.error("강의(id: #${lecture.id}, title: ${lecture.courseTitle})의 강의동 데이터(${lecture.classPlaceAndTimes.map { it.place }.joinToString(", ")})를 불러오는데 실패했습니다..")
             }
         } else {
             log.info(

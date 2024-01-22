@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.lecturebuildings.service
 
-import com.wafflestudio.snu4t.lecturebuildings.data.Campus
 import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuildingUpdateResult
+import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snu4t.lecturebuildings.repository.LectureBuildingRepository
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -27,17 +27,17 @@ class LectureBuildingPopulateServiceImpl(
         }
 
         val placeBuildingInfos = lecture.classPlaceAndTimes
-            .mapNotNull { parseBuildingNumberAndCampusFromPlace(it.place) }
-            .distinctBy { it.first }
-        val placeBuildingNumbers = placeBuildingInfos.map { it.first }
+            .mapNotNull { PlaceInfo(it.place) }
+            .distinctBy { it.buildingNumber }
+        val placeBuildingNumbers = placeBuildingInfos.map { it.buildingNumber }
 
         val lectureBuildings = lectureBuildingRepository.findByBuildingNumberIsIn(placeBuildingNumbers).toMutableList()
         val savedLectureBuildingNumbers = lectureBuildings.map { it.buildingNumber }
 
-        val buildingsToFetch = placeBuildingInfos.filter { !savedLectureBuildingNumbers.contains(it.first) }
+        val buildingsToFetch = placeBuildingInfos.filter { !savedLectureBuildingNumbers.contains(it.buildingNumber) }
         val fetchedBuildings = runBlocking {
             return@runBlocking buildingsToFetch.map {
-                async { return@async lectureBuildingFetchService.getSnuMapLectureBuilding(it.second, it.first) }
+                async { return@async lectureBuildingFetchService.getSnuMapLectureBuilding(it.campus, it.buildingNumber) }
             }.awaitAll()
         }.filterNotNull()
 
@@ -51,7 +51,7 @@ class LectureBuildingPopulateServiceImpl(
                 endMinute = it.endMinute,
                 lectureBuilding = lectureBuildings.firstOrNull {
                     building ->
-                    building.buildingNumber == parseBuildingNumberAndStripCampusPrefix(it.place)
+                    building.buildingNumber == PlaceInfo(it.place)?.buildingNumber
                 }
             )
         }
@@ -62,23 +62,7 @@ class LectureBuildingPopulateServiceImpl(
                     this.classPlaceAndTimes = classPlaceAndTimesWithBuildings
                 }
             ),
-            buildingsAdded = fetchedBuildings
+            buildingsAdded = lectureBuildings
         )
     }
-
-    private fun parseBuildingNumberAndCampusFromPlace(place: String): Pair<String, Campus>? = place
-        .let { it.split("-").dropLast(1).joinToString("-") }
-        .ifBlank { null }
-        ?.let {
-            when (it.first()) {
-                '#' -> Pair(it.removePrefix("#"), Campus.YEONGEON)
-                '*' -> Pair(it.removePrefix("*"), Campus.PYEONGCHANG)
-                else -> Pair(it, Campus.GWANAK)
-            }
-        }
-
-    private fun parseBuildingNumberAndStripCampusPrefix(place: String): String? = place
-        .split("-").dropLast(1).joinToString("-")
-        .removePrefix("#").removePrefix("*")
-        .ifBlank { null }
 }
