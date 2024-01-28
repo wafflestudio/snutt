@@ -1,25 +1,30 @@
 package com.wafflestudio.snu4t.lecturebuildings.job
 
+import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuildingUpdateResult
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingPopulateService
 import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.service.LectureService
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import com.wafflestudio.snu4t.lectures.repository.LectureRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
+import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
 class LectureBuildingPopulateJobConfig(
-    private val lectureService: LectureService,
+    private val lectureRepository: LectureRepository,
     private val lectureBuildingPopulateService: LectureBuildingPopulateService,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
@@ -30,45 +35,60 @@ class LectureBuildingPopulateJobConfig(
     }
 
     @Bean
-    fun lectureBuildingCreateJob(jobRepository: JobRepository, lectureBuildingCreateStep: Step): Job {
+    fun lectureBuildingPopulateJob(jobRepository: JobRepository, lectureBuildingPopulateStep: Step): Job {
         return JobBuilder(JOB_NAME, jobRepository)
-            .start(lectureBuildingCreateStep)
+            .start(lectureBuildingPopulateStep)
             .build()
     }
 
     @Bean
-    fun lectureBuildingCreateStep(
+    @JobScope
+    fun lectureBuildingPopulateStep(
         jobRepository: JobRepository,
-        transactionManager: PlatformTransactionManager
+        transactionManager: PlatformTransactionManager,
+        @Value("#{jobParameters[year]}") year: Int,
+        @Value("#{jobParameters[semester]}") semester: Int,
     ): Step = StepBuilder(STEP_NAME, jobRepository).tasklet(
         { _, _ ->
             runBlocking {
-                val lectures = lectureService.findAll()
-                    .onEach {
-                        tryToUpdateLectureBuilding(it)
+                lectureRepository.findAllByYearAndSemester(year, Semester.getOfValue(semester)!!).toList()
+                    .let { tryToUpdateLectureBuildings(it) }
+                    .let { updateResult ->
+                        updateTimetableLectures(updateResult.lecturesWithBuildingInfos)
                     }
-                    .collect()
             }
             RepeatStatus.FINISHED
         },
         transactionManager
     ).build()
 
-    private suspend fun tryToUpdateLectureBuilding(lecture: Lecture) = runBlocking {
-        val updateResult = lectureBuildingPopulateService.populateLectureBuildings(lecture)
+    private suspend fun tryToUpdateLectureBuildings(lectures: List<Lecture>): LectureBuildingUpdateResult = runBlocking {
+        val updateResult = lectureBuildingPopulateService.populateLectureBuildingsWithFetch(lectures)
 
-        if (updateResult.buildingsAdded.isEmpty()) {
-            if (lecture.classPlaceAndTimes.map { it.place }.isEmpty()) {
-                log.info("강의(id: #${lecture.id}, title: ${lecture.courseTitle})의 강의동 데이터가 없습니다.")
-            } else {
-                log.error("강의(id: #${lecture.id}, title: ${lecture.courseTitle})의 강의동 데이터(${lecture.classPlaceAndTimes.map { it.place }.joinToString(", ")})를 불러오는데 실패했습니다..")
-            }
-        } else {
-            log.info(
-                "강의(id: #${lecture.id}, title: ${lecture.courseTitle}의 강의동(${
-                updateResult.buildingsAdded.map { "${it.buildingNameKor}(${it.buildingNumber})" }.joinToString(", ")
-                })을 추가합니다."
-            )
-        }
+        log.info(
+            "강의 ${updateResult.lecturesWithBuildingInfos.count()}개의 강의동 정보를 업데이트 했습니다.\n${
+            updateResult.lecturesWithBuildingInfos
+                .map { "${it.courseTitle}(${it.lectureNumber})" }
+                .joinToString(", ")
+            }"
+        )
+        log.info(
+            "강의동 업데이트에 실패한 강의:\n ${
+            updateResult.lecturesFailed
+                .map { "${it.courseTitle}(${it.lectureNumber}): ${it.classPlaceAndTimes.map { it.place }.joinToString(", ")}" }
+                .joinToString("\n")
+            }"
+        )
+
+        return@runBlocking updateResult
     }
+
+    private suspend fun updateTimetableLectures(lectures: List<Lecture>) = runBlocking {
+        lectures.map {
+            async {
+                val timetables = lectureBuildingPopulateService.populateLectureBuildingsOfTimetables(it)
+                log.info("강의 ${it.courseTitle}(${it.courseNumber})}가 포함된 시간표 ${timetables.count()}개를 업데이트 했습니다.")
+            }
+        }
+    }.awaitAll()
 }

@@ -5,5 +5,5 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface LectureBuildingRepository : CoroutineCrudRepository<LectureBuilding, String> {
     suspend fun findByBuildingNumber(buildingNumber: String): LectureBuilding?
-    suspend fun findByBuildingNumberIsIn(buildingNumbers: List<String>): List<LectureBuilding>
+    suspend fun findByBuildingNumberIsIn(buildingNumbers: Set<String>): List<LectureBuilding>
 }
