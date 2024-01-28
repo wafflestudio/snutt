@@ -8,7 +8,7 @@ data class ClassPlaceAndTime(
     val place: String,
     val startMinute: Int,
     val endMinute: Int,
-    var lectureBuilding: LectureBuilding? = null
+    var lectureBuildings: List<LectureBuilding>? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
