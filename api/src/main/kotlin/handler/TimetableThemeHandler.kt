@@ -71,4 +71,11 @@ class TimetableThemeHandler(
 
         timetableThemeService.unsetDefault(userId, themeId).let(::TimetableThemeDto)
     }
+
+    suspend fun unsetBasicThemeTypeDefault(req: ServerRequest) = handle(req) {
+        val userId = req.userId
+        val basicThemeType = req.pathVariable("basicThemeTypeValue").toIntOrNull()?.let { BasicThemeType.from(it) } ?: throw InvalidPathParameterException("basicThemeTypeValue")
+
+        timetableThemeService.unsetDefault(userId, basicThemeType = basicThemeType).let(::TimetableThemeDto)
+    }
 }

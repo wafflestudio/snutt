@@ -14,7 +14,6 @@ import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
-import com.wafflestudio.snu4t.timetables.utils.ColorUtils
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {
@@ -54,12 +53,7 @@ class TimetableLectureServiceImpl(
         val lecture = lectureRepository.findById(lectureId) ?: throw LectureNotFoundException
         if (!(timetable.year == lecture.year && timetable.semester == lecture.semester)) throw WrongSemesterException
 
-        val (colorIndex, color) = if (timetable.themeId == null) {
-            ColorUtils.getLeastUsedColorIndexByRandom(timetable.lectures.map { it.colorIndex }) to null
-        } else {
-            val theme = timetableThemeService.getTheme(userId, timetable.themeId)
-            0 to requireNotNull(theme.colors).random()
-        }
+        val (colorIndex, color) = timetableThemeService.getNewColorIndexAndColor(timetable)
 
         if (timetable.lectures.any { it.lectureId == lectureId }) throw DuplicateTimetableLectureException
         val timetableLecture = TimetableLecture(lecture, colorIndex, color)
