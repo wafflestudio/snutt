@@ -29,7 +29,7 @@ object SugangSnuClassTimeUtils {
                     place = locationTexts.joinToString("/"),
                     startMinute = sugangSnuClassTime.startHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
                     endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.endMinute.toInt(),
-                    lectureBuilding = null
+                    lectureBuildings = null
                 )
             }
             .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
