@@ -125,7 +125,7 @@ class TimetableLectureServiceImpl(
 
             classPlaceAndTimes = classPlaceAndTimes.mapIndexed { index, classPlaceAndTime ->
                 classPlaceAndTime.apply {
-                    this.lectureBuilding = lecture?.classPlaceAndTimes?.getOrNull(index)?.lectureBuilding
+                    this.lectureBuildings = lecture?.classPlaceAndTimes?.getOrNull(index)?.lectureBuildings
                 }
             }
         }
