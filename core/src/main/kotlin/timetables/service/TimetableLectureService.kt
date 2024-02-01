@@ -7,7 +7,6 @@ import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
 import com.wafflestudio.snu4t.common.exception.LectureTimeOverlapException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongSemesterException
-import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.timetables.data.Timetable
