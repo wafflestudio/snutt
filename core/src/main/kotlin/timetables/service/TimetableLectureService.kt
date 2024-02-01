@@ -7,6 +7,7 @@ import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
 import com.wafflestudio.snu4t.common.exception.LectureTimeOverlapException
 import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongSemesterException
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snu4t.timetables.data.Timetable
@@ -117,9 +118,21 @@ class TimetableLectureServiceImpl(
             remark = modifyTimetableLectureRequestDto.remark ?: remark
             color = modifyTimetableLectureRequestDto.color ?: color
             colorIndex = modifyTimetableLectureRequestDto.colorIndex ?: colorIndex
-            classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() } ?: classPlaceAndTimes
+            classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map {
+                it.toClassPlaceAndTime()
+            } ?: classPlaceAndTimes
+        }.apply {
+            val lecture = timetableLecture.lectureId?.let { lectureRepository.findById(it) }
+
+            classPlaceAndTimes = classPlaceAndTimes.mapIndexed { index, classPlaceAndTime ->
+                classPlaceAndTime.apply {
+                    this.lectureBuilding = lecture?.classPlaceAndTimes?.getOrNull(index)?.lectureBuilding
+                }
+            }
         }
+
         resolveTimeConflict(timetable, timetableLecture, isForced)
+
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
