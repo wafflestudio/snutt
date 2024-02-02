@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.push.UrlScheme
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
@@ -60,8 +61,6 @@ class VacancyNotifierServiceImpl(
         val lectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val lectureMap = lectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
-        val isCurrentStudentRegistrationPeriod =
-            coursebook.semester == Semester.SPRING && LocalDate.now().dayOfMonth < 15
 
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
@@ -74,13 +73,9 @@ class VacancyNotifierServiceImpl(
             val lectureAndRegistrationStatus = (lectureMap.keys intersect registrationStatusMap.keys)
                 .map { lectureMap[it]!! to registrationStatusMap[it]!! }
 
-            val notiTargetLectures = lectureAndRegistrationStatus.filter { (lecture, _) ->
-                if (isCurrentStudentRegistrationPeriod) {
-                    lecture.quota - (lecture.freshmanQuota ?: 0) == lecture.registrationCount
-                } else {
-                    lecture.quota == lecture.registrationCount
-                }
-            }.filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
+            val notiTargetLectures = lectureAndRegistrationStatus
+                .filter { (lecture, _) -> lecture.isFull() }
+                .filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
                 .map { (lecture, _) -> lecture }
 
             val updated = lectureAndRegistrationStatus
@@ -88,7 +83,7 @@ class VacancyNotifierServiceImpl(
                 .map { (lecture, status) ->
                     lecture.apply {
                         registrationCount = status.registrationCount
-                        wasFull = wasFull || lecture.registrationCount == lecture.quota
+                        wasFull = wasFull || lecture.isFull()
                     }
                 }
             lectureService.upsertLectures(updated)
@@ -122,6 +117,16 @@ class VacancyNotifierServiceImpl(
         return VacancyNotificationJobResult.SUCCESS
     }
 
+    private fun Lecture.isFull(): Boolean {
+        val isCurrentStudentRegistrationPeriod =
+            this.semester == Semester.SPRING && LocalDate.now().dayOfMonth < 15
+        return if (isCurrentStudentRegistrationPeriod) {
+            this.quota - (this.freshmanQuota ?: 0) == this.registrationCount
+        } else {
+            this.quota == this.registrationCount
+        }
+    }
+
     private suspend fun getPageCount(): Int {
         val firstPageContent = getSugangSnuSearchContent(1)
         val totalCount =
@@ -152,10 +157,13 @@ class VacancyNotifierServiceImpl(
                             info.select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
                                 .text()
                                 .split("/").first().toInt()
+                        val hasVacancy =
+                            info.select("""ul.course-info > li:nth-of-type(3) > span[data-dialog-target="remaining-place-dialog"]""")
+                                .isNotEmpty()
                         RegistrationStatus(
                             courseNumber = courseNumber,
                             lectureNumber = lectureNumber,
-                            registrationCount = registrationCount
+                            registrationCount = registrationCount,
                         )
                     }
             }
