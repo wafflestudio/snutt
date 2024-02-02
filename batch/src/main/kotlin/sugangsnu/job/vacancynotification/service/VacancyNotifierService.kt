@@ -157,9 +157,6 @@ class VacancyNotifierServiceImpl(
                             info.select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
                                 .text()
                                 .split("/").first().toInt()
-                        val hasVacancy =
-                            info.select("""ul.course-info > li:nth-of-type(3) > span[data-dialog-target="remaining-place-dialog"]""")
-                                .isNotEmpty()
                         RegistrationStatus(
                             courseNumber = courseNumber,
                             lectureNumber = lectureNumber,
