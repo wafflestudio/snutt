@@ -9,9 +9,6 @@ spring:
         enabled: false
       host:
       database:
-logging:
-  level:
-    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 google:
   firebase:
@@ -59,6 +56,10 @@ google:
       ios:
         bundle-id:
         app-store-id:
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 ---
 
