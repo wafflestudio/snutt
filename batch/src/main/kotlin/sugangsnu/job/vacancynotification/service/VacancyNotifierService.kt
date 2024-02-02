@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDate
+import java.util.Calendar
 import kotlin.time.Duration.Companion.seconds
 
 interface VacancyNotifierService {
@@ -48,6 +48,10 @@ class VacancyNotifierServiceImpl(
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
+    private val isFreshmanRegistrationCompleted = Calendar.getInstance() > Calendar.getInstance().apply {
+        set(Calendar.MONTH, Calendar.FEBRUARY)
+        set(Calendar.DAY_OF_MONTH, 14)
+    }
 
     override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
         log.info("시작")
@@ -118,8 +122,7 @@ class VacancyNotifierServiceImpl(
     }
 
     private fun Lecture.isFull(): Boolean {
-        val isCurrentStudentRegistrationPeriod =
-            this.semester == Semester.SPRING && LocalDate.now().dayOfMonth < 15
+        val isCurrentStudentRegistrationPeriod = this.semester == Semester.SPRING && !isFreshmanRegistrationCompleted
         return if (isCurrentStudentRegistrationPeriod) {
             this.quota - (this.freshmanQuota ?: 0) == this.registrationCount
         } else {
