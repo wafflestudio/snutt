@@ -52,10 +52,18 @@ class TimetableThemeServiceImpl(
         val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByCreatedAtDesc(userId)
         val defaultTheme = getDefaultTheme(userId)
 
-        return (
-            BasicThemeType.values().map { buildTimetableTheme(userId, it, isDefault = it.displayName == defaultTheme?.name) } +
-                customThemes
+        val basicThemes = BasicThemeType.values().map {
+            buildTimetableTheme(
+                userId,
+                it,
+                isDefault = (
+                    it.displayName == defaultTheme?.name ||
+                        (defaultTheme == null && it == BasicThemeType.SNUTT)
+                    )
             )
+        }
+
+        return basicThemes + customThemes
     }
 
     override suspend fun addTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme {
@@ -194,7 +202,14 @@ class TimetableThemeServiceImpl(
 
         return themeId?.let {
             timetableThemeRepository.findByIdAndUserId(it, userId) ?: throw ThemeNotFoundException
-        } ?: buildTimetableTheme(userId, basicThemeType!!, isDefault = basicThemeType.displayName == defaultTheme?.name)
+        } ?: buildTimetableTheme(
+            userId,
+            basicThemeType!!,
+            isDefault = (
+                basicThemeType.displayName == defaultTheme?.name ||
+                    (defaultTheme == null && basicThemeType == BasicThemeType.SNUTT)
+                ),
+        )
     }
 
     private suspend fun getCustomTheme(userId: String, themeId: String): TimetableTheme {
