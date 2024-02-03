@@ -17,7 +17,7 @@ data class TimetableThemeDto(
 fun TimetableThemeDto(timetableTheme: TimetableTheme) =
     with(timetableTheme) {
         TimetableThemeDto(
-            id = id,
+            id = if (isCustom) id else null,
             theme = toBasicThemeType(),
             name = name,
             colors = colors,
