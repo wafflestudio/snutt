@@ -91,7 +91,7 @@ class TimetableThemeServiceImpl(
         colors?.let {
             if (it.size !in 1..MAX_COLOR_COUNT) throw InvalidThemeColorCountException
 
-            val colorMap = requireNotNull(theme.colors).mapIndexed { i, color -> color to colors[i] }.toMap()
+            val colorMap = requireNotNull(theme.colors).mapIndexed { i, color -> color to colors.getOrNull(i) }.toMap()
 
             val timetables = timetableRepository.findByUserIdAndThemeId(userId, themeId)
             timetables.forEach { timetable ->
