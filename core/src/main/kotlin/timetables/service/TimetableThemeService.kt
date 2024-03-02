@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.timetables.service
 
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
-import com.wafflestudio.snu4t.common.exception.DefaultThemeDeleteErrorException
 import com.wafflestudio.snu4t.common.exception.DuplicateThemeNameException
 import com.wafflestudio.snu4t.common.exception.InvalidThemeColorCountException
 import com.wafflestudio.snu4t.common.exception.InvalidThemeTypeException
@@ -49,7 +48,7 @@ class TimetableThemeServiceImpl(
     }
 
     override suspend fun getThemes(userId: String): List<TimetableTheme> {
-        val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByCreatedAtDesc(userId)
+        val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
         val defaultTheme = getDefaultTheme(userId)
 
         val basicThemes = BasicThemeType.values().map {
@@ -111,7 +110,6 @@ class TimetableThemeServiceImpl(
 
     override suspend fun deleteTheme(userId: String, themeId: String) {
         val theme = getCustomTheme(userId, themeId)
-        if (theme.isDefault) throw DefaultThemeDeleteErrorException
 
         val timetables = timetableRepository.findByUserIdAndThemeId(userId, themeId)
 
@@ -192,7 +190,8 @@ class TimetableThemeServiceImpl(
     }
 
     override suspend fun getDefaultTheme(userId: String): TimetableTheme? {
-        return timetableThemeRepository.findByUserIdAndIsDefaultTrue(userId)
+        val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
+        return customThemes.firstOrNull() ?: buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true)
     }
 
     override suspend fun getTheme(userId: String, themeId: String?, basicThemeType: BasicThemeType?): TimetableTheme {
