@@ -69,7 +69,7 @@ class TimetableServiceImpl(
             semester = timetableRequest.semester,
             title = timetableRequest.title,
             theme = defaultTheme.toBasicThemeType(),
-            themeId = defaultTheme?.id,
+            themeId = defaultTheme.toIdForTimetable(),
             isPrimary = timetableRepository
                 .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
                 .toList()
@@ -122,7 +122,7 @@ class TimetableServiceImpl(
         val theme = timetableThemeService.getTheme(userId, themeId, basicThemeType)
 
         timetable.theme = theme.toBasicThemeType()
-        timetable.themeId = theme.id
+        timetable.themeId = theme.toIdForTimetable()
 
         val colorCount = if (theme.isCustom) requireNotNull(theme.colors).size else BasicThemeType.COLOR_COUNT
         timetable.lectures.forEachIndexed { index, lecture ->
@@ -161,7 +161,7 @@ class TimetableServiceImpl(
             semester = coursebook.semester,
             title = "나의 시간표",
             theme = defaultTheme.toBasicThemeType(),
-            themeId = defaultTheme?.id,
+            themeId = defaultTheme.toIdForTimetable(),
         )
         timetableRepository.save(timetable)
     }

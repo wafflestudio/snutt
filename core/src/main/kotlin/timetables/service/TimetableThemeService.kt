@@ -238,8 +238,7 @@ class TimetableThemeServiceImpl(
             val theme = getTheme(timetable.userId, timetable.themeId)
 
             val alreadyUsedColors = timetable.lectures.map { requireNotNull(it.color) }
-            val colors = requireNotNull(theme.colors) { "theme.colors 가 null - userId: ${timetable.userId}, timetableId: ${timetable.id}, themeId: ${theme.id}" }
-            val colorToCount = colors.associateWith { color -> alreadyUsedColors.count { it == color } }
+            val colorToCount = requireNotNull(theme.colors).associateWith { color -> alreadyUsedColors.count { it == color } }
 
             val minCount = colorToCount.minOf { it.value }
             0 to colorToCount.entries.filter { (_, count) -> count == minCount }.map { it.key }.random()
@@ -248,3 +247,4 @@ class TimetableThemeServiceImpl(
 }
 
 fun TimetableTheme?.toBasicThemeType() = if (this == null || isCustom) BasicThemeType.SNUTT else requireNotNull(BasicThemeType.from(name))
+fun TimetableTheme?.toIdForTimetable() = if (this == null || isCustom.not()) null else id

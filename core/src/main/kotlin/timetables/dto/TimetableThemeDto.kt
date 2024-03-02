@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.timetables.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.TimetableTheme
 import com.wafflestudio.snu4t.timetables.service.toBasicThemeType
+import com.wafflestudio.snu4t.timetables.service.toIdForTimetable
 
 data class TimetableThemeDto(
     val id: String?,
@@ -17,7 +18,7 @@ data class TimetableThemeDto(
 fun TimetableThemeDto(timetableTheme: TimetableTheme) =
     with(timetableTheme) {
         TimetableThemeDto(
-            id = if (isCustom) id else null,
+            id = toIdForTimetable(),
             theme = toBasicThemeType(),
             name = name,
             colors = colors,
