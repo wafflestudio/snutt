@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.timetables.data
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -19,7 +20,9 @@ data class TimetableTheme(
     var name: String,
     var colors: List<ColorSet>?, // basic 테마는 null (클라이언트 처리)
     val isCustom: Boolean, // basic 테마는 false
-    var isDefault: Boolean,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    @Transient // iOS, Android 3.5.0 버전 대응하는 레거시 로직을 위해서만 남아있고 실제 DB 에선 제거한 필드
+    var isDefault: Boolean = false
+}
