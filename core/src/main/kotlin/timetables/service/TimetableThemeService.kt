@@ -30,7 +30,7 @@ interface TimetableThemeService {
 
     suspend fun unsetDefault(userId: String, themeId: String? = null, basicThemeType: BasicThemeType? = null): TimetableTheme
 
-    suspend fun getDefaultTheme(userId: String): TimetableTheme?
+    suspend fun getDefaultTheme(userId: String): TimetableTheme
 
     suspend fun getTheme(userId: String, themeId: String? = null, basicThemeType: BasicThemeType? = null): TimetableTheme
 
@@ -48,17 +48,16 @@ class TimetableThemeServiceImpl(
     }
 
     override suspend fun getThemes(userId: String): List<TimetableTheme> {
-        val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
         val defaultTheme = getDefaultTheme(userId)
+
+        val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
+        customThemes.forEach { if (it.id == defaultTheme.id) it.isDefault = true } // iOS, Android 3.5.0 버전 대응을 위함
 
         val basicThemes = BasicThemeType.values().map {
             buildTimetableTheme(
                 userId,
                 it,
-                isDefault = (
-                    it.displayName == defaultTheme?.name ||
-                        (defaultTheme == null && it == BasicThemeType.SNUTT)
-                    )
+                isDefault = it.displayName == defaultTheme.name,
             )
         }
 
@@ -74,7 +73,6 @@ class TimetableThemeServiceImpl(
             name = name,
             colors = colors,
             isCustom = true,
-            isDefault = false,
         )
         return timetableThemeRepository.save(theme)
     }
@@ -133,7 +131,6 @@ class TimetableThemeServiceImpl(
             name = "$baseName (${lastCopiedThemeNumber + 1})",
             colors = theme.colors,
             isCustom = true,
-            isDefault = false,
         )
         return timetableThemeRepository.save(newTheme)
     }
@@ -144,33 +141,28 @@ class TimetableThemeServiceImpl(
             ?.replace(baseName, "")?.filter { it.isDigit() }?.toIntOrNull() ?: 0
     }
 
+    // iOS, Android 3.5.0 버전에서만 사용
     override suspend fun setDefault(userId: String, themeId: String?, basicThemeType: BasicThemeType?): TimetableTheme {
         require((themeId == null) xor (basicThemeType == null))
 
-        val theme = themeId?.let {
-            timetableThemeRepository.findByIdAndUserId(it, userId) ?: throw ThemeNotFoundException
-        } ?: buildTimetableTheme(userId, basicThemeType!!, isDefault = true)
-
-        val defaultThemeBefore = timetableThemeRepository.findByUserIdAndIsDefaultTrue(userId)
-        defaultThemeBefore?.let {
-            if (it.isCustom) {
-                it.isDefault = false
-                it.updatedAt = LocalDateTime.now()
-                timetableThemeRepository.save(it)
-            } else {
-                timetableThemeRepository.delete(it)
-            }
+        if (basicThemeType != null) { // 3.5.0 버전에서만 사용하기에 basic 테마의 경우 유저가 직접적으로 default 테마로 지정하는 것 불가하도록 처리
+            return getDefaultTheme(userId)
         }
 
+        val theme = themeId?.let {
+            timetableThemeRepository.findByIdAndUserId(it, userId) ?: throw ThemeNotFoundException
+        } ?: return buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true)
+
         theme.isDefault = true
-        theme.updatedAt = LocalDateTime.now()
+        theme.updatedAt = LocalDateTime.now() // updatedAt 을 가장 최신으로 만듦으로써 getDefaultTheme() 의 로직상 default 테마가 되도록 함
         return timetableThemeRepository.save(theme)
     }
 
+    // iOS, Android 3.5.0 버전에서만 사용
     override suspend fun unsetDefault(userId: String, themeId: String?, basicThemeType: BasicThemeType?): TimetableTheme {
         require((themeId == null) xor (basicThemeType == null))
 
-        val theme = getDefaultTheme(userId) ?: throw NotDefaultThemeErrorException
+        val theme = getDefaultTheme(userId)
 
         themeId?.let {
             if (theme.isCustom.not() || theme.id != it) throw NotDefaultThemeErrorException
@@ -178,20 +170,12 @@ class TimetableThemeServiceImpl(
             if (theme.isCustom || theme.name != basicThemeType!!.displayName) throw NotDefaultThemeErrorException
         }
 
-        if (theme.isCustom) {
-            theme.isDefault = false
-            theme.updatedAt = LocalDateTime.now()
-            timetableThemeRepository.save(theme)
-        } else {
-            timetableThemeRepository.delete(theme)
-        }
-
         return timetableThemeRepository.save(buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true))
     }
 
-    override suspend fun getDefaultTheme(userId: String): TimetableTheme? {
+    override suspend fun getDefaultTheme(userId: String): TimetableTheme {
         val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
-        return customThemes.firstOrNull() ?: buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true)
+        return customThemes.firstOrNull()?.also { it.isDefault = true } ?: buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true)
     }
 
     override suspend fun getTheme(userId: String, themeId: String?, basicThemeType: BasicThemeType?): TimetableTheme {
@@ -204,10 +188,7 @@ class TimetableThemeServiceImpl(
         } ?: buildTimetableTheme(
             userId,
             basicThemeType!!,
-            isDefault = (
-                basicThemeType.displayName == defaultTheme?.name ||
-                    (defaultTheme == null && basicThemeType == BasicThemeType.SNUTT)
-                ),
+            isDefault = basicThemeType.displayName == defaultTheme.name,
         )
     }
 
@@ -223,8 +204,7 @@ class TimetableThemeServiceImpl(
             name = basicThemeType.displayName,
             colors = null,
             isCustom = false,
-            isDefault = isDefault,
-        )
+        ).also { it.isDefault = isDefault }
 
     override suspend fun getNewColorIndexAndColor(timetable: Timetable): Pair<Int, ColorSet?> {
         return if (timetable.themeId == null) {
@@ -245,5 +225,5 @@ class TimetableThemeServiceImpl(
     }
 }
 
-fun TimetableTheme?.toBasicThemeType() = if (this == null || isCustom) BasicThemeType.SNUTT else requireNotNull(BasicThemeType.from(name))
-fun TimetableTheme?.toIdForTimetable() = if (this == null || isCustom.not()) null else id
+fun TimetableTheme.toBasicThemeType() = if (isCustom) BasicThemeType.SNUTT else requireNotNull(BasicThemeType.from(name))
+fun TimetableTheme.toIdForTimetable() = if (isCustom) id else null
