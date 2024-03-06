@@ -4,7 +4,7 @@ export async function getPopups(user: User, osType?: string, osVersion?: string,
   return {
     content: [
        {
-         "key": "new-service-custom-theme",
+         "key": "custom-theme-event",
          "image_url": "https://snutt-asset.s3.ap-northeast-2.amazonaws.com/popup-images/themeEventPopup.png",
          "hidden_days": 1,
        },
