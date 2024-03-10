@@ -14,6 +14,7 @@ data class NotificationResponse(
     val title: String,
     val message: String,
     val type: NotificationType,
+    val deeplink: String?,
     @JsonProperty("created_at")
     val createdAt: ZonedDateTime,
 ) {
@@ -24,6 +25,7 @@ data class NotificationResponse(
             title = notification.title,
             message = notification.message,
             type = notification.type,
+            deeplink = notification.deeplink,
             createdAt = notification.createdAt.toZonedDateTime(),
         )
     }

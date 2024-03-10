@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.push.UrlScheme
+import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -106,7 +106,7 @@ class VacancyNotifierServiceImpl(
                         val pushMessage = PushMessage(
                             title = "빈자리 알림",
                             body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
-                            urlScheme = UrlScheme.VACANCY
+                            urlScheme = DeeplinkType.VACANCY
                         )
                         pushWithNotificationService.sendPushesAndNotifications(
                             pushMessage,

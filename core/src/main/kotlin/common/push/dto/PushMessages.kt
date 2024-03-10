@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.common.push.dto
 
-import com.wafflestudio.snu4t.common.push.UrlScheme
+import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 
@@ -30,7 +30,7 @@ data class TargetedPushMessageWithTopic(
 data class PushMessage(
     val title: String,
     val body: String,
-    val urlScheme: UrlScheme? = null,
+    val urlScheme: DeeplinkType? = null,
     val data: Data = Data(emptyMap()),
 ) {
     data class Data(val payload: Map<String, String>)
@@ -41,6 +41,7 @@ data class PushMessage(
             title = title,
             message = body,
             type = notificationType,
+            deeplink = urlScheme?.build()?.value,
         )
     }
 }
