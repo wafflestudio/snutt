@@ -170,7 +170,7 @@ class TimetableThemeServiceImpl(
             if (theme.isCustom || theme.name != basicThemeType!!.displayName) throw NotDefaultThemeErrorException
         }
 
-        return timetableThemeRepository.save(buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true))
+        return buildTimetableTheme(userId, BasicThemeType.SNUTT, isDefault = true)
     }
 
     override suspend fun getDefaultTheme(userId: String): TimetableTheme {
