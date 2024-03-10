@@ -104,7 +104,7 @@ internal class FcmPushClient(
                 is TargetedPushMessageWithToken -> setToken(targetToken)
                 is TargetedPushMessageWithTopic -> setTopic(topic)
             }
-            message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.compileWith().value) }
+            message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.build().value) }
             setNotification(notification)
             putAllData(message.data.payload)
             build()

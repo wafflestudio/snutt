@@ -294,6 +294,7 @@ class SugangSnuSyncServiceImpl(
                 lectureId = updatedLecture.oldData.id!!,
                 userId = timetable.userId,
                 timetableTitle = timetable.title,
+                timetableId = timetable.id!!,
                 courseTitle = updatedLecture.oldData.courseTitle,
                 updatedFields = updatedLecture.updatedField
             )

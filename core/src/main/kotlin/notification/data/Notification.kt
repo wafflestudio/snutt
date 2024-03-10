@@ -23,7 +23,7 @@ data class Notification(
     val title: String,
     val message: String,
     val type: NotificationType,
-    val urlScheme: String?,
+    val deeplink: String?,
     @Indexed(direction = IndexDirection.DESCENDING)
     @Field("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),
