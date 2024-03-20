@@ -14,7 +14,7 @@ class NotificationAdminService(
 ) {
     suspend fun insertNotification(request: InsertNotificationRequest) {
         val user = request.userId?.let {
-            userRepository.findByCredentialLocalIdAndActiveTrue(it) ?: throw UserNotFoundException
+            userRepository.findByIdAndActiveTrue(it) ?: throw UserNotFoundException
         }
 
         val pushMessage = PushMessage(
