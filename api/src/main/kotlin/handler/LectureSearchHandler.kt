@@ -3,12 +3,10 @@ package com.wafflestudio.snu4t.handler
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -23,7 +21,7 @@ class LectureSearchHandler(
 ) {
     suspend fun searchLectures(req: ServerRequest): ServerResponse = handle(req) {
         val query: SearchQueryLegacy = req.awaitBody()
-        lectureService.search(query.toSearchDto()).toList().map { LectureDto(it) }
+        lectureService.search(query.toSearchDto())
     }
 }
 
