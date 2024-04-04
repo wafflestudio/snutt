@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.common.extension.toZonedDateTime
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.users.data.User
@@ -47,6 +48,12 @@ class UserHandler(
         val user = userService.patchUserInfo(userId, body)
         buildUserDto(user)
     }
+
+    suspend fun deleteAccount(req: ServerRequest): ServerResponse =
+            handle(req) {
+                userService.update(req.getContext().user!!.copy(active = false))
+                OkResponse()
+            }
 
     private fun buildUserDto(user: User) = UserDto(
         id = user.id!!,
