@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.common.dto.PageResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
 import com.wafflestudio.snu4t.friend.dto.FriendState
@@ -34,7 +34,7 @@ class FriendHandler(
             )
         }
 
-        ListResponse(
+        PageResponse(
             content = content,
             totalCount = content.size,
             nextPageToken = null,

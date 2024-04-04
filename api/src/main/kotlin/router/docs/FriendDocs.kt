@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.common.dto.PageResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "getFriends",
             parameters = [Parameter(`in` = ParameterIn.QUERY, name = "state", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PageResponse::class))])]
         ),
     ),
     RouterOperation(
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 content = [Content(schema = Schema(implementation = FriendRequest::class))],
                 required = true,
             ),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PageResponse::class))])]
         ),
     ),
     RouterOperation(

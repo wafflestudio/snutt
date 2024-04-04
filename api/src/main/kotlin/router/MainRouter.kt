@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.BuildingHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
@@ -17,6 +18,7 @@ import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
@@ -48,6 +50,7 @@ class MainRouter(
     private val friendTableHandler: FriendTableHandler,
     private val configHandler: ConfigHandler,
     private val adminHandler: AdminHandler,
+    private val buildingHandler: BuildingHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -107,6 +110,12 @@ class MainRouter(
     @LectureSearchDocs
     fun lectureRoute() = v1CoRouter {
         POST("/search_query", lectureSearchHandler::searchLectures)
+    }
+
+    @Bean
+    @BuildingsDocs
+    fun buildingRoute() = v1CoRouter {
+        GET("/buildings", buildingHandler::searchBuildings)
     }
 
     @Bean
