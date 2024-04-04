@@ -117,21 +117,10 @@ class TimetableLectureServiceImpl(
             remark = modifyTimetableLectureRequestDto.remark ?: remark
             color = modifyTimetableLectureRequestDto.color ?: color
             colorIndex = modifyTimetableLectureRequestDto.colorIndex ?: colorIndex
-            classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map {
-                it.toClassPlaceAndTime()
-            } ?: classPlaceAndTimes
-        }.apply {
-            val lecture = timetableLecture.lectureId?.let { lectureRepository.findById(it) }
-
-            classPlaceAndTimes = classPlaceAndTimes.mapIndexed { index, classPlaceAndTime ->
-                classPlaceAndTime.apply {
-                    this.lectureBuildings = lecture?.classPlaceAndTimes?.getOrNull(index)?.lectureBuildings
-                }
-            }
+            classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() }
+                ?: classPlaceAndTimes
         }
-
         resolveTimeConflict(timetable, timetableLecture, isForced)
-
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 

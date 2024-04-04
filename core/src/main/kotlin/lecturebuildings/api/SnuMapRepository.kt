@@ -1,10 +1,8 @@
-package com.wafflestudio.snu4t.lecturebuildings
+package com.wafflestudio.snu4t.lecturebuildings.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.wafflestudio.snu4t.lecturebuildings.api.SnuMapApi
 import com.wafflestudio.snu4t.lecturebuildings.data.SnuMapSearchResult
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 
@@ -25,6 +23,7 @@ class SnuMapRepository(
             .query(DEFAULT_SEARCH_PARAMS)
             .queryParam("search_word", buildingNum)
             .build()
-    }.accept(MediaType.APPLICATION_JSON).retrieve().awaitBody<String>()
+    }
+        .retrieve().awaitBody<String>()
         .let { objectMapper.readValue<SnuMapSearchResult>(it) }
 }
