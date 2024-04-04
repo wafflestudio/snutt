@@ -49,11 +49,10 @@ class UserHandler(
         buildUserDto(user)
     }
 
-    suspend fun deleteAccount(req: ServerRequest): ServerResponse =
-            handle(req) {
-                userService.update(req.getContext().user!!.copy(active = false))
-                OkResponse()
-            }
+    suspend fun deleteAccount(req: ServerRequest): ServerResponse = handle(req) {
+        userService.update(req.getContext().user!!.copy(active = false))
+        OkResponse()
+    }
 
     private fun buildUserDto(user: User) = UserDto(
         id = user.id!!,
