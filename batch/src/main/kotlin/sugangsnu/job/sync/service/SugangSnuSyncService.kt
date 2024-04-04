@@ -310,11 +310,11 @@ class SugangSnuSyncServiceImpl(
             )
         }
 
-    private suspend fun updateLectureBuildings(compareResult: SugangSnuLectureCompareResult){
+    private suspend fun updateLectureBuildings(compareResult: SugangSnuLectureCompareResult) {
         val updatedPlaceInfos = (compareResult.updatedLectureList.map { it.newData } + compareResult.createdLectureList)
             .flatMap { it.classPlaceAndTimes }
             .flatMap { PlaceInfo.getValuesOf(it.place) }
-            .filter { it.campus == Campus.GWANAK}
+            .filter { it.campus == Campus.GWANAK }
             .distinct()
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
     }

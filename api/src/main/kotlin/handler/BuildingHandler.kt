@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 
 @Component
-class BuildingHandler (
+class BuildingHandler(
     private val lectureBuildingService: LectureBuildingService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
