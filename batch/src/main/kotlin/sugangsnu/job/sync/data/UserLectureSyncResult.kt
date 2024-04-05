@@ -37,6 +37,7 @@ data class TimetableLectureUpdateResult(
     val year: Int,
     val semester: Semester,
     val timetableTitle: String,
+    val timetableId: String,
     val courseTitle: String,
     override val userId: String,
     override val lectureId: String,

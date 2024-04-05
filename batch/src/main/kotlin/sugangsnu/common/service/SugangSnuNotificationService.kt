@@ -1,8 +1,7 @@
 package com.wafflestudio.snu4t.sugangsnu.common.service
 
-import com.wafflestudio.snu4t.common.push.UrlScheme
+import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
@@ -30,7 +29,6 @@ class SugangSnuNotificationServiceImpl(
     private val pushWithNotificationService: PushWithNotificationService,
     private val notificationService: NotificationService,
     private val pushService: PushService,
-    private val phase: Phase,
 ) : SugangSnuNotificationService {
     override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit = coroutineScope {
         val notifications = userLectureSyncResults.map { it.toNotification() }
@@ -68,7 +66,7 @@ class SugangSnuNotificationServiceImpl(
             PushMessage(
                 title = "수강편람 업데이트",
                 body = messageBody,
-                urlScheme = UrlScheme.NOTIFICATIONS,
+                urlScheme = DeeplinkType.NOTIFICATIONS,
             )
         }
         pushService.sendTargetPushes(userIdToMessage)
@@ -87,42 +85,68 @@ class SugangSnuNotificationServiceImpl(
         this.map { result -> result.userId to result.lectureId }.distinct().groupingBy { it.first }.eachCount()
 
     private fun UserLectureSyncResult.toNotification(): Notification {
-        val (message, notificationType) = when (this) {
+        val (message, notificationType, deeplink) = when (this) {
             // 업데이트 알림
             is TimetableLectureUpdateResult -> {
-                """
+                Triple(
+                    """
                    $year-${semester.fullName} '$timetableTitle' 시간표의 
                    '$courseTitle' 강의가 업데이트 되었습니다.
                    (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
-                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_UPDATE
+                    """.trimIndent().replace("\n", ""),
+                    NotificationType.LECTURE_UPDATE,
+                    DeeplinkType.TIMETABLE_LECTURE.build(timetableId, lectureId)
+                )
             }
             is BookmarkLectureUpdateResult -> {
-                """
+                Triple(
+                    """
                 $year-${semester.fullName} 관심강좌 목록의 '$courseTitle' 강의가 업데이트 되었습니다.
                 (항목: ${updatedFields.map { field -> field.toKoreanFieldName() }.distinct().joinToString()})
-                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_UPDATE
+                    """.trimIndent().replace("\n", ""),
+                    NotificationType.LECTURE_UPDATE,
+                    DeeplinkType.BOOKMARKS.build(year, semester, lectureId)
+                )
             }
             // 폐강 알림
             is TimetableLectureDeleteResult -> {
-                """
+                Triple(
+                    """
                 $year-${semester.fullName} '$timetableTitle' 시간표의 
                 '$courseTitle' 강의가 폐강되어 삭제되었습니다.
-                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+                    """.trimIndent().replace("\n", ""),
+                    NotificationType.LECTURE_REMOVE,
+                    DeeplinkType.NOTIFICATIONS.build()
+                )
             }
             is BookmarkLectureDeleteResult -> {
-                """
+                Triple(
+                    """
                 $year-${semester.fullName} 관심강좌 목록의 
                 '$courseTitle' 강의가 폐강되어 삭제되었습니다.
-                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+                    """.trimIndent().replace("\n", ""),
+                    NotificationType.LECTURE_REMOVE,
+                    DeeplinkType.NOTIFICATIONS.build()
+                )
             }
             is TimetableLectureDeleteByOverlapResult -> {
-                """
+                Triple(
+                    """
                 $year-${semester.fullName} '$timetableTitle' 시간표의 
                 '$courseTitle' 강의가 업데이트되었으나, 시간표의 다른 강의와 겹쳐 삭제되었습니다.
-                """.trimIndent().replace("\n", "") to NotificationType.LECTURE_REMOVE
+                    """.trimIndent().replace("\n", ""),
+                    NotificationType.LECTURE_REMOVE,
+                    DeeplinkType.NOTIFICATIONS.build()
+                )
             }
         }
 
-        return Notification(userId = userId, title = "수강편람 업데이트", message = message, type = notificationType)
+        return Notification(
+            userId = userId,
+            title = "수강편람 업데이트",
+            message = message,
+            type = notificationType,
+            deeplink = deeplink.value,
+        )
     }
 }

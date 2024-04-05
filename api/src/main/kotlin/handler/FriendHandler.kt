@@ -37,7 +37,6 @@ class FriendHandler(
         ListResponse(
             content = content,
             totalCount = content.size,
-            nextPageToken = null,
         )
     }
 

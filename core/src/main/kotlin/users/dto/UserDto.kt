@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class UserDto(
+    val id: String,
     val isAdmin: Boolean,
     val regDate: LocalDateTime,
     val notificationCheckedAt: LocalDateTime,

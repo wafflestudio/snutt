@@ -1,9 +1,11 @@
 package com.wafflestudio.snu4t.lecturebuildings.data
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
+@CompoundIndex(def = "{'buildingNumber': 1, 'campus': 1}", unique = true)
 data class LectureBuilding(
     @Id
     val id: String? = null,

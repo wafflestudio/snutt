@@ -49,6 +49,7 @@ class UserHandler(
     }
 
     private fun buildUserDto(user: User) = UserDto(
+        id = user.id!!,
         isAdmin = user.isAdmin,
         regDate = user.regDate,
         notificationCheckedAt = user.notificationCheckedAt,
