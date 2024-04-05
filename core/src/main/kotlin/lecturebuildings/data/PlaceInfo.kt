@@ -9,7 +9,7 @@ data class PlaceInfo(
     }
 }
 
-fun PlaceInfo(place: String): PlaceInfo? {
+fun PlaceInfo(place: String): PlaceInfo? = runCatching {
     val campus: Campus = when (place.first()) {
         '#' -> Campus.YEONGEON
         '*' -> Campus.PYEONGCHANG
@@ -26,5 +26,5 @@ fun PlaceInfo(place: String): PlaceInfo? {
         it.trimStart { firstChar -> firstChar == '0' }
     } ?: return null
 
-    return PlaceInfo(campus, buildingNumber)
-}
+    PlaceInfo(campus, buildingNumber)
+}.getOrNull()
