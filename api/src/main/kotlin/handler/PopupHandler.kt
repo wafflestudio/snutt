@@ -20,7 +20,6 @@ class PopupHandler(
         ListResponse(
             content = popups.map(::PopupResponse),
             totalCount = popups.size,
-            nextPageToken = null,
         )
     }
 }

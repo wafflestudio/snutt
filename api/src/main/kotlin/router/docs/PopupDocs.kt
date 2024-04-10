@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.popup.dto.PopupResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/popups", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getPopups",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ListResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PopupsResponse::class))])]
         ),
     ),
 )
 annotation class PopupDocs
+
+private class PopupsResponse : ListResponse<PopupResponse>(listOf())
