@@ -80,7 +80,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/admin/images/{source}/get-upload-uris", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/admin/images/{source}/upload-uris", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getUploadSignedUris",
             parameters = [
