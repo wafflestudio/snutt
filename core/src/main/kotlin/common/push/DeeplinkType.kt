@@ -1,6 +1,5 @@
 package com.wafflestudio.snu4t.common.push
 
-import com.wafflestudio.snu4t.config.Phase
 import com.wafflestudio.snu4t.config.PhaseUtils
 
 enum class DeeplinkType(private val url: String) {
@@ -16,7 +15,7 @@ enum class DeeplinkType(private val url: String) {
         referrer: String? = null
     ): Deeplink {
         val phase = PhaseUtils.getPhase()
-        val protocol = if (phase == Phase.PROD) "snutt" else "snutt-dev"
+        val protocol = if (phase.isProd) "snutt" else "snutt-dev"
 
         val fullScheme = "$protocol://${url.format(*params)}"
 

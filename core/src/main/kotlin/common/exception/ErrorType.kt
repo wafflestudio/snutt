@@ -46,6 +46,7 @@ enum class ErrorType(
     INVALID_THEME_COLOR_COUNT(HttpStatus.BAD_REQUEST, 40012, "테마의 색상 개수가 적절하지 않습니다.", "테마의 색상 개수가 적절하지 않습니다."),
     DEFAULT_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40013, "default 테마는 삭제할 수 없습니다.", "default 테마는 삭제할 수 없습니다."),
     NOT_DEFAULT_THEME_ERROR(HttpStatus.BAD_REQUEST, 40014, "default 테마가 아닙니다.", "default 테마가 아닙니다."),
+    TOO_MANY_FILES(HttpStatus.BAD_REQUEST, 40015, "파일 개수가 너무 많습니다.", "파일 개수가 너무 많습니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     PRIMARY_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "timetable_id가 유효하지 않습니다", "대표 시간표가 존재하지 않습니다."),
@@ -61,6 +62,7 @@ enum class ErrorType(
     INVALID_FRIEND(HttpStatus.CONFLICT, 40903, "친구 요청을 보낼 수 없는 유저입니다.", "친구 요청을 보낼 수 없는 유저입니다."),
     DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다.", "중복된 테마 이름입니다."),
     INVALID_THEME_TYPE(HttpStatus.CONFLICT, 40905, "적절하지 않은 유형의 테마입니다.", "적절하지 않은 유형의 테마입니다."),
+    DUPLICATE_POPUP_KEY(HttpStatus.CONFLICT, 40906, "중복된 팝업 키입니다.", "중복된 팝업 키입니다."),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
 }
