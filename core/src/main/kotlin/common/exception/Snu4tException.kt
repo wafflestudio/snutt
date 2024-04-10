@@ -45,6 +45,7 @@ object TableDeleteErrorException : Snu4tException(ErrorType.TABLE_DELETE_ERROR)
 object InvalidThemeColorCountException : Snu4tException(ErrorType.INVALID_THEME_COLOR_COUNT)
 object DefaultThemeDeleteErrorException : Snu4tException(ErrorType.DEFAULT_THEME_DELETE_ERROR)
 object NotDefaultThemeErrorException : Snu4tException(ErrorType.NOT_DEFAULT_THEME_ERROR)
+object TooManyFilesException : Snu4tException(ErrorType.TOO_MANY_FILES)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
@@ -73,5 +74,6 @@ object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)
 object InvalidFriendException : Snu4tException(ErrorType.INVALID_FRIEND)
 object DuplicateThemeNameException : Snu4tException(ErrorType.DUPLICATE_THEME_NAME)
 object InvalidThemeTypeException : Snu4tException(ErrorType.INVALID_THEME_TYPE)
+object DuplicatePopupKeyException : Snu4tException(ErrorType.DUPLICATE_POPUP_KEY)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

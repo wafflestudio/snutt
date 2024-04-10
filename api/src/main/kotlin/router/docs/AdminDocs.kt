@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.clientconfig.dto.ConfigResponse
 import com.wafflestudio.snu4t.clientconfig.dto.PatchConfigRequest
 import com.wafflestudio.snu4t.clientconfig.dto.PostConfigRequest
 import com.wafflestudio.snu4t.common.dto.OkResponse
+import com.wafflestudio.snu4t.common.storage.dto.FileUploadUriDto
 import com.wafflestudio.snu4t.popup.dto.PopupResponse
 import com.wafflestudio.snu4t.popup.dto.PostPopupRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -79,12 +80,33 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
+        path = "/v1/admin/images/{source}/get-upload-uris", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "getUploadSignedUris",
+            parameters = [
+                Parameter(`in` = ParameterIn.PATH, name = "source", required = true),
+                Parameter(`in` = ParameterIn.QUERY, name = "count", required = false),
+            ],
+            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = FileUploadUriDto::class)))])],
+        ),
+    ),
+    RouterOperation(
         path = "/v1/admin/popups", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "postPopup",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = PostPopupRequest::class))], required = true),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PopupResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PopupResponse::class))])],
         ),
     ),
+    RouterOperation(
+        path = "/v1/admin/popups/{id}", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "deletePopup",
+            parameters = [
+                Parameter(`in` = ParameterIn.PATH, name = "id", required = true),
+            ],
+            responses = [ApiResponse(responseCode = "200")],
+        ),
+    )
 )
 annotation class AdminDocs

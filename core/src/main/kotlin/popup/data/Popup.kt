@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.popup.data
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import java.time.LocalDateTime
@@ -10,6 +11,7 @@ data class Popup(
     @Id
     val id: String? = null,
     @Field
+    @Indexed(unique = true)
     val key: String,
     @Field
     val imageOriginUri: String,
