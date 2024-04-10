@@ -152,7 +152,7 @@ class MainRouter(
             DELETE("/configs/{name}/{id}", adminHandler::deleteConfig)
             PATCH("/configs/{name}/{id}", adminHandler::patchConfig)
 
-            GET("/images/{source}/get-upload-uris", adminHandler::getUploadSignedUris)
+            POST("/images/{source}/upload-uris", adminHandler::getUploadSignedUris)
 
             POST("/popups", adminHandler::postPopup)
             DELETE("/popups/{id}", adminHandler::deletePopup)
