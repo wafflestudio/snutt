@@ -1,16 +1,15 @@
 package com.wafflestudio.snu4t.lecturebuildings.data
 
-class PlaceInfo(
-    val rawString: String,
+data class PlaceInfo(
     val campus: Campus,
     val buildingNumber: String,
 ) {
     companion object {
-        fun getValuesOf(places: String): List<PlaceInfo> = places.split("/").map { PlaceInfo(it) }.filterNotNull()
+        fun getValuesOf(places: String): List<PlaceInfo> = places.split("/").mapNotNull { PlaceInfo(it) }
     }
 }
 
-fun PlaceInfo(place: String): PlaceInfo? {
+fun PlaceInfo(place: String): PlaceInfo? = runCatching {
     val campus: Campus = when (place.first()) {
         '#' -> Campus.YEONGEON
         '*' -> Campus.PYEONGCHANG
@@ -24,8 +23,8 @@ fun PlaceInfo(place: String): PlaceInfo? {
         3 -> if (splits[1].count() == 1) splits.dropLast(1).joinToString("-") else splits.first()
         else -> splits.firstOrNull()
     }?.let {
-        it.trimStart { it == '0' }
+        it.trimStart { firstChar -> firstChar == '0' }
     } ?: return null
 
-    return PlaceInfo(place, campus, buildingNumber)
-}
+    PlaceInfo(campus, buildingNumber)
+}.getOrNull()

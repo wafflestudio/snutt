@@ -3,12 +3,14 @@ package com.wafflestudio.snu4t.router
 import com.wafflestudio.snu4t.handler.AdminHandler
 import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
+import com.wafflestudio.snu4t.handler.BuildingHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
+import com.wafflestudio.snu4t.handler.PopupHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
 import com.wafflestudio.snu4t.handler.TimetableThemeHandler
@@ -17,10 +19,12 @@ import com.wafflestudio.snu4t.handler.VacancyNotifcationHandler
 import com.wafflestudio.snu4t.router.docs.AdminDocs
 import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
+import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
+import com.wafflestudio.snu4t.router.docs.PopupDocs
 import com.wafflestudio.snu4t.router.docs.ThemeDocs
 import com.wafflestudio.snu4t.router.docs.TimetableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
@@ -47,7 +51,9 @@ class MainRouter(
     private val friendHandler: FriendHandler,
     private val friendTableHandler: FriendTableHandler,
     private val configHandler: ConfigHandler,
+    private val popupHandler: PopupHandler,
     private val adminHandler: AdminHandler,
+    private val buildingHandler: BuildingHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -71,6 +77,7 @@ class MainRouter(
             GET("/info", userHandler::getUserInfo)
             POST("/device/{id}", deviceHandler::addRegistrationId)
             DELETE("/device/{id}", deviceHandler::removeRegistrationId)
+            DELETE("/account", userHandler::deleteAccount)
         }
         "/users".nest {
             GET("/me", userHandler::getUserMe)
@@ -110,6 +117,12 @@ class MainRouter(
     }
 
     @Bean
+    @BuildingsDocs
+    fun buildingRoute() = v1CoRouter {
+        GET("/buildings", buildingHandler::searchBuildings)
+    }
+
+    @Bean
     @BookmarkDocs
     fun bookmarkRoute() = v1CoRouter {
         "/bookmarks".nest {
@@ -139,6 +152,11 @@ class MainRouter(
             GET("/configs/{name}", adminHandler::getConfigs)
             DELETE("/configs/{name}/{id}", adminHandler::deleteConfig)
             PATCH("/configs/{name}/{id}", adminHandler::patchConfig)
+
+            POST("/images/{source}/upload-uris", adminHandler::getUploadSignedUris)
+
+            POST("/popups", adminHandler::postPopup)
+            DELETE("/popups/{id}", adminHandler::deletePopup)
         }
     }
 
@@ -158,6 +176,14 @@ class MainRouter(
     fun configRoute() = v1CoRouter {
         "/configs".nest {
             GET("", configHandler::getConfigs)
+        }
+    }
+
+    @Bean
+    @PopupDocs
+    fun popupRoute() = v1CoRouter {
+        "/popups".nest {
+            GET("", popupHandler::getPopups)
         }
     }
 

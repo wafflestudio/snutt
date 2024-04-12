@@ -4,8 +4,9 @@ plugins {
 
 dependencies {
     implementation("org.springframework.security:spring-security-crypto")
-    implementation("software.amazon.awssdk:secretsmanager:2.17.276")
-    implementation("software.amazon.awssdk:sts:2.17.276")
+    implementation("software.amazon.awssdk:s3:2.25.15")
+    implementation("software.amazon.awssdk:secretsmanager:2.25.15")
+    implementation("software.amazon.awssdk:sts:2.25.15")
     implementation("com.google.firebase:firebase-admin:9.1.1")
 
     testFixturesImplementation("org.testcontainers:mongodb:1.19.0")
