@@ -31,7 +31,7 @@ data class LectureDto(
     val courseTitle: String,
     val registrationCount: Int,
     val wasFull: Boolean,
-    val snuttevLecture: SnuttEvLectureSummaryDto? = null,
+    val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
 
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
@@ -57,6 +57,6 @@ fun LectureDto(lecture: Lecture, snuttevLecture: SnuttEvLectureSummaryDto? = nul
     courseTitle = lecture.courseTitle,
     registrationCount = lecture.registrationCount,
     wasFull = lecture.wasFull,
-    snuttevLecture = snuttevLecture,
+    snuttEvLecture = snuttevLecture,
     classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
 )

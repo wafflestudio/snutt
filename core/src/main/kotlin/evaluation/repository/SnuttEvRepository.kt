@@ -3,13 +3,15 @@ package com.wafflestudio.snu4t.evaluation.repository
 import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
 import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
+import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 
-class SnuttEvRepository(private val SnuttEvWebClient: SnuttEvWebClient) {
+@Component
+class SnuttEvRepository(private val snuttEvWebClient: SnuttEvWebClient) {
     suspend fun getSummariesByIds(ids: List<String>): List<SnuttEvLectureSummaryDto> =
-        SnuttEvWebClient.get().uri { builder ->
+        snuttEvWebClient.get().uri { builder ->
             builder.path("/v1/lectures/snutt-summary")
-                .queryParam("semesterLectureSnuttIds", ids)
+                .queryParam("semesterLectureSnuttIds", ids.joinToString(","))
                 .build()
         }
             .retrieve()

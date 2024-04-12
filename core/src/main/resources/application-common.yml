@@ -65,7 +65,7 @@ google:
 api:
   server:
     snuttev:
-      base-url: : http://snutt-ev-api-dev.wafflestudio.com
+      base-url: http://snutt-ev.snutt-dev.svc.cluster.local
 
 logging:
   level:
@@ -101,6 +101,6 @@ google:
 api:
   server:
     snuttev:
-      base-url: : https://snutt-ev-api.wafflestudio.com
+      base-url: http://snutt-ev.snutt-prod.svc.cluster.local
 
 secret-names: prod/snutt-timetable

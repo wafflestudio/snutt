@@ -37,11 +37,11 @@ class LectureServiceImpl(
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
     override suspend fun search(query: SearchDto): List<LectureDto> {
         val lectures = lectureRepository.searchLectures(query).toList()
-        val snuttevLectures =
+        val snuttEvLectures =
             snuttEvRepository.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
         return lectures.map { lecture ->
-            val snuttevLecture = snuttevLectures[lecture.id]
-            LectureDto(lecture, snuttevLecture)
+            val snuttEvLecture = snuttEvLectures[lecture.id]
+            LectureDto(lecture, snuttEvLecture)
         }
     }
 }
