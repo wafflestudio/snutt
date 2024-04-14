@@ -37,6 +37,7 @@ class TimetableIntegTest(
         }.build()
 
     coEvery { mockSnuttEvRepository.getSummariesByIds(any()) } returns emptyList()
+    coEvery { mockSnuttEvRepository.getEvIdsBySnuttIds(any()) } returns emptyList()
     coEvery { mockMiddleware.invoke(any(), any()) } returns RequestContext(user = userFixture.testUser)
     afterContainer { repositories.forEach { it.deleteAll() } }
 
