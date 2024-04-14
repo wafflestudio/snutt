@@ -16,4 +16,13 @@ class SnuttEvRepository(private val snuttEvWebClient: SnuttEvWebClient) {
         }
             .retrieve()
             .awaitBody<ListResponse<SnuttEvLectureSummaryDto>>().content
+
+    suspend fun getEvIdsBySnuttIds(snuttIds: List<String>): List<SnuttEvLectureSummaryDto> =
+        snuttEvWebClient.get().uri { builder ->
+            builder.path("/v1/lectures/ids")
+                .queryParam("semesterLectureSnuttIds", snuttIds.joinToString(","))
+                .build()
+        }
+            .retrieve()
+            .awaitBody<ListResponse<SnuttEvLectureSummaryDto>>().content
 }

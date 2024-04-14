@@ -20,11 +20,16 @@ data class TimetableDto(
 )
 
 fun TimetableDto(timetable: Timetable) = TimetableDto(
+    timetable = timetable,
+    lectures = timetable.lectures.map { TimetableLectureDto(it) },
+)
+
+fun TimetableDto(timetable: Timetable, lectures: List<TimetableLectureDto>) = TimetableDto(
     id = timetable.id,
     userId = timetable.userId,
     year = timetable.year,
     semester = timetable.semester,
-    lectures = timetable.lectures.map { TimetableLectureDto(it) },
+    lectures = lectures,
     title = timetable.title,
     theme = timetable.theme,
     themeId = timetable.themeId,
@@ -50,11 +55,16 @@ data class TimetableLegacyDto(
 )
 
 fun TimetableLegacyDto(timetable: Timetable) = TimetableLegacyDto(
+    timetable = timetable,
+    lectures = timetable.lectures.map { TimetableLectureLegacyDto(it) },
+)
+
+fun TimetableLegacyDto(timetable: Timetable, lectures: List<TimetableLectureLegacyDto>) = TimetableLegacyDto(
     id = timetable.id,
     userId = timetable.userId,
     year = timetable.year,
     semester = timetable.semester,
-    lectures = timetable.lectures.map { TimetableLectureLegacyDto(it) },
+    lectures = lectures,
     title = timetable.title,
     theme = timetable.theme,
     themeId = timetable.themeId,

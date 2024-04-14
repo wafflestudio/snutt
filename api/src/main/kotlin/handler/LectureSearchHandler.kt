@@ -3,16 +3,11 @@ package com.wafflestudio.snu4t.handler
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
-import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -21,28 +16,13 @@ import org.springframework.web.reactive.function.server.awaitBody
 @Component
 class LectureSearchHandler(
     private val lectureService: LectureService,
-    private val lectureBuildingService: LectureBuildingService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiNoAuthMiddleware
 ) {
     suspend fun searchLectures(req: ServerRequest): ServerResponse = handle(req) {
         val query: SearchQueryLegacy = req.awaitBody()
-        lectureService.search(query.toSearchDto())
-            .map { it.addLectureBuildings() }
-    }
-
-    private suspend fun LectureDto.addLectureBuildings(): LectureDto = coroutineScope {
-        copy(
-            classPlaceAndTimes = classPlaceAndTimes.map { classPlaceAndTime ->
-                async {
-                    classPlaceAndTime.apply {
-                        lectureBuildings =
-                            place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
-                    }
-                }
-            }.awaitAll()
-        )
+        lectureService.search(query.toSearchDto()).toList().let { lectureService.convertLecturesToLectureDtos(it) }
     }
 }
 

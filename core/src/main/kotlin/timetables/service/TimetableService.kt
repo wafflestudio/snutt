@@ -12,14 +12,24 @@ import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
+import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
+import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.dto.TimetableDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLectureDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLectureLegacyDto
+import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -40,6 +50,8 @@ interface TimetableService {
     suspend fun createDefaultTable(userId: String)
     suspend fun setPrimary(userId: String, timetableId: String)
     suspend fun unSetPrimary(userId: String, timetableId: String)
+    suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto
+    suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto
 }
 
 @Service
@@ -47,6 +59,8 @@ class TimetableServiceImpl(
     private val coursebookService: CoursebookService,
     private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
+    private val lectureBuildingService: LectureBuildingService,
+    private val evRepository: SnuttEvRepository,
     private val dynamicLinkClient: DynamicLinkClient,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
@@ -213,5 +227,33 @@ class TimetableServiceImpl(
         val table = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         if (table.isPrimary != true) throw TimetableNotPrimaryException
         timetableRepository.save(table.copy(isPrimary = false))
+    }
+
+    override suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto {
+        val evLectureIdMap =
+            evRepository.getEvIdsBySnuttIds(timetable.lectures.map { it.id }).associateBy { it.snuttId }
+        val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.id]) }
+        return TimetableLegacyDto(timetable, timetableLectures).addLectureBuildings()
+    }
+
+    override suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto {
+        val evLectureIdMap =
+            evRepository.getEvIdsBySnuttIds(timetable.lectures.map { it.id }).associateBy { it.snuttId }
+        val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.id]) }
+        return TimetableDto(timetable, timetableLectures)
+    }
+
+    private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto = coroutineScope {
+        lectures.flatMap {
+            it.classPlaceAndTimes.map { classPlaceAndTime ->
+                launch {
+                    classPlaceAndTime.apply {
+                        lectureBuildings =
+                            place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
+                    }
+                }
+            }
+        }.joinAll()
+        this@addLectureBuildings
     }
 }

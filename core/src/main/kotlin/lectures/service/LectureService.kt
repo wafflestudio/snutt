@@ -2,13 +2,17 @@ package com.wafflestudio.snu4t.lectures.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
+import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 interface LectureService {
@@ -17,13 +21,15 @@ interface LectureService {
     suspend fun upsertLectures(lectures: Iterable<Lecture>)
     fun getLecturesByYearAndSemesterAsFlow(year: Int, semester: Semester): Flow<Lecture>
     suspend fun deleteLectures(lectures: Iterable<Lecture>)
-    suspend fun search(query: SearchDto): List<LectureDto>
+    fun search(query: SearchDto): Flow<Lecture>
+    suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto>
 }
 
 @Service
 class LectureServiceImpl(
     private val lectureRepository: LectureRepository,
-    private val snuttEvRepository: SnuttEvRepository
+    private val snuttEvRepository: SnuttEvRepository,
+    private val lectureBuildingService: LectureBuildingService,
 ) : LectureService {
     override fun findAll(): Flow<Lecture> = lectureRepository.findAll()
 
@@ -35,13 +41,26 @@ class LectureServiceImpl(
         lectureRepository.saveAll(lectures).collect()
 
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
-    override suspend fun search(query: SearchDto): List<LectureDto> {
-        val lectures = lectureRepository.searchLectures(query).toList()
-        val snuttEvLectures =
+    override fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
+    override suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto> {
+        val snuttIdToEvLectureMap =
             snuttEvRepository.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
         return lectures.map { lecture ->
-            val snuttEvLecture = snuttEvLectures[lecture.id]
+            val snuttEvLecture = snuttIdToEvLectureMap[lecture.id]
             LectureDto(lecture, snuttEvLecture)
-        }
+        }.addLectureBuildings()
+    }
+    private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> = coroutineScope {
+        flatMap {
+            it.classPlaceAndTimes.map { classPlaceAndTime ->
+                launch {
+                    classPlaceAndTime.apply {
+                        lectureBuildings =
+                            place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
+                    }
+                }
+            }
+        }.joinAll()
+        this@addLectureBuildings
     }
 }
