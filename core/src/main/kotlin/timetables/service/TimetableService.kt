@@ -13,8 +13,8 @@ import com.wafflestudio.snu4t.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
+import com.wafflestudio.snu4t.lectures.dto.placeInfos
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.dto.TimetableLectureDto
@@ -28,8 +28,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -244,16 +242,17 @@ class TimetableServiceImpl(
     }
 
     private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto = coroutineScope {
-        lectures.flatMap {
-            it.classPlaceAndTimes.map { classPlaceAndTime ->
-                launch {
-                    classPlaceAndTime.apply {
-                        lectureBuildings =
-                            place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
-                    }
+        val placeInfos =
+            lectures.flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }
+                .distinct()
+        val buildings = lectureBuildingService.getLectureBuildings(placeInfos).associateBy { it.buildingNumber }
+        lectures.forEach {
+            it.classPlaceAndTimes.forEach { classPlaceAndTime ->
+                classPlaceAndTime.apply {
+                    lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
                 }
             }
-        }.joinAll()
+        }
         this@addLectureBuildings
     }
 }

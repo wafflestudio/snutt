@@ -2,17 +2,15 @@ package com.wafflestudio.snu4t.lectures.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.dto.LectureDto
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
+import com.wafflestudio.snu4t.lectures.dto.placeInfos
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 
 interface LectureService {
@@ -41,7 +39,9 @@ class LectureServiceImpl(
         lectureRepository.saveAll(lectures).collect()
 
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
+
     override fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
+
     override suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto> {
         val snuttIdToEvLectureMap =
             snuttEvRepository.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
@@ -51,16 +51,16 @@ class LectureServiceImpl(
         }.addLectureBuildings()
     }
     private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> = coroutineScope {
-        flatMap {
-            it.classPlaceAndTimes.map { classPlaceAndTime ->
-                launch {
-                    classPlaceAndTime.apply {
-                        lectureBuildings =
-                            place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
-                    }
+        val placeInfos =
+            flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()
+        val buildings = lectureBuildingService.getLectureBuildings(placeInfos).associateBy { it.buildingNumber }
+        forEach {
+            it.classPlaceAndTimes.forEach { classPlaceAndTime ->
+                classPlaceAndTime.apply {
+                    lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
                 }
             }
-        }.joinAll()
+        }
         this@addLectureBuildings
     }
 }

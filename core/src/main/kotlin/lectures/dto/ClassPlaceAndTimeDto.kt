@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuilding
+import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.utils.endPeriod
 import com.wafflestudio.snu4t.lectures.utils.minuteToString
@@ -48,3 +49,6 @@ fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlace
     startPeriod = classPlaceAndTime.startPeriod,
     periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
 )
+
+val ClassPlaceAndTimeLegacyDto.placeInfos: List<PlaceInfo>
+    get() = place?.let { PlaceInfo.getValuesOf(it) } ?: emptyList()
