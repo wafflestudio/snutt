@@ -14,10 +14,10 @@ data class LectureBuilding(
     val buildingNumber: String,
 
     // 건물 이름(한국어) - 자연과학대학(500)
-    val buildingNameKor: String? = null,
+    val buildingNameKor: String,
 
     // 건물 이름(영어) - College of Natural Sciences(500)
-    val buildingNameEng: String? = null,
+    val buildingNameEng: String = "",
 
     // 위경도 - 37.4592190840394, 126.948120067187
     val locationInDMS: GeoCoordinate?,
