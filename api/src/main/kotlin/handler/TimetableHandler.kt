@@ -2,17 +2,12 @@ package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
-import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -23,7 +18,6 @@ import timetables.dto.TimetableBriefDto
 @Component
 class TimetableHandler(
     private val timetableService: TimetableService,
-    private val lectureBuildingService: LectureBuildingService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
@@ -38,7 +32,6 @@ class TimetableHandler(
         val userId = req.userId
 
         timetableService.getMostRecentlyUpdatedTimetable(userId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
     }
 
     suspend fun getTimetablesBySemester(req: ServerRequest): ServerResponse = handle(req) {
@@ -48,7 +41,6 @@ class TimetableHandler(
             Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
 
         timetableService.getTimetablesBySemester(userId, year, semester).toList().map(::TimetableLegacyDto)
-            .map { it.addLectureBuidlings() }
     }
 
     suspend fun addTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -69,7 +61,6 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
 
         timetableService.getTimetable(userId, timetableId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
     }
 
     suspend fun modifyTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -109,7 +100,6 @@ class TimetableHandler(
         val body = req.awaitBody<TimetableModifyThemeRequestDto>()
 
         timetableService.modifyTimetableTheme(userId, timetableId, body.theme, body.themeId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
     }
 
     suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
@@ -120,22 +110,5 @@ class TimetableHandler(
     suspend fun unSetPrimary(req: ServerRequest): ServerResponse = handle(req) {
         val timetableId = req.pathVariable("timetableId")
         timetableService.unSetPrimary(req.userId, timetableId)
-    }
-
-    private suspend fun TimetableLegacyDto.addLectureBuidlings(): TimetableLegacyDto = coroutineScope {
-        copy(
-            lectures = lectures.map { lecture ->
-                lecture.apply {
-                    classPlaceAndTimes = classPlaceAndTimes.map { placeAndTime ->
-                        async {
-                            placeAndTime.apply {
-                                lectureBuildings =
-                                    place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
-                            }
-                        }
-                    }.awaitAll()
-                }
-            }
-        )
     }
 }
