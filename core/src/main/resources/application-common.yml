@@ -30,7 +30,7 @@ http:
 api:
   server:
     snuttev:
-      base-url: : http://snutt-ev-api-dev.wafflestudio.com
+      base-url: http://snutt-ev-api-dev.wafflestudio.com
 
 secret-names: dev/snutt-timetable
 
