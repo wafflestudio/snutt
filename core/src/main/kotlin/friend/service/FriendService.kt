@@ -8,8 +8,10 @@ import com.wafflestudio.snu4t.common.exception.UserNotFoundByNicknameException
 import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.friend.data.Friend
+import com.wafflestudio.snu4t.friend.data.FriendRequestLink
 import com.wafflestudio.snu4t.friend.dto.FriendState
 import com.wafflestudio.snu4t.friend.repository.FriendRepository
+import com.wafflestudio.snu4t.friend.repository.FriendRequestLinkRepository
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.users.data.User
@@ -22,6 +24,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.Base64
 
 interface FriendService {
     suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
@@ -37,6 +40,10 @@ interface FriendService {
     suspend fun breakFriend(friendId: String, userId: String)
 
     suspend fun get(friendId: String): Friend?
+
+    suspend fun generateFriendRequestLink(userId: String): Pair<String, LocalDateTime>
+
+    suspend fun acceptFriendByLink(userId: String, requestInfo: String)
 }
 
 @Service
@@ -44,6 +51,7 @@ class FriendServiceImpl(
     private val pushWithNotificationService: PushWithNotificationService,
     private val userNicknameService: UserNicknameService,
     private val friendRepository: FriendRepository,
+    private val friendRequestLinkRepository: FriendRequestLinkRepository,
     private val userRepository: UserRepository,
 ) : FriendService {
     companion object {
@@ -147,5 +155,38 @@ class FriendServiceImpl(
 
     override suspend fun get(friendId: String): Friend? {
         return friendRepository.findById(friendId)
+    }
+
+    override suspend fun generateFriendRequestLink(userId: String): Pair<String, LocalDateTime> {
+        val encodedString =
+            Base64.getEncoder().encodeToString(
+                (userId + "|" + LocalDateTime.now().toString()).encodeToByteArray()
+            )
+        val friendRequestLink = friendRequestLinkRepository.save(
+            FriendRequestLink(
+                fromUserId = userId,
+                encodedString = encodedString
+            )
+        )
+        return friendRequestLink.encodedString to friendRequestLink.expireAt
+    }
+
+    override suspend fun acceptFriendByLink(userId: String, requestInfo: String) {
+        val friend = friendRequestLinkRepository.findByEncodedString(requestInfo)?.let { friendRequestLink ->
+            if (friendRequestLink.fromUserId == userId) throw InvalidFriendException
+            if (friendRepository.findByUserPair(friendRequestLink.fromUserId to userId) != null) throw DuplicateFriendException
+            friendRepository.save(
+                Friend(
+                    fromUserId = friendRequestLink.fromUserId,
+                    toUserId = userId,
+                    isAccepted = true,
+                )
+            )
+        } ?: throw FriendNotFoundException
+
+        coroutineScope.launch {
+            val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.fromUserId))
+            sendFriendAcceptPush(friend.toUserId, toUser)
+        }
     }
 }
