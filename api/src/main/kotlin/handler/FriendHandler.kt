@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
@@ -89,5 +90,6 @@ class FriendHandler(
         val requestInfo = req.pathVariable("requestInfo")
 
         friendService.acceptFriendByLink(userId, requestInfo)
+        OkResponse()
     }
 }
