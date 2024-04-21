@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -172,7 +173,7 @@ class FriendServiceImpl(
     }
 
     override suspend fun acceptFriendByLink(userId: String, requestInfo: String) {
-        val friend = friendRequestLinkRepository.findByEncodedString(requestInfo)?.let { friendRequestLink ->
+        val friend = friendRequestLinkRepository.findByEncodedString(requestInfo).single()?.let { friendRequestLink ->
             if (friendRequestLink.fromUserId == userId) throw InvalidFriendException
             if (friendRepository.findByUserPair(friendRequestLink.fromUserId to userId) != null) throw DuplicateFriendException
             friendRepository.save(
@@ -185,8 +186,8 @@ class FriendServiceImpl(
         } ?: throw FriendNotFoundException
 
         coroutineScope.launch {
-            val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.fromUserId))
-            sendFriendAcceptPush(friend.toUserId, toUser)
+            val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.toUserId))
+            sendFriendAcceptPush(friend.fromUserId, toUser)
         }
     }
 }
