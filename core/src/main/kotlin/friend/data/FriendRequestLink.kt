@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
-import org.springframework.data.mongodb.core.annotation.Collation
 import org.springframework.data.mongodb.core.index.Index
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -13,7 +12,6 @@ import java.util.concurrent.TimeUnit
 import javax.annotation.PostConstruct
 
 @Document
-@Collation()
 data class FriendRequestLink(
     @Id
     val id: String? = null,
@@ -28,11 +26,15 @@ data class FriendRequestLink(
 @Configuration
 class RequestAutoExpireConfig(private val reactiveMongoTemplate: ReactiveMongoTemplate) {
     @PostConstruct
-    fun setExpiration() {
+    fun setTTLIndex() {
         val indexOps = reactiveMongoTemplate.indexOps(FriendRequestLink::class.java)
-        val indexDefinition = Index()
+        val expireIndex = Index()
             .on("expireAt", Sort.Direction.ASC)
-            .expire(1, TimeUnit.SECONDS)
-        indexOps.ensureIndex(indexDefinition).subscribe()
+            .expire(0, TimeUnit.SECONDS)
+        val encodedStringIndex = Index()
+            .on("encodedString", Sort.Direction.ASC)
+            .unique()
+        indexOps.ensureIndex(expireIndex).subscribe()
+        indexOps.ensureIndex(encodedStringIndex).subscribe()
     }
 }
