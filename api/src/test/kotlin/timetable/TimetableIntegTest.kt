@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.timetable
 
 import BaseIntegTest
 import com.ninjasquad.springmockk.MockkBean
+import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
 import com.wafflestudio.snu4t.fixture.TimetableFixture
 import com.wafflestudio.snu4t.fixture.UserFixture
 import com.wafflestudio.snu4t.handler.RequestContext
@@ -23,6 +24,7 @@ import timetables.dto.TimetableBriefDto
 @SpringBootTest
 class TimetableIntegTest(
     @MockkBean private val mockMiddleware: SnuttRestApiDefaultMiddleware,
+    @MockkBean private val mockSnuttEvRepository: SnuttEvRepository,
     val mainRouter: MainRouter,
     val timetableFixture: TimetableFixture,
     val userFixture: UserFixture,
@@ -34,6 +36,8 @@ class TimetableIntegTest(
             header.contentType = MediaType.APPLICATION_JSON
         }.build()
 
+    coEvery { mockSnuttEvRepository.getSummariesByIds(any()) } returns emptyList()
+    coEvery { mockSnuttEvRepository.getEvIdsBySnuttIds(any()) } returns emptyList()
     coEvery { mockMiddleware.invoke(any(), any()) } returns RequestContext(user = userFixture.testUser)
     afterContainer { repositories.forEach { it.deleteAll() } }
 

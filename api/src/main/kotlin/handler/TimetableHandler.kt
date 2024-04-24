@@ -2,17 +2,11 @@ package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
-import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -23,7 +17,6 @@ import timetables.dto.TimetableBriefDto
 @Component
 class TimetableHandler(
     private val timetableService: TimetableService,
-    private val lectureBuildingService: LectureBuildingService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
@@ -37,8 +30,8 @@ class TimetableHandler(
     suspend fun getMostRecentlyUpdatedTimetables(req: ServerRequest): ServerResponse = handle(req) {
         val userId = req.userId
 
-        timetableService.getMostRecentlyUpdatedTimetable(userId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
+        timetableService.getMostRecentlyUpdatedTimetable(userId)
+            .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun getTimetablesBySemester(req: ServerRequest): ServerResponse = handle(req) {
@@ -47,8 +40,8 @@ class TimetableHandler(
         val semester =
             Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
 
-        timetableService.getTimetablesBySemester(userId, year, semester).toList().map(::TimetableLegacyDto)
-            .map { it.addLectureBuidlings() }
+        timetableService.getTimetablesBySemester(userId, year, semester).toList()
+            .map { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun addTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -68,8 +61,8 @@ class TimetableHandler(
         val userId = req.userId
         val timetableId = req.pathVariable("timetableId")
 
-        timetableService.getTimetable(userId, timetableId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
+        timetableService.getTimetable(userId, timetableId)
+            .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun modifyTimetable(req: ServerRequest): ServerResponse = handle(req) {
@@ -108,8 +101,8 @@ class TimetableHandler(
         val timetableId = req.pathVariable("timetableId")
         val body = req.awaitBody<TimetableModifyThemeRequestDto>()
 
-        timetableService.modifyTimetableTheme(userId, timetableId, body.theme, body.themeId).let(::TimetableLegacyDto)
-            .addLectureBuidlings()
+        timetableService.modifyTimetableTheme(userId, timetableId, body.theme, body.themeId)
+            .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun setPrimary(req: ServerRequest): ServerResponse = handle(req) {
@@ -120,22 +113,5 @@ class TimetableHandler(
     suspend fun unSetPrimary(req: ServerRequest): ServerResponse = handle(req) {
         val timetableId = req.pathVariable("timetableId")
         timetableService.unSetPrimary(req.userId, timetableId)
-    }
-
-    private suspend fun TimetableLegacyDto.addLectureBuidlings(): TimetableLegacyDto = coroutineScope {
-        copy(
-            lectures = lectures.map { lecture ->
-                lecture.apply {
-                    classPlaceAndTimes = classPlaceAndTimes.map { placeAndTime ->
-                        async {
-                            placeAndTime.apply {
-                                lectureBuildings =
-                                    place?.let { lectureBuildingService.getLectureBuildings(PlaceInfo.getValuesOf(it)) }
-                            }
-                        }
-                    }.awaitAll()
-                }
-            }
-        )
     }
 }
