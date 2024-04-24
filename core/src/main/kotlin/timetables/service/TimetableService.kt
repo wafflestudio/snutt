@@ -242,10 +242,10 @@ class TimetableServiceImpl(
     }
 
     private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto = coroutineScope {
-        val placeInfos =
+        val placeInfosAll =
             lectures.flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }
                 .distinct()
-        val buildings = lectureBuildingService.getLectureBuildings(placeInfos).associateBy { it.buildingNumber }
+        val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
         lectures.forEach {
             it.classPlaceAndTimes.forEach { classPlaceAndTime ->
                 classPlaceAndTime.apply {

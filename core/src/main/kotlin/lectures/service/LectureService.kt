@@ -51,9 +51,9 @@ class LectureServiceImpl(
         }.addLectureBuildings()
     }
     private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> = coroutineScope {
-        val placeInfos =
+        val placeInfosAll =
             flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()
-        val buildings = lectureBuildingService.getLectureBuildings(placeInfos).associateBy { it.buildingNumber }
+        val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
         forEach {
             it.classPlaceAndTimes.forEach { classPlaceAndTime ->
                 classPlaceAndTime.apply {
