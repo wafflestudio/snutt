@@ -80,9 +80,9 @@ class FriendHandler(
 
     suspend fun generateFriendLink(req: ServerRequest) = handle(req) {
         val userId = req.userId
-        val friendRequestLink = friendService.generateFriendRequestLink(userId)
+        val friendRequestToken = friendService.generateFriendRequestLink(userId)
 
-        FriendRequestLinkResponse(friendRequestLink.first, friendRequestLink.second)
+        FriendRequestLinkResponse(friendRequestToken)
     }
 
     suspend fun acceptFriendByLink(req: ServerRequest) = handle(req) {

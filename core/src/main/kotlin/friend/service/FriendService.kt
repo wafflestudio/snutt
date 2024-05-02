@@ -8,24 +8,25 @@ import com.wafflestudio.snu4t.common.exception.UserNotFoundByNicknameException
 import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.friend.data.Friend
-import com.wafflestudio.snu4t.friend.data.FriendRequestLink
 import com.wafflestudio.snu4t.friend.dto.FriendState
 import com.wafflestudio.snu4t.friend.repository.FriendRepository
-import com.wafflestudio.snu4t.friend.repository.FriendRequestLinkRepository
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import com.wafflestudio.snu4t.users.service.UserNicknameService
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDateTime
-import java.util.Base64
+import java.util.Date
 
 interface FriendService {
     suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
@@ -42,9 +43,9 @@ interface FriendService {
 
     suspend fun get(friendId: String): Friend?
 
-    suspend fun generateFriendRequestLink(userId: String): Pair<String, LocalDateTime>
+    suspend fun generateFriendRequestLink(userId: String): String
 
-    suspend fun acceptFriendByLink(userId: String, requestInfo: String)
+    suspend fun acceptFriendByLink(userId: String, requestToken: String)
 }
 
 @Service
@@ -52,8 +53,8 @@ class FriendServiceImpl(
     private val pushWithNotificationService: PushWithNotificationService,
     private val userNicknameService: UserNicknameService,
     private val friendRepository: FriendRepository,
-    private val friendRequestLinkRepository: FriendRequestLinkRepository,
     private val userRepository: UserRepository,
+    @Value("\${snutt.secret-key}") private val secretKey: String
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -158,32 +159,38 @@ class FriendServiceImpl(
         return friendRepository.findById(friendId)
     }
 
-    override suspend fun generateFriendRequestLink(userId: String): Pair<String, LocalDateTime> {
-        val encodedString =
-            Base64.getEncoder().encodeToString(
-                (userId + "|" + LocalDateTime.now().toString()).encodeToByteArray()
-            )
-        val friendRequestLink = friendRequestLinkRepository.save(
-            FriendRequestLink(
-                fromUserId = userId,
-                encodedString = encodedString
-            )
-        )
-        return friendRequestLink.encodedString to friendRequestLink.expireAt
+    override suspend fun generateFriendRequestLink(userId: String): String {
+        val expirationSeconds = 10L
+        val generationTime = Instant.now()
+        val generatedToken = Jwts.builder()
+            .setSubject("friend-request")
+            .setId(userId)
+            .setIssuedAt(Date.from(generationTime))
+            .setExpiration(Date.from(generationTime.plusSeconds(expirationSeconds)))
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .compact()
+        return generatedToken
     }
 
-    override suspend fun acceptFriendByLink(userId: String, requestInfo: String) {
-        val friend = friendRequestLinkRepository.findByEncodedString(requestInfo).single()?.let { friendRequestLink ->
-            if (friendRequestLink.fromUserId == userId) throw InvalidFriendException
-            if (friendRepository.findByUserPair(friendRequestLink.fromUserId to userId) != null) throw DuplicateFriendException
-            friendRepository.save(
-                Friend(
-                    fromUserId = friendRequestLink.fromUserId,
-                    toUserId = userId,
-                    isAccepted = true,
-                )
+    override suspend fun acceptFriendByLink(userId: String, requestToken: String) {
+        val target = userRepository.findById(
+            Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(requestToken)
+                .body
+                .id
+        ) ?: throw InvalidFriendException
+        if (target.id == userId)
+            throw InvalidFriendException
+        if (friendRepository.findByUserPair(target.id!! to userId) != null)
+            throw DuplicateFriendException
+        val friend = friendRepository.save(
+            Friend(
+                fromUserId = target.id,
+                toUserId = userId,
+                isAccepted = true,
             )
-        } ?: throw FriendNotFoundException
+        )
 
         coroutineScope.launch {
             val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.toUserId))
