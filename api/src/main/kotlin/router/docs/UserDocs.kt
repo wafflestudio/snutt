@@ -76,7 +76,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/friend/accept-link", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friend/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "acceptFriendByLink",
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]

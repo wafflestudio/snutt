@@ -87,9 +87,9 @@ class FriendHandler(
 
     suspend fun acceptFriendByLink(req: ServerRequest) = handle(req) {
         val userId = req.userId
-        val requestInfo = req.pathVariable("requestInfo")
+        val requestToken = req.pathVariable("requestToken")
 
-        friendService.acceptFriendByLink(userId, requestInfo)
+        friendService.acceptFriendByLink(userId, requestToken)
         OkResponse()
     }
 }
