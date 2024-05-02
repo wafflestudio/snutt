@@ -38,7 +38,7 @@ class LectureBuildingServiceImpl(
                 }
             }.awaitAll().filterNotNull().map {
                 LectureBuilding(
-                    buildingNumber = it.buildingNumber,
+                    buildingNumber = it.buildingNumber ?: "",
                     buildingNameKor = it.name,
                     buildingNameEng = it.englishName ?: "",
                     locationInDMS = GeoCoordinate(it.latitudeInDMS, it.longitudeInDMS),
