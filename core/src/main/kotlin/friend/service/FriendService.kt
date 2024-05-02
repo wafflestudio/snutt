@@ -160,12 +160,10 @@ class FriendServiceImpl(
     }
 
     override suspend fun generateFriendRequestLink(userId: String): String {
-        val expirationSeconds = 10L
+        val expirationSeconds = 1209600L
         val generationTime = Instant.now()
         val generatedToken = Jwts.builder()
-            .setSubject("friend-request")
             .setId(userId)
-            .setIssuedAt(Date.from(generationTime))
             .setExpiration(Date.from(generationTime.plusSeconds(expirationSeconds)))
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact()
