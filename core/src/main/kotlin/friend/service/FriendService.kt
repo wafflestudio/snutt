@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.common.exception.InvalidDisplayNameException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundByNicknameException
+import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.friend.data.Friend
@@ -15,18 +16,20 @@ import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import com.wafflestudio.snu4t.users.service.UserNicknameService
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate
+import org.springframework.data.redis.core.expireAndAwait
+import org.springframework.data.redis.core.getAndAwait
+import org.springframework.data.redis.core.setAndAwait
 import org.springframework.stereotype.Service
+import org.sqids.Sqids
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
-import java.util.Date
 
 interface FriendService {
     suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
@@ -54,7 +57,7 @@ class FriendServiceImpl(
     private val userNicknameService: UserNicknameService,
     private val friendRepository: FriendRepository,
     private val userRepository: UserRepository,
-    @Value("\${snutt.secret-key}") private val secretKey: String
+    private val redisTemplate: ReactiveStringRedisTemplate
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -160,31 +163,27 @@ class FriendServiceImpl(
     }
 
     override suspend fun generateFriendRequestLink(userId: String): String {
-        val expirationSeconds = 1209600L
-        val generationTime = Instant.now()
-        val generatedToken = Jwts.builder()
-            .setId(userId)
-            .setExpiration(Date.from(generationTime.plusSeconds(expirationSeconds)))
-            .signWith(SignatureAlgorithm.HS256, secretKey)
-            .compact()
+        val userIdLong = userId.hashCode().toLong()
+        val generationTime = Instant.now().epochSecond
+        val generatedToken = Sqids.builder().build().encode(listOf(userIdLong, generationTime))
+        val redisKey = "friend-link:$generatedToken"
+
+        redisTemplate.opsForValue().setAndAwait(redisKey, userId)
+        redisTemplate.expireAndAwait(redisKey, Duration.ofDays(14))
         return generatedToken
     }
 
     override suspend fun acceptFriendByLink(userId: String, requestToken: String) {
-        val target = userRepository.findById(
-            Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(requestToken)
-                .body
-                .id
-        ) ?: throw InvalidFriendException
-        if (target.id == userId)
+        val fromUserId = redisTemplate.opsForValue()
+            .getAndAwait("friend-link:$requestToken") ?: throw FriendNotFoundException
+        val fromUser = userRepository.findByIdAndActiveTrue(fromUserId) ?: throw UserNotFoundException
+        if (fromUser.id == userId)
             throw InvalidFriendException
-        if (friendRepository.findByUserPair(target.id!! to userId) != null)
+        if (friendRepository.findByUserPair(fromUser.id!! to userId) != null)
             throw DuplicateFriendException
         val friend = friendRepository.save(
             Friend(
-                fromUserId = target.id,
+                fromUserId = fromUser.id,
                 toUserId = userId,
                 isAccepted = true,
             )
