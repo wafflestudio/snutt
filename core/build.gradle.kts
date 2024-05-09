@@ -8,7 +8,6 @@ dependencies {
     implementation("software.amazon.awssdk:secretsmanager:2.25.15")
     implementation("software.amazon.awssdk:sts:2.25.15")
     implementation("com.google.firebase:firebase-admin:9.1.1")
-    implementation("org.sqids:sqids:0.1.0")
 
     testFixturesImplementation("org.testcontainers:mongodb:1.19.0")
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")

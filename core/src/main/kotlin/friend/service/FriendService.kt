@@ -26,10 +26,10 @@ import org.springframework.data.redis.core.expireAndAwait
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.data.redis.core.setAndAwait
 import org.springframework.stereotype.Service
-import org.sqids.Sqids
+import java.security.SecureRandom
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
+import java.util.Base64
 
 interface FriendService {
     suspend fun getMyFriends(myUserId: String, state: FriendState): List<Pair<Friend, User>>
@@ -163,14 +163,14 @@ class FriendServiceImpl(
     }
 
     override suspend fun generateFriendRequestLink(userId: String): String {
-        val userIdLong = userId.hashCode().toLong()
-        val generationTime = Instant.now().epochSecond
-        val generatedToken = Sqids.builder().build().encode(listOf(userIdLong, generationTime))
-        val redisKey = "friend-link:$generatedToken"
+        val bytes = ByteArray(8)
+        SecureRandom.getInstanceStrong().nextBytes(bytes)
+        val encodedKey = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+        val redisKey = "friend-link:$encodedKey"
 
         redisTemplate.opsForValue().setAndAwait(redisKey, userId)
         redisTemplate.expireAndAwait(redisKey, Duration.ofDays(14))
-        return generatedToken
+        return encodedKey
     }
 
     override suspend fun acceptFriendByLink(userId: String, requestToken: String) {
