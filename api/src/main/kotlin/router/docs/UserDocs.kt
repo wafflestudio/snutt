@@ -60,5 +60,12 @@ import org.springframework.web.bind.annotation.RequestMethod
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = UserLegacyDto::class))])]
         ),
     ),
+    RouterOperation(
+        path = "/v1/user/account", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "deleteAccount",
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
+        ),
+    ),
 )
 annotation class UserDocs

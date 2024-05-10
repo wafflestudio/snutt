@@ -2,10 +2,10 @@ package com.wafflestudio.snu4t.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.service.TimetableLectureService
+import com.wafflestudio.snu4t.timetables.service.TimetableService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.server.awaitBodyOrNull
 @Component
 class TimetableLectureHandler(
     private val timetableLectureService: TimetableLectureService,
+    private val timetableService: TimetableService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiDefaultMiddleware
@@ -30,7 +31,7 @@ class TimetableLectureHandler(
             timetableId = timetableId,
             timetableLectureRequest = customTimetable,
             isForced = isForced,
-        ).let(::TimetableLegacyDto)
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun addLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -44,7 +45,7 @@ class TimetableLectureHandler(
             timetableId = timetableId,
             lectureId = lectureId,
             isForced = isForced,
-        ).let(::TimetableLegacyDto)
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun resetTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -58,7 +59,7 @@ class TimetableLectureHandler(
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
             isForced,
-        ).let(::TimetableLegacyDto)
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun modifyTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -74,7 +75,7 @@ class TimetableLectureHandler(
             timetableLectureId = timetableLectureId,
             modifyTimetableLectureRequestDto = modifyRequestDto,
             isForced = isForced,
-        ).let(::TimetableLegacyDto)
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
@@ -86,7 +87,7 @@ class TimetableLectureHandler(
             userId = userId,
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
-        ).let(::TimetableLegacyDto)
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
     }
 
     data class ForcedReq(

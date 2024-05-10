@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
 
@@ -30,13 +31,14 @@ data class LectureDto(
     val courseTitle: String,
     val registrationCount: Int,
     val wasFull: Boolean,
+    val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
 
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
     val classTimeMask: List<Int> = emptyList(),
 )
 
-fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
+fun LectureDto(lecture: Lecture, snuttevLecture: SnuttEvLectureSummaryDto? = null): LectureDto = LectureDto(
     id = lecture.id,
     academicYear = lecture.academicYear,
     category = lecture.category,
@@ -55,5 +57,6 @@ fun LectureDto(lecture: Lecture): LectureDto = LectureDto(
     courseTitle = lecture.courseTitle,
     registrationCount = lecture.registrationCount,
     wasFull = lecture.wasFull,
+    snuttEvLecture = snuttevLecture,
     classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
 )

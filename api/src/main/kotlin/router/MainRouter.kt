@@ -77,6 +77,7 @@ class MainRouter(
             GET("/info", userHandler::getUserInfo)
             POST("/device/{id}", deviceHandler::addRegistrationId)
             DELETE("/device/{id}", deviceHandler::removeRegistrationId)
+            DELETE("/account", userHandler::deleteAccount)
         }
         "/users".nest {
             GET("/me", userHandler::getUserMe)

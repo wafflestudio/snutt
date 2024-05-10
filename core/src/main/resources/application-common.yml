@@ -27,6 +27,11 @@ google:
 http:
   response-timeout: 3s
 
+api:
+  server:
+    snuttev:
+      base-url: http://snutt-ev-api-dev.wafflestudio.com
+
 secret-names: dev/snutt-timetable
 
 ---
@@ -56,6 +61,11 @@ google:
       ios:
         bundle-id:
         app-store-id:
+
+api:
+  server:
+    snuttev:
+      base-url: http://snutt-ev.snutt-dev.svc.cluster.local
 
 logging:
   level:
@@ -87,5 +97,10 @@ google:
       ios:
         bundle-id:
         app-store-id:
+
+api:
+  server:
+    snuttev:
+      base-url: http://snutt-ev.snutt-prod.svc.cluster.local
 
 secret-names: prod/snutt-timetable
