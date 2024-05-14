@@ -199,6 +199,8 @@ class MainRouter(
             DELETE("/{friendId}", friendHandler::breakFriend)
             GET("/{friendId}/primary-table", friendTableHandler::getPrimaryTable)
             GET("/{friendId}/coursebooks", friendTableHandler::getCoursebooks)
+            GET("/generate-link", friendHandler::generateFriendLink)
+            POST("/accept-link/{requestToken}", friendHandler::acceptFriendByLink)
             GET("/{friendId}/registered-course-books", friendTableHandler::getCoursebooks) // TODO: delete
         }
     }

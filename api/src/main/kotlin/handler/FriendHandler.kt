@@ -1,7 +1,9 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
+import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
 import com.wafflestudio.snu4t.friend.dto.FriendState
 import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
@@ -74,5 +76,20 @@ class FriendHandler(
         val friendId = req.pathVariable("friendId")
 
         friendService.breakFriend(friendId, userId)
+    }
+
+    suspend fun generateFriendLink(req: ServerRequest) = handle(req) {
+        val userId = req.userId
+        val friendRequestToken = friendService.generateFriendRequestLink(userId)
+
+        FriendRequestLinkResponse(friendRequestToken)
+    }
+
+    suspend fun acceptFriendByLink(req: ServerRequest) = handle(req) {
+        val userId = req.userId
+        val requestToken = req.pathVariable("requestToken")
+
+        friendService.acceptFriendByLink(userId, requestToken)
+        OkResponse()
     }
 }
