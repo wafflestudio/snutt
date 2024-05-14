@@ -22,8 +22,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
-import org.springframework.data.redis.core.expireAndAwait
 import org.springframework.data.redis.core.getAndAwait
+import org.springframework.data.redis.core.hasKeyAndAwait
 import org.springframework.data.redis.core.setAndAwait
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
@@ -164,12 +164,12 @@ class FriendServiceImpl(
 
     override suspend fun generateFriendRequestLink(userId: String): String {
         val bytes = ByteArray(8)
-        SecureRandom.getInstanceStrong().nextBytes(bytes)
-        val encodedKey = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
-        val redisKey = "friend-link:$encodedKey"
-
-        redisTemplate.opsForValue().setAndAwait(redisKey, userId)
-        redisTemplate.expireAndAwait(redisKey, Duration.ofDays(14))
+        var encodedKey: String
+        do {
+            SecureRandom.getInstanceStrong().nextBytes(bytes)
+            encodedKey = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+        } while (redisTemplate.hasKeyAndAwait("friend-link:$encodedKey"))
+        redisTemplate.opsForValue().setAndAwait("friend-link:$encodedKey", userId, Duration.ofDays(14))
         return encodedKey
     }
 
