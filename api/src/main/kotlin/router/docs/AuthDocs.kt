@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/register_local", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/auth/register_local", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "registerLocal",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalRegisterRequest::class))]),
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/login_local", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/auth/login_local", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "loginLocal",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalLoginRequest::class))]),
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/logout", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/auth/logout", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "logout",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = LogoutRequest::class))]),
