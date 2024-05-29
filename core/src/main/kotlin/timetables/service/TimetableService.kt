@@ -230,14 +230,14 @@ class TimetableServiceImpl(
     override suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto {
         val evLectureIdMap =
             evRepository.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
-        val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.id]) }
+        val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.lectureId]) }
         return TimetableLegacyDto(timetable, timetableLectures).addLectureBuildings()
     }
 
     override suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto {
         val evLectureIdMap =
             evRepository.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
-        val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.id]) }
+        val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.lectureId]) }
         return TimetableDto(timetable, timetableLectures)
     }
 

@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
+import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeLegacyDto
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
@@ -26,10 +26,10 @@ data class TimetableLectureDto(
     var color: ColorSet?,
     var colorIndex: Int = 0,
     var lectureId: String? = null,
-    val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
+    val snuttEvLecture: SnuttEvLectureIdDto? = null,
 )
 
-fun TimetableLectureDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureSummaryDto? = null) = TimetableLectureDto(
+fun TimetableLectureDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureIdDto? = null) = TimetableLectureDto(
     id = timetableLecture.id,
     academicYear = timetableLecture.academicYear,
     category = timetableLecture.category,
@@ -76,14 +76,14 @@ data class TimetableLectureLegacyDto(
     var colorIndex: Int = 0,
     @JsonProperty("lecture_id")
     var lectureId: String? = null,
-    val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
+    val snuttEvLecture: SnuttEvLectureIdDto? = null,
 
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
     val classTimeMask: List<Int> = emptyList(),
 )
 
-fun TimetableLectureLegacyDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureSummaryDto? = null) =
+fun TimetableLectureLegacyDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureIdDto? = null) =
     TimetableLectureLegacyDto(
         id = timetableLecture.id,
         academicYear = timetableLecture.academicYear,
