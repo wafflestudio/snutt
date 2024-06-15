@@ -1,6 +1,8 @@
 package com.wafflestudio.snu4t.lectures.service
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.exception.EvDataNotFoundException
+import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -21,6 +23,7 @@ interface LectureService {
     suspend fun deleteLectures(lectures: Iterable<Lecture>)
     fun search(query: SearchDto): Flow<Lecture>
     suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto>
+    suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto
 }
 
 @Service
@@ -50,6 +53,11 @@ class LectureServiceImpl(
             LectureDto(lecture, snuttEvLecture)
         }.addLectureBuildings()
     }
+
+    override suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto {
+        return snuttEvRepository.getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
+    }
+
     private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> = coroutineScope {
         val placeInfosAll =
             flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()

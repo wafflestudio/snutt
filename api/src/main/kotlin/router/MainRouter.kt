@@ -6,6 +6,7 @@ import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.BuildingHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
+import com.wafflestudio.snu4t.handler.EvHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
@@ -21,6 +22,7 @@ import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.EvDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
@@ -54,6 +56,7 @@ class MainRouter(
     private val popupHandler: PopupHandler,
     private val adminHandler: AdminHandler,
     private val buildingHandler: BuildingHandler,
+    private val evHandler: EvHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -219,6 +222,12 @@ class MainRouter(
             DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
             DELETE("basic/{basicThemeTypeValue}/default", timetableThemeHandler::unsetBasicThemeTypeDefault)
         }
+    }
+
+    @Bean
+    @EvDocs
+    fun evRouter() = v1CoRouter {
+        GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
     }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {
