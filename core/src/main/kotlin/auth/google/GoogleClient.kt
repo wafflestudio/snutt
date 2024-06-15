@@ -30,9 +30,9 @@ class GoogleClient(
 
         return googleUserResponse?.let {
             OAuth2UserResponse(
-                socialId = it.id,
-                name = it.name,
+                socialId = it.sub,
                 email = it.email,
+                name = null,
             )
         }
     }
