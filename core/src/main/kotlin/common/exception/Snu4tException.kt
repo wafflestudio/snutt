@@ -67,6 +67,7 @@ object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
+object EvDataNotFoundException : Snu4tException(ErrorType.EV_DATA_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
