@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class FacebookLoginRequest(
-    val token: String,
-    val userId: String?,
-    val email: String?,
+    val fbId: String?,
+    val fbToken: String,
 )

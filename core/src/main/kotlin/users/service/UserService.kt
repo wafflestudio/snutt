@@ -120,7 +120,7 @@ class UserServiceImpl(
     }
 
     override suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse {
-        val token = facebookLoginRequest.token
+        val token = facebookLoginRequest.fbToken
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.FACEBOOK, token)
 
         val user = userRepository.findByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)
@@ -134,7 +134,11 @@ class UserServiceImpl(
 
         val credential = authService.buildFacebookCredential(oauth2UserResponse)
 
-        return signup(credential, facebookLoginRequest.email ?: oauth2UserResponse.email)
+        oauth2UserResponse.email?.let {
+            if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(it)) throw DuplicateEmailException
+        }
+
+        return signup(credential, oauth2UserResponse.email)
     }
 
     override suspend fun loginGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse {
@@ -143,15 +147,15 @@ class UserServiceImpl(
 
         val user = userRepository.findByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)
 
-        checkNotNull(oauth2UserResponse.email)
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
-
         if (user != null) {
             return LoginResponse(
                 userId = user.id!!,
                 token = user.credentialHash,
             )
         }
+
+        checkNotNull(oauth2UserResponse.email)
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
 
         val credential = authService.buildGoogleCredential(oauth2UserResponse)
 
