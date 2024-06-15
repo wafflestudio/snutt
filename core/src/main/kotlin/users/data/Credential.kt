@@ -17,6 +17,10 @@ data class Credential(
     var appleEmail: String? = null,
     var appleTransferSub: String? = null,
     @Field(write = Field.Write.ALWAYS)
+    var googleSub: String? = null,
+    @Field(write = Field.Write.ALWAYS)
+    var googleEmail: String? = null,
+    @Field(write = Field.Write.ALWAYS)
     var tempDate: String? = null,
     @Field(write = Field.Write.ALWAYS)
     var tempSeed: String? = null,

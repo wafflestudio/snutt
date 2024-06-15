@@ -2,6 +2,8 @@ package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
+import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
@@ -25,6 +27,16 @@ class AuthHandler(
     suspend fun loginLocal(req: ServerRequest): ServerResponse = handle(req) {
         val localLoginRequest: LocalLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
         userService.loginLocal(localLoginRequest)
+    }
+
+    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
+        val facebookLoginRequest: FacebookLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginFacebook(facebookLoginRequest)
+    }
+
+    suspend fun loginGoogle(req: ServerRequest): ServerResponse = handle(req) {
+        val googleLoginRequest: GoogleLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginGoogle(googleLoginRequest)
     }
 
     suspend fun logout(req: ServerRequest): ServerResponse = handle(req) {

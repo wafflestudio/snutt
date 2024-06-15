@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.users.service
 
+import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
@@ -14,7 +15,10 @@ import com.wafflestudio.snu4t.common.exception.WrongPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
 import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.timetables.service.TimetableService
+import com.wafflestudio.snu4t.users.data.Credential
 import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
+import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
@@ -33,6 +37,10 @@ interface UserService {
     suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): LoginResponse
 
     suspend fun loginLocal(localRegisterRequest: LocalLoginRequest): LoginResponse
+
+    suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse
+
+    suspend fun loginGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse
 
     suspend fun logout(userId: String, logoutRequest: LogoutRequest)
 
@@ -90,25 +98,7 @@ class UserServiceImpl(
             if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
             val credential = authService.buildLocalCredential(localId, password)
-            val credentialHash = authService.generateCredentialHash(credential)
-
-            val randomNickname = userNicknameService.generateUniqueRandomNickname()
-
-            val user = User(
-                email = email,
-                isEmailVerified = false,
-                credential = credential,
-                credentialHash = credentialHash,
-                nickname = randomNickname,
-                fcmKey = null,
-            ).let { userRepository.save(it) }
-
-            timetableService.createDefaultTable(user.id!!)
-
-            return LoginResponse(
-                userId = user.id,
-                token = credentialHash,
-            )
+            return signup(credential, email)
         }.getOrElse {
             if (it is Snu4tException) cache.releaseLock(cacheKey)
             throw it
@@ -126,6 +116,70 @@ class UserServiceImpl(
         return LoginResponse(
             userId = user.id!!,
             token = user.credentialHash,
+        )
+    }
+
+    override suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse {
+        val token = facebookLoginRequest.token
+        val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.FACEBOOK, token)
+
+        val user = userRepository.findByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)
+
+        if (user != null) {
+            return LoginResponse(
+                userId = user.id!!,
+                token = user.credentialHash,
+            )
+        }
+
+        val credential = authService.buildFacebookCredential(oauth2UserResponse)
+
+        return signup(credential, facebookLoginRequest.email ?: oauth2UserResponse.email)
+    }
+
+    override suspend fun loginGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse {
+        val token = googleLoginRequest.token
+        val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.GOOGLE, token)
+
+        val user = userRepository.findByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)
+
+        checkNotNull(oauth2UserResponse.email)
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
+
+        if (user != null) {
+            return LoginResponse(
+                userId = user.id!!,
+                token = user.credentialHash,
+            )
+        }
+
+        val credential = authService.buildGoogleCredential(oauth2UserResponse)
+
+        return signup(credential, oauth2UserResponse.email)
+    }
+
+    private suspend fun signup(
+        credential: Credential,
+        email: String?
+    ): LoginResponse {
+        val credentialHash = authService.generateCredentialHash(credential)
+
+        val randomNickname = userNicknameService.generateUniqueRandomNickname()
+
+        val user = User(
+            email = email,
+            isEmailVerified = false,
+            credential = credential,
+            credentialHash = credentialHash,
+            nickname = randomNickname,
+            fcmKey = null,
+        ).let { userRepository.save(it) }
+
+        timetableService.createDefaultTable(user.id!!)
+
+        return LoginResponse(
+            userId = user.id,
+            token = credentialHash,
         )
     }
 
