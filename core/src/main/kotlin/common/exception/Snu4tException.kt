@@ -47,6 +47,8 @@ object DefaultThemeDeleteErrorException : Snu4tException(ErrorType.DEFAULT_THEME
 object NotDefaultThemeErrorException : Snu4tException(ErrorType.NOT_DEFAULT_THEME_ERROR)
 object TooManyFilesException : Snu4tException(ErrorType.TOO_MANY_FILES)
 
+object SocialConnectFailException : Snu4tException(ErrorType.SOCIAL_CONNECT_FAIL)
+
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)

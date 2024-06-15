@@ -66,6 +66,8 @@ class MainRouter(
         "/auth".nest {
             POST("/register_local", authHandler::registerLocal)
             POST("/login_local", authHandler::loginLocal)
+            POST("/login_fb", authHandler::loginFacebook)
+            POST("/login_google", authHandler::loginGoogle)
             POST("/logout", authHandler::logout)
         }
     }
