@@ -21,10 +21,6 @@ class GoogleClient(
         private const val USER_INFO_URI = "https://www.googleapis.com/oauth2/v1/userinfo"
     }
 
-    override suspend fun getMeWithAuthCode(authorizationCode: String): OAuth2UserResponse? {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val googleUserResponse =
             webClient.get<GoogleOAuth2UserResponse>(

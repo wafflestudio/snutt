@@ -22,10 +22,6 @@ class FacebookClient(
         private const val USER_INFO_URI = "https://graph.facebook.com/me"
     }
 
-    override suspend fun getMeWithAuthCode(authorizationCode: String): OAuth2UserResponse? {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val facebookUserResponse =
             webClient.get<FacebookOAuth2UserResponse>(
