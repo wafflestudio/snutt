@@ -227,7 +227,7 @@ class MainRouter(
     @Bean
     @EvDocs
     fun evRouter() = v1CoRouter {
-        GET("/lectures/{lectureId}/evaluations/summary", evHandler::getLectureEvaluationSummary)
+        GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
     }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {
