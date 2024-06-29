@@ -85,6 +85,12 @@ class MainRouter(
             POST("/device/{id}", deviceHandler::addRegistrationId)
             DELETE("/device/{id}", deviceHandler::removeRegistrationId)
             DELETE("/account", userHandler::deleteAccount)
+            POST("/email/verification", userHandler::sendVerificationEmail)
+            GET("/email/verification", userHandler::getEmailVerification)
+            DELETE("/email/verification", userHandler::resetEmailVerification)
+            POST("/email/verification/code", userHandler::confirmEmailVerification)
+            POST("/password", userHandler::attachLocal)
+            PUT("/password", userHandler::changePassword)
         }
         "/users".nest {
             GET("/me", userHandler::getUserMe)

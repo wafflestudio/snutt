@@ -1,29 +1,39 @@
 package com.wafflestudio.snu4t.users.service
 
 import com.wafflestudio.snu4t.auth.SocialProvider
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
+import com.wafflestudio.snu4t.common.exception.AlreadyLocalAccountException
 import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
+import com.wafflestudio.snu4t.common.exception.EmailAlreadyVerifiedException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
 import com.wafflestudio.snu4t.common.exception.InvalidPasswordException
+import com.wafflestudio.snu4t.common.exception.InvalidVerificationCodeException
 import com.wafflestudio.snu4t.common.exception.Snu4tException
+import com.wafflestudio.snu4t.common.exception.TooManyVerificationCodeRequestException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongLocalIdException
 import com.wafflestudio.snu4t.common.exception.WrongPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
+import com.wafflestudio.snu4t.email.MailClient
 import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
+import com.wafflestudio.snu4t.users.data.RedisVerificationValue
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate
+import org.springframework.data.redis.core.getAndAwait
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -47,6 +57,16 @@ interface UserService {
     suspend fun logout(userId: String, logoutRequest: LogoutRequest)
 
     suspend fun update(user: User): User
+
+    suspend fun sendVerificationCode(user: User, email: String)
+
+    suspend fun verifyEmail(user: User, code: String)
+
+    suspend fun resetEmailVerification(user: User)
+
+    suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest)
+
+    suspend fun changePassword(user: User, passwordResetRequest: PasswordResetRequest)
 }
 
 @Service
@@ -57,6 +77,9 @@ class UserServiceImpl(
     private val userRepository: UserRepository,
     private val userNicknameService: UserNicknameService,
     private val cache: Cache,
+    private val redisTemplate: ReactiveStringRedisTemplate,
+    private val mapper: ObjectMapper,
+    private val mailClient: MailClient
 ) : UserService {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -241,5 +264,60 @@ class UserServiceImpl(
 
     override suspend fun update(user: User): User {
         return userRepository.save(user)
+    }
+
+    override suspend fun sendVerificationCode(user: User, email: String) {
+        if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
+        val key = "verification-code-${user.id}"
+        val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
+        val existing = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
+        if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
+        val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
+        val emailBody = "<h2>비밀번호 재설정 안내</h2><br/>" +
+            "안녕하세요. SNUTT입니다. <br/> " +
+            "<b>아래의 인증코드를 진행 중인 화면에 입력하여 비밀번호 재설정을 완료해주세요.</b><br/><br/>" +
+            "<h3>인증코드</h3><h3>$code</h3><br/><br/>" +
+            "인증코드는 이메일 발송 시점으로부터 3분 동안 유효합니다."
+        val emailSubject = "[SNUTT] 인증코드 [$code] 를 입력해주세요"
+        redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value)).subscribe()
+        mailClient.sendMail(email, emailSubject, emailBody)
+    }
+
+    override suspend fun verifyEmail(user: User, code: String) {
+        val key = "verification-code-${user.id}"
+        val value = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
+        if (value == null || value.code != code) throw InvalidVerificationCodeException
+        user.email = value.email
+        user.isEmailVerified = true
+        userRepository.save(user)
+        redisTemplate.delete(key).subscribe()
+    }
+
+    override suspend fun resetEmailVerification(user: User) {
+        user.isEmailVerified = false
+        userRepository.save(user)
+    }
+
+    override suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest) {
+        if (user.credential.localId != null) throw AlreadyLocalAccountException
+        val localId = localLoginRequest.id
+        val password = localLoginRequest.password
+        if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
+        if (!authService.isValidPassword(password)) throw InvalidPasswordException
+        if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
+        val localCredential = authService.buildLocalCredential(localId, password)
+        user.credential.localId = localCredential.localId
+        user.credential.localPw = localCredential.localPw
+        user.credentialHash = authService.generateCredentialHash(user.credential)
+        userRepository.save(user)
+    }
+
+    override suspend fun changePassword(user: User, passwordResetRequest: PasswordResetRequest) {
+        if (!authService.isMatchedPassword(user, passwordResetRequest.oldPassword)) throw WrongPasswordException
+        if (!authService.isValidPassword(passwordResetRequest.newPassword)) throw InvalidPasswordException
+        user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, passwordResetRequest.newPassword).localPw
+        user.credentialHash = authService.generateCredentialHash(user.credential)
+        userRepository.save(user)
     }
 }
