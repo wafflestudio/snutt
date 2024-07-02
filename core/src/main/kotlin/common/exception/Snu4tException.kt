@@ -47,6 +47,8 @@ object DefaultThemeDeleteErrorException : Snu4tException(ErrorType.DEFAULT_THEME
 object NotDefaultThemeErrorException : Snu4tException(ErrorType.NOT_DEFAULT_THEME_ERROR)
 object TooManyFilesException : Snu4tException(ErrorType.TOO_MANY_FILES)
 
+object SocialConnectFailException : Snu4tException(ErrorType.SOCIAL_CONNECT_FAIL)
+
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 object InvalidRegistrationForPreviousSemesterCourseException :
     Snu4tException(ErrorType.INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE)
@@ -67,6 +69,7 @@ object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
+object EvDataNotFoundException : Snu4tException(ErrorType.EV_DATA_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
