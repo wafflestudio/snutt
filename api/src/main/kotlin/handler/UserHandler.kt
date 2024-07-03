@@ -6,7 +6,7 @@ import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
-import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
+import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
@@ -93,7 +93,7 @@ class UserHandler(
 
     suspend fun changePassword(req: ServerRequest): ServerResponse = handle(req) {
         val user = req.getContext().user!!
-        val body = req.awaitBody<PasswordResetRequest>()
+        val body = req.awaitBody<PasswordChangeRequest>()
         userService.changePassword(user, body)
         OkResponse()
     }

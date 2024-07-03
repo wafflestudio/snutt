@@ -28,6 +28,7 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -36,6 +37,9 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.Duration
+import java.util.Base64
+import kotlin.random.Random
 
 interface UserService {
     suspend fun getUser(userId: String): User
@@ -66,7 +70,17 @@ interface UserService {
 
     suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest)
 
-    suspend fun changePassword(user: User, passwordResetRequest: PasswordResetRequest)
+    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest)
+
+    suspend fun sendLocalIdToEmail(email: String)
+
+    suspend fun sendResetPasswordCode(email: String)
+
+    suspend fun verifyResetPasswordCode(localId: String, code: String)
+
+    suspend fun getMaskedEmail(localId: String): String
+
+    suspend fun resetPassword(localId: String, newPassword: String, code: String)
 }
 
 @Service
@@ -268,19 +282,20 @@ class UserServiceImpl(
 
     override suspend fun sendVerificationCode(user: User, email: String) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
+        if (!authService.isValidEmail(email)) throw InvalidEmailException
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
         val key = "verification-code-${user.id}"
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
         val existing = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
         if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
         val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
-        val emailBody = "<h2>비밀번호 재설정 안내</h2><br/>" +
+        val emailSubject = "[SNUTT] 인증번호 [$code] 를 입력해주세요"
+        val emailBody = "<h2>인증번호 안내</h2><br/>" +
             "안녕하세요. SNUTT입니다. <br/> " +
-            "<b>아래의 인증코드를 진행 중인 화면에 입력하여 비밀번호 재설정을 완료해주세요.</b><br/><br/>" +
-            "<h3>인증코드</h3><h3>$code</h3><br/><br/>" +
-            "인증코드는 이메일 발송 시점으로부터 3분 동안 유효합니다."
-        val emailSubject = "[SNUTT] 인증코드 [$code] 를 입력해주세요"
-        redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value)).subscribe()
+            "<b>아래의 인증번호 6자리를 진행 중인 화면에 입력하여 3분내에 인증을 완료해주세요.</b><br/><br/>" +
+            "<h3>인증번호</h3><h3>$code</h3><br/><br/>" +
+            "인증번호는 이메일 발송 시점으로부터 3분 동안 유효합니다."
+        redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), Duration.ofMinutes(3)).subscribe()
         mailClient.sendMail(email, emailSubject, emailBody)
     }
 
@@ -313,10 +328,63 @@ class UserServiceImpl(
         userRepository.save(user)
     }
 
-    override suspend fun changePassword(user: User, passwordResetRequest: PasswordResetRequest) {
-        if (!authService.isMatchedPassword(user, passwordResetRequest.oldPassword)) throw WrongPasswordException
-        if (!authService.isValidPassword(passwordResetRequest.newPassword)) throw InvalidPasswordException
-        user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, passwordResetRequest.newPassword).localPw
+    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest) {
+        if (!authService.isMatchedPassword(user, passwordChangeRequest.oldPassword)) throw WrongPasswordException
+        if (!authService.isValidPassword(passwordChangeRequest.newPassword)) throw InvalidPasswordException
+        user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, passwordChangeRequest.newPassword).localPw
+        user.credentialHash = authService.generateCredentialHash(user.credential)
+        userRepository.save(user)
+    }
+
+    override suspend fun sendLocalIdToEmail(email: String) {
+        if (!authService.isValidEmail(email)) throw InvalidEmailException
+        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val emailSubject = "[SNUTT] 아이디를 찾았습니다"
+        val emailBody = "<h2>아이디 찾기 안내</h2><br/>" +
+            "안녕하세요. SNUTT입니다. <br/> " +
+            "<b>${user.email}로 가입된 아이디는 다음과 같습니다.</b><br/><br/>" +
+            "<h3>아이디</h3><h3>${user.credential.localId}</h3><br/><br/>"
+        mailClient.sendMail(email, emailSubject, emailBody)
+    }
+
+    override suspend fun sendResetPasswordCode(email: String) {
+        if (!authService.isValidEmail(email)) throw InvalidEmailException
+        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val key = "reset-password-code-${user.id}"
+        val code = Base64.getEncoder().encode(Random.nextBytes(6)).toString()
+        val existing = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
+        if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
+        val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
+        val emailSubject = "[SNUTT] 인증코드 [$code] 를 입력해주세요"
+        val emailBody = "<h2>비밀번호 재설정 안내</h2><br/>" +
+            "안녕하세요. SNUTT입니다. <br/> " +
+            "<b>아래의 인증코드를 진행 중인 화면에 입력하여 비밀번호 재설정을 완료해주세요.</b><br/><br/>" +
+            "<h3>인증코드</h3><h3>$code</h3><br/><br/>" +
+            "인증코드는 이메일 발송 시점으로부터 3분 동안 유효합니다."
+        redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), Duration.ofMinutes(3)).subscribe()
+        mailClient.sendMail(email, emailSubject, emailBody)
+    }
+
+    override suspend fun verifyResetPasswordCode(localId: String, code: String) {
+        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val key = "reset-password-code-${user.id}"
+        val value = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
+        if (value == null || value.code != code) throw InvalidVerificationCodeException
+        redisTemplate.opsForValue().getAndExpire(key, Duration.ofMinutes(3)).subscribe()
+    }
+
+    override suspend fun getMaskedEmail(localId: String): String {
+        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val email = user.email ?: throw UserNotFoundException
+        val maskedEmail = email.replace(Regex("(?<=.{3}).(?=.*@)"), "*")
+        return maskedEmail
+    }
+
+    override suspend fun resetPassword(localId: String, newPassword: String, code: String) {
+        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        verifyResetPasswordCode(localId, code)
+        if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
+        user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, newPassword).localPw
         user.credentialHash = authService.generateCredentialHash(user.credential)
         userRepository.save(user)
     }
