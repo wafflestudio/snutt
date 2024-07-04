@@ -1,12 +1,12 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.OkResponse
-import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeResponse
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
+import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.dto.VerificationCodeRequest

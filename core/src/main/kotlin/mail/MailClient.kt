@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.email
+package com.wafflestudio.snu4t.mail
 
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.regions.Region.AP_NORTHEAST_2

@@ -2,8 +2,9 @@ package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.users.dto.EmailResponse
-import com.wafflestudio.snu4t.users.dto.GetMaskedEmailRequest
 import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
+import com.wafflestudio.snu4t.users.dto.GetMaskedEmailRequest
+import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse

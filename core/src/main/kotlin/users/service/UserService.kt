@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.users.service
 
-import com.wafflestudio.snu4t.auth.SocialProvider
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.exception.AlreadyLocalAccountException
@@ -18,7 +18,7 @@ import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongLocalIdException
 import com.wafflestudio.snu4t.common.exception.WrongPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
-import com.wafflestudio.snu4t.email.MailClient
+import com.wafflestudio.snu4t.mail.MailClient
 import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
