@@ -95,7 +95,6 @@ class UserHandler(
         val user = req.getContext().user!!
         val body = req.awaitBody<PasswordChangeRequest>()
         userService.changePassword(user, body)
-        OkResponse()
     }
 
     private fun buildUserDto(user: User) = UserDto(

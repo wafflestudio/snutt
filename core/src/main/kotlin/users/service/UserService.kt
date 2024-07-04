@@ -29,6 +29,7 @@ import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
+import com.wafflestudio.snu4t.users.dto.PasswordChangeResponse
 import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -70,7 +71,7 @@ interface UserService {
 
     suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest)
 
-    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest)
+    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): PasswordChangeResponse
 
     suspend fun sendLocalIdToEmail(email: String)
 
@@ -286,9 +287,7 @@ class UserServiceImpl(
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
         val key = "verification-code-${user.id}"
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
-        val existing = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
-        if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
-        val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
+        val value = getVerificationValue(email, code, key)
         val emailSubject = "[SNUTT] 인증번호 [$code] 를 입력해주세요"
         val emailBody = "<h2>인증번호 안내</h2><br/>" +
             "안녕하세요. SNUTT입니다. <br/> " +
@@ -328,12 +327,13 @@ class UserServiceImpl(
         userRepository.save(user)
     }
 
-    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest) {
+    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): PasswordChangeResponse {
         if (!authService.isMatchedPassword(user, passwordChangeRequest.oldPassword)) throw WrongPasswordException
         if (!authService.isValidPassword(passwordChangeRequest.newPassword)) throw InvalidPasswordException
         user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, passwordChangeRequest.newPassword).localPw
         user.credentialHash = authService.generateCredentialHash(user.credential)
         userRepository.save(user)
+        return PasswordChangeResponse(token = user.credentialHash)
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
@@ -351,10 +351,8 @@ class UserServiceImpl(
         if (!authService.isValidEmail(email)) throw InvalidEmailException
         val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
         val key = "reset-password-code-${user.id}"
-        val code = Base64.getEncoder().encode(Random.nextBytes(6)).toString()
-        val existing = mapper.treeToValue(mapper.reader().readTree(redisTemplate.opsForValue().getAndAwait(key)), RedisVerificationValue::class.java)
-        if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
-        val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
+        val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
+        val value = getVerificationValue(email, code, key)
         val emailSubject = "[SNUTT] 인증코드 [$code] 를 입력해주세요"
         val emailBody = "<h2>비밀번호 재설정 안내</h2><br/>" +
             "안녕하세요. SNUTT입니다. <br/> " +
@@ -387,5 +385,15 @@ class UserServiceImpl(
         user.credential.localPw = authService.buildLocalCredential(user.credential.localId!!, newPassword).localPw
         user.credentialHash = authService.generateCredentialHash(user.credential)
         userRepository.save(user)
+        redisTemplate.delete("reset-password-code-${user.id}").subscribe()
+    }
+
+    private suspend fun getVerificationValue(email: String, code: String, key: String): RedisVerificationValue {
+        val existing = when (val existingRedisString = redisTemplate.opsForValue().getAndAwait(key)) {
+            null -> null
+            else -> mapper.readValue(existingRedisString, RedisVerificationValue::class.java)
+        }
+        if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
+        return RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
     }
 }
