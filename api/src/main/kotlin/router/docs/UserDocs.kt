@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.OkResponse
-import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -65,20 +64,6 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/user/account", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteAccount",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
-        ),
-    ),
-    RouterOperation(
-        path = "/v1/friend/generate-link", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "generateFriendLink",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = FriendRequestLinkResponse::class))])]
-        ),
-    ),
-    RouterOperation(
-        path = "/v1/friend/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "acceptFriendByLink",
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
         ),
     ),
