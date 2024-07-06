@@ -1,5 +1,8 @@
 package com.wafflestudio.snu4t.mail
 
+import com.wafflestudio.snu4t.common.exception.InvalidEmailException
+import com.wafflestudio.snu4t.common.exception.SendEmailFailedException
+import com.wafflestudio.snu4t.users.service.AuthService
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.regions.Region.AP_NORTHEAST_2
 import software.amazon.awssdk.services.ses.SesAsyncClient
@@ -10,7 +13,9 @@ import software.amazon.awssdk.services.ses.model.Message
 import software.amazon.awssdk.services.ses.model.SendEmailRequest
 
 @Component
-class MailClient {
+class MailClient(
+    private val authService: AuthService
+) {
     private val sesClient = SesAsyncClient.builder().region(AP_NORTHEAST_2).build()
     val sourceEmail = "snutt@wafflestudio.com"
 
@@ -19,6 +24,9 @@ class MailClient {
         subject: String,
         body: String,
     ) {
+        if (!authService.isValidEmail(to)) {
+            throw InvalidEmailException
+        }
         val dest = Destination.builder().toAddresses(to).build()
         val message = Message.builder()
             .subject(Content.builder().data(subject).build())
@@ -29,6 +37,8 @@ class MailClient {
             .message(message)
             .source(sourceEmail)
             .build()
-        sesClient.sendEmail(request).join()
+        if (!sesClient.sendEmail(request).join().sdkHttpResponse().isSuccessful) {
+            throw SendEmailFailedException
+        }
     }
 }

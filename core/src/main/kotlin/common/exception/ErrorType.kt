@@ -72,4 +72,5 @@ enum class ErrorType(
     DUPLICATE_POPUP_KEY(HttpStatus.CONFLICT, 40906, "중복된 팝업 키입니다.", "중복된 팝업 키입니다."),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
+    SEND_EMAIL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "이메일 전송 실패", "이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요."),
 }
