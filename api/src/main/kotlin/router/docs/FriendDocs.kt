@@ -98,14 +98,14 @@ import org.springframework.web.bind.annotation.RequestMethod
         ),
     ),
     RouterOperation(
-        path = "/v1/friend/generate-link", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/generate-link", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "generateFriendLink",
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = FriendRequestLinkResponse::class))])]
         ),
     ),
     RouterOperation(
-        path = "/v1/friend/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        path = "/v1/friends/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "acceptFriendByLink",
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
