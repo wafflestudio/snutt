@@ -1,8 +1,10 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
+import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
 import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
@@ -93,6 +95,20 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "getCoursebooks",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],
             responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = CoursebookDto::class)))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/friends/generate-link", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "generateFriendLink",
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = FriendRequestLinkResponse::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/friends/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "acceptFriendByLink",
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
         ),
     ),
 )
