@@ -19,6 +19,8 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByCredentialGoogleSubAndActiveTrue(fbId: String): User?
 
+    suspend fun findByCredentialKakaoSubAndActiveTrue(fbId: String): User?
+
     suspend fun findByNicknameAndActiveTrue(nickname: String): User?
 
     suspend fun findAllByIdInAndActiveTrue(ids: List<String>): List<User>

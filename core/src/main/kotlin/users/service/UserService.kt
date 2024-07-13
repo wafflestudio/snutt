@@ -18,11 +18,11 @@ import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
 import com.wafflestudio.snu4t.users.data.User
 import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
-import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -40,7 +40,9 @@ interface UserService {
 
     suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse
 
-    suspend fun loginGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse
+    suspend fun loginGoogle(socialLoginRequest: SocialLoginRequest): LoginResponse
+
+    suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse
 
     suspend fun logout(userId: String, logoutRequest: LogoutRequest)
 
@@ -141,8 +143,8 @@ class UserServiceImpl(
         return signup(credential, oauth2UserResponse.email)
     }
 
-    override suspend fun loginGoogle(googleLoginRequest: GoogleLoginRequest): LoginResponse {
-        val token = googleLoginRequest.token
+    override suspend fun loginGoogle(socialLoginRequest: SocialLoginRequest): LoginResponse {
+        val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.GOOGLE, token)
 
         val user = userRepository.findByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)
@@ -154,10 +156,31 @@ class UserServiceImpl(
             )
         }
 
-        checkNotNull(oauth2UserResponse.email)
+        checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
 
         val credential = authService.buildGoogleCredential(oauth2UserResponse)
+
+        return signup(credential, oauth2UserResponse.email)
+    }
+
+    override suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse {
+        val token = socialLoginRequest.token
+        val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.KAKAO, token)
+
+        val user = userRepository.findByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)
+
+        if (user != null) {
+            return LoginResponse(
+                userId = user.id!!,
+                token = user.credentialHash,
+            )
+        }
+
+        checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
+
+        val credential = authService.buildKakaoCredential(oauth2UserResponse)
 
         return signup(credential, oauth2UserResponse.email)
     }

@@ -70,7 +70,8 @@ class MainRouter(
             POST("/register_local", authHandler::registerLocal)
             POST("/login_local", authHandler::loginLocal)
             POST("/login_fb", authHandler::loginFacebook)
-            POST("/login_google", authHandler::loginGoogle)
+            POST("/login/google", authHandler::loginGoogle)
+            POST("/login/kakao", authHandler::loginKakao)
             POST("/logout", authHandler::logout)
         }
     }
