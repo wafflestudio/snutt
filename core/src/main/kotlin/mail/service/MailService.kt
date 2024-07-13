@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.mail.utils
 
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
-import com.wafflestudio.snu4t.mail.MailClient
+import com.wafflestudio.snu4t.common.mail.MailClient
 import com.wafflestudio.snu4t.users.service.AuthService
 import org.springframework.stereotype.Service
 
