@@ -37,8 +37,16 @@ import org.springframework.web.bind.annotation.RequestMethod
     RouterOperation(
         path = "/v1/auth/login_fb", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
-            operationId = "loginFacebook",
+            operationId = "loginFacebookLegacy",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = FacebookLoginRequest::class))]),
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = LoginResponse::class))])]
+        ),
+    ),
+    RouterOperation(
+        path = "/v1/auth/login/facebook", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation = Operation(
+            operationId = "loginFacebook",
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = SocialLoginRequest::class))]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = LoginResponse::class))])]
         ),
     ),

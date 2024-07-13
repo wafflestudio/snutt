@@ -17,7 +17,6 @@ import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
 import com.wafflestudio.snu4t.users.data.User
-import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
@@ -25,6 +24,7 @@ import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 interface UserService {
@@ -38,7 +38,7 @@ interface UserService {
 
     suspend fun loginLocal(localRegisterRequest: LocalLoginRequest): LoginResponse
 
-    suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse
+    suspend fun loginFacebook(socialLoginRequest: SocialLoginRequest): LoginResponse
 
     suspend fun loginGoogle(socialLoginRequest: SocialLoginRequest): LoginResponse
 
@@ -58,6 +58,8 @@ class UserServiceImpl(
     private val userNicknameService: UserNicknameService,
     private val cache: Cache,
 ) : UserService {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override suspend fun getUser(userId: String): User {
         return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
     }
@@ -121,8 +123,8 @@ class UserServiceImpl(
         )
     }
 
-    override suspend fun loginFacebook(facebookLoginRequest: FacebookLoginRequest): LoginResponse {
-        val token = facebookLoginRequest.fbToken
+    override suspend fun loginFacebook(socialLoginRequest: SocialLoginRequest): LoginResponse {
+        val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.FACEBOOK, token)
 
         val user = userRepository.findByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)
@@ -138,7 +140,7 @@ class UserServiceImpl(
 
         oauth2UserResponse.email?.let {
             if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(it)) throw DuplicateEmailException
-        }
+        } ?: run { log.error("facebook email is null: $oauth2UserResponse") }
 
         return signup(credential, oauth2UserResponse.email)
     }

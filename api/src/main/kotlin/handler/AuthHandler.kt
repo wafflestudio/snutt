@@ -29,9 +29,14 @@ class AuthHandler(
         userService.loginLocal(localLoginRequest)
     }
 
-    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
+    suspend fun loginFacebookLegacy(req: ServerRequest): ServerResponse = handle(req) {
         val facebookLoginRequest: FacebookLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginFacebook(facebookLoginRequest)
+        userService.loginFacebook(SocialLoginRequest(facebookLoginRequest.fbToken))
+    }
+
+    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
+        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginFacebook(socialLoginRequest)
     }
 
     suspend fun loginGoogle(req: ServerRequest): ServerResponse = handle(req) {
