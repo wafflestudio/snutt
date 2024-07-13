@@ -18,7 +18,7 @@ import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongLocalIdException
 import com.wafflestudio.snu4t.common.exception.WrongPasswordException
 import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
-import com.wafflestudio.snu4t.mail.MailClient
+import com.wafflestudio.snu4t.mail.utils.MailService
 import com.wafflestudio.snu4t.notification.service.DeviceService
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
@@ -94,7 +94,7 @@ class UserServiceImpl(
     private val cache: Cache,
     private val redisTemplate: ReactiveStringRedisTemplate,
     private val mapper: ObjectMapper,
-    private val mailClient: MailClient
+    private val mailService: MailService
 ) : UserService {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -295,7 +295,7 @@ class UserServiceImpl(
             "<h3>인증번호</h3><h3>$code</h3><br/><br/>" +
             "인증번호는 이메일 발송 시점으로부터 3분 동안 유효합니다."
         redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), Duration.ofMinutes(3)).subscribe()
-        mailClient.sendMail(email, emailSubject, emailBody)
+        mailService.sendMail(email, emailSubject, emailBody)
     }
 
     override suspend fun verifyEmail(user: User, code: String) {
@@ -344,7 +344,7 @@ class UserServiceImpl(
             "안녕하세요. SNUTT입니다. <br/> " +
             "<b>${user.email}로 가입된 아이디는 다음과 같습니다.</b><br/><br/>" +
             "<h3>아이디</h3><h3>${user.credential.localId}</h3><br/><br/>"
-        mailClient.sendMail(email, emailSubject, emailBody)
+        mailService.sendMail(email, emailSubject, emailBody)
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
@@ -360,7 +360,7 @@ class UserServiceImpl(
             "<h3>인증코드</h3><h3>$code</h3><br/><br/>" +
             "인증코드는 이메일 발송 시점으로부터 3분 동안 유효합니다."
         redisTemplate.opsForValue().set(key, mapper.writeValueAsString(value), Duration.ofMinutes(3)).subscribe()
-        mailClient.sendMail(email, emailSubject, emailBody)
+        mailService.sendMail(email, emailSubject, emailBody)
     }
 
     override suspend fun verifyResetPasswordCode(localId: String, code: String) {
