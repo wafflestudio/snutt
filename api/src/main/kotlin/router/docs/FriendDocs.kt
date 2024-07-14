@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
@@ -108,7 +107,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/friends/accept-link/{requestToken}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "acceptFriendByLink",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = FriendResponse::class))])]
         ),
     ),
 )
