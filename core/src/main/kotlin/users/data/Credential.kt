@@ -21,6 +21,10 @@ data class Credential(
     @Field(write = Field.Write.ALWAYS)
     var googleEmail: String? = null,
     @Field(write = Field.Write.ALWAYS)
+    var kakaoSub: String? = null,
+    @Field(write = Field.Write.ALWAYS)
+    var kakaoEmail: String? = null,
+    @Field(write = Field.Write.ALWAYS)
     var tempDate: String? = null,
     @Field(write = Field.Write.ALWAYS)
     var tempSeed: String? = null,

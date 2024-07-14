@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.net.URI
 
 object WebClientUtils {
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
     val objectMapper: ObjectMapper = jacksonObjectMapper().registerModules(JavaTimeModule())
 
     fun logWebClientError(
@@ -19,9 +19,9 @@ object WebClientUtils {
         it: Throwable,
     ) {
         if (it is WebClientResponseException) {
-            logger.error("[WEBCLIENT ERROR] {}\n{}", uri, it.responseBodyAsString, it)
+            log.error("[WEBCLIENT ERROR] {}\n{}", uri, it.responseBodyAsString, it)
         } else {
-            logger.error("[WEBCLIENT ERROR] {}\n{}", uri, it.message, it)
+            log.error("[WEBCLIENT ERROR] {}\n{}", uri, it.message, it)
         }
     }
 

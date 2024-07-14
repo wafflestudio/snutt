@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.auth.google
 import com.wafflestudio.snu4t.auth.OAuth2Client
 import com.wafflestudio.snu4t.auth.OAuth2UserResponse
 import com.wafflestudio.snu4t.common.extension.get
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
@@ -14,6 +15,8 @@ import java.time.Duration
 class GoogleClient(
     webClientBuilder: WebClient.Builder,
 ) : OAuth2Client {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
     private val webClient = webClientBuilder.clientConnector(ReactorClientHttpConnector(httpClient)).build()
 
@@ -28,10 +31,13 @@ class GoogleClient(
                 headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
             ).getOrNull()
 
+        log.info("token=$token, googleUserResponse=$googleUserResponse")
+
         return googleUserResponse?.let {
             OAuth2UserResponse(
                 socialId = it.id,
                 email = it.email,
+                isEmailVerified = true,
                 name = null,
             )
         }

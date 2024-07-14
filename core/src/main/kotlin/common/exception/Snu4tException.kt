@@ -1,9 +1,12 @@
 package com.wafflestudio.snu4t.common.exception
 
+import com.wafflestudio.snu4t.auth.SocialProvider
+
 open class Snu4tException(
     val error: ErrorType = ErrorType.DEFAULT_ERROR,
     val errorMessage: String = error.errorMessage,
     val displayMessage: String = error.displayMessage,
+    val detail: Any? = null,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제
     val ext: Map<String, String> = mapOf(),
 ) : RuntimeException(errorMessage)
@@ -72,7 +75,7 @@ object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
 object EvDataNotFoundException : Snu4tException(ErrorType.EV_DATA_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
-object DuplicateEmailException : Snu4tException(ErrorType.DUPLICATE_EMAIL)
+class DuplicateEmailException(socialProvider: SocialProvider) : Snu4tException(ErrorType.DUPLICATE_EMAIL, detail = mapOf("socialProvider" to socialProvider))
 object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)
 object InvalidFriendException : Snu4tException(ErrorType.INVALID_FRIEND)
 object DuplicateThemeNameException : Snu4tException(ErrorType.DUPLICATE_THEME_NAME)

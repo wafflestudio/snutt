@@ -3,10 +3,10 @@ package com.wafflestudio.snu4t.handler
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
 import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
-import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
+import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.service.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -29,14 +29,24 @@ class AuthHandler(
         userService.loginLocal(localLoginRequest)
     }
 
-    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
+    suspend fun loginFacebookLegacy(req: ServerRequest): ServerResponse = handle(req) {
         val facebookLoginRequest: FacebookLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginFacebook(facebookLoginRequest)
+        userService.loginFacebook(SocialLoginRequest(facebookLoginRequest.fbToken))
+    }
+
+    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
+        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginFacebook(socialLoginRequest)
     }
 
     suspend fun loginGoogle(req: ServerRequest): ServerResponse = handle(req) {
-        val googleLoginRequest: GoogleLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginGoogle(googleLoginRequest)
+        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginGoogle(socialLoginRequest)
+    }
+
+    suspend fun loginKakao(req: ServerRequest): ServerResponse = handle(req) {
+        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+        userService.loginKakao(socialLoginRequest)
     }
 
     suspend fun logout(req: ServerRequest): ServerResponse = handle(req) {
