@@ -4,15 +4,14 @@ import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.users.dto.EmailResponse
 import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
 import com.wafflestudio.snu4t.users.dto.GetMaskedEmailRequest
-import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
-import com.wafflestudio.snu4t.users.dto.VerificationCodeRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.VerificationCodeRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

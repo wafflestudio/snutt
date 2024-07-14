@@ -5,14 +5,13 @@ import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
 import com.wafflestudio.snu4t.users.dto.EmailResponse
 import com.wafflestudio.snu4t.users.dto.FacebookLoginRequest
 import com.wafflestudio.snu4t.users.dto.GetMaskedEmailRequest
-import com.wafflestudio.snu4t.users.dto.GoogleLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
-import com.wafflestudio.snu4t.users.dto.VerificationCodeRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.VerificationCodeRequest
 import com.wafflestudio.snu4t.users.service.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

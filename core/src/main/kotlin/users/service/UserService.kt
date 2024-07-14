@@ -32,13 +32,12 @@ import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeResponse
-import com.wafflestudio.snu4t.users.dto.PasswordResetRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.util.Base64
@@ -286,7 +285,7 @@ class UserServiceImpl(
     override suspend fun sendVerificationCode(user: User, email: String) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
         if (!authService.isValidEmail(email)) throw InvalidEmailException
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException(getSocialProvider(user))
         val key = VERIFICATION_CODE_PREFIX + user.id
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
         saveNewVerificationValue(email, code, key)
