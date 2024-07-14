@@ -39,6 +39,7 @@ class FacebookClient(
                 socialId = it.id,
                 name = it.name,
                 email = it.email,
+                isEmailVerified = true,
             )
         }
     }

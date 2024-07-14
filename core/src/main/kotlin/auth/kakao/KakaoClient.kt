@@ -37,6 +37,7 @@ class KakaoClient(
             OAuth2UserResponse(
                 socialId = it.id.toString(),
                 email = it.kakaoAccount.email,
+                isEmailVerified = it.kakaoAccount.isEmailVerified,
                 name = null,
             )
         }

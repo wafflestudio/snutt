@@ -37,6 +37,7 @@ class GoogleClient(
             OAuth2UserResponse(
                 socialId = it.id,
                 email = it.email,
+                isEmailVerified = true,
                 name = null,
             )
         }

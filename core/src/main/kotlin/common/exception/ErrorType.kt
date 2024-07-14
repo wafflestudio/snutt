@@ -60,7 +60,7 @@ enum class ErrorType(
     EV_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 40407, "강의평 데이터를 찾을 수 없습니다.", "강의평 데이터를 찾을 수 없습니다."),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.CONFLICT, 40900, "빈자리 알림 중복"),
-    DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다."),
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다.", "이미 사용 중인 이메일입니다."),
     DUPLICATE_FRIEND(HttpStatus.CONFLICT, 40902, "이미 친구 관계이거나 친구 요청을 보냈습니다.", "이미 친구 관계이거나 친구 요청을 보냈습니다."),
     INVALID_FRIEND(HttpStatus.CONFLICT, 40903, "친구 요청을 보낼 수 없는 유저입니다.", "친구 요청을 보낼 수 없는 유저입니다."),
     DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다.", "중복된 테마 이름입니다."),

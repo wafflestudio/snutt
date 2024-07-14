@@ -96,13 +96,15 @@ class UserServiceImpl(
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
             email?.let {
                 if (!authService.isValidEmail(email)) throw InvalidEmailException
-                if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException
+                userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
+                    throw DuplicateEmailException(getSocialProvider(it))
+                }
             }
 
             if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
             val credential = authService.buildLocalCredential(localId, password)
-            return signup(credential, email)
+            return signup(credential, email, isEmailVerified = false)
         }.getOrElse {
             if (it is Snu4tException) cache.releaseLock(cacheKey)
             throw it
@@ -138,11 +140,15 @@ class UserServiceImpl(
 
         val credential = authService.buildFacebookCredential(oauth2UserResponse)
 
-        oauth2UserResponse.email?.let {
-            if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(it)) throw DuplicateEmailException
-        } ?: run { log.error("facebook email is null: $oauth2UserResponse") }
+        if (oauth2UserResponse.email != null) {
+            userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+                throw DuplicateEmailException(getSocialProvider(it))
+            }
+        } else {
+            log.error("facebook email is null: $oauth2UserResponse")
+        }
 
-        return signup(credential, oauth2UserResponse.email)
+        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
     }
 
     override suspend fun loginGoogle(socialLoginRequest: SocialLoginRequest): LoginResponse {
@@ -159,11 +165,13 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+            throw DuplicateEmailException(getSocialProvider(it))
+        }
 
         val credential = authService.buildGoogleCredential(oauth2UserResponse)
 
-        return signup(credential, oauth2UserResponse.email)
+        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
     }
 
     override suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse {
@@ -180,16 +188,30 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)) throw DuplicateEmailException
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+            throw DuplicateEmailException(getSocialProvider(it))
+        }
 
         val credential = authService.buildKakaoCredential(oauth2UserResponse)
 
-        return signup(credential, oauth2UserResponse.email)
+        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
+    }
+
+    private fun getSocialProvider(user: User): SocialProvider {
+        return when {
+            user.credential.fbId != null -> SocialProvider.FACEBOOK
+            user.credential.appleSub != null -> SocialProvider.APPLE
+            user.credential.googleSub != null -> SocialProvider.GOOGLE
+            user.credential.kakaoSub != null -> SocialProvider.KAKAO
+            user.credential.localId != null -> SocialProvider.LOCAL
+            else -> throw IllegalStateException("Unknown social provider")
+        }
     }
 
     private suspend fun signup(
         credential: Credential,
-        email: String?
+        email: String?,
+        isEmailVerified: Boolean,
     ): LoginResponse {
         val credentialHash = authService.generateCredentialHash(credential)
 
@@ -197,7 +219,7 @@ class UserServiceImpl(
 
         val user = User(
             email = email,
-            isEmailVerified = false,
+            isEmailVerified = if (email != null) isEmailVerified else false,
             credential = credential,
             credentialHash = credentialHash,
             nickname = randomNickname,
