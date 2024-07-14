@@ -23,8 +23,8 @@ class MailServiceImpl(
         if (!authService.isValidEmail(to)) {
             throw InvalidEmailException
         }
-        getUserMailContent(type, code, to, localId).let { (mailSubject, mailBody) ->
-            mailClient.sendMail(to, mailSubject, mailBody)
+        getUserMailContent(type, code, to, localId).let { (subject, body) ->
+            mailClient.sendMail(to, subject, body)
         }
     }
     private suspend fun getUserMailContent(type: UserMailType, email: String, code: String, localId: String): MailContent {
@@ -36,7 +36,7 @@ class MailServiceImpl(
             .replace("{localId}", localId)
             .split("\n\n")
             .windowed(2, 2, false)
-            .map { (it1, it2) -> MailContent(it1, it2) }
+            .map { (subject, body) -> MailContent(subject, body) }
         val mailContent = mailContentList[type.index]
         return mailContent
     }
