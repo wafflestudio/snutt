@@ -23,7 +23,7 @@ class MailServiceImpl(
         if (!authService.isValidEmail(to)) {
             throw InvalidEmailException
         }
-        getUserMailContent(type, code, to, localId).let { (subject, body) ->
+        getUserMailContent(type, to, code, localId).let { (subject, body) ->
             mailClient.sendMail(to, subject, body)
         }
     }
