@@ -106,7 +106,9 @@ class TimetableLectureServiceImpl(
     ): Timetable {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw LectureNotFoundException
-        if (ClassTimeUtils.timesOverlap(timetableLecture.classPlaceAndTimes)) throw InvalidTimeException
+        val newClassPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() }
+            ?: timetableLecture.classPlaceAndTimes
+        if (ClassTimeUtils.timesOverlap(newClassPlaceAndTimes)) throw InvalidTimeException
         timetableLecture.apply {
             courseTitle = modifyTimetableLectureRequestDto.courseTitle ?: courseTitle
             academicYear = modifyTimetableLectureRequestDto.academicYear ?: academicYear
@@ -117,8 +119,7 @@ class TimetableLectureServiceImpl(
             remark = modifyTimetableLectureRequestDto.remark ?: remark
             color = modifyTimetableLectureRequestDto.color ?: color
             colorIndex = modifyTimetableLectureRequestDto.colorIndex ?: colorIndex
-            classPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() }
-                ?: classPlaceAndTimes
+            classPlaceAndTimes = newClassPlaceAndTimes
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
