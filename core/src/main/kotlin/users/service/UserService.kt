@@ -145,7 +145,7 @@ class UserServiceImpl(
                 throw DuplicateEmailException(getSocialProvider(it))
             }
         } else {
-            log.error("facebook email is null: $oauth2UserResponse")
+            log.warn("facebook email is null: $oauth2UserResponse")
         }
 
         return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
