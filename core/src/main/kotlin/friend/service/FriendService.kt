@@ -48,7 +48,7 @@ interface FriendService {
 
     suspend fun generateFriendRequestLink(userId: String): String
 
-    suspend fun acceptFriendByLink(userId: String, requestToken: String)
+    suspend fun acceptFriendByLink(userId: String, requestToken: String): Pair<Friend, User>
 }
 
 @Service
@@ -175,7 +175,7 @@ class FriendServiceImpl(
         return encodedKey
     }
 
-    override suspend fun acceptFriendByLink(userId: String, requestToken: String) {
+    override suspend fun acceptFriendByLink(userId: String, requestToken: String): Pair<Friend, User> {
         val fromUserId = redisTemplate.opsForValue()
             .getAndAwait(FRIEND_LINK_REDIS_PREFIX + requestToken) ?: throw FriendNotFoundException
         val fromUser = userRepository.findByIdAndActiveTrue(fromUserId) ?: throw UserNotFoundException
@@ -190,10 +190,10 @@ class FriendServiceImpl(
                 isAccepted = true,
             )
         )
-
         coroutineScope.launch {
             val toUser = requireNotNull(userRepository.findByIdAndActiveTrue(friend.toUserId))
             sendFriendAcceptPush(friend.fromUserId, toUser)
         }
+        return friend to fromUser
     }
 }

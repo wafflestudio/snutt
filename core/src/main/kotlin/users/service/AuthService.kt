@@ -30,6 +30,8 @@ interface AuthService {
 
     fun buildGoogleCredential(oAuth2UserResponse: OAuth2UserResponse): Credential
 
+    fun buildKakaoCredential(oAuth2UserResponse: OAuth2UserResponse): Credential
+
     suspend fun socialLoginWithAccessToken(socialProvider: SocialProvider, token: String): OAuth2UserResponse
 }
 
@@ -76,6 +78,11 @@ class AuthServiceImpl(
     override fun buildGoogleCredential(oAuth2UserResponse: OAuth2UserResponse) = Credential(
         googleSub = oAuth2UserResponse.socialId,
         googleEmail = oAuth2UserResponse.email,
+    )
+
+    override fun buildKakaoCredential(oAuth2UserResponse: OAuth2UserResponse) = Credential(
+        kakaoSub = oAuth2UserResponse.socialId,
+        kakaoEmail = oAuth2UserResponse.email,
     )
 
     private fun hmacSHA256Hex(data: String): String {

@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendRequest
 import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snu4t.friend.dto.FriendResponse
@@ -90,6 +89,15 @@ class FriendHandler(
         val requestToken = req.pathVariable("requestToken")
 
         friendService.acceptFriendByLink(userId, requestToken)
-        OkResponse()
+            .let {
+                (friend, partner) ->
+                FriendResponse(
+                    id = friend.id!!,
+                    userId = partner.id!!,
+                    displayName = friend.getPartnerDisplayName(userId),
+                    nickname = userNicknameService.getNicknameDto(partner.nickname!!),
+                    createdAt = friend.createdAt,
+                )
+            }
     }
 }
