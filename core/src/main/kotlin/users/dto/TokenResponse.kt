@@ -1,5 +1,5 @@
 package com.wafflestudio.snu4t.users.dto
 
-data class PasswordChangeResponse(
+data class TokenResponse(
     val token: String,
 )

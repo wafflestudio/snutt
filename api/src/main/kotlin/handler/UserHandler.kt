@@ -88,7 +88,6 @@ class UserHandler(
         val user = req.getContext().user!!
         val body = req.awaitBody<LocalLoginRequest>()
         userService.attachLocal(user, body)
-        OkResponse()
     }
 
     suspend fun changePassword(req: ServerRequest): ServerResponse = handle(req) {

@@ -31,8 +31,8 @@ import com.wafflestudio.snu4t.users.dto.LocalRegisterRequest
 import com.wafflestudio.snu4t.users.dto.LoginResponse
 import com.wafflestudio.snu4t.users.dto.LogoutRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
-import com.wafflestudio.snu4t.users.dto.PasswordChangeResponse
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.TokenResponse
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import org.slf4j.LoggerFactory
@@ -70,9 +70,9 @@ interface UserService {
 
     suspend fun resetEmailVerification(user: User)
 
-    suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest)
+    suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest): TokenResponse
 
-    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): PasswordChangeResponse
+    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): TokenResponse
 
     suspend fun sendLocalIdToEmail(email: String)
 
@@ -308,7 +308,7 @@ class UserServiceImpl(
         userRepository.save(user)
     }
 
-    override suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest) {
+    override suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest): TokenResponse {
         if (user.credential.localId != null) throw AlreadyLocalAccountException
         val localId = localLoginRequest.id
         val password = localLoginRequest.password
@@ -322,9 +322,10 @@ class UserServiceImpl(
             credentialHash = authService.generateCredentialHash(credential)
         }
         userRepository.save(user)
+        return TokenResponse(token = user.credentialHash)
     }
 
-    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): PasswordChangeResponse {
+    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): TokenResponse {
         if (!authService.isMatchedPassword(user, passwordChangeRequest.oldPassword)) throw WrongPasswordException
         if (!authService.isValidPassword(passwordChangeRequest.newPassword)) throw InvalidPasswordException
         user.apply {
@@ -332,7 +333,7 @@ class UserServiceImpl(
             credentialHash = authService.generateCredentialHash(credential)
         }
         userRepository.save(user)
-        return PasswordChangeResponse(token = user.credentialHash)
+        return TokenResponse(token = user.credentialHash)
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {

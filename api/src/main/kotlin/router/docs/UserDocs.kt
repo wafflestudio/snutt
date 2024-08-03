@@ -4,8 +4,8 @@ import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
-import com.wafflestudio.snu4t.users.dto.PasswordChangeResponse
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
+import com.wafflestudio.snu4t.users.dto.TokenResponse
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -108,7 +108,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "attachLocal",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalLoginRequest::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TokenResponse::class))])]
         ),
     ),
     RouterOperation(
@@ -116,7 +116,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "changePassword",
             requestBody = RequestBody(content = [Content(schema = Schema(implementation = PasswordChangeRequest::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PasswordChangeResponse::class))])]
+            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TokenResponse::class))])]
         ),
     ),
 )
