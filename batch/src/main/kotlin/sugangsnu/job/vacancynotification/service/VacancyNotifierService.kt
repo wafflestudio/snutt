@@ -153,7 +153,6 @@ class VacancyNotifierServiceImpl(
                     .let { info ->
                         val (courseNumber, lectureNumber) = info
                             .select("li:nth-of-type(1) > span:nth-of-type(3)").text()
-                            .also { log.info("강좌번호: {}", it) }
                             .takeIf { courseNumberRegex.matches(it) }!!
                             .let { courseNumberRegex.find(it)!!.groups }
                             .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
