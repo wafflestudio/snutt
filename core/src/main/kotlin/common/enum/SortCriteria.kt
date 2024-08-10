@@ -1,7 +1,12 @@
 package com.wafflestudio.snu4t.common.enum
 
 import com.fasterxml.jackson.annotation.JsonValue
+import com.wafflestudio.snu4t.common.extension.asc
+import com.wafflestudio.snu4t.common.extension.desc
+import com.wafflestudio.snu4t.lectures.data.EvInfo
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import org.springframework.data.domain.Sort
+import org.springframework.data.mapping.div
 
 enum class SortCriteria(
     val value: Int,
@@ -16,10 +21,10 @@ enum class SortCriteria(
 
     companion object {
         fun getSort(sortCriteria: SortCriteria?): Sort = when (sortCriteria) {
-            RATING_DESC -> Sort.by("evInfo.avgRating").descending()
-            RATING_ASC -> Sort.by("evInfo.avgRating").ascending()
-            COUNT_DESC -> Sort.by("evInfo.count").descending()
-            COUNT_ASC -> Sort.by("evInfo.count").ascending()
+            RATING_DESC -> (Lecture::evInfo / EvInfo::avgRating).desc()
+            RATING_ASC -> (Lecture::evInfo / EvInfo::avgRating).asc()
+            COUNT_DESC -> (Lecture::evInfo / EvInfo::count).desc()
+            COUNT_ASC -> (Lecture::evInfo / EvInfo::count).asc()
             else -> Sort.unsorted()
         }
     }
