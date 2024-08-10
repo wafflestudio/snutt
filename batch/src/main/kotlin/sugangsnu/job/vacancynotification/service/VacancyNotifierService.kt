@@ -47,7 +47,7 @@ class VacancyNotifierServiceImpl(
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>\d+)\)""".toRegex()
+    private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
     private val isFreshmanRegistrationCompleted = Calendar.getInstance() > Calendar.getInstance().apply {
         set(Calendar.MONTH, Calendar.FEBRUARY)
         set(Calendar.DAY_OF_MONTH, 14)
@@ -152,7 +152,8 @@ class VacancyNotifierServiceImpl(
                 course.select("div.course-info-item ul.course-info").first()!!
                     .let { info ->
                         val (courseNumber, lectureNumber) = info
-                            .select("ul.course-info > li:nth-of-type(1) > span:nth-of-type(3)").text()
+                            .select("li:nth-of-type(1) > span:nth-of-type(3)").text()
+                            .also { log.info("강좌번호: {}", it) }
                             .takeIf { courseNumberRegex.matches(it) }!!
                             .let { courseNumberRegex.find(it)!!.groups }
                             .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
