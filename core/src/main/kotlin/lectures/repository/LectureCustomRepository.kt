@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.lectures.repository
 
+import com.wafflestudio.snu4t.common.enum.SortCriteria
 import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
@@ -88,7 +89,7 @@ class LectureCustomRepositoryImpl(
                 ),
             )
         )
-            .with(searchCondition.sortBy)
+            .with(SortCriteria.getSort(SortCriteria.getOfName(searchCondition.sortBy)))
             .skip(searchCondition.offset).limit(searchCondition.limit)
     ).asFlow()
 

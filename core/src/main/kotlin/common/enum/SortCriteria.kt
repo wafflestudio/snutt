@@ -20,6 +20,8 @@ enum class SortCriteria(
     COUNT_ASC(5, "강의평 적은 순");
 
     companion object {
+        private val nameMap = values().associateBy { it.fullName }
+        fun getOfName(sortCriteriaName: String?): SortCriteria? = nameMap[sortCriteriaName]
         fun getSort(sortCriteria: SortCriteria?): Sort = when (sortCriteria) {
             RATING_DESC -> (Lecture::evInfo / EvInfo::avgRating).desc()
             RATING_ASC -> (Lecture::evInfo / EvInfo::avgRating).asc()

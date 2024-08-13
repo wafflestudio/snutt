@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.handler
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snu4t.common.enum.DayOfWeek
 import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.enum.SortCriteria
 import com.wafflestudio.snu4t.lectures.dto.SearchDto
 import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
 import com.wafflestudio.snu4t.lectures.service.LectureService
@@ -47,7 +46,7 @@ data class SearchQueryLegacy(
     val page: Int = 0,
     val offset: Long = page * 20L,
     val limit: Int = 20,
-    val sortCriteria: SortCriteria? = null,
+    val sortCriteria: String? = null,
 ) {
     fun toSearchDto(): SearchDto {
         return SearchDto(
@@ -66,7 +65,7 @@ data class SearchQueryLegacy(
             page = page,
             offset = offset,
             limit = limit,
-            sortBy = SortCriteria.getSort(sortCriteria)
+            sortBy = sortCriteria
         )
     }
 
