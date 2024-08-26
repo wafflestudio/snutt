@@ -46,7 +46,6 @@ data class SearchQueryLegacy(
     val page: Int = 0,
     val offset: Long = page * 20L,
     val limit: Int = 20,
-    val sortCriteria: String? = null,
 ) {
     fun toSearchDto(): SearchDto {
         return SearchDto(
@@ -64,8 +63,7 @@ data class SearchQueryLegacy(
             timesToExclude = timesToExclude,
             page = page,
             offset = offset,
-            limit = limit,
-            sortBy = sortCriteria
+            limit = limit
         )
     }
 
