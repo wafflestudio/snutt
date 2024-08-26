@@ -77,6 +77,7 @@ object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
 object EvDataNotFoundException : Snu4tException(ErrorType.EV_DATA_NOT_FOUND)
+object TagListNotFoundException : Snu4tException(ErrorType.TAG_LIST_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 class DuplicateEmailException(socialProvider: SocialProvider) : Snu4tException(ErrorType.DUPLICATE_EMAIL, detail = mapOf("socialProvider" to socialProvider))
