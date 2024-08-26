@@ -10,8 +10,9 @@ data class TagListResponse(
     val credit: List<String>,
     val instructor: List<String>,
     val category: List<String>,
+    val sortCriteria: List<String>,
     @JsonProperty("updated_at")
-    val updatedAt: Long
+    val updatedAt: Long,
 )
 fun TagListResponse(tagList: TagList) = TagListResponse(
     classification = tagList.tagCollection.classification,
@@ -20,5 +21,6 @@ fun TagListResponse(tagList: TagList) = TagListResponse(
     credit = tagList.tagCollection.credit,
     instructor = tagList.tagCollection.instructor,
     category = tagList.tagCollection.category,
+    sortCriteria = tagList.tagCollection.sortCriteria,
     updatedAt = tagList.updatedAt.toEpochMilli()
 )
