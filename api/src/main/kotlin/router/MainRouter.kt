@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.BuildingHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
+import com.wafflestudio.snu4t.handler.CoursebookHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.EvHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
@@ -57,6 +58,7 @@ class MainRouter(
     private val adminHandler: AdminHandler,
     private val buildingHandler: BuildingHandler,
     private val evHandler: EvHandler,
+    private val coursebookHandler: CoursebookHandler,
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -243,6 +245,11 @@ class MainRouter(
     @EvDocs
     fun evRouter() = v1CoRouter {
         GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
+    }
+
+    @Bean
+    fun coursebookRouter() = v1CoRouter {
+        GET("/course_books", coursebookHandler::getCourseBooks)
     }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {

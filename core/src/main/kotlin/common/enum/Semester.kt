@@ -29,6 +29,12 @@ class SemesterReadConverter : Converter<Int, Semester> {
     override fun convert(source: Int): Semester = Semester.getOfValue(source)!!
 }
 
+@ReadingConverter
+@Component
+class SemesterNumberReadConverter : Converter<Number, Semester> {
+    override fun convert(source: Number): Semester = Semester.getOfValue(source.toInt())!!
+}
+
 @Component
 @WritingConverter
 class SemesterWriteConverter : Converter<Semester, Int> {
