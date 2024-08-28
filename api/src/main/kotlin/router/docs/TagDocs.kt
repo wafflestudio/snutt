@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springdoc.core.annotations.RouterOperation
 import org.springdoc.core.annotations.RouterOperations
+import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/tags/{year}/{semester}",
+        path = "/v1/tags/{year}/{semester}", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTagList",
             parameters = [
@@ -24,7 +26,7 @@ import org.springdoc.core.annotations.RouterOperations
         ),
     ),
     RouterOperation(
-        path = "/v1/tags/{year}/{semester}/update_time",
+        path = "/v1/tags/{year}/{semester}/update_time", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTagListUpdateTime",
             parameters = [
