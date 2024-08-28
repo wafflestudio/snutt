@@ -7,8 +7,8 @@ spring:
     redis:
       repositories:
         enabled: false
-      host: localhost
-      database: 2
+      host:
+      database:
 
 google:
   firebase:
@@ -45,8 +45,8 @@ spring:
       uri:
       auto-index-creation: true
     redis:
-      host: localhost
-      database: 2
+      host:
+      database:
 
 google:
   firebase:

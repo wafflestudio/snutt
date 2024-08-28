@@ -29,7 +29,7 @@ class SecretsManagerConfig : EnvironmentAware, BeanFactoryPostProcessor {
         secretNames.forEach { secretName ->
             val secretString = getSecretString(secretName, region)
             val map = objectMapper.readValue<Map<String, String>>(secretString)
-            map.filterNot { it.key.startsWith("spring.data.redis") }.forEach { (key, value) -> System.setProperty(key, value) }
+            map.forEach { (key, value) -> System.setProperty(key, value) }
         }
     }
 

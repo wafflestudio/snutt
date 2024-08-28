@@ -23,6 +23,7 @@ import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.CoursebookDocs
 import com.wafflestudio.snu4t.router.docs.EvDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
@@ -248,6 +249,7 @@ class MainRouter(
     }
 
     @Bean
+    @CoursebookDocs
     fun coursebookRouter() = v1CoRouter {
         "/course_books".nest {
             GET("", coursebookHandler::getCoursebooks)

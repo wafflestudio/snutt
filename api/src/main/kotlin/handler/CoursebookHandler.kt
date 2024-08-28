@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.coursebook.data.CoursebookOfficialResponse
 import com.wafflestudio.snu4t.coursebook.data.toResponse
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
@@ -24,11 +25,12 @@ class CoursebookHandler(
     }
 
     suspend fun getCoursebookOfficial(req: ServerRequest): ServerResponse = handle(req) {
-        coursebookService.getSyllabusUrl(
+        val url = coursebookService.getSyllabusUrl(
             year = req.parseQueryParam("year"),
             semester = req.parseQueryParam("semester") { Semester.getOfValue(it.toInt()) },
             courseNumber = req.parseQueryParam("course_number"),
             lectureNumber = req.parseQueryParam("lecture_number")
         )
+        CoursebookOfficialResponse(url)
     }
 }
