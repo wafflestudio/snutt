@@ -249,7 +249,8 @@ class MainRouter(
 
     @Bean
     fun coursebookRouter() = v1CoRouter {
-        GET("/course_books", coursebookHandler::getCourseBooks)
+        GET("/course_books", coursebookHandler::getCoursebooks)
+        GET("/course_books/recent", coursebookHandler::getLatestCoursebook)
     }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {

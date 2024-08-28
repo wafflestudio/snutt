@@ -14,7 +14,11 @@ class CoursebookHandler(
 ) : ServiceHandler(
     handlerMiddleware = snuttRestApiNoAuthMiddleware
 ) {
-    suspend fun getCourseBooks(req: ServerRequest): ServerResponse = handle(req) {
-        coursebookService.getCourseBooks().map { it.toResponse() }
+    suspend fun getCoursebooks(req: ServerRequest): ServerResponse = handle(req) {
+        coursebookService.getCoursebooks().map { it.toResponse() }
+    }
+
+    suspend fun getLatestCoursebook(req: ServerRequest): ServerResponse = handle(req) {
+        coursebookService.getLatestCoursebook().toResponse()
     }
 }
