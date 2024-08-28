@@ -13,6 +13,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.PopupHandler
+import com.wafflestudio.snu4t.handler.TagHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
 import com.wafflestudio.snu4t.handler.TimetableThemeHandler
@@ -29,6 +30,7 @@ import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
 import com.wafflestudio.snu4t.router.docs.PopupDocs
+import com.wafflestudio.snu4t.router.docs.TagDocs
 import com.wafflestudio.snu4t.router.docs.ThemeDocs
 import com.wafflestudio.snu4t.router.docs.TimetableDocs
 import com.wafflestudio.snu4t.router.docs.UserDocs
@@ -60,6 +62,7 @@ class MainRouter(
     private val buildingHandler: BuildingHandler,
     private val evHandler: EvHandler,
     private val coursebookHandler: CoursebookHandler,
+    private val tagHandler: TagHandler
 ) {
     @Bean
     fun healthCheck() = coRouter {
@@ -239,6 +242,15 @@ class MainRouter(
             POST("basic/{basicThemeTypeValue}/default", timetableThemeHandler::setBasicThemeTypeDefault)
             DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
             DELETE("basic/{basicThemeTypeValue}/default", timetableThemeHandler::unsetBasicThemeTypeDefault)
+        }
+    }
+
+    @Bean
+    @TagDocs
+    fun tagRoute() = v1CoRouter {
+        "/tags".nest {
+            GET("/{year}/{semester}", tagHandler::getTagList)
+            GET("/{year}/{semester}/update_time", tagHandler::getTagListUpdateTime)
         }
     }
 
