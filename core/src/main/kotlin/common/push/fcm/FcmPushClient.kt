@@ -58,7 +58,7 @@ internal class FcmPushClient(
                 val messages = chunk.map { it.toFcmMessage() }
                 async {
                     runCatching {
-                        messagingInstance.sendAllAsync(messages).await()
+                        messagingInstance.sendEachAsync(messages).await()
                     }.getOrElse {
                         log.error("푸시전송 실패", it)
                         null
