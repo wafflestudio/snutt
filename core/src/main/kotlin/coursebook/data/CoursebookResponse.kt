@@ -9,12 +9,10 @@ data class CoursebookResponse(
     val semester: Semester,
     @JsonProperty("updated_at")
     val updatedAt: Instant
-)
-
-fun Coursebook.toResponse(): CoursebookResponse {
-    return CoursebookResponse(
-        year = this.year,
-        semester = this.semester,
-        updatedAt = this.updatedAt
+) {
+    constructor(coursebook: Coursebook) : this(
+        year = coursebook.year,
+        semester = coursebook.semester,
+        updatedAt = coursebook.updatedAt
     )
 }
