@@ -32,5 +32,4 @@ data class TagCollection(
     val credit: List<String>,
     val instructor: List<String>,
     val category: List<String>,
-    val sortCriteria: List<String> = listOf()
 )
