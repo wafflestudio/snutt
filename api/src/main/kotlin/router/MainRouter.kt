@@ -5,6 +5,7 @@ import com.wafflestudio.snu4t.handler.AuthHandler
 import com.wafflestudio.snu4t.handler.BookmarkHandler
 import com.wafflestudio.snu4t.handler.BuildingHandler
 import com.wafflestudio.snu4t.handler.ConfigHandler
+import com.wafflestudio.snu4t.handler.CoursebookHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.EvHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
@@ -23,6 +24,7 @@ import com.wafflestudio.snu4t.router.docs.AuthDocs
 import com.wafflestudio.snu4t.router.docs.BookmarkDocs
 import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
+import com.wafflestudio.snu4t.router.docs.CoursebookDocs
 import com.wafflestudio.snu4t.router.docs.EvDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
@@ -59,6 +61,7 @@ class MainRouter(
     private val adminHandler: AdminHandler,
     private val buildingHandler: BuildingHandler,
     private val evHandler: EvHandler,
+    private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler
 ) {
     @Bean
@@ -255,6 +258,16 @@ class MainRouter(
     @EvDocs
     fun evRouter() = v1CoRouter {
         GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
+    }
+
+    @Bean
+    @CoursebookDocs
+    fun coursebookRouter() = v1CoRouter {
+        "/course_books".nest {
+            GET("", coursebookHandler::getCoursebooks)
+            GET("/recent", coursebookHandler::getLatestCoursebook)
+            GET("/official", coursebookHandler::getCoursebookOfficial)
+        }
     }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) = coRouter {

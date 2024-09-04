@@ -3,10 +3,10 @@ package com.wafflestudio.snu4t.sugangsnu.common
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.util.SugangSnuUrlUtils.convertSemesterToSugangSnuSearchString
 import com.wafflestudio.snu4t.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuLectureInfo
-import com.wafflestudio.snu4t.sugangsnu.common.utils.toSugangSnuSearchString
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -48,7 +48,7 @@ class SugangSnuRepository(
         courseNumber: String,
         lectureNumber: String
     ): SugangSnuLectureInfo = sugangSnuApi.get().uri { builder ->
-        val semesterSearchString = semester.toSugangSnuSearchString()
+        val semesterSearchString = convertSemesterToSugangSnuSearchString(semester)
         builder.path(SUGANG_SNU_SEARCH_POPUP_PATH)
             .query(DEFAULT_SEARCH_POPUP_PARAMS)
             .queryParam("openSchyy", year)
@@ -84,7 +84,7 @@ class SugangSnuRepository(
                 query(DEFAULT_LECTURE_EXCEL_DOWNLOAD_PARAMS)
                 queryParam("srchLanguage", language)
                 queryParam("srchOpenSchyy", year)
-                queryParam("srchOpenShtm", semester.toSugangSnuSearchString())
+                queryParam("srchOpenShtm", convertSemesterToSugangSnuSearchString(semester))
                 build()
             }
         }.accept(MediaType.TEXT_HTML).awaitExchange {
