@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.common.dto.ListResponse
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
@@ -13,7 +14,6 @@ import com.wafflestudio.snu4t.timetables.service.TimetableThemeService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBody
-import org.springframework.web.reactive.function.server.queryParamOrNull
 
 @Component
 class TimetableThemeHandler(
@@ -30,13 +30,15 @@ class TimetableThemeHandler(
     suspend fun getBestThemes(req: ServerRequest) = handle(req) {
         val page = req.parseRequiredQueryParam<Int>("page")
 
-        timetableThemeService.getBestThemes(page).map(::TimetableThemeDto)
+        val themes = timetableThemeService.getBestThemes(page)
+        ListResponse(themes.map(::TimetableThemeDto))
     }
 
     suspend fun getFriendsThemes(req: ServerRequest) = handle(req) {
         val userId = req.userId
 
-        timetableThemeService.getFriendsThemes(userId).map(::TimetableThemeDto)
+        val themes = timetableThemeService.getFriendsThemes(userId)
+        ListResponse(themes.map(::TimetableThemeDto))
     }
 
     suspend fun addTheme(req: ServerRequest) =
@@ -77,7 +79,8 @@ class TimetableThemeHandler(
     suspend fun searchThemes(req: ServerRequest) = handle(req) {
         val query = req.parseRequiredQueryParam<String>("query")
 
-        timetableThemeService.searchThemes(query).map(::TimetableThemeDto)
+        val themes = timetableThemeService.searchThemes(query)
+        ListResponse(themes.map(::TimetableThemeDto))
     }
 
     suspend fun deleteTheme(req: ServerRequest) = handle(req) {
