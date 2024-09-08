@@ -7,16 +7,16 @@ import com.wafflestudio.snu4t.common.exception.InvalidThemeColorCountException
 import com.wafflestudio.snu4t.common.exception.InvalidThemeTypeException
 import com.wafflestudio.snu4t.common.exception.NotDefaultThemeErrorException
 import com.wafflestudio.snu4t.common.exception.ThemeNotFoundException
-import com.wafflestudio.snu4t.theme.data.ColorSet
 import com.wafflestudio.snu4t.friend.dto.FriendState
 import com.wafflestudio.snu4t.friend.service.FriendService
+import com.wafflestudio.snu4t.theme.data.ColorSet
 import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
 import com.wafflestudio.snu4t.theme.data.ThemeOrigin
 import com.wafflestudio.snu4t.theme.data.ThemeStatus
-import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.theme.data.TimetableTheme
-import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import com.wafflestudio.snu4t.theme.repository.TimetableThemeRepository
+import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -301,7 +301,7 @@ class TimetableThemeServiceImpl(
 
     override suspend fun searchThemes(keyword: String): List<TimetableTheme> {
         return timetableThemeRepository.findPublishedTimetablesByPublishNameContaining(keyword)
-   }
+    }
 
     private suspend fun getCustomTheme(userId: String, themeId: String): TimetableTheme {
         return timetableThemeRepository.findByIdAndUserId(themeId, userId)?.also {

@@ -23,7 +23,7 @@ data class TimetableTheme(
     // basic 테마는 false
     val isCustom: Boolean,
     var origin: ThemeOrigin? = null,
-    var status: ThemeStatus = if(isCustom) ThemeStatus.PRIVATE else ThemeStatus.BASIC,
+    var status: ThemeStatus = if (isCustom) ThemeStatus.PRIVATE else ThemeStatus.BASIC,
     var publishInfo: ThemeMarketInfo? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
@@ -48,4 +48,4 @@ enum class ThemeStatus {
     DOWNLOADED, // 다운로드 받은 테마
     PUBLISHED, // 공유된 테마
     PRIVATE, // 개인 테마
-};
+}

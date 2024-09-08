@@ -1,7 +1,7 @@
 package com.wafflestudio.snu4t.theme.repository
 
-import com.wafflestudio.snu4t.theme.data.TimetableTheme
 import com.wafflestudio.snu4t.theme.data.ThemeStatus
+import com.wafflestudio.snu4t.theme.data.TimetableTheme
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, String>, TimetableThemeCustomRepository {

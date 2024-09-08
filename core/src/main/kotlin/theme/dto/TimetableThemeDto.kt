@@ -17,7 +17,7 @@ data class TimetableThemeDto(
     val isDefault: Boolean,
     val isCustom: Boolean,
     var origin: ThemeOrigin? = null,
-    var status: ThemeStatus = if(isCustom) ThemeStatus.PRIVATE else ThemeStatus.BASIC,
+    var status: ThemeStatus = if (isCustom) ThemeStatus.PRIVATE else ThemeStatus.BASIC,
     var publishInfo: ThemeMarketInfo? = null,
 )
 

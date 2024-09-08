@@ -1,5 +1,5 @@
 package com.wafflestudio.snu4t.theme.dto.request
 
-class TimetableThemeDownloadRequestDto (
+class TimetableThemeDownloadRequestDto(
     val name: String,
 )
