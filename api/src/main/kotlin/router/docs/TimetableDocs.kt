@@ -53,6 +53,10 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTimetablesBySemester",
+            parameters = [
+                Parameter(`in` = ParameterIn.PATH, name = "year", required = true),
+                Parameter(`in` = ParameterIn.PATH, name = "semester", required = true)
+            ],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -67,7 +71,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "addTimetable",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableAddRequestDto::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableAddRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -82,6 +86,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "getTimetable",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -96,7 +101,8 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "modifyTimetable",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyRequestDto::class))]),
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -111,6 +117,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteTimetable",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -125,6 +132,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "copyTimetable",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -139,7 +147,8 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "modifyTimetableTheme",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyThemeRequestDto::class))]),
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyThemeRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -154,6 +163,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "setPrimary",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -168,6 +178,7 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "unSetPrimary",
+            parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -189,8 +200,13 @@ import timetables.dto.TimetableBriefDto
                     required = false,
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
                 ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableId",
+                    required = true
+                ),
             ],
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = CustomTimetableLectureAddLegacyRequestDto::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = CustomTimetableLectureAddLegacyRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -211,6 +227,16 @@ import timetables.dto.TimetableBriefDto
                     name = "isForced",
                     required = false,
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
+                ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableId",
+                    required = true
+                ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "lectureId",
+                    required = true
                 ),
             ],
             responses = [
@@ -234,6 +260,16 @@ import timetables.dto.TimetableBriefDto
                     required = false,
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
                 ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableId",
+                    required = true
+                ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableLectureId",
+                    required = true
+                ),
             ],
             responses = [
                 ApiResponse(
@@ -256,8 +292,18 @@ import timetables.dto.TimetableBriefDto
                     required = false,
                     description = "시간 겹치는 강의 강제로 삭제 후 실행"
                 ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableId",
+                    required = true
+                ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableLectureId",
+                    required = true
+                ),
             ],
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableLectureModifyLegacyRequestDto::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableLectureModifyLegacyRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [
                 ApiResponse(
                     responseCode = "200",
@@ -272,6 +318,18 @@ import timetables.dto.TimetableBriefDto
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "deleteTimetableLecture",
+            parameters = [
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableId",
+                    required = true
+                ),
+                Parameter(
+                    `in` = ParameterIn.PATH,
+                    name = "timetableLectureId",
+                    required = true
+                ),
+            ],
             responses = [
                 ApiResponse(
                     responseCode = "200",

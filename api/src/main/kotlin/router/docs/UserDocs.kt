@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "registerLocal",
             parameters = [
-                Parameter(`in` = ParameterIn.PATH, name = "fcmRegistrationId", required = true)
+                Parameter(`in` = ParameterIn.PATH, name = "id", required = true)
             ],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
         ),
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "registerLocal",
             parameters = [
-                Parameter(`in` = ParameterIn.PATH, name = "fcmRegistrationId", required = true)
+                Parameter(`in` = ParameterIn.PATH, name = "id", required = true)
             ],
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
         ),
@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/users/me", method = [RequestMethod.PATCH], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "patchUserInfo",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = UserPatchRequest::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = UserPatchRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = UserDto::class))])]
         ),
     ),
@@ -91,7 +91,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/user/email/verification", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "sendVerificationEmail",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = SendEmailRequest::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = SendEmailRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])]
         ),
     ),
@@ -99,7 +99,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/user/email/verification/code", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "confirmEmailVerification",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = VerificationCodeRequest::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = VerificationCodeRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = EmailVerificationResultDto::class))])]
         ),
     ),
@@ -107,7 +107,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/user/password", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "attachLocal",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalLoginRequest::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = LocalLoginRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TokenResponse::class))])]
         ),
     ),
@@ -115,7 +115,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/user/password", method = [RequestMethod.PUT], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "changePassword",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PasswordChangeRequest::class))]),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PasswordChangeRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)]),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TokenResponse::class))])]
         ),
     ),
