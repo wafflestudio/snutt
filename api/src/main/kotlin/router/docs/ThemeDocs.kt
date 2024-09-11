@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "addTheme",
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = TimetableThemeAddRequestDto::class))],
+                content = [Content(schema = Schema(implementation = TimetableThemeAddRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
             ),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableThemeDto::class))])],
@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "modifyTheme",
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = TimetableThemeAddRequestDto::class))],
+                content = [Content(schema = Schema(implementation = TimetableThemeAddRequestDto::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
             ),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableThemeDto::class))])],

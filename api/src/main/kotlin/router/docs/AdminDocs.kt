@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "insertNotification",
             description = "어드민 권한으로 알림 보내기",
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = InsertNotificationRequest::class))],
+                content = [Content(schema = Schema(implementation = InsertNotificationRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
                 description = "userId null이면 모든 유저에게 보냄"
             ),
