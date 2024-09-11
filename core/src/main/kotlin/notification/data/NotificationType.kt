@@ -19,7 +19,7 @@ enum class NotificationType(
     FEATURE_NEW(6);
 
     companion object {
-        private val valueMap = NotificationType.values().associateBy { e -> e.value }
+        private val valueMap = NotificationType.entries.associateBy { e -> e.value }
 
         fun getOfValue(value: Int): NotificationType? = valueMap[value]
     }

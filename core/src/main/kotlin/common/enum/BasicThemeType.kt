@@ -17,8 +17,8 @@ enum class BasicThemeType(@get:JsonValue val value: Int, val displayName: String
 
     companion object {
         const val COLOR_COUNT = 9
-        fun from(value: Int) = values().find { it.value == value }
-        fun from(displayName: String) = values().find { it.displayName == displayName }
+        fun from(value: Int) = entries.find { it.value == value }
+        fun from(displayName: String) = entries.find { it.displayName == displayName }
     }
 }
 

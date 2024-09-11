@@ -17,7 +17,7 @@ enum class Semester(
     WINTER(4, "겨울학기");
 
     companion object {
-        private val valueMap = values().associateBy { e -> e.value }
+        private val valueMap = entries.associateBy { e -> e.value }
 
         fun getOfValue(semesterValue: Int): Semester? = valueMap[semesterValue]
     }

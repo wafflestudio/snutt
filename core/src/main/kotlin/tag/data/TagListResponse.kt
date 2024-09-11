@@ -22,6 +22,6 @@ fun TagListResponse(tagList: TagList) = TagListResponse(
     credit = tagList.tagCollection.credit,
     instructor = tagList.tagCollection.instructor,
     category = tagList.tagCollection.category,
-    sortCriteria = SortCriteria.values().sortedBy { it.value }.map { it.fullName }.filterNot { it == "기본값" },
+    sortCriteria = SortCriteria.entries.sortedBy { it.value }.map { it.fullName }.filterNot { it == "기본값" },
     updatedAt = tagList.updatedAt.toEpochMilli()
 )

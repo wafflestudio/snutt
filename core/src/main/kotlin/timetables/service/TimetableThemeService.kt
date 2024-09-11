@@ -53,7 +53,7 @@ class TimetableThemeServiceImpl(
         val customThemes = timetableThemeRepository.findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId)
         customThemes.forEach { if (it.id == defaultTheme.id) it.isDefault = true } // iOS, Android 3.5.0 버전 대응을 위함
 
-        val basicThemes = BasicThemeType.values().map {
+        val basicThemes = BasicThemeType.entries.map {
             buildTimetableTheme(
                 userId,
                 it,

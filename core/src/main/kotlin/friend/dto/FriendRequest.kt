@@ -15,6 +15,6 @@ enum class FriendState {
     ;
 
     companion object {
-        fun from(value: String) = values().find { it.name == value }
+        fun from(value: String) = entries.find { it.name == value }
     }
 }

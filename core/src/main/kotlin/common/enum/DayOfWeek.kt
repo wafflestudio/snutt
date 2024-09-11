@@ -20,8 +20,8 @@ enum class DayOfWeek(
     SUNDAY(6, "일");
 
     companion object {
-        private val valueMap = DayOfWeek.values().associateBy { e -> e.value }
-        private val koreanTextMap = DayOfWeek.values().associateBy { e -> e.korText }
+        private val valueMap = DayOfWeek.entries.associateBy { e -> e.value }
+        private val koreanTextMap = DayOfWeek.entries.associateBy { e -> e.korText }
 
         fun getOfValue(dayOfWeek: Int): DayOfWeek? = valueMap[dayOfWeek]
         fun getOfValue(dayOfWeek: Double): DayOfWeek? = valueMap[dayOfWeek.toInt()]
