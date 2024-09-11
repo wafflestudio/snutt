@@ -22,7 +22,6 @@ import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
 import com.wafflestudio.snu4t.mail.data.UserMailType
 import com.wafflestudio.snu4t.mail.service.MailService
 import com.wafflestudio.snu4t.notification.service.DeviceService
-import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.data.Credential
 import com.wafflestudio.snu4t.users.data.RedisVerificationValue
 import com.wafflestudio.snu4t.users.data.User
@@ -34,8 +33,10 @@ import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.TokenResponse
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
+import com.wafflestudio.snu4t.users.event.data.SignupEvent
 import com.wafflestudio.snu4t.users.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.stereotype.Service
@@ -113,7 +114,6 @@ interface UserService {
 @Service
 class UserServiceImpl(
     private val authService: AuthService,
-    private val timetableService: TimetableService,
     private val deviceService: DeviceService,
     private val userRepository: UserRepository,
     private val userNicknameService: UserNicknameService,
@@ -121,6 +121,7 @@ class UserServiceImpl(
     private val redisTemplate: ReactiveStringRedisTemplate,
     private val mapper: ObjectMapper,
     private val mailService: MailService,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : UserService {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -294,7 +295,7 @@ class UserServiceImpl(
                 fcmKey = null,
             ).let { userRepository.save(it) }
 
-        timetableService.createDefaultTable(user.id!!)
+        eventPublisher.publishEvent(SignupEvent(user.id!!))
 
         return LoginResponse(
             userId = user.id,
