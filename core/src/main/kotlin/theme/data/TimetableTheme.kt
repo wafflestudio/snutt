@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.timetables.data
+package com.wafflestudio.snu4t.theme.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient

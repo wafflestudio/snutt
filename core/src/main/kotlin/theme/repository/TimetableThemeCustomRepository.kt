@@ -1,12 +1,9 @@
-package com.wafflestudio.snu4t.timetables.repository
+package com.wafflestudio.snu4t.theme.repository
 
 import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.common.extension.regex
-import com.wafflestudio.snu4t.timetables.data.ThemeMarketInfo
-import com.wafflestudio.snu4t.timetables.data.ThemeOrigin
-import com.wafflestudio.snu4t.timetables.data.ThemeStatus
-import com.wafflestudio.snu4t.timetables.data.TimetableTheme
+import com.wafflestudio.snu4t.theme.data.TimetableTheme
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.mapping.div

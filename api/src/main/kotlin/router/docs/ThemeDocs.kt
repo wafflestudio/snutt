@@ -1,10 +1,10 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.timetables.dto.TimetableThemeDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableThemeAddRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableThemeDownloadRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableThemePublishRequestDto
+import com.wafflestudio.snu4t.theme.dto.TimetableThemeDto
+import com.wafflestudio.snu4t.theme.dto.request.TimetableThemeAddRequestDto
+import com.wafflestudio.snu4t.theme.dto.request.TimetableThemeDownloadRequestDto
+import com.wafflestudio.snu4t.theme.dto.request.TimetableThemePublishRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

@@ -1,13 +1,13 @@
-package com.wafflestudio.snu4t.timetables.dto
+package com.wafflestudio.snu4t.theme.dto
 
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
-import com.wafflestudio.snu4t.timetables.data.ColorSet
-import com.wafflestudio.snu4t.timetables.data.ThemeMarketInfo
-import com.wafflestudio.snu4t.timetables.data.ThemeOrigin
-import com.wafflestudio.snu4t.timetables.data.ThemeStatus
-import com.wafflestudio.snu4t.timetables.data.TimetableTheme
-import com.wafflestudio.snu4t.timetables.service.toBasicThemeType
-import com.wafflestudio.snu4t.timetables.service.toIdForTimetable
+import com.wafflestudio.snu4t.theme.data.ColorSet
+import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
+import com.wafflestudio.snu4t.theme.data.ThemeOrigin
+import com.wafflestudio.snu4t.theme.data.ThemeStatus
+import com.wafflestudio.snu4t.theme.data.TimetableTheme
+import com.wafflestudio.snu4t.theme.service.toBasicThemeType
+import com.wafflestudio.snu4t.theme.service.toIdForTimetable
 
 data class TimetableThemeDto(
     val id: String?,
