@@ -47,10 +47,9 @@ import kotlin.random.Random
 interface UserService {
     suspend fun getUser(userId: String): User
 
-    suspend fun patchUserInfo(
-        userId: String,
-        userPatchRequest: UserPatchRequest,
-    ): User
+    suspend fun getUsers(userIds: List<String>): List<User>
+
+    suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User
 
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
@@ -129,10 +128,11 @@ class UserServiceImpl(
         return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
     }
 
-    override suspend fun patchUserInfo(
-        userId: String,
-        userPatchRequest: UserPatchRequest,
-    ): User {
+    override suspend fun getUsers(userIds: List<String>): List<User> {
+        return userRepository.findAllByIdInAndActiveTrue(userIds)
+    }
+
+    override suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User {
         val user = getUser(userId)
 
         with(userPatchRequest) {

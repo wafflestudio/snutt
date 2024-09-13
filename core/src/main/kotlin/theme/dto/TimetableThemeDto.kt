@@ -2,7 +2,6 @@ package com.wafflestudio.snu4t.theme.dto
 
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
 import com.wafflestudio.snu4t.theme.data.ColorSet
-import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
 import com.wafflestudio.snu4t.theme.data.ThemeOrigin
 import com.wafflestudio.snu4t.theme.data.ThemeStatus
 import com.wafflestudio.snu4t.theme.data.TimetableTheme
@@ -18,7 +17,13 @@ data class TimetableThemeDto(
     val isCustom: Boolean,
     var origin: ThemeOrigin? = null,
     var status: ThemeStatus = if (isCustom) ThemeStatus.PRIVATE else ThemeStatus.BASIC,
-    var publishInfo: ThemeMarketInfo? = null,
+    var publishInfo: ThemeMarketInfoDto? = null,
+)
+
+data class ThemeMarketInfoDto(
+    val publishName: String,
+    val authorName: String,
+    var downloads: Int,
 )
 
 fun TimetableThemeDto(timetableTheme: TimetableTheme) =
@@ -32,6 +37,29 @@ fun TimetableThemeDto(timetableTheme: TimetableTheme) =
             isCustom = isCustom,
             origin = origin,
             status = status,
-            publishInfo = publishInfo,
+            publishInfo = null,
         )
+    }
+
+fun TimetableThemeDto(timetableTheme: TimetableTheme, userNickname: String?) =
+    userNickname?.let { nickname ->
+        with(timetableTheme) {
+            TimetableThemeDto(
+                id = toIdForTimetable(),
+                theme = toBasicThemeType(),
+                name = name,
+                colors = colors,
+                isDefault = isDefault,
+                isCustom = isCustom,
+                origin = origin,
+                status = status,
+                publishInfo = publishInfo?.let {
+                    ThemeMarketInfoDto(
+                        publishName = it.publishName,
+                        authorName = if (it.authorAnonymous) "익명" else nickname,
+                        downloads = it.downloads,
+                    )
+                },
+            )
+        }
     }

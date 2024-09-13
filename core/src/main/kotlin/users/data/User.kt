@@ -12,7 +12,7 @@ data class User(
     val id: String? = null,
     var email: String?,
     @Indexed(unique = true, sparse = true)
-    var nickname: String?,
+    var nickname: String,
     var isEmailVerified: Boolean?,
     var credential: Credential,
     var credentialHash: String,
@@ -26,12 +26,18 @@ data class User(
     var lastLoginTimestamp: Long = System.currentTimeMillis(),
     var notificationCheckedAt: LocalDateTime = LocalDateTime.now(),
 ) {
-    fun getNicknameTag(): Int? {
-        return nickname
-            ?.split(NICKNAME_TAG_DELIMITER)
-            ?.last()
-            ?.toInt()
-    }
+    val nicknameTag: Int
+        get() {
+            return nickname
+                .substringAfterLast(NICKNAME_TAG_DELIMITER)
+                .toInt()
+        }
+
+    val nicknameWithoutTag: String
+        get() {
+            return nickname
+                .substringBeforeLast(NICKNAME_TAG_DELIMITER)
+        }
 
     companion object {
         const val NICKNAME_TAG_DELIMITER = "#"

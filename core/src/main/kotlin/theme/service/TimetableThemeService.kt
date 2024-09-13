@@ -14,9 +14,11 @@ import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
 import com.wafflestudio.snu4t.theme.data.ThemeOrigin
 import com.wafflestudio.snu4t.theme.data.ThemeStatus
 import com.wafflestudio.snu4t.theme.data.TimetableTheme
+import com.wafflestudio.snu4t.theme.dto.TimetableThemeDto
 import com.wafflestudio.snu4t.theme.repository.TimetableThemeRepository
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -71,6 +73,8 @@ interface TimetableThemeService {
     suspend fun searchThemes(keyword: String): List<TimetableTheme>
 
     suspend fun getNewColorIndexAndColor(timetable: Timetable): Pair<Int, ColorSet?>
+
+    suspend fun convertThemesToTimetableDtos(themes: List<TimetableTheme>): List<TimetableThemeDto>
 }
 
 @Service
@@ -78,6 +82,7 @@ class TimetableThemeServiceImpl(
     private val timetableThemeRepository: TimetableThemeRepository,
     private val timetableRepository: TimetableRepository,
     private val friendService: FriendService,
+    private val userService: UserService,
 ) : TimetableThemeService {
     companion object {
         private const val MAX_COLOR_COUNT = 9
@@ -336,6 +341,11 @@ class TimetableThemeServiceImpl(
             val minCount = colorToCount.minOf { it.value }
             0 to colorToCount.entries.filter { (_, count) -> count == minCount }.map { it.key }.random()
         }
+    }
+
+    override suspend fun convertThemesToTimetableDtos(themes: List<TimetableTheme>): List<TimetableThemeDto> {
+        val nicknameMap = userService.getUsers(themes.map { it.userId }).associate { it.id to it.nicknameWithoutTag }
+        return themes.mapNotNull { TimetableThemeDto(it, nicknameMap[it.userId]) }
     }
 }
 
