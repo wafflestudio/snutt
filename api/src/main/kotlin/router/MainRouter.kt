@@ -248,11 +248,16 @@ class MainRouter(
         v1CoRouter {
             "/themes".nest {
                 GET("", timetableThemeHandler::getThemes)
+                GET("/best", timetableThemeHandler::getBestThemes)
+                GET("/friends", timetableThemeHandler::getFriendsThemes)
                 POST("", timetableThemeHandler::addTheme)
                 PATCH("{themeId}", timetableThemeHandler::modifyTheme)
                 DELETE("{themeId}", timetableThemeHandler::deleteTheme)
                 POST("{themeId}/copy", timetableThemeHandler::copyTheme)
                 POST("{themeId}/default", timetableThemeHandler::setDefault)
+                POST("{themeId}/publish", timetableThemeHandler::publishTheme)
+                POST("{themeId}/download", timetableThemeHandler::downloadTheme)
+                POST("search", timetableThemeHandler::searchThemes)
                 POST("basic/{basicThemeTypeValue}/default", timetableThemeHandler::setBasicThemeTypeDefault)
                 DELETE("{themeId}/default", timetableThemeHandler::unsetDefault)
                 DELETE("basic/{basicThemeTypeValue}/default", timetableThemeHandler::unsetBasicThemeTypeDefault)
