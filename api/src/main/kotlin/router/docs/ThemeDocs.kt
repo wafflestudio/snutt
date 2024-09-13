@@ -208,7 +208,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = ThemesResponse::class)))],
+                        content = [Content(schema = Schema(implementation = ThemesResponse::class))],
                     ),
                 ],
             ),
