@@ -9,6 +9,7 @@ import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongSemesterException
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snu4t.theme.service.TimetableThemeService
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto

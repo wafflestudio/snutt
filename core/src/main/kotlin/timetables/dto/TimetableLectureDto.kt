@@ -5,7 +5,7 @@ import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeLegacyDto
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.timetables.data.ColorSet
+import com.wafflestudio.snu4t.theme.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 
 data class TimetableLectureDto(

@@ -47,6 +47,8 @@ import kotlin.random.Random
 interface UserService {
     suspend fun getUser(userId: String): User
 
+    suspend fun getUsers(userIds: List<String>): List<User>
+
     suspend fun patchUserInfo(
         userId: String,
         userPatchRequest: UserPatchRequest,
@@ -127,6 +129,10 @@ class UserServiceImpl(
 
     override suspend fun getUser(userId: String): User {
         return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+    }
+
+    override suspend fun getUsers(userIds: List<String>): List<User> {
+        return userRepository.findAllByIdInAndActiveTrue(userIds)
     }
 
     override suspend fun patchUserInfo(

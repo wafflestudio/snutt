@@ -10,7 +10,7 @@ class UserFixture {
         User(
             id = "59e206efdc67c31ad5fa0d35",
             email = "snutt@wafflestudio.com",
-            nickname = null,
+            nickname = "",
             isEmailVerified = false,
             credential = Credential(localId = "", localPw = ""),
             credentialHash = "test",

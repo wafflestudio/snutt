@@ -53,7 +53,7 @@ class UserNicknameService(
 
         val tagsWithSameNickname =
             userRepository.findAllByNicknameStartingWith(nickname)
-                .mapNotNull { it.getNicknameTag() }
+                .mapNotNull { it.nicknameTag }
                 .toSet()
         val newTag = createTag(tagsWithSameNickname)
 

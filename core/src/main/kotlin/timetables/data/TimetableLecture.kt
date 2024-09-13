@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snu4t.theme.data.ColorSet
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed

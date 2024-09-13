@@ -15,6 +15,9 @@ import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.dto.placeInfos
+import com.wafflestudio.snu4t.theme.service.TimetableThemeService
+import com.wafflestudio.snu4t.theme.service.toBasicThemeType
+import com.wafflestudio.snu4t.theme.service.toIdForTimetable
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.dto.TimetableLectureDto

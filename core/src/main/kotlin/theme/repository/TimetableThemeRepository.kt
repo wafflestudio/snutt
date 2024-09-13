@@ -1,6 +1,7 @@
-package com.wafflestudio.snu4t.timetables.repository
+package com.wafflestudio.snu4t.theme.repository
 
-import com.wafflestudio.snu4t.timetables.data.TimetableTheme
+import com.wafflestudio.snu4t.theme.data.ThemeStatus
+import com.wafflestudio.snu4t.theme.data.TimetableTheme
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, String>, TimetableThemeCustomRepository {
@@ -15,4 +16,9 @@ interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, Str
         userId: String,
         name: String,
     ): Boolean
+
+    suspend fun findByUserIdInAndStatus(
+        userIds: List<String>,
+        status: ThemeStatus,
+    ): List<TimetableTheme>
 }

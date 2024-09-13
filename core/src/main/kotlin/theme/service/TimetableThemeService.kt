@@ -1,22 +1,34 @@
-package com.wafflestudio.snu4t.timetables.service
+package com.wafflestudio.snu4t.theme.service
 
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
+import com.wafflestudio.snu4t.common.exception.AlreadyDownloadedThemeException
 import com.wafflestudio.snu4t.common.exception.DuplicateThemeNameException
 import com.wafflestudio.snu4t.common.exception.InvalidThemeColorCountException
 import com.wafflestudio.snu4t.common.exception.InvalidThemeTypeException
 import com.wafflestudio.snu4t.common.exception.NotDefaultThemeErrorException
 import com.wafflestudio.snu4t.common.exception.ThemeNotFoundException
-import com.wafflestudio.snu4t.timetables.data.ColorSet
+import com.wafflestudio.snu4t.friend.dto.FriendState
+import com.wafflestudio.snu4t.friend.service.FriendService
+import com.wafflestudio.snu4t.theme.data.ColorSet
+import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
+import com.wafflestudio.snu4t.theme.data.ThemeOrigin
+import com.wafflestudio.snu4t.theme.data.ThemeStatus
+import com.wafflestudio.snu4t.theme.data.TimetableTheme
+import com.wafflestudio.snu4t.theme.dto.TimetableThemeDto
+import com.wafflestudio.snu4t.theme.repository.TimetableThemeRepository
 import com.wafflestudio.snu4t.timetables.data.Timetable
-import com.wafflestudio.snu4t.timetables.data.TimetableTheme
 import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
-import com.wafflestudio.snu4t.timetables.repository.TimetableThemeRepository
+import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 interface TimetableThemeService {
     suspend fun getThemes(userId: String): List<TimetableTheme>
+
+    suspend fun getBestThemes(page: Int): List<TimetableTheme>
+
+    suspend fun getFriendsThemes(userId: String): List<TimetableTheme>
 
     suspend fun addTheme(
         userId: String,
@@ -29,6 +41,19 @@ interface TimetableThemeService {
         themeId: String,
         name: String?,
         colors: List<ColorSet>?,
+    ): TimetableTheme
+
+    suspend fun publishTheme(
+        userId: String,
+        themeId: String,
+        publishName: String,
+        authorAnonymous: Boolean,
+    )
+
+    suspend fun downloadTheme(
+        downloadedUserId: String,
+        themeId: String,
+        name: String,
     ): TimetableTheme
 
     suspend fun deleteTheme(
@@ -61,13 +86,19 @@ interface TimetableThemeService {
         basicThemeType: BasicThemeType? = null,
     ): TimetableTheme
 
+    suspend fun searchThemes(keyword: String): List<TimetableTheme>
+
     suspend fun getNewColorIndexAndColor(timetable: Timetable): Pair<Int, ColorSet?>
+
+    suspend fun convertThemesToTimetableDtos(themes: List<TimetableTheme>): List<TimetableThemeDto>
 }
 
 @Service
 class TimetableThemeServiceImpl(
     private val timetableThemeRepository: TimetableThemeRepository,
     private val timetableRepository: TimetableRepository,
+    private val friendService: FriendService,
+    private val userService: UserService,
 ) : TimetableThemeService {
     companion object {
         private const val MAX_COLOR_COUNT = 9
@@ -90,6 +121,15 @@ class TimetableThemeServiceImpl(
             }
 
         return basicThemes + customThemes
+    }
+
+    override suspend fun getBestThemes(page: Int): List<TimetableTheme> {
+        return timetableThemeRepository.findPublishedTimetablesOrderByDownloadsDesc(page)
+    }
+
+    override suspend fun getFriendsThemes(userId: String): List<TimetableTheme> {
+        val friendIds = friendService.getMyFriends(userId, state = FriendState.ACTIVE).map { it.second.id!! }
+        return timetableThemeRepository.findByUserIdInAndStatus(friendIds, ThemeStatus.PUBLISHED)
     }
 
     override suspend fun addTheme(
@@ -142,6 +182,52 @@ class TimetableThemeServiceImpl(
         }
         theme.updatedAt = LocalDateTime.now()
         return timetableThemeRepository.save(theme)
+    }
+
+    override suspend fun publishTheme(
+        userId: String,
+        themeId: String,
+        publishName: String,
+        authorAnonymous: Boolean,
+    ) {
+        val theme = getCustomTheme(userId, themeId)
+        theme.apply {
+            status = ThemeStatus.PUBLISHED
+            publishInfo =
+                ThemeMarketInfo(
+                    publishName = publishName,
+                    authorAnonymous = authorAnonymous,
+                    downloads = 0,
+                )
+        }
+        timetableThemeRepository.save(theme)
+    }
+
+    override suspend fun downloadTheme(
+        downloadedUserId: String,
+        themeId: String,
+        name: String,
+    ): TimetableTheme {
+        val theme = timetableThemeRepository.findById(themeId) ?: throw ThemeNotFoundException
+        if (theme.status != ThemeStatus.PUBLISHED) throw ThemeNotFoundException
+        if (timetableThemeRepository.existsByOriginId(themeId)) throw AlreadyDownloadedThemeException
+        val downloadedTheme =
+            theme.copy(
+                id = null,
+                name = name,
+                userId = downloadedUserId,
+                origin =
+                    ThemeOrigin(
+                        originId = theme.id!!,
+                        authorId = theme.userId,
+                    ),
+                status = ThemeStatus.DOWNLOADED,
+                publishInfo = null,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+            )
+        timetableThemeRepository.addDownloadCount(themeId)
+        return timetableThemeRepository.save(downloadedTheme)
     }
 
     override suspend fun deleteTheme(
@@ -254,13 +340,17 @@ class TimetableThemeServiceImpl(
         )
     }
 
+    override suspend fun searchThemes(keyword: String): List<TimetableTheme> {
+        return timetableThemeRepository.findPublishedTimetablesByPublishNameContaining(keyword)
+    }
+
     private suspend fun getCustomTheme(
         userId: String,
         themeId: String,
     ): TimetableTheme {
-        val theme = timetableThemeRepository.findByIdAndUserId(themeId, userId) ?: throw ThemeNotFoundException
-        if (!theme.isCustom) throw InvalidThemeTypeException
-        return theme
+        return timetableThemeRepository.findByIdAndUserId(themeId, userId)?.also {
+            if (!it.isCustom) throw InvalidThemeTypeException
+        } ?: throw ThemeNotFoundException
     }
 
     private fun buildTimetableTheme(
@@ -290,6 +380,11 @@ class TimetableThemeServiceImpl(
             val minCount = colorToCount.minOf { it.value }
             0 to colorToCount.entries.filter { (_, count) -> count == minCount }.map { it.key }.random()
         }
+    }
+
+    override suspend fun convertThemesToTimetableDtos(themes: List<TimetableTheme>): List<TimetableThemeDto> {
+        val nicknameMap = userService.getUsers(themes.map { it.userId }).associate { it.id to it.nicknameWithoutTag }
+        return themes.mapNotNull { TimetableThemeDto(it, nicknameMap[it.userId]) }
     }
 }
 

@@ -133,4 +133,6 @@ object InvalidThemeTypeException : Snu4tException(ErrorType.INVALID_THEME_TYPE)
 
 object DuplicatePopupKeyException : Snu4tException(ErrorType.DUPLICATE_POPUP_KEY)
 
+object AlreadyDownloadedThemeException : Snu4tException(ErrorType.ALREADY_DOWNLOADED_THEME)
+
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
