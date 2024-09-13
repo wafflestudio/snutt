@@ -10,7 +10,11 @@ interface PushWithNotificationService {
     /**
      * 한 명의 유저에게 푸시를 보내고 알림함에 보이게 합니다.
      */
-    suspend fun sendPushAndNotification(pushMessage: PushMessage, notificationType: NotificationType, userId: String)
+    suspend fun sendPushAndNotification(
+        pushMessage: PushMessage,
+        notificationType: NotificationType,
+        userId: String,
+    )
 
     /**
      * 복수 명의 유저에게 푸시를 보내고 알림함에 보이게 합니다.
@@ -18,13 +22,16 @@ interface PushWithNotificationService {
     suspend fun sendPushesAndNotifications(
         pushMessage: PushMessage,
         notificationType: NotificationType,
-        userIds: List<String>
+        userIds: List<String>,
     )
 
     /**
      * 모든 유저에게 푸시를 보내고 해당 내용이 알림함에 보이게 합니다.
      */
-    suspend fun sendGlobalPushAndNotification(pushMessage: PushMessage, notificationType: NotificationType)
+    suspend fun sendGlobalPushAndNotification(
+        pushMessage: PushMessage,
+        notificationType: NotificationType,
+    )
 }
 
 @Service
@@ -36,33 +43,37 @@ class PushWithNotificationServiceImpl internal constructor(
         pushMessage: PushMessage,
         notificationType: NotificationType,
         userId: String,
-    ): Unit = coroutineScope {
-        launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId)) }
-        launch { pushService.sendPush(pushMessage, userId) }
-    }
+    ): Unit =
+        coroutineScope {
+            launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId)) }
+            launch { pushService.sendPush(pushMessage, userId) }
+        }
 
     override suspend fun sendPushesAndNotifications(
         pushMessage: PushMessage,
         notificationType: NotificationType,
         userIds: List<String>,
-    ): Unit = coroutineScope {
-        launch {
-            notificationService.sendNotifications(
-                userIds.map {
-                    pushMessage.toNotification(
-                        notificationType, it
-                    )
-                }
-            )
+    ): Unit =
+        coroutineScope {
+            launch {
+                notificationService.sendNotifications(
+                    userIds.map {
+                        pushMessage.toNotification(
+                            notificationType,
+                            it,
+                        )
+                    },
+                )
+            }
+            launch { pushService.sendPushes(pushMessage, userIds) }
         }
-        launch { pushService.sendPushes(pushMessage, userIds) }
-    }
 
     override suspend fun sendGlobalPushAndNotification(
         pushMessage: PushMessage,
         notificationType: NotificationType,
-    ): Unit = coroutineScope {
-        launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId = null)) }
-        launch { pushService.sendGlobalPush(pushMessage) }
-    }
+    ): Unit =
+        coroutineScope {
+            launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId = null)) }
+            launch { pushService.sendGlobalPush(pushMessage) }
+        }
 }

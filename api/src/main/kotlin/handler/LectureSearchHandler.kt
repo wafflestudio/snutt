@@ -18,12 +18,13 @@ class LectureSearchHandler(
     private val lectureService: LectureService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiNoAuthMiddleware
-) {
-    suspend fun searchLectures(req: ServerRequest): ServerResponse = handle(req) {
-        val query: SearchQueryLegacy = req.awaitBody()
-        lectureService.search(query.toSearchDto()).toList().let { lectureService.convertLecturesToLectureDtos(it) }
-    }
+        handlerMiddleware = snuttRestApiNoAuthMiddleware,
+    ) {
+    suspend fun searchLectures(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val query: SearchQueryLegacy = req.awaitBody()
+            lectureService.search(query.toSearchDto()).toList().let { lectureService.convertLecturesToLectureDtos(it) }
+        }
 }
 
 data class SearchQueryLegacy(
@@ -65,7 +66,7 @@ data class SearchQueryLegacy(
             page = page,
             offset = offset,
             limit = limit,
-            sortBy = sortCriteria
+            sortBy = sortCriteria,
         )
     }
 
@@ -80,11 +81,12 @@ data class SearchQueryLegacy(
             mask.toTimeMask().zip((mask shr 1).toTimeMask())
                 .foldIndexed(emptyList()) { index, acc, (bit, bitBefore) ->
                     if (bit && !bitBefore) {
-                        acc + SearchTimeDto(
-                            day = DayOfWeek.getOfValue(dayValue)!!,
-                            startMinute = index * 30 + 8 * 60,
-                            endMinute = index * 30 + 8 * 60 + 30
-                        )
+                        acc +
+                            SearchTimeDto(
+                                day = DayOfWeek.getOfValue(dayValue)!!,
+                                startMinute = index * 30 + 8 * 60,
+                                endMinute = index * 30 + 8 * 60 + 30,
+                            )
                     } else if (bit && bitBefore) {
                         val updated = acc.last().copy(endMinute = index * 30 + 8 * 60 + 30)
                         acc.dropLast(1) + updated

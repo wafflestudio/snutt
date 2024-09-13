@@ -8,7 +8,13 @@ interface UserDeviceRepository : CoroutineCrudRepository<UserDevice, String> {
 
     suspend fun findByUserIdInAndIsDeletedFalse(userIds: List<String>): List<UserDevice>
 
-    suspend fun findByUserIdAndDeviceIdAndIsDeletedFalse(userId: String, deviceId: String): UserDevice?
+    suspend fun findByUserIdAndDeviceIdAndIsDeletedFalse(
+        userId: String,
+        deviceId: String,
+    ): UserDevice?
 
-    suspend fun findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId: String, registrationId: String): UserDevice?
+    suspend fun findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(
+        userId: String,
+        registrationId: String,
+    ): UserDevice?
 }

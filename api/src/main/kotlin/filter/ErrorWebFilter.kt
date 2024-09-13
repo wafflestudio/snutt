@@ -20,7 +20,10 @@ class ErrorWebFilter(
 ) : WebFilter {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+    override fun filter(
+        exchange: ServerWebExchange,
+        chain: WebFilterChain,
+    ): Mono<Void> {
         return chain.filter(exchange)
             .onErrorResume { throwable ->
                 val errorBody: ErrorBody
@@ -32,9 +35,10 @@ class ErrorWebFilter(
                     }
                     is ResponseStatusException -> {
                         httpStatusCode = throwable.statusCode
-                        errorBody = makeErrorBody(
-                            Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage)
-                        )
+                        errorBody =
+                            makeErrorBody(
+                                Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
+                            )
                     }
                     else -> {
                         log.error(throwable.message, throwable)
@@ -49,15 +53,13 @@ class ErrorWebFilter(
                     Mono.just(
                         exchange.response
                             .bufferFactory()
-                            .wrap(objectMapper.writeValueAsBytes(errorBody))
-                    )
+                            .wrap(objectMapper.writeValueAsBytes(errorBody)),
+                    ),
                 )
             }
     }
 
-    private fun makeErrorBody(
-        exception: Snu4tException,
-    ): ErrorBody {
+    private fun makeErrorBody(exception: Snu4tException): ErrorBody {
         return ErrorBody(exception.error.errorCode, exception.errorMessage, exception.displayMessage, exception.detail, exception.ext)
     }
 }

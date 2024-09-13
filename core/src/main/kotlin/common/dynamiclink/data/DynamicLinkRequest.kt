@@ -40,9 +40,10 @@ data class NavigationInfo(
 )
 
 data class Suffix(
-    val option: SuffixOption = SuffixOption.SHORT
+    val option: SuffixOption = SuffixOption.SHORT,
 )
 
 enum class SuffixOption {
-    SHORT, UNGUESSABLE
+    SHORT,
+    UNGUESSABLE,
 }

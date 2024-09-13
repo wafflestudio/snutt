@@ -15,35 +15,39 @@ class VacancyNotifcationHandler(
     private val lectureService: LectureService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiDefaultMiddleware
-) {
-    suspend fun getVacancyNotificationLectures(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
+        handlerMiddleware = snuttRestApiDefaultMiddleware,
+    ) {
+    suspend fun getVacancyNotificationLectures(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
 
-        vacancyNotificationService.getVacancyNotificationLectures(userId)
-            .let { lectureService.convertLecturesToLectureDtos(it) }
-            .let { VacancyNotificationLecturesResponse(it) }
-    }
+            vacancyNotificationService.getVacancyNotificationLectures(userId)
+                .let { lectureService.convertLecturesToLectureDtos(it) }
+                .let { VacancyNotificationLecturesResponse(it) }
+        }
 
-    suspend fun existsVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val lectureId = req.pathVariable("lectureId")
-        ExistenceResponse(vacancyNotificationService.existsVacancyNotification(userId, lectureId))
-    }
+    suspend fun existsVacancyNotification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val lectureId = req.pathVariable("lectureId")
+            ExistenceResponse(vacancyNotificationService.existsVacancyNotification(userId, lectureId))
+        }
 
-    suspend fun addVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val lectureId = req.pathVariable("lectureId")
+    suspend fun addVacancyNotification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val lectureId = req.pathVariable("lectureId")
 
-        vacancyNotificationService.addVacancyNotification(userId, lectureId)
-        null
-    }
+            vacancyNotificationService.addVacancyNotification(userId, lectureId)
+            null
+        }
 
-    suspend fun deleteVacancyNotification(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val lectureId = req.pathVariable("lectureId")
+    suspend fun deleteVacancyNotification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val lectureId = req.pathVariable("lectureId")
 
-        vacancyNotificationService.deleteVacancyNotification(userId, lectureId)
-        null
-    }
+            vacancyNotificationService.deleteVacancyNotification(userId, lectureId)
+            null
+        }
 }

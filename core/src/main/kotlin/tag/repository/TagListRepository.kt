@@ -7,5 +7,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TagListRepository : CoroutineCrudRepository<TagList, String> {
-    suspend fun findByYearAndSemester(year: Int, semester: Semester): TagList?
+    suspend fun findByYearAndSemester(
+        year: Int,
+        semester: Semester,
+    ): TagList?
 }

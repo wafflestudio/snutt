@@ -15,22 +15,25 @@ class FriendTableHandler(
     private val timetableService: TimetableService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
+    suspend fun getPrimaryTable(req: ServerRequest) =
+        handle(req) {
+            val friend =
+                friendService.get(req.pathVariable("friendId"))
+                    ?.takeIf { it.isAccepted && it.includes(req.userId) }
+                    ?: throw FriendNotFoundException
 
-    suspend fun getPrimaryTable(req: ServerRequest) = handle(req) {
-        val friend = friendService.get(req.pathVariable("friendId"))
-            ?.takeIf { it.isAccepted && it.includes(req.userId) }
-            ?: throw FriendNotFoundException
+            val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
+            val year = req.parseRequiredQueryParam<Int>("year")
+            timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester).let(::TimetableDto)
+        }
 
-        val semester = req.parseRequiredQueryParam("semester") { Semester.getOfValue(it.toInt()) }
-        val year = req.parseRequiredQueryParam<Int>("year")
-        timetableService.getUserPrimaryTable(friend.getPartnerUserId(req.userId), year, semester).let(::TimetableDto)
-    }
+    suspend fun getCoursebooks(req: ServerRequest) =
+        handle(req) {
+            val friend =
+                friendService.get(req.pathVariable("friendId"))
+                    ?.takeIf { it.isAccepted && it.includes(req.userId) }
+                    ?: throw FriendNotFoundException
 
-    suspend fun getCoursebooks(req: ServerRequest) = handle(req) {
-        val friend = friendService.get(req.pathVariable("friendId"))
-            ?.takeIf { it.isAccepted && it.includes(req.userId) }
-            ?: throw FriendNotFoundException
-
-        timetableService.getCoursebooksWithPrimaryTable(friend.getPartnerUserId(req.userId))
-    }
+            timetableService.getCoursebooksWithPrimaryTable(friend.getPartnerUserId(req.userId))
+        }
 }

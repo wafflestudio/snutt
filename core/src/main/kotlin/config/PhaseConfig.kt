@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PhaseUtils(
-    private val environment: Environment
+    private val environment: Environment,
 ) {
     companion object {
         private lateinit var env: Environment
@@ -33,7 +33,7 @@ enum class Phase {
     DEV,
     PROD,
     LOCAL,
-    TEST
+    TEST,
     ;
 
     val isProd: Boolean

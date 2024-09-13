@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/configs", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getConfigs",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = Map::class))])]
-        ),
+        path = "/v1/configs",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getConfigs",
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = Map::class))])],
+            ),
     ),
 )
 annotation class ConfigDocs

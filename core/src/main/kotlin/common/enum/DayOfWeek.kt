@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 enum class DayOfWeek(
     @JsonValue
     val value: Int,
-    val korText: String
+    val korText: String,
 ) {
     MONDAY(0, "월"),
     TUESDAY(1, "화"),
@@ -17,14 +17,17 @@ enum class DayOfWeek(
     THURSDAY(3, "목"),
     FRIDAY(4, "금"),
     SATURDAY(5, "토"),
-    SUNDAY(6, "일");
+    SUNDAY(6, "일"),
+    ;
 
     companion object {
-        private val valueMap = DayOfWeek.values().associateBy { e -> e.value }
-        private val koreanTextMap = DayOfWeek.values().associateBy { e -> e.korText }
+        private val valueMap = DayOfWeek.entries.associateBy { e -> e.value }
+        private val koreanTextMap = DayOfWeek.entries.associateBy { e -> e.korText }
 
         fun getOfValue(dayOfWeek: Int): DayOfWeek? = valueMap[dayOfWeek]
+
         fun getOfValue(dayOfWeek: Double): DayOfWeek? = valueMap[dayOfWeek.toInt()]
+
         fun getByKoreanText(koreanText: String): DayOfWeek? = koreanTextMap[koreanText]
     }
 }

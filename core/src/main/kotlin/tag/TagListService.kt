@@ -7,13 +7,18 @@ import com.wafflestudio.snu4t.tag.repository.TagListRepository
 import org.springframework.stereotype.Service
 
 interface TagListService {
-    suspend fun getTagList(year: Int, semester: Semester): TagList
+    suspend fun getTagList(
+        year: Int,
+        semester: Semester,
+    ): TagList
 }
 
 @Service
 class TagServiceImpl(
-    private val tagListRepository: TagListRepository
+    private val tagListRepository: TagListRepository,
 ) : TagListService {
-    override suspend fun getTagList(year: Int, semester: Semester): TagList =
-        tagListRepository.findByYearAndSemester(year, semester) ?: throw TagListNotFoundException
+    override suspend fun getTagList(
+        year: Int,
+        semester: Semester,
+    ): TagList = tagListRepository.findByYearAndSemester(year, semester) ?: throw TagListNotFoundException
 }

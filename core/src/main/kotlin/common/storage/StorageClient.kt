@@ -57,7 +57,10 @@ class StorageClient {
         return generateGetSignedUri(bucketName, key)
     }
 
-    private fun generateGetSignedUri(bucketName: String, key: String): String {
+    private fun generateGetSignedUri(
+        bucketName: String,
+        key: String,
+    ): String {
         val request =
             GetObjectRequest.builder()
                 .bucket(bucketName)

@@ -6,5 +6,5 @@ import kotlin.reflect.KProperty1
 class UpdatedLecture(
     val oldData: Lecture,
     val newData: Lecture,
-    val updatedField: List<KProperty1<Lecture, *>>
+    val updatedField: List<KProperty1<Lecture, *>>,
 )

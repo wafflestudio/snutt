@@ -19,12 +19,16 @@ data class TimetableDto(
     var updatedAt: Instant = Instant.now(),
 )
 
-fun TimetableDto(timetable: Timetable) = TimetableDto(
-    timetable = timetable,
-    lectures = timetable.lectures.map { TimetableLectureDto(it) },
-)
+fun TimetableDto(timetable: Timetable) =
+    TimetableDto(
+        timetable = timetable,
+        lectures = timetable.lectures.map { TimetableLectureDto(it) },
+    )
 
-fun TimetableDto(timetable: Timetable, lectures: List<TimetableLectureDto>) = TimetableDto(
+fun TimetableDto(
+    timetable: Timetable,
+    lectures: List<TimetableLectureDto>,
+) = TimetableDto(
     id = timetable.id,
     userId = timetable.userId,
     year = timetable.year,
@@ -54,12 +58,16 @@ data class TimetableLegacyDto(
     var updatedAt: Instant = Instant.now(),
 )
 
-fun TimetableLegacyDto(timetable: Timetable) = TimetableLegacyDto(
-    timetable = timetable,
-    lectures = timetable.lectures.map { TimetableLectureLegacyDto(it) },
-)
+fun TimetableLegacyDto(timetable: Timetable) =
+    TimetableLegacyDto(
+        timetable = timetable,
+        lectures = timetable.lectures.map { TimetableLectureLegacyDto(it) },
+    )
 
-fun TimetableLegacyDto(timetable: Timetable, lectures: List<TimetableLectureLegacyDto>) = TimetableLegacyDto(
+fun TimetableLegacyDto(
+    timetable: Timetable,
+    lectures: List<TimetableLectureLegacyDto>,
+) = TimetableLegacyDto(
     id = timetable.id,
     userId = timetable.userId,
     year = timetable.year,

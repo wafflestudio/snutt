@@ -27,27 +27,30 @@ data class BookmarkLectureDto(
     @JsonProperty("course_title")
     var courseTitle: String,
     val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
-
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
     val classTimeMask: List<Int> = emptyList(),
 )
 
-fun BookmarkLectureDto(lecture: BookmarkLecture, snuttEvLecture: SnuttEvLectureSummaryDto? = null): BookmarkLectureDto = BookmarkLectureDto(
-    id = lecture.id,
-    academicYear = lecture.academicYear,
-    category = lecture.category,
-    classTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
-    classification = lecture.classification,
-    credit = lecture.credit,
-    department = lecture.department,
-    instructor = lecture.instructor,
-    quota = lecture.quota,
-    freshmanQuota = lecture.freshmanQuota,
-    remark = lecture.remark,
-    lectureNumber = lecture.lectureNumber,
-    courseNumber = lecture.courseNumber,
-    courseTitle = lecture.courseTitle,
-    snuttEvLecture = snuttEvLecture,
-    classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
-)
+fun BookmarkLectureDto(
+    lecture: BookmarkLecture,
+    snuttEvLecture: SnuttEvLectureSummaryDto? = null,
+): BookmarkLectureDto =
+    BookmarkLectureDto(
+        id = lecture.id,
+        academicYear = lecture.academicYear,
+        category = lecture.category,
+        classTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
+        classification = lecture.classification,
+        credit = lecture.credit,
+        department = lecture.department,
+        instructor = lecture.instructor,
+        quota = lecture.quota,
+        freshmanQuota = lecture.freshmanQuota,
+        remark = lecture.remark,
+        lectureNumber = lecture.lectureNumber,
+        courseNumber = lecture.courseNumber,
+        courseTitle = lecture.courseTitle,
+        snuttEvLecture = snuttEvLecture,
+        classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
+    )

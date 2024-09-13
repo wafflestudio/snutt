@@ -19,32 +19,45 @@ import org.springframework.data.mongodb.core.query.and
 import org.springframework.data.mongodb.core.update
 
 interface BookmarkCustomRepository {
-    fun findAllContainsLectureId(year: Int, semester: Semester, lectureId: String): Flow<Bookmark>
+    fun findAllContainsLectureId(
+        year: Int,
+        semester: Semester,
+        lectureId: String,
+    ): Flow<Bookmark>
+
     suspend fun findAndAddLectureByUserIdAndYearAndSemester(
         userId: String,
         year: Int,
         semester: Semester,
-        lecture: BookmarkLecture
+        lecture: BookmarkLecture,
     ): Bookmark
 
     suspend fun findAndDeleteLectureByUserIdAndYearAndSemesterAndLectureId(
         userId: String,
         year: Int,
         semester: Semester,
-        lectureId: String
+        lectureId: String,
     ): Bookmark
-    suspend fun pullLecture(timeTableId: String, lectureId: String)
+
+    suspend fun pullLecture(
+        timeTableId: String,
+        lectureId: String,
+    )
 }
 
 class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMongoTemplate) :
     BookmarkCustomRepository {
-    override fun findAllContainsLectureId(year: Int, semester: Semester, lectureId: String): Flow<Bookmark> {
+    override fun findAllContainsLectureId(
+        year: Int,
+        semester: Semester,
+        lectureId: String,
+    ): Flow<Bookmark> {
         return reactiveMongoTemplate.find<Bookmark>(
             Query.query(
                 Bookmark::year isEqualTo year and
                     Bookmark::semester isEqualTo semester and
-                    Bookmark::lectures elemMatch (BookmarkLecture::id isEqualTo lectureId)
-            )
+                    Bookmark::lectures elemMatch (BookmarkLecture::id isEqualTo lectureId),
+            ),
         ).asFlow()
     }
 
@@ -52,12 +65,12 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         userId: String,
         year: Int,
         semester: Semester,
-        lecture: BookmarkLecture
+        lecture: BookmarkLecture,
     ): Bookmark =
         reactiveMongoTemplate.update<Bookmark>().matching(
             Bookmark::userId isEqualTo userId and
                 Bookmark::year isEqualTo year and
-                Bookmark::semester isEqualTo semester
+                Bookmark::semester isEqualTo semester,
         ).apply(
             Update().addToSet(Bookmark::lectures.toDotPath(), lecture),
         ).withOptions(
@@ -68,19 +81,22 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         userId: String,
         year: Int,
         semester: Semester,
-        lectureId: String
+        lectureId: String,
     ): Bookmark =
         reactiveMongoTemplate.update<Bookmark>().matching(
             Bookmark::userId isEqualTo userId and
                 Bookmark::year isEqualTo year and
-                Bookmark::semester isEqualTo semester
+                Bookmark::semester isEqualTo semester,
         ).apply(
             Update().pull(Bookmark::lectures.toDotPath(), Query.query(Lecture::id isEqualTo lectureId)),
         ).findModifyAndAwait()
 
-    override suspend fun pullLecture(timeTableId: String, lectureId: String) {
+    override suspend fun pullLecture(
+        timeTableId: String,
+        lectureId: String,
+    ) {
         reactiveMongoTemplate.update<Bookmark>().matching(
-            Bookmark::id isEqualTo timeTableId
+            Bookmark::id isEqualTo timeTableId,
         ).apply(
             Update().pull(Bookmark::lectures.toDotPath(), Query.query(BookmarkLecture::id isEqualTo lectureId)),
         ).findModifyAndAwait()

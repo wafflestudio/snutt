@@ -9,7 +9,10 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByIdInAndActiveTrue(ids: List<String>): List<User>
 
-    suspend fun findByCredentialHashAndActive(credentialHash: String, active: Boolean): User?
+    suspend fun findByCredentialHashAndActive(
+        credentialHash: String,
+        active: Boolean,
+    ): User?
 
     suspend fun existsByCredentialLocalIdAndActiveTrue(localId: String): Boolean
 
@@ -28,6 +31,7 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
     suspend fun findByEmailAndActiveTrue(email: String): User?
 
     suspend fun existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): Boolean
+
     suspend fun findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
     fun findAllByNicknameStartingWith(nickname: String): Flow<User>

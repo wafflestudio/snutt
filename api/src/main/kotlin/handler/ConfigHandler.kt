@@ -13,11 +13,12 @@ class ConfigHandler(
     private val objectMapper: ObjectMapper,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(snuttRestApiNoAuthMiddleware) {
-    suspend fun getConfigs(req: ServerRequest) = handle<Map<String, JsonNode>>(req) {
-        val clientInfo = req.clientInfo!!
+    suspend fun getConfigs(req: ServerRequest) =
+        handle<Map<String, JsonNode>>(req) {
+            val clientInfo = req.clientInfo!!
 
-        configService.getConfigs(clientInfo).associate {
-            it.name to objectMapper.readTree(it.value)
+            configService.getConfigs(clientInfo).associate {
+                it.name to objectMapper.readTree(it.value)
+            }
         }
-    }
 }

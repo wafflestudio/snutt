@@ -13,7 +13,10 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
 
 interface FriendCustomRepository {
-    suspend fun findAllFriends(userId: String, state: FriendState): List<Friend>
+    suspend fun findAllFriends(
+        userId: String,
+        state: FriendState,
+    ): List<Friend>
 
     suspend fun findByUserPair(userIds: Pair<String, String>): Friend?
 }
@@ -21,7 +24,10 @@ interface FriendCustomRepository {
 class FriendCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : FriendCustomRepository {
-    override suspend fun findAllFriends(userId: String, state: FriendState): List<Friend> {
+    override suspend fun findAllFriends(
+        userId: String,
+        state: FriendState,
+    ): List<Friend> {
         return reactiveMongoTemplate.find<Friend>(
             Query.query(
                 when (state) {
@@ -46,8 +52,8 @@ class FriendCustomRepositoryImpl(
                             Friend::isAccepted isEqualTo false,
                         )
                     }
-                }
-            ).with(Friend::createdAt.desc())
+                },
+            ).with(Friend::createdAt.desc()),
         ).asFlow().toList()
     }
 
@@ -63,8 +69,8 @@ class FriendCustomRepositoryImpl(
                         Friend::fromUserId isEqualTo userIds.second,
                         Friend::toUserId isEqualTo userIds.first,
                     ),
-                )
-            )
+                ),
+            ),
         ).awaitFirstOrNull()
     }
 }

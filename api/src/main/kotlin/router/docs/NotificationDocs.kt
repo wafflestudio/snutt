@@ -16,23 +16,39 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/notification", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getNotification",
-            parameters = [
-                Parameter(`in` = ParameterIn.QUERY, name = "offset", required = false),
-                Parameter(`in` = ParameterIn.QUERY, name = "limit", required = false),
-                Parameter(`in` = ParameterIn.QUERY, name = "explicit", required = false),
-            ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = NotificationResponse::class)))])]
-        ),
+        path = "/v1/notification",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getNotification",
+                parameters = [
+                    Parameter(`in` = ParameterIn.QUERY, name = "offset", required = false),
+                    Parameter(`in` = ParameterIn.QUERY, name = "limit", required = false),
+                    Parameter(`in` = ParameterIn.QUERY, name = "explicit", required = false),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = NotificationResponse::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
-        path = "/v1/notification/count", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getUnreadCounts",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = NotificationCountResponse::class))])]
-        ),
-    )
+        path = "/v1/notification/count",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getUnreadCounts",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = NotificationCountResponse::class))],
+                    ),
+                ],
+            ),
+    ),
 )
 annotation class NotificationDocs

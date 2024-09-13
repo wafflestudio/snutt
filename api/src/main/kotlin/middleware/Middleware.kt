@@ -4,7 +4,10 @@ import com.wafflestudio.snu4t.handler.RequestContext
 import org.springframework.web.reactive.function.server.ServerRequest
 
 fun interface Middleware {
-    suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext
+    suspend fun invoke(
+        req: ServerRequest,
+        context: RequestContext,
+    ): RequestContext
 
     companion object {
         val NoOp = Middleware { _, context -> context }

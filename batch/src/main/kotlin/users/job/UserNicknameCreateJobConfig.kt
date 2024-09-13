@@ -29,7 +29,7 @@ import kotlin.time.measureTimedValue
 @Configuration
 class UserNicknameCreateJobConfig(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
-    private val userNicknameService: UserNicknameService
+    private val userNicknameService: UserNicknameService,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -39,7 +39,10 @@ class UserNicknameCreateJobConfig(
     }
 
     @Bean
-    fun userNicknameCreateJob(jobRepository: JobRepository, userNicknameCreateStep: Step): Job {
+    fun userNicknameCreateJob(
+        jobRepository: JobRepository,
+        userNicknameCreateStep: Step,
+    ): Job {
         return JobBuilder(JOB_NAME, jobRepository)
             .start(userNicknameCreateStep)
             .build()
@@ -50,35 +53,37 @@ class UserNicknameCreateJobConfig(
     fun userNicknameCreateStep(
         jobRepository: JobRepository,
         transactionManager: PlatformTransactionManager,
-    ): Step = StepBuilder(STEP_NAME, jobRepository).tasklet(
-        { _, _ ->
-            val (updateCount, elapsedTime) = measureTimedValue { updateUserNickname() }
-            log.info("닉네임 생성 작업이 완료되었습니다. 총 ${updateCount}명 유저의 닉네임을 생성했습니다. (소요시간: ${elapsedTime.inWholeSeconds}초)")
-            RepeatStatus.FINISHED
-        },
-        transactionManager
-    ).build()
+    ): Step =
+        StepBuilder(STEP_NAME, jobRepository).tasklet(
+            { _, _ ->
+                val (updateCount, elapsedTime) = measureTimedValue { updateUserNickname() }
+                log.info("닉네임 생성 작업이 완료되었습니다. 총 ${updateCount}명 유저의 닉네임을 생성했습니다. (소요시간: ${elapsedTime.inWholeSeconds}초)")
+                RepeatStatus.FINISHED
+            },
+            transactionManager,
+        ).build()
 
-    private fun updateUserNickname(): Int = runBlocking {
-        val updateCount = AtomicInteger()
-        val channel = Channel<User>(capacity = 100)
+    private fun updateUserNickname(): Int =
+        runBlocking {
+            val updateCount = AtomicInteger()
+            val channel = Channel<User>(capacity = 100)
 
-        repeat(100) {
-            launch {
-                for (user in channel) {
-                    tryToUpdateNickname(user)
-                    updateCount.incrementAndGet()
+            repeat(100) {
+                launch {
+                    for (user in channel) {
+                        tryToUpdateNickname(user)
+                        updateCount.incrementAndGet()
+                    }
                 }
             }
+
+            reactiveMongoTemplate.find<User>(Query.query(User::nickname isEqualTo null))
+                .asFlow()
+                .collect { channel.send(it) }
+
+            channel.close()
+            updateCount.get()
         }
-
-        reactiveMongoTemplate.find<User>(Query.query(User::nickname isEqualTo null))
-            .asFlow()
-            .collect { channel.send(it) }
-
-        channel.close()
-        updateCount.get()
-    }
 
     private suspend fun tryToUpdateNickname(user: User) {
         val nickname = userNicknameService.generateRandomNickname()

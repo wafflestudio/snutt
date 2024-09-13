@@ -47,7 +47,10 @@ data class Friend(
         }
     }
 
-    fun updatePartnerDisplayName(userId: String, displayName: String) {
+    fun updatePartnerDisplayName(
+        userId: String,
+        displayName: String,
+    ) {
         check(this.includes(userId))
         when (userId) {
             fromUserId -> toUserDisplayName = displayName

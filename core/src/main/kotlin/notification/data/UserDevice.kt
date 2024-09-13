@@ -41,7 +41,10 @@ data class UserDevice(
     var isDeleted: Boolean = false,
 ) {
     companion object {
-        fun of(userId: String, fcmGroupKey: String): UserDevice =
+        fun of(
+            userId: String,
+            fcmGroupKey: String,
+        ): UserDevice =
             UserDevice(
                 userId = userId,
                 osType = OsType.UNKNOWN,

@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.springframework.boot") version "3.1.1" apply false
+    id("org.springframework.boot") version "3.3.3" apply false
     id("io.spring.dependency-management") version "1.1.0"
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
-    kotlin("jvm") version "1.7.21"
-    kotlin("plugin.spring") version "1.7.21"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.spring") version "2.0.20"
 }
 
 group = "com.wafflestudio"
@@ -32,7 +32,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.1.1")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.3")
         }
     }
 
@@ -77,19 +77,21 @@ subprojects {
 
 fun RepositoryHandler.mavenCodeArtifact() {
     maven {
-        val authToken = properties["codeArtifactAuthToken"] as String? ?: ByteArrayOutputStream().use {
-            runCatching {
-                exec {
-                    commandLine = (
-                        "aws codeartifact get-authorization-token " +
-                            "--domain wafflestudio --domain-owner 405906814034 " +
-                            "--query authorizationToken --region ap-northeast-1 --output text"
-                        ).split(" ")
-                    standardOutput = it
+        val authToken =
+            properties["codeArtifactAuthToken"] as String? ?: ByteArrayOutputStream().use {
+                runCatching {
+                    exec {
+                        commandLine =
+                            listOf(
+                                "aws", "codeartifact", "get-authorization-token",
+                                "--domain", "wafflestudio", "--domain-owner", "405906814034",
+                                "--query", "authorizationToken", "--region", "ap-northeast-1", "--output", "text",
+                            )
+                        standardOutput = it
+                    }
                 }
+                it.toString()
             }
-            it.toString()
-        }
         url = uri("https://wafflestudio-405906814034.d.codeartifact.ap-northeast-1.amazonaws.com/maven/truffle-kotlin/")
         credentials {
             username = "aws"

@@ -13,21 +13,30 @@ import org.springframework.data.mongodb.core.query.inValues
 import java.time.LocalDateTime
 
 interface NotificationCustomRepository {
-    fun findNotifications(userId: String, createdAt: LocalDateTime, offset: Long, limit: Int): Flow<Notification>
+    fun findNotifications(
+        userId: String,
+        createdAt: LocalDateTime,
+        offset: Long,
+        limit: Int,
+    ): Flow<Notification>
 }
 
 class NotificationRepositoryImpl(private val reactiveMongoTemplate: ReactiveMongoTemplate) : NotificationCustomRepository {
-    override fun findNotifications(userId: String, createdAt: LocalDateTime, offset: Long, limit: Int) =
-        reactiveMongoTemplate.find<Notification>(
-            Query.query(
-                Criteria().andOperator(
-                    Notification::createdAt gt createdAt,
-                    Notification::userId inValues listOf(userId, null),
-                )
-            ).apply {
-                with(Notification::createdAt.desc())
-                skip(offset)
-                limit(limit)
-            }
-        ).asFlow()
+    override fun findNotifications(
+        userId: String,
+        createdAt: LocalDateTime,
+        offset: Long,
+        limit: Int,
+    ) = reactiveMongoTemplate.find<Notification>(
+        Query.query(
+            Criteria().andOperator(
+                Notification::createdAt gt createdAt,
+                Notification::userId inValues listOf(userId, null),
+            ),
+        ).apply {
+            with(Notification::createdAt.desc())
+            skip(offset)
+            limit(limit)
+        },
+    ).asFlow()
 }

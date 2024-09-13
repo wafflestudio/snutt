@@ -28,13 +28,15 @@ internal class FcmPushClient(
     private object PayloadKeys {
         const val URL_SCHEME = "url_scheme"
     }
+
     private val log = LoggerFactory.getLogger(javaClass)
 
     init {
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
-            .setDatabaseUrl("https://$projectId.firebaseio.com/")
-            .build()
+        val options =
+            FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
+                .setDatabaseUrl("https://$projectId.firebaseio.com/")
+                .build()
 
         FirebaseApp.initializeApp(options)
     }
@@ -50,29 +52,31 @@ internal class FcmPushClient(
         log.info("Message Request Sent : $message, response : $response")
     }
 
-    override suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>): Unit = coroutineScope {
-        val messagingInstance = FirebaseMessaging.getInstance()
-        val responses = pushMessages
-            .chunked(FCM_MESSAGE_COUNT_LIMIT)
-            .map { chunk ->
-                val messages = chunk.map { it.toFcmMessage() }
-                async {
-                    runCatching {
-                        messagingInstance.sendEachAsync(messages).await()
-                    }.getOrElse {
-                        log.error("푸시전송 실패", it)
-                        null
+    override suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>): Unit =
+        coroutineScope {
+            val messagingInstance = FirebaseMessaging.getInstance()
+            val responses =
+                pushMessages
+                    .chunked(FCM_MESSAGE_COUNT_LIMIT)
+                    .map { chunk ->
+                        val messages = chunk.map { it.toFcmMessage() }
+                        async {
+                            runCatching {
+                                messagingInstance.sendEachAsync(messages).await()
+                            }.getOrElse {
+                                log.error("푸시전송 실패", it)
+                                null
+                            }
+                        }
                     }
-                }
-            }
-            .awaitAll()
-            .filterNotNull()
-            .flatMap { it.responses }
+                    .awaitAll()
+                    .filterNotNull()
+                    .flatMap { it.responses }
 
-        pushMessages
-            .zip(responses)
-            .map { (message, response) -> log.info("Message Request Sent: $message, response : $response") }
-    }
+            pushMessages
+                .zip(responses)
+                .map { (message, response) -> log.info("Message Request Sent: $message, response : $response") }
+        }
 
     override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
         sendTopicMessage(TargetedPushMessageWithTopic(GLOBAL_TOPIC, pushMessage))
@@ -95,10 +99,11 @@ internal class FcmPushClient(
     }
 
     private fun TargetedPushMessage.toFcmMessage(): Message {
-        val notification = Notification.builder()
-            .setTitle(message.title)
-            .setBody(message.body)
-            .build()
+        val notification =
+            Notification.builder()
+                .setTitle(message.title)
+                .setBody(message.body)
+                .build()
         return Message.builder().run {
             when (this@toFcmMessage) {
                 is TargetedPushMessageWithToken -> setToken(targetToken)

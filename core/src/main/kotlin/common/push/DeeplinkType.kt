@@ -12,7 +12,7 @@ enum class DeeplinkType(private val url: String) {
 
     fun build(
         vararg params: Any,
-        referrer: String? = null
+        referrer: String? = null,
     ): Deeplink {
         val phase = PhaseUtils.getPhase()
         val protocol = if (phase.isProd) "snutt" else "snutt-dev"

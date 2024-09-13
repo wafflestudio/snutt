@@ -19,14 +19,15 @@ data class NotificationResponse(
     val createdAt: ZonedDateTime,
 ) {
     companion object {
-        fun from(notification: Notification) = NotificationResponse(
-            id = notification.id,
-            userId = notification.userId,
-            title = notification.title,
-            message = notification.message,
-            type = notification.type,
-            deeplink = notification.deeplink,
-            createdAt = notification.createdAt.toZonedDateTime(),
-        )
+        fun from(notification: Notification) =
+            NotificationResponse(
+                id = notification.id,
+                userId = notification.userId,
+                title = notification.title,
+                message = notification.message,
+                type = notification.type,
+                deeplink = notification.deeplink,
+                createdAt = notification.createdAt.toZonedDateTime(),
+            )
     }
 }

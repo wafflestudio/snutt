@@ -20,84 +20,93 @@ class FriendHandler(
     private val userNicknameService: UserNicknameService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
-    suspend fun getFriends(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val state = FriendState.from(req.parseRequiredQueryParam<String>("state")) ?: throw ServerWebInputException("Invalid state")
+    suspend fun getFriends(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val state = FriendState.from(req.parseRequiredQueryParam<String>("state")) ?: throw ServerWebInputException("Invalid state")
 
-        val content = friendService.getMyFriends(userId, state).map { (friend, partner) ->
-            val partnerDisplayName = friend.getPartnerDisplayName(userId)
-            FriendResponse(
-                id = friend.id!!,
-                userId = partner.id!!,
-                displayName = partnerDisplayName,
-                nickname = userNicknameService.getNicknameDto(partner.nickname!!),
-                createdAt = friend.createdAt,
+            val content =
+                friendService.getMyFriends(userId, state).map { (friend, partner) ->
+                    val partnerDisplayName = friend.getPartnerDisplayName(userId)
+                    FriendResponse(
+                        id = friend.id!!,
+                        userId = partner.id!!,
+                        displayName = partnerDisplayName,
+                        nickname = userNicknameService.getNicknameDto(partner.nickname!!),
+                        createdAt = friend.createdAt,
+                    )
+                }
+
+            ListResponse(
+                content = content,
+                totalCount = content.size,
             )
         }
 
-        ListResponse(
-            content = content,
-            totalCount = content.size,
-        )
-    }
+    suspend fun requestFriend(req: ServerRequest) =
+        handle(req) {
+            val fromUserId = req.userId
+            val body = req.awaitBody<FriendRequest>()
 
-    suspend fun requestFriend(req: ServerRequest) = handle(req) {
-        val fromUserId = req.userId
-        val body = req.awaitBody<FriendRequest>()
+            friendService.requestFriend(fromUserId, body.nickname)
+        }
 
-        friendService.requestFriend(fromUserId, body.nickname)
-    }
+    suspend fun acceptFriend(req: ServerRequest) =
+        handle(req) {
+            val toUserId = req.userId
+            val friendId = req.pathVariable("friendId")
 
-    suspend fun acceptFriend(req: ServerRequest) = handle(req) {
-        val toUserId = req.userId
-        val friendId = req.pathVariable("friendId")
+            friendService.acceptFriend(friendId, toUserId)
+        }
 
-        friendService.acceptFriend(friendId, toUserId)
-    }
+    suspend fun declineFriend(req: ServerRequest) =
+        handle(req) {
+            val toUserId = req.userId
+            val friendId = req.pathVariable("friendId")
 
-    suspend fun declineFriend(req: ServerRequest) = handle(req) {
-        val toUserId = req.userId
-        val friendId = req.pathVariable("friendId")
+            friendService.declineFriend(friendId, toUserId)
+        }
 
-        friendService.declineFriend(friendId, toUserId)
-    }
+    suspend fun updateFriendDisplayName(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val friendId = req.pathVariable("friendId")
+            val body = req.awaitBody<UpdateFriendDisplayNameRequest>()
 
-    suspend fun updateFriendDisplayName(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val friendId = req.pathVariable("friendId")
-        val body = req.awaitBody<UpdateFriendDisplayNameRequest>()
+            friendService.updateFriendDisplayName(userId, friendId, body.displayName)
+        }
 
-        friendService.updateFriendDisplayName(userId, friendId, body.displayName)
-    }
+    suspend fun breakFriend(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val friendId = req.pathVariable("friendId")
 
-    suspend fun breakFriend(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val friendId = req.pathVariable("friendId")
+            friendService.breakFriend(friendId, userId)
+        }
 
-        friendService.breakFriend(friendId, userId)
-    }
+    suspend fun generateFriendLink(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val friendRequestToken = friendService.generateFriendRequestLink(userId)
 
-    suspend fun generateFriendLink(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val friendRequestToken = friendService.generateFriendRequestLink(userId)
+            FriendRequestLinkResponse(friendRequestToken)
+        }
 
-        FriendRequestLinkResponse(friendRequestToken)
-    }
+    suspend fun acceptFriendByLink(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val requestToken = req.pathVariable("requestToken")
 
-    suspend fun acceptFriendByLink(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val requestToken = req.pathVariable("requestToken")
-
-        friendService.acceptFriendByLink(userId, requestToken)
-            .let {
-                (friend, partner) ->
-                FriendResponse(
-                    id = friend.id!!,
-                    userId = partner.id!!,
-                    displayName = friend.getPartnerDisplayName(userId),
-                    nickname = userNicknameService.getNicknameDto(partner.nickname!!),
-                    createdAt = friend.createdAt,
-                )
-            }
-    }
+            friendService.acceptFriendByLink(userId, requestToken)
+                .let {
+                        (friend, partner) ->
+                    FriendResponse(
+                        id = friend.id!!,
+                        userId = partner.id!!,
+                        displayName = friend.getPartnerDisplayName(userId),
+                        nickname = userNicknameService.getNicknameDto(partner.nickname!!),
+                        createdAt = friend.createdAt,
+                    )
+                }
+        }
 }

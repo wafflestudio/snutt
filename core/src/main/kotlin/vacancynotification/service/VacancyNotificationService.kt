@@ -17,9 +17,22 @@ import org.springframework.stereotype.Service
 
 interface VacancyNotificationService {
     suspend fun getVacancyNotificationLectures(userId: String): List<Lecture>
-    suspend fun existsVacancyNotification(userId: String, lectureId: String): Boolean
-    suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification
-    suspend fun deleteVacancyNotification(userId: String, lectureId: String)
+
+    suspend fun existsVacancyNotification(
+        userId: String,
+        lectureId: String,
+    ): Boolean
+
+    suspend fun addVacancyNotification(
+        userId: String,
+        lectureId: String,
+    ): VacancyNotification
+
+    suspend fun deleteVacancyNotification(
+        userId: String,
+        lectureId: String,
+    )
+
     suspend fun deleteAll()
 }
 
@@ -27,17 +40,23 @@ interface VacancyNotificationService {
 class VacancyNotificationServiceImpl(
     private val vacancyNotificationRepository: VacancyNotificationRepository,
     private val lectureRepository: LectureRepository,
-    private val coursebookService: CoursebookService
+    private val coursebookService: CoursebookService,
 ) : VacancyNotificationService {
     override suspend fun getVacancyNotificationLectures(userId: String): List<Lecture> =
         vacancyNotificationRepository.findAllByUserId(userId).map { it.lectureId }
             .let { lectureRepository.findAllById(it) }.toList()
 
-    override suspend fun existsVacancyNotification(userId: String, lectureId: String): Boolean {
+    override suspend fun existsVacancyNotification(
+        userId: String,
+        lectureId: String,
+    ): Boolean {
         return vacancyNotificationRepository.existsByUserIdAndLectureId(userId, lectureId)
     }
 
-    override suspend fun addVacancyNotification(userId: String, lectureId: String): VacancyNotification =
+    override suspend fun addVacancyNotification(
+        userId: String,
+        lectureId: String,
+    ): VacancyNotification =
         coroutineScope {
             val deferredLecture = async { lectureRepository.findById(lectureId) }
             val deferredLatestCoursebook = async { coursebookService.getLatestCoursebook() }
@@ -51,7 +70,10 @@ class VacancyNotificationServiceImpl(
             trySave(VacancyNotification(userId = userId, lectureId = lectureId))
         }
 
-    override suspend fun deleteVacancyNotification(userId: String, lectureId: String) {
+    override suspend fun deleteVacancyNotification(
+        userId: String,
+        lectureId: String,
+    ) {
         vacancyNotificationRepository.deleteByUserIdAndLectureId(userId, lectureId)
     }
 

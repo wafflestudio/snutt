@@ -18,8 +18,10 @@ data class TimetableTheme(
     @Field(targetType = FieldType.OBJECT_ID)
     val userId: String,
     var name: String,
-    var colors: List<ColorSet>?, // basic 테마는 null (클라이언트 처리)
-    val isCustom: Boolean, // basic 테마는 false
+    // basic 테마는 null (클라이언트 처리)
+    var colors: List<ColorSet>?,
+    // basic 테마는 false
+    val isCustom: Boolean,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {

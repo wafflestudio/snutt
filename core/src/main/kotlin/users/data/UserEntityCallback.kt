@@ -13,30 +13,36 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
 @Component
-class UserEntityCallback @Lazy constructor(
-    private val userRepository: UserRepository,
-    private val userNicknameService: UserNicknameService,
-) : ReactiveAfterConvertCallback<User> {
+class UserEntityCallback
+    @Lazy
+    constructor(
+        private val userRepository: UserRepository,
+        private val userNicknameService: UserNicknameService,
+    ) : ReactiveAfterConvertCallback<User> {
+        private val log = LoggerFactory.getLogger(javaClass)
 
-    private val log = LoggerFactory.getLogger(javaClass)
+        override fun onAfterConvert(
+            entity: User,
+            document: Document,
+            collection: String,
+        ): Publisher<User> {
+            if (entity.nickname != null) {
+                return Mono.just(entity)
+            }
 
-    override fun onAfterConvert(entity: User, document: Document, collection: String): Publisher<User> {
-        if (entity.nickname != null) {
-            return Mono.just(entity)
+            log.info("empty nickname found. user: $entity")
+            return backFillNickname(entity)
         }
 
-        log.info("empty nickname found. user: $entity")
-        return backFillNickname(entity)
+        private fun backFillNickname(user: User): Mono<User> =
+            mono(Dispatchers.Unconfined) {
+                try {
+                    val result = userRepository.save(user.copy(nickname = userNicknameService.generateUniqueRandomNickname()))
+                    log.info("[BACKFILL] updated nickname of USER: $result")
+                    result
+                } catch (e: Exception) {
+                    log.error("[BACKFILL] failed to update nickname of USER: $user", e)
+                    throw e
+                }
+            }
     }
-
-    private fun backFillNickname(user: User): Mono<User> = mono(Dispatchers.Unconfined) {
-        try {
-            val result = userRepository.save(user.copy(nickname = userNicknameService.generateUniqueRandomNickname()))
-            log.info("[BACKFILL] updated nickname of USER: $result")
-            result
-        } catch (e: Exception) {
-            log.error("[BACKFILL] failed to update nickname of USER: $user", e)
-            throw e
-        }
-    }
-}

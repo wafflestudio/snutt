@@ -11,6 +11,7 @@ import kotlin.system.exitProcess
 class Snu4tBatchApplication
 
 val log: Logger = LoggerFactory.getLogger(Snu4tBatchApplication::class.java)
+
 fun main(args: Array<String>) {
     runCatching {
         val applicationContext = runApplication<Snu4tBatchApplication>(*args)

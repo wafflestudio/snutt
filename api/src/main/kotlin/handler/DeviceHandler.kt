@@ -16,16 +16,17 @@ class DeviceHandler(
     private val userNicknameService: UserNicknameService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
-    suspend fun addRegistrationId(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val clientInfo = req.clientInfo!!
+    suspend fun addRegistrationId(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val clientInfo = req.clientInfo!!
 
-        val registrationId = req.pathVariable("id")
-        deviceService.addRegistrationId(userId, registrationId, clientInfo)
+            val registrationId = req.pathVariable("id")
+            deviceService.addRegistrationId(userId, registrationId, clientInfo)
 
-        updateIfUserNicknameNull(req.getContext().user!!)
-        OkResponse()
-    }
+            updateIfUserNicknameNull(req.getContext().user!!)
+            OkResponse()
+        }
 
     // TODO 회원가입 API (SNUTT -> SNU4T) 마이그레이션 완료 이후 삭제
     //   context: https://wafflestudio.slack.com/archives/C0PAVPS5T/p1690711859658779
@@ -36,12 +37,13 @@ class DeviceHandler(
         }
     }
 
-    suspend fun removeRegistrationId(req: ServerRequest) = handle(req) {
-        val userId = req.userId
+    suspend fun removeRegistrationId(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
 
-        val registrationId = req.pathVariable("id")
-        deviceService.removeRegistrationId(userId, registrationId)
+            val registrationId = req.pathVariable("id")
+            deviceService.removeRegistrationId(userId, registrationId)
 
-        OkResponse()
-    }
+            OkResponse()
+        }
 }

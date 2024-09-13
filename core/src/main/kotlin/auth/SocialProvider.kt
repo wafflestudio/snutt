@@ -9,7 +9,7 @@ enum class SocialProvider(val value: String) {
     ;
 
     companion object {
-        private val mapping = values().associateBy { e -> e.value }
+        private val mapping = entries.associateBy { e -> e.value }
 
         fun from(value: String): SocialProvider? = mapping[value]
     }

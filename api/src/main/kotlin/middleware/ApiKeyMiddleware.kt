@@ -14,14 +14,18 @@ class ApiKeyMiddleware(
 ) : Middleware {
     private val keySpec = SecretKeySpec(secretKey.toByteArray(), "HmacSHA256")
     private val jwtParser = Jwts.parser().setSigningKey(keySpec)
-    private val stringToKeyVersionMap = mapOf(
-        "ios" to "0",
-        "web" to "0",
-        "android" to "0",
-        "test" to "0",
-    )
+    private val stringToKeyVersionMap =
+        mapOf(
+            "ios" to "0",
+            "web" to "0",
+            "android" to "0",
+            "test" to "0",
+        )
 
-    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext =
+    override suspend fun invoke(
+        req: ServerRequest,
+        context: RequestContext,
+    ): RequestContext =
         runCatching {
             val apiKey = requireNotNull(req.headers().firstHeader("x-access-apikey"))
             val claims = jwtParser.parseClaimsJws(apiKey).body

@@ -15,20 +15,30 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/buildings", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "searchBuildings",
-            parameters = [
-                Parameter(
-                    `in` = ParameterIn.QUERY, name = "places", required = true,
-                    description = """
+        path = "/v1/buildings",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "searchBuildings",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.QUERY,
+                        name = "places",
+                        required = true,
+                        description = """
                     Comma separated list of place codes.
                     custom 강의 제외하는 것을 추천
-                """
-                )
-            ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = BuildingsResponse::class))])]
-        ),
+                """,
+                    ),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = BuildingsResponse::class))],
+                    ),
+                ],
+            ),
     ),
 )
 annotation class BuildingsDocs

@@ -32,31 +32,34 @@ data class LectureDto(
     val registrationCount: Int,
     val wasFull: Boolean,
     val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
-
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
     val classTimeMask: List<Int> = emptyList(),
 )
 
-fun LectureDto(lecture: Lecture, snuttevLecture: SnuttEvLectureSummaryDto? = null): LectureDto = LectureDto(
-    id = lecture.id,
-    academicYear = lecture.academicYear,
-    category = lecture.category,
-    classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
-    classification = lecture.classification,
-    credit = lecture.credit,
-    department = lecture.department,
-    instructor = lecture.instructor,
-    lectureNumber = lecture.lectureNumber,
-    quota = lecture.quota,
-    freshmanQuota = lecture.freshmanQuota,
-    remark = lecture.remark,
-    semester = lecture.semester,
-    year = lecture.year,
-    courseNumber = lecture.courseNumber,
-    courseTitle = lecture.courseTitle,
-    registrationCount = lecture.registrationCount,
-    wasFull = lecture.wasFull,
-    snuttEvLecture = snuttevLecture,
-    classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
-)
+fun LectureDto(
+    lecture: Lecture,
+    snuttevLecture: SnuttEvLectureSummaryDto? = null,
+): LectureDto =
+    LectureDto(
+        id = lecture.id,
+        academicYear = lecture.academicYear,
+        category = lecture.category,
+        classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
+        classification = lecture.classification,
+        credit = lecture.credit,
+        department = lecture.department,
+        instructor = lecture.instructor,
+        lectureNumber = lecture.lectureNumber,
+        quota = lecture.quota,
+        freshmanQuota = lecture.freshmanQuota,
+        remark = lecture.remark,
+        semester = lecture.semester,
+        year = lecture.year,
+        courseNumber = lecture.courseNumber,
+        courseTitle = lecture.courseTitle,
+        registrationCount = lecture.registrationCount,
+        wasFull = lecture.wasFull,
+        snuttEvLecture = snuttevLecture,
+        classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
+    )

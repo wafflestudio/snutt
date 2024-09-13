@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 class SnuttRestApiDefaultMiddleware(middleware: Middleware) : Middleware by middleware
+
 class SnuttRestAdminApiMiddleware(middleware: Middleware) : Middleware by middleware
+
 class SnuttRestApiNoAuthMiddleware(middleware: Middleware) : Middleware by middleware
 
 @Configuration
@@ -23,6 +25,5 @@ class CompositeMiddlewareConfig(
         SnuttRestApiNoAuthMiddleware(apiKeyMiddleware + nativeClientInfoMiddleware)
 
     @Bean
-    fun snuttRestAdminApiMiddleware(): SnuttRestAdminApiMiddleware =
-        SnuttRestAdminApiMiddleware(apiKeyMiddleware + adminApiMiddleware)
+    fun snuttRestAdminApiMiddleware(): SnuttRestAdminApiMiddleware = SnuttRestAdminApiMiddleware(apiKeyMiddleware + adminApiMiddleware)
 }

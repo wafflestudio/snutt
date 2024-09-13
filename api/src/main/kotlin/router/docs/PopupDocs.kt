@@ -13,11 +13,19 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/popups", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getPopups",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PopupsResponse::class))])]
-        ),
+        path = "/v1/popups",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getPopups",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = PopupsResponse::class))],
+                    ),
+                ],
+            ),
     ),
 )
 annotation class PopupDocs
