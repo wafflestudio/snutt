@@ -36,7 +36,10 @@ class ClientConfigService(
         return cache.get(cacheKey) { getAdaptableConfigs(osType, appVersion) } ?: emptyList()
     }
 
-    private suspend fun getAdaptableConfigs(osType: OsType, appVersion: AppVersion): List<ClientConfig> {
+    private suspend fun getAdaptableConfigs(
+        osType: OsType,
+        appVersion: AppVersion,
+    ): List<ClientConfig> {
         return clientConfigRepository.findAll()
             .toList()
             .filter { it.isAdaptable(osType, appVersion) }
@@ -47,47 +50,59 @@ class ClientConfigService(
         return clientConfigRepository.findByNameOrderByCreatedAtDesc(name)
     }
 
-    suspend fun postConfig(name: String, body: PostConfigRequest): ClientConfig {
+    suspend fun postConfig(
+        name: String,
+        body: PostConfigRequest,
+    ): ClientConfig {
         val value = objectMapper.writeValueAsString(body.data)
 
-        val config = with(body) {
-            clientConfigRepository.findByNameAndVersions(
-                name = name,
-                minIosVersion = minVersion?.iosAppVersion,
-                minAndroidVersion = minVersion?.androidAppVersion,
-                maxIosVersion = maxVersion?.iosAppVersion,
-                maxAndroidVersion = maxVersion?.androidAppVersion,
-            )?.copy(value = value) ?: ClientConfig(
-                name = name,
-                value = value,
-                minIosVersion = minVersion?.iosAppVersion,
-                minAndroidVersion = minVersion?.androidAppVersion,
-                maxIosVersion = maxVersion?.iosAppVersion,
-                maxAndroidVersion = maxVersion?.androidAppVersion,
-            )
-        }
+        val config =
+            with(body) {
+                clientConfigRepository.findByNameAndVersions(
+                    name = name,
+                    minIosVersion = minVersion?.iosAppVersion,
+                    minAndroidVersion = minVersion?.androidAppVersion,
+                    maxIosVersion = maxVersion?.iosAppVersion,
+                    maxAndroidVersion = maxVersion?.androidAppVersion,
+                )?.copy(value = value) ?: ClientConfig(
+                    name = name,
+                    value = value,
+                    minIosVersion = minVersion?.iosAppVersion,
+                    minAndroidVersion = minVersion?.androidAppVersion,
+                    maxIosVersion = maxVersion?.iosAppVersion,
+                    maxAndroidVersion = maxVersion?.androidAppVersion,
+                )
+            }
 
         return clientConfigRepository.save(config)
     }
 
-    suspend fun deleteConfig(name: String, configId: String) {
+    suspend fun deleteConfig(
+        name: String,
+        configId: String,
+    ) {
         val deleted = clientConfigRepository.deleteByNameAndId(name, configId)
         if (deleted == 0L) throw ConfigNotFoundException
     }
 
-    suspend fun patchConfig(name: String, configId: String, body: PatchConfigRequest): ClientConfig {
+    suspend fun patchConfig(
+        name: String,
+        configId: String,
+        body: PatchConfigRequest,
+    ): ClientConfig {
         val config = clientConfigRepository.findByNameAndId(name, configId) ?: throw ConfigNotFoundException
 
-        val patchedConfig = with(body) {
-            config.copy(
-                value = data?.let { objectMapper.writeValueAsString(it) } ?: config.value,
-                minIosVersion = minVersion?.iosAppVersion ?: config.minIosVersion,
-                minAndroidVersion = minVersion?.androidAppVersion ?: config.minAndroidVersion,
-                maxIosVersion = maxVersion?.iosAppVersion ?: config.maxIosVersion,
-                maxAndroidVersion = maxVersion?.androidAppVersion ?: config.maxAndroidVersion,
-                updatedAt = LocalDateTime.now(),
-            )
-        }
+        val patchedConfig =
+            with(body) {
+                config.copy(
+                    value = data?.let { objectMapper.writeValueAsString(it) } ?: config.value,
+                    minIosVersion = minVersion?.iosAppVersion ?: config.minIosVersion,
+                    minAndroidVersion = minVersion?.androidAppVersion ?: config.minAndroidVersion,
+                    maxIosVersion = maxVersion?.iosAppVersion ?: config.maxIosVersion,
+                    maxAndroidVersion = maxVersion?.androidAppVersion ?: config.maxAndroidVersion,
+                    updatedAt = LocalDateTime.now(),
+                )
+            }
 
         return clientConfigRepository.save(patchedConfig)
     }

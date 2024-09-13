@@ -5,19 +5,20 @@ import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
-fun KProperty1<Lecture, *>.toKoreanFieldName(): String = when (this) {
-    Lecture::classification -> "교과 구분"
-    Lecture::department -> "학부"
-    Lecture::academicYear -> "학년"
-    Lecture::courseTitle -> "강의명"
-    Lecture::credit -> "학점"
-    Lecture::instructor -> "교수"
-    Lecture::quota -> "정원"
-    Lecture::remark -> "비고"
-    Lecture::category -> "교양 구분"
-    Lecture::classPlaceAndTimes -> "강의 시간/장소"
-    else -> "기타"
-}
+fun KProperty1<Lecture, *>.toKoreanFieldName(): String =
+    when (this) {
+        Lecture::classification -> "교과 구분"
+        Lecture::department -> "학부"
+        Lecture::academicYear -> "학년"
+        Lecture::courseTitle -> "강의명"
+        Lecture::credit -> "학점"
+        Lecture::instructor -> "교수"
+        Lecture::quota -> "정원"
+        Lecture::remark -> "비고"
+        Lecture::category -> "교양 구분"
+        Lecture::classPlaceAndTimes -> "강의 시간/장소"
+        else -> "기타"
+    }
 
 fun Coursebook.nextCoursebook(): Coursebook {
     return when (this.semester) {

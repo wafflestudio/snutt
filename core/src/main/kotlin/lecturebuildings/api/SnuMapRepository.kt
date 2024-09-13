@@ -16,14 +16,13 @@ class SnuMapRepository(
         const val DEFAULT_SEARCH_PARAMS = "lang_type=KOR"
     }
 
-    suspend fun getLectureBuildingSearchResult(
-        buildingNum: String
-    ): SnuMapSearchResult = snuMapApi.get().uri { builder ->
-        builder.path(SNU_MAP_SEARCH_PATH)
-            .query(DEFAULT_SEARCH_PARAMS)
-            .queryParam("search_word", buildingNum)
-            .build()
-    }
-        .retrieve().awaitBody<String>()
-        .let { objectMapper.readValue<SnuMapSearchResult>(it) }
+    suspend fun getLectureBuildingSearchResult(buildingNum: String): SnuMapSearchResult =
+        snuMapApi.get().uri { builder ->
+            builder.path(SNU_MAP_SEARCH_PATH)
+                .query(DEFAULT_SEARCH_PARAMS)
+                .queryParam("search_word", buildingNum)
+                .build()
+        }
+            .retrieve().awaitBody<String>()
+            .let { objectMapper.readValue<SnuMapSearchResult>(it) }
 }

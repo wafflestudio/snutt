@@ -13,14 +13,16 @@ class BuildingHandler(
     private val lectureBuildingService: LectureBuildingService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiNoAuthMiddleware
-) {
-    suspend fun searchBuildings(req: ServerRequest): ServerResponse = handle(req) {
-        val placesQuery = req.parseRequiredQueryParam<String>("places")
-            .split(",")
-            .flatMap { PlaceInfo.getValuesOf(it) }
-            .distinct()
-        val buildings = lectureBuildingService.getLectureBuildings(placesQuery)
-        ListResponse(buildings)
-    }
+        handlerMiddleware = snuttRestApiNoAuthMiddleware,
+    ) {
+    suspend fun searchBuildings(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val placesQuery =
+                req.parseRequiredQueryParam<String>("places")
+                    .split(",")
+                    .flatMap { PlaceInfo.getValuesOf(it) }
+                    .distinct()
+            val buildings = lectureBuildingService.getLectureBuildings(placesQuery)
+            ListResponse(buildings)
+        }
 }

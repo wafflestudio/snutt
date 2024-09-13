@@ -46,7 +46,10 @@ import kotlin.random.Random
 interface UserService {
     suspend fun getUser(userId: String): User
 
-    suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User
+    suspend fun patchUserInfo(
+        userId: String,
+        userPatchRequest: UserPatchRequest,
+    ): User
 
     suspend fun getUserByCredentialHash(credentialHash: String): User
 
@@ -60,29 +63,51 @@ interface UserService {
 
     suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse
 
-    suspend fun logout(userId: String, logoutRequest: LogoutRequest)
+    suspend fun logout(
+        userId: String,
+        logoutRequest: LogoutRequest,
+    )
 
     suspend fun update(user: User): User
 
-    suspend fun sendVerificationCode(user: User, email: String)
+    suspend fun sendVerificationCode(
+        user: User,
+        email: String,
+    )
 
-    suspend fun verifyEmail(user: User, code: String)
+    suspend fun verifyEmail(
+        user: User,
+        code: String,
+    )
 
     suspend fun resetEmailVerification(user: User)
 
-    suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest): TokenResponse
+    suspend fun attachLocal(
+        user: User,
+        localLoginRequest: LocalLoginRequest,
+    ): TokenResponse
 
-    suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): TokenResponse
+    suspend fun changePassword(
+        user: User,
+        passwordChangeRequest: PasswordChangeRequest,
+    ): TokenResponse
 
     suspend fun sendLocalIdToEmail(email: String)
 
     suspend fun sendResetPasswordCode(email: String)
 
-    suspend fun verifyResetPasswordCode(localId: String, code: String)
+    suspend fun verifyResetPasswordCode(
+        localId: String,
+        code: String,
+    )
 
     suspend fun getMaskedEmail(localId: String): String
 
-    suspend fun resetPassword(localId: String, newPassword: String, code: String)
+    suspend fun resetPassword(
+        localId: String,
+        newPassword: String,
+        code: String,
+    )
 }
 
 @Service
@@ -103,7 +128,10 @@ class UserServiceImpl(
         return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
     }
 
-    override suspend fun patchUserInfo(userId: String, userPatchRequest: UserPatchRequest): User {
+    override suspend fun patchUserInfo(
+        userId: String,
+        userPatchRequest: UserPatchRequest,
+    ): User {
         val user = getUser(userId)
 
         with(userPatchRequest) {
@@ -256,14 +284,15 @@ class UserServiceImpl(
 
         val randomNickname = userNicknameService.generateUniqueRandomNickname()
 
-        val user = User(
-            email = email,
-            isEmailVerified = if (email != null) isEmailVerified else false,
-            credential = credential,
-            credentialHash = credentialHash,
-            nickname = randomNickname,
-            fcmKey = null,
-        ).let { userRepository.save(it) }
+        val user =
+            User(
+                email = email,
+                isEmailVerified = if (email != null) isEmailVerified else false,
+                credential = credential,
+                credentialHash = credentialHash,
+                nickname = randomNickname,
+                fcmKey = null,
+            ).let { userRepository.save(it) }
 
         timetableService.createDefaultTable(user.id!!)
 
@@ -273,7 +302,10 @@ class UserServiceImpl(
         )
     }
 
-    override suspend fun logout(userId: String, logoutRequest: LogoutRequest) {
+    override suspend fun logout(
+        userId: String,
+        logoutRequest: LogoutRequest,
+    ) {
         val user = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
         deviceService.removeRegistrationId(user.id!!, logoutRequest.registrationId)
     }
@@ -282,7 +314,10 @@ class UserServiceImpl(
         return userRepository.save(user)
     }
 
-    override suspend fun sendVerificationCode(user: User, email: String) {
+    override suspend fun sendVerificationCode(
+        user: User,
+        email: String,
+    ) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
         if (!authService.isValidEmail(email)) throw InvalidEmailException
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException(getSocialProvider(user))
@@ -292,7 +327,10 @@ class UserServiceImpl(
         mailService.sendUserMail(type = UserMailType.VERIFICATION, to = email, code = code)
     }
 
-    override suspend fun verifyEmail(user: User, code: String) {
+    override suspend fun verifyEmail(
+        user: User,
+        code: String,
+    ) {
         val key = VERIFICATION_CODE_PREFIX + user.id
         val value = checkVerificationValue(key, code)
         user.apply {
@@ -308,7 +346,10 @@ class UserServiceImpl(
         userRepository.save(user)
     }
 
-    override suspend fun attachLocal(user: User, localLoginRequest: LocalLoginRequest): TokenResponse {
+    override suspend fun attachLocal(
+        user: User,
+        localLoginRequest: LocalLoginRequest,
+    ): TokenResponse {
         if (user.credential.localId != null) throw AlreadyLocalAccountException
         val localId = localLoginRequest.id
         val password = localLoginRequest.password
@@ -325,7 +366,10 @@ class UserServiceImpl(
         return TokenResponse(token = user.credentialHash)
     }
 
-    override suspend fun changePassword(user: User, passwordChangeRequest: PasswordChangeRequest): TokenResponse {
+    override suspend fun changePassword(
+        user: User,
+        passwordChangeRequest: PasswordChangeRequest,
+    ): TokenResponse {
         if (!authService.isMatchedPassword(user, passwordChangeRequest.oldPassword)) throw WrongPasswordException
         if (!authService.isValidPassword(passwordChangeRequest.newPassword)) throw InvalidPasswordException
         user.apply {
@@ -351,7 +395,10 @@ class UserServiceImpl(
         mailService.sendUserMail(type = UserMailType.PASSWORD_RESET, to = email, code = code)
     }
 
-    override suspend fun verifyResetPasswordCode(localId: String, code: String) {
+    override suspend fun verifyResetPasswordCode(
+        localId: String,
+        code: String,
+    ) {
         val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         checkVerificationValue(key, code)
@@ -365,7 +412,11 @@ class UserServiceImpl(
         return maskedEmail
     }
 
-    override suspend fun resetPassword(localId: String, newPassword: String, code: String) {
+    override suspend fun resetPassword(
+        localId: String,
+        newPassword: String,
+        code: String,
+    ) {
         val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
         verifyResetPasswordCode(localId, code)
         if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
@@ -377,7 +428,11 @@ class UserServiceImpl(
         redisTemplate.delete(RESET_PASSWORD_CODE_PREFIX + user.id).subscribe()
     }
 
-    private suspend fun saveNewVerificationValue(email: String, code: String, key: String): RedisVerificationValue {
+    private suspend fun saveNewVerificationValue(
+        email: String,
+        code: String,
+        key: String,
+    ): RedisVerificationValue {
         val existing = readVerificationValue(key)
         if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
         val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
@@ -387,7 +442,10 @@ class UserServiceImpl(
         return value
     }
 
-    private suspend fun checkVerificationValue(key: String, code: String): RedisVerificationValue {
+    private suspend fun checkVerificationValue(
+        key: String,
+        code: String,
+    ): RedisVerificationValue {
         val value = readVerificationValue(key)
         if (value == null || value.code != code) throw InvalidVerificationCodeException
         return value

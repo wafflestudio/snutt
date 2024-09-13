@@ -10,7 +10,12 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
 
 interface MailService {
-    suspend fun sendUserMail(type: UserMailType, to: String, code: String = "", localId: String = "")
+    suspend fun sendUserMail(
+        type: UserMailType,
+        to: String,
+        code: String = "",
+        localId: String = "",
+    )
 }
 
 @Service
@@ -19,7 +24,12 @@ class MailServiceImpl(
     private val mailClient: MailClient,
     private val authService: AuthService,
 ) : MailService {
-    override suspend fun sendUserMail(type: UserMailType, to: String, code: String, localId: String) {
+    override suspend fun sendUserMail(
+        type: UserMailType,
+        to: String,
+        code: String,
+        localId: String,
+    ) {
         if (!authService.isValidEmail(to)) {
             throw InvalidEmailException
         }
@@ -27,16 +37,23 @@ class MailServiceImpl(
             mailClient.sendMail(to, subject, body)
         }
     }
-    private suspend fun getUserMailContent(type: UserMailType, email: String, code: String, localId: String): MailContent {
-        val mailContentList = mailTemplateResource.inputStream
-            .readBytes()
-            .decodeToString()
-            .replace("{code}", code)
-            .replace("{email}", email)
-            .replace("{localId}", localId)
-            .split("\n\n")
-            .windowed(2, 2, false)
-            .map { (subject, body) -> MailContent(subject, body) }
+
+    private suspend fun getUserMailContent(
+        type: UserMailType,
+        email: String,
+        code: String,
+        localId: String,
+    ): MailContent {
+        val mailContentList =
+            mailTemplateResource.inputStream
+                .readBytes()
+                .decodeToString()
+                .replace("{code}", code)
+                .replace("{email}", email)
+                .replace("{localId}", localId)
+                .split("\n\n")
+                .windowed(2, 2, false)
+                .map { (subject, body) -> MailContent(subject, body) }
         val mailContent = mailContentList[type.index]
         return mailContent
     }

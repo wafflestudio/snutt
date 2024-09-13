@@ -24,11 +24,17 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
         return ServerResponse.ok().bodyValue(this).awaitSingle()
     }
 
-    fun <T> ServerRequest.parseRequiredQueryParam(name: String, convert: (String) -> T?): T =
+    fun <T> ServerRequest.parseRequiredQueryParam(
+        name: String,
+        convert: (String) -> T?,
+    ): T =
         parseQueryParam(name, convert)
             ?: throw MissingRequiredParameterException(name)
 
-    fun <T> ServerRequest.parseQueryParam(name: String, convert: (String) -> T?): T? =
+    fun <T> ServerRequest.parseQueryParam(
+        name: String,
+        convert: (String) -> T?,
+    ): T? =
         this.queryParamOrNull(name)?.runCatching { convert(this)!! }
             ?.getOrElse { throw InvalidQueryParameterException(name) }
 

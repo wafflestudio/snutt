@@ -19,7 +19,11 @@ class DeviceService internal constructor(
     private val userRepository: UserRepository,
     private val cache: Cache,
 ) {
-    suspend fun addRegistrationId(userId: String, registrationId: String, clientInfo: ClientInfo) {
+    suspend fun addRegistrationId(
+        userId: String,
+        registrationId: String,
+        clientInfo: ClientInfo,
+    ) {
         val cacheKey = CacheKey.LOCK_ADD_FCM_REGISTRATION_ID.build(userId, registrationId)
         if (!cache.acquireLock(cacheKey)) return
 
@@ -29,9 +33,10 @@ class DeviceService internal constructor(
             }
 
             launch {
-                val userDevice = clientInfo.deviceId?.let {
-                    userDeviceRepository.findByUserIdAndDeviceIdAndIsDeletedFalse(userId, it)
-                } ?: userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)
+                val userDevice =
+                    clientInfo.deviceId?.let {
+                        userDeviceRepository.findByUserIdAndDeviceIdAndIsDeletedFalse(userId, it)
+                    } ?: userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)
 
                 userDevice?.apply {
                     if (updateIfChanged(clientInfo, registrationId)) {
@@ -48,7 +53,7 @@ class DeviceService internal constructor(
                             appType = clientInfo.appType,
                             appVersion = clientInfo.appVersion,
                             fcmRegistrationId = registrationId,
-                        )
+                        ),
                     )
                 }
             }
@@ -57,7 +62,10 @@ class DeviceService internal constructor(
         cache.releaseLock(cacheKey)
     }
 
-    private fun UserDevice.updateIfChanged(clientInfo: ClientInfo, registrationId: String): Boolean {
+    private fun UserDevice.updateIfChanged(
+        clientInfo: ClientInfo,
+        registrationId: String,
+    ): Boolean {
         var isUpdated = false
 
         fun <T> T.updateIfDifferent(newValue: T): T {
@@ -79,7 +87,10 @@ class DeviceService internal constructor(
         return isUpdated
     }
 
-    suspend fun removeRegistrationId(userId: String, registrationId: String) = coroutineScope {
+    suspend fun removeRegistrationId(
+        userId: String,
+        registrationId: String,
+    ) = coroutineScope {
         launch {
             pushClient.unsubscribeGlobalTopic(registrationId)
         }
@@ -107,10 +118,11 @@ class DeviceService internal constructor(
 
         // UserDevice 로 migration 되지 않은 경우를 고려
         val noDeviceUserIds = userIds.filter { userId -> userDevices.none { it.userId == userId } }
-        val legacyUserDevices = userRepository.findByIdInAndActiveTrue(noDeviceUserIds).mapNotNull { user ->
-            // FCM API 의 한계로 기기 그룹 내의 registrationId 들을 알아낼 수는 없음
-            user.fcmKey?.let { fcmKey -> UserDevice.of(user.id!!, fcmKey) }
-        }
+        val legacyUserDevices =
+            userRepository.findByIdInAndActiveTrue(noDeviceUserIds).mapNotNull { user ->
+                // FCM API 의 한계로 기기 그룹 내의 registrationId 들을 알아낼 수는 없음
+                user.fcmKey?.let { fcmKey -> UserDevice.of(user.id!!, fcmKey) }
+            }
 
         return (userDevices + legacyUserDevices).groupBy { it.userId }
     }

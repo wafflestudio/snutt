@@ -48,13 +48,18 @@ data class ConfigVersionDto(
         get() = AppVersion(android)
 
     companion object {
-        fun of(iosAppVersion: AppVersion?, androidAppVersion: AppVersion?): ConfigVersionDto? {
+        fun of(
+            iosAppVersion: AppVersion?,
+            androidAppVersion: AppVersion?,
+        ): ConfigVersionDto? {
             return if (iosAppVersion != null && androidAppVersion != null) {
                 ConfigVersionDto(
                     ios = iosAppVersion.appVersion,
                     android = androidAppVersion.appVersion,
                 )
-            } else null
+            } else {
+                null
+            }
         }
     }
 }

@@ -22,11 +22,12 @@ class PopupServiceImpl(
     private val popupRepository: PopupRepository,
 ) : PopupService {
     override suspend fun postPopup(request: PostPopupRequest): Popup {
-        val popup = Popup(
-            key = request.key,
-            imageOriginUri = request.imageOriginUri,
-            hiddenDays = request.hiddenDays,
-        )
+        val popup =
+            Popup(
+                key = request.key,
+                imageOriginUri = request.imageOriginUri,
+                hiddenDays = request.hiddenDays,
+            )
         return try {
             popupRepository.save(popup)
         } catch (e: DuplicateKeyException) {

@@ -17,12 +17,22 @@ import org.springframework.stereotype.Service
 
 interface LectureService {
     fun findAll(): Flow<Lecture>
+
     suspend fun getByIdOrNull(lectureId: String): Lecture?
+
     suspend fun upsertLectures(lectures: Iterable<Lecture>)
-    fun getLecturesByYearAndSemesterAsFlow(year: Int, semester: Semester): Flow<Lecture>
+
+    fun getLecturesByYearAndSemesterAsFlow(
+        year: Int,
+        semester: Semester,
+    ): Flow<Lecture>
+
     suspend fun deleteLectures(lectures: Iterable<Lecture>)
+
     fun search(query: SearchDto): Flow<Lecture>
+
     suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto>
+
     suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto
 }
 
@@ -35,11 +45,13 @@ class LectureServiceImpl(
     override fun findAll(): Flow<Lecture> = lectureRepository.findAll()
 
     override suspend fun getByIdOrNull(lectureId: String): Lecture? = lectureRepository.findById(lectureId)
-    override fun getLecturesByYearAndSemesterAsFlow(year: Int, semester: Semester): Flow<Lecture> =
-        lectureRepository.findAllByYearAndSemester(year, semester)
 
-    override suspend fun upsertLectures(lectures: Iterable<Lecture>) =
-        lectureRepository.saveAll(lectures).collect()
+    override fun getLecturesByYearAndSemesterAsFlow(
+        year: Int,
+        semester: Semester,
+    ): Flow<Lecture> = lectureRepository.findAllByYearAndSemester(year, semester)
+
+    override suspend fun upsertLectures(lectures: Iterable<Lecture>) = lectureRepository.saveAll(lectures).collect()
 
     override suspend fun deleteLectures(lectures: Iterable<Lecture>) = lectureRepository.deleteAll(lectures)
 
@@ -58,17 +70,18 @@ class LectureServiceImpl(
         return snuttEvRepository.getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
     }
 
-    private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> = coroutineScope {
-        val placeInfosAll =
-            flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()
-        val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
-        forEach {
-            it.classPlaceAndTimes.forEach { classPlaceAndTime ->
-                classPlaceAndTime.apply {
-                    lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
+    private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> =
+        coroutineScope {
+            val placeInfosAll =
+                flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()
+            val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
+            forEach {
+                it.classPlaceAndTimes.forEach { classPlaceAndTime ->
+                    classPlaceAndTime.apply {
+                        lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
+                    }
                 }
             }
+            this@addLectureBuildings
         }
-        this@addLectureBuildings
-    }
 }

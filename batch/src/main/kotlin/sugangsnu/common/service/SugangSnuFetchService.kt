@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 interface SugangSnuFetchService {
-    suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture>
+    suspend fun getSugangSnuLectures(
+        year: Int,
+        semester: Semester,
+    ): List<Lecture>
 }
 
 @Service
@@ -20,7 +23,10 @@ class SugangSnuFetchServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
-    override suspend fun getSugangSnuLectures(year: Int, semester: Semester): List<Lecture> {
+    override suspend fun getSugangSnuLectures(
+        year: Int,
+        semester: Semester,
+    ): List<Lecture> {
         val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "ko")
         val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "en")
         val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
@@ -37,18 +43,24 @@ class SugangSnuFetchServiceImpl(
                 sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
 
             val extraCourseTitle =
-                if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) extraLectureInfo.subInfo.courseName
-                else "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
+                if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) {
+                    extraLectureInfo.subInfo.courseName
+                } else {
+                    "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
+                }
             val extraDepartment =
-                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null)
+                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
                     "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
-                else null
+                } else {
+                    null
+                }
 
             lecture.apply {
-                classPlaceAndTimes = SugangSnuClassTimeUtils.convertTextToClassTimeObject(
-                    extraLectureInfo.ltTime,
-                    extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") }
-                )
+                classPlaceAndTimes =
+                    SugangSnuClassTimeUtils.convertTextToClassTimeObject(
+                        extraLectureInfo.ltTime,
+                        extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") },
+                    )
                 academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
                     ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
                 courseTitle = extraCourseTitle ?: courseTitle
@@ -77,7 +89,7 @@ class SugangSnuFetchServiceImpl(
                 columnNameIndex.getOrElse(key) {
                     log.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
                     this.size
-                }
+                },
             ].stringCellValue
 
         val classification = row.getCellByColumnName("교과구분")
@@ -93,10 +105,11 @@ class SugangSnuFetchServiceImpl(
         val classTimeText = row.getCellByColumnName("수업교시")
         val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
         val instructor = row.getCellByColumnName("주담당교수")
-        val (quota, quotaForCurrentStudent) = row.getCellByColumnName("정원")
-            .takeIf { quotaRegex.matches(it) }
-            ?.let { quotaRegex.find(it)!!.groups }
-            ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)
+        val (quota, quotaForCurrentStudent) =
+            row.getCellByColumnName("정원")
+                .takeIf { quotaRegex.matches(it) }
+                ?.let { quotaRegex.find(it)!!.groups }
+                ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)
         val remark = row.getCellByColumnName("비고")
         val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
@@ -122,7 +135,7 @@ class SugangSnuFetchServiceImpl(
             semester = semester,
             category = "",
             classPlaceAndTimes = classTimes,
-            registrationCount = registrationCount
+            registrationCount = registrationCount,
         )
     }
 }

@@ -11,5 +11,5 @@ data class InsertNotificationRequest(
     val body: String,
     val insertFcm: Boolean,
     val type: NotificationType = NotificationType.NORMAL,
-    val dataPayload: Map<String, String> = emptyMap()
+    val dataPayload: Map<String, String> = emptyMap(),
 )

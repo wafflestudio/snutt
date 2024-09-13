@@ -5,7 +5,7 @@ import com.wafflestudio.snu4t.notification.data.Notification
 import com.wafflestudio.snu4t.notification.data.NotificationType
 
 sealed class TargetedPushMessage(
-    open val message: PushMessage
+    open val message: PushMessage,
 )
 
 /**
@@ -13,7 +13,7 @@ sealed class TargetedPushMessage(
  */
 data class TargetedPushMessageWithToken(
     val targetToken: String,
-    override val message: PushMessage
+    override val message: PushMessage,
 ) : TargetedPushMessage(message)
 
 /**
@@ -35,7 +35,10 @@ data class PushMessage(
 ) {
     data class Data(val payload: Map<String, String>)
 
-    fun toNotification(notificationType: NotificationType, userId: String?): Notification {
+    fun toNotification(
+        notificationType: NotificationType,
+        userId: String?,
+    ): Notification {
         return Notification(
             userId = userId,
             title = title,

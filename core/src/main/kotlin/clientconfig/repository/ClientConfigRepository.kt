@@ -15,9 +15,15 @@ interface ClientConfigRepository : CoroutineCrudRepository<ClientConfig, String>
 
     suspend fun findByNameOrderByCreatedAtDesc(name: String): List<ClientConfig>
 
-    suspend fun findByNameAndId(name: String, id: String): ClientConfig?
+    suspend fun findByNameAndId(
+        name: String,
+        id: String,
+    ): ClientConfig?
 
-    suspend fun deleteByNameAndId(name: String, id: String): Long
+    suspend fun deleteByNameAndId(
+        name: String,
+        id: String,
+    ): Long
 }
 
 suspend fun ClientConfigRepository.findByNameAndVersions(
@@ -26,11 +32,10 @@ suspend fun ClientConfigRepository.findByNameAndVersions(
     minAndroidVersion: AppVersion?,
     maxIosVersion: AppVersion?,
     maxAndroidVersion: AppVersion?,
-) =
-    findByNameAndMinIosVersionAndMinAndroidVersionAndMaxIosVersionAndMaxAndroidVersion(
-        name,
-        minIosVersion,
-        minAndroidVersion,
-        maxIosVersion,
-        maxAndroidVersion,
-    )
+) = findByNameAndMinIosVersionAndMinAndroidVersionAndMaxIosVersionAndMaxAndroidVersion(
+    name,
+    minIosVersion,
+    minAndroidVersion,
+    maxIosVersion,
+    maxAndroidVersion,
+)

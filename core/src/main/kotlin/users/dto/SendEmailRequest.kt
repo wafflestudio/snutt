@@ -6,5 +6,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class SendEmailRequest(
     @JsonProperty("email")
     @JsonAlias("user_email")
-    val email: String
+    val email: String,
 )

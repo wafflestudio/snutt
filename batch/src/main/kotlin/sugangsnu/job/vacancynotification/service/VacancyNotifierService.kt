@@ -48,20 +48,23 @@ class VacancyNotifierServiceImpl(
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
-    private val isFreshmanRegistrationCompleted = Calendar.getInstance() > Calendar.getInstance().apply {
-        set(Calendar.MONTH, Calendar.FEBRUARY)
-        set(Calendar.DAY_OF_MONTH, 14)
-    }
+    private val isFreshmanRegistrationCompleted =
+        Calendar.getInstance() >
+            Calendar.getInstance().apply {
+                set(Calendar.MONTH, Calendar.FEBRUARY)
+                set(Calendar.DAY_OF_MONTH, 14)
+            }
 
     override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
         log.info("시작")
-        val pageCount = runCatching {
-            getPageCount()
-        }.getOrElse {
-            log.error("에러가 발생했거나 부하 기간입니다. {}", it.message, it)
-            delay(30L.seconds)
-            return VacancyNotificationJobResult.OVERLOAD_PERIOD
-        }
+        val pageCount =
+            runCatching {
+                getPageCount()
+            }.getOrElse {
+                log.error("에러가 발생했거나 부하 기간입니다. {}", it.message, it)
+                delay(30L.seconds)
+                return VacancyNotificationJobResult.OVERLOAD_PERIOD
+            }
         val lectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val lectureMap = lectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
@@ -74,22 +77,25 @@ class VacancyNotifierServiceImpl(
             val registrationStatusMap =
                 registrationStatus.associateBy { info -> info.courseNumber + "##" + info.lectureNumber }
 
-            val lectureAndRegistrationStatus = (lectureMap.keys intersect registrationStatusMap.keys)
-                .map { lectureMap[it]!! to registrationStatusMap[it]!! }
+            val lectureAndRegistrationStatus =
+                (lectureMap.keys intersect registrationStatusMap.keys)
+                    .map { lectureMap[it]!! to registrationStatusMap[it]!! }
 
-            val notiTargetLectures = lectureAndRegistrationStatus
-                .filter { (lecture, _) -> lecture.isFull() }
-                .filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
-                .map { (lecture, _) -> lecture }
+            val notiTargetLectures =
+                lectureAndRegistrationStatus
+                    .filter { (lecture, _) -> lecture.isFull() }
+                    .filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
+                    .map { (lecture, _) -> lecture }
 
-            val updated = lectureAndRegistrationStatus
-                .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
-                .map { (lecture, status) ->
-                    lecture.apply {
-                        registrationCount = status.registrationCount
-                        wasFull = wasFull || lecture.isFull()
+            val updated =
+                lectureAndRegistrationStatus
+                    .filter { (lecture, status) -> lecture.registrationCount != status.registrationCount }
+                    .map { (lecture, status) ->
+                        lecture.apply {
+                            registrationCount = status.registrationCount
+                            wasFull = wasFull || lecture.isFull()
+                        }
                     }
-                }
             lectureService.upsertLectures(updated)
 
             pushCoroutineScope.launch {
@@ -98,20 +104,21 @@ class VacancyNotifierServiceImpl(
                         "이름: {}, 강좌번호: {}, 분반번호: {}",
                         lecture.courseTitle,
                         lecture.courseNumber,
-                        lecture.lectureNumber
+                        lecture.lectureNumber,
                     )
                     launch {
                         val userIds =
                             vacancyNotificationRepository.findAllByLectureId(lecture.id!!).map { it.userId }.toList()
-                        val pushMessage = PushMessage(
-                            title = "빈자리 알림",
-                            body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
-                            urlScheme = DeeplinkType.VACANCY
-                        )
+                        val pushMessage =
+                            PushMessage(
+                                title = "빈자리 알림",
+                                body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
+                                urlScheme = DeeplinkType.VACANCY,
+                            )
                         pushWithNotificationService.sendPushesAndNotifications(
                             pushMessage,
                             NotificationType.LECTURE_VACANCY,
-                            userIds
+                            userIds,
                         )
                     }
                 }
@@ -151,11 +158,12 @@ class VacancyNotifierServiceImpl(
             .map { course ->
                 course.select("div.course-info-item ul.course-info").first()!!
                     .let { info ->
-                        val (courseNumber, lectureNumber) = info
-                            .select("li:nth-of-type(1) > span:nth-of-type(3)").text()
-                            .takeIf { courseNumberRegex.matches(it) }!!
-                            .let { courseNumberRegex.find(it)!!.groups }
-                            .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
+                        val (courseNumber, lectureNumber) =
+                            info
+                                .select("li:nth-of-type(1) > span:nth-of-type(3)").text()
+                                .takeIf { courseNumberRegex.matches(it) }!!
+                                .let { courseNumberRegex.find(it)!!.groups }
+                                .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
                         val registrationCount =
                             info.select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
                                 .text()

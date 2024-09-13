@@ -7,7 +7,7 @@ data class SnuttEvLectureSummaryDto(
     val snuttId: String,
     val evLectureId: Long,
     val avgRating: Double?,
-    val evaluationCount: Long
+    val evaluationCount: Long,
 )
 
 data class SnuttEvLectureIdDto(

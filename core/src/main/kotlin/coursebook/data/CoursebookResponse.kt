@@ -8,11 +8,11 @@ data class CoursebookResponse(
     val year: Int,
     val semester: Semester,
     @JsonProperty("updated_at")
-    val updatedAt: Instant
+    val updatedAt: Instant,
 ) {
     constructor(coursebook: Coursebook) : this(
         year = coursebook.year,
         semester = coursebook.semester,
-        updatedAt = coursebook.updatedAt
+        updatedAt = coursebook.updatedAt,
     )
 }

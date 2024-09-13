@@ -37,8 +37,11 @@ import kotlin.reflect.full.memberProperties
 
 interface SugangSnuSyncService {
     suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult>
+
     suspend fun addCoursebook(coursebook: Coursebook)
+
     suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
+
     suspend fun flushCache()
 }
 
@@ -86,64 +89,73 @@ class SugangSnuSyncServiceImpl(
 
     private fun compareLectures(
         newLectures: Iterable<Lecture>,
-        oldLectures: Iterable<Lecture>
+        oldLectures: Iterable<Lecture>,
     ): SugangSnuLectureCompareResult {
         val newMap = newLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
         val oldMap = oldLectures.associateBy { lecture -> lecture.courseNumber + "##" + lecture.lectureNumber }
 
         val created = (newMap.keys - oldMap.keys).map(newMap::getValue)
-        val updated = (newMap.keys intersect oldMap.keys)
-            .map { oldMap[it]!! to newMap[it]!! }
-            .filter { (old, new) -> !(old equalsMetadata new) }
-            .map { (old, new) ->
-                UpdatedLecture(
-                    old, new,
-                    Lecture::class.memberProperties.filter {
-                        it != Lecture::id && it.get(old) != it.get(new)
-                    }
-                )
-            }
-        val deleted = (oldMap.keys - newMap.keys).map(
-            oldMap::getValue
-        )
+        val updated =
+            (newMap.keys intersect oldMap.keys)
+                .map { oldMap[it]!! to newMap[it]!! }
+                .filter { (old, new) -> !(old equalsMetadata new) }
+                .map { (old, new) ->
+                    UpdatedLecture(
+                        old,
+                        new,
+                        Lecture::class.memberProperties.filter {
+                            it != Lecture::id && it.get(old) != it.get(new)
+                        },
+                    )
+                }
+        val deleted =
+            (oldMap.keys - newMap.keys).map(
+                oldMap::getValue,
+            )
 
         return SugangSnuLectureCompareResult(created, deleted, updated)
     }
 
-    private suspend fun syncTagList(coursebook: Coursebook, lectures: Iterable<Lecture>) {
-        val tagCollection = lectures.fold(ParsedTags()) { acc, lecture ->
-            ParsedTags(
-                academicYear = acc.academicYear + lecture.academicYear,
-                classification = acc.classification + lecture.classification,
-                department = acc.department + lecture.department,
-                credit = acc.credit + lecture.credit,
-                instructor = acc.instructor + lecture.instructor,
-                category = acc.category + lecture.category,
+    private suspend fun syncTagList(
+        coursebook: Coursebook,
+        lectures: Iterable<Lecture>,
+    ) {
+        val tagCollection =
+            lectures.fold(ParsedTags()) { acc, lecture ->
+                ParsedTags(
+                    academicYear = acc.academicYear + lecture.academicYear,
+                    classification = acc.classification + lecture.classification,
+                    department = acc.department + lecture.department,
+                    credit = acc.credit + lecture.credit,
+                    instructor = acc.instructor + lecture.instructor,
+                    category = acc.category + lecture.category,
+                )
+            }.let { parsedTag ->
+                TagCollection(
+                    // 엑셀 academicYear 필드 '학년' 안 붙어 나오는 경우 제외
+                    academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
+                    classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                    department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                    credit = parsedTag.credit.sorted().map { "${it}학점" },
+                    instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                    category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                )
+            }
+        val tagList =
+            tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
+                ?.copy(tagCollection = tagCollection, updatedAt = Instant.now()) ?: TagList(
+                year = coursebook.year,
+                semester = coursebook.semester,
+                tagCollection = tagCollection,
             )
-        }.let { parsedTag ->
-            TagCollection(
-                // 엑셀 academicYear 필드 '학년' 안 붙어 나오는 경우 제외
-                academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
-                classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                credit = parsedTag.credit.sorted().map { "${it}학점" },
-                instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
-            )
-        }
-        val tagList = tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
-            ?.copy(tagCollection = tagCollection, updatedAt = Instant.now()) ?: TagList(
-            year = coursebook.year,
-            semester = coursebook.semester,
-            tagCollection = tagCollection
-        )
         tagListRepository.save(tagList)
     }
 
     private suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
-        val updatedLectures = compareResult.updatedLectureList.map { diff ->
-            diff.newData.apply { id = diff.oldData.id }
-        }
+        val updatedLectures =
+            compareResult.updatedLectureList.map { diff ->
+                diff.newData.apply { id = diff.oldData.id }
+            }
 
         lectureService.upsertLectures(compareResult.createdLectureList)
         lectureService.upsertLectures(updatedLectures)
@@ -172,7 +184,7 @@ class SugangSnuSyncServiceImpl(
         bookmarkRepository.findAllContainsLectureId(
             updatedLecture.oldData.year,
             updatedLecture.oldData.semester,
-            updatedLecture.oldData.id!!
+            updatedLecture.oldData.id!!,
         ).map { bookmark ->
             bookmark.apply {
                 lectures.find { it.id == updatedLecture.oldData.id }?.apply {
@@ -200,7 +212,7 @@ class SugangSnuSyncServiceImpl(
                 updatedLecture.oldData.courseTitle,
                 bookmark.userId,
                 updatedLecture.oldData.id!!,
-                updatedLecture.updatedField
+                updatedLecture.updatedField,
             )
         }
 
@@ -208,23 +220,23 @@ class SugangSnuSyncServiceImpl(
         timeTableRepository.findAllContainsLectureId(
             updatedLecture.oldData.year,
             updatedLecture.oldData.semester,
-            updatedLecture.oldData.id!!
+            updatedLecture.oldData.id!!,
         ).let { timetables ->
             merge(
                 updateTimetableLectures(
                     timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
-                    updatedLecture
+                    updatedLecture,
                 ),
                 dropOverlappingLectures(
                     timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
-                    updatedLecture
-                )
+                    updatedLecture,
+                ),
             )
         }
 
     private fun updateTimetableLectures(
         timetables: Flow<Timetable>,
-        updatedLecture: UpdatedLecture
+        updatedLecture: UpdatedLecture,
     ): Flow<TimetableLectureUpdateResult> =
         timetables.map { timetable ->
             timetable.apply {
@@ -256,13 +268,13 @@ class SugangSnuSyncServiceImpl(
                 timetableTitle = timetable.title,
                 timetableId = timetable.id!!,
                 courseTitle = updatedLecture.oldData.courseTitle,
-                updatedFields = updatedLecture.updatedField
+                updatedFields = updatedLecture.updatedField,
             )
         }
 
     fun dropOverlappingLectures(
         timetables: Flow<Timetable>,
-        updatedLecture: UpdatedLecture
+        updatedLecture: UpdatedLecture,
     ) = timetables.map { timetable ->
         timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, updatedLecture.oldData.id!!)
         TimetableLectureDeleteByOverlapResult(
@@ -275,16 +287,20 @@ class SugangSnuSyncServiceImpl(
         )
     }
 
-    fun isUpdatedTimetableLectureOverlapped(timetable: Timetable, updatedLecture: UpdatedLecture) =
-        updatedLecture.updatedField.contains(Lecture::classPlaceAndTimes) &&
-            timetable.lectures.any {
-                it.lectureId != updatedLecture.oldData.id &&
-                    ClassTimeUtils.timesOverlap(it.classPlaceAndTimes, updatedLecture.newData.classPlaceAndTimes)
-            }
+    fun isUpdatedTimetableLectureOverlapped(
+        timetable: Timetable,
+        updatedLecture: UpdatedLecture,
+    ) = updatedLecture.updatedField.contains(Lecture::classPlaceAndTimes) &&
+        timetable.lectures.any {
+            it.lectureId != updatedLecture.oldData.id &&
+                ClassTimeUtils.timesOverlap(it.classPlaceAndTimes, updatedLecture.newData.classPlaceAndTimes)
+        }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =
         bookmarkRepository.findAllContainsLectureId(
-            deletedLecture.year, deletedLecture.semester, deletedLecture.id!!
+            deletedLecture.year,
+            deletedLecture.semester,
+            deletedLecture.id!!,
         ).map { bookmark ->
             bookmarkRepository.pullLecture(bookmark.id!!, deletedLecture.id!!)
             BookmarkLectureDeleteResult(
@@ -298,7 +314,9 @@ class SugangSnuSyncServiceImpl(
 
     private fun deleteTimetableLectures(deletedLecture: Lecture): Flow<TimetableLectureDeleteResult> =
         timeTableRepository.findAllContainsLectureId(
-            deletedLecture.year, deletedLecture.semester, deletedLecture.id!!
+            deletedLecture.year,
+            deletedLecture.semester,
+            deletedLecture.id!!,
         ).map { timetable ->
             timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, deletedLecture.id!!)
             TimetableLectureDeleteResult(
@@ -312,11 +330,12 @@ class SugangSnuSyncServiceImpl(
         }
 
     private suspend fun updateLectureBuildings(compareResult: SugangSnuLectureCompareResult) {
-        val updatedPlaceInfos = (compareResult.updatedLectureList.map { it.newData } + compareResult.createdLectureList)
-            .flatMap { it.classPlaceAndTimes }
-            .flatMap { PlaceInfo.getValuesOf(it.place) }
-            .filter { it.campus == Campus.GWANAK }
-            .distinct()
+        val updatedPlaceInfos =
+            (compareResult.updatedLectureList.map { it.newData } + compareResult.createdLectureList)
+                .flatMap { it.classPlaceAndTimes }
+                .flatMap { PlaceInfo.getValuesOf(it.place) }
+                .filter { it.campus == Campus.GWANAK }
+                .distinct()
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
     }
 

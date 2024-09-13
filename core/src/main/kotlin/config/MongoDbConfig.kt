@@ -12,16 +12,14 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext
 @Configuration
 class MongoDbConfig {
     @Bean
-    fun customConversions(
-        converters: List<Converter<*, *>>,
-    ): MongoCustomConversions {
+    fun customConversions(converters: List<Converter<*, *>>): MongoCustomConversions {
         return MongoCustomConversions(converters)
     }
 
     @Bean
     fun mappingMongoConverter(
         context: MongoMappingContext,
-        conversions: MongoCustomConversions
+        conversions: MongoCustomConversions,
     ): MappingMongoConverter {
         return MappingMongoConverter(NoOpDbRefResolver.INSTANCE, context).apply {
             customConversions = conversions

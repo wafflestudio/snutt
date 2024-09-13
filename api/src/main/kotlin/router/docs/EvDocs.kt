@@ -14,12 +14,20 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/ev/lectures/{lectureId}/summary", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getLectureEvaluationSummary",
-            parameters = [Parameter(`in` = ParameterIn.QUERY, name = "lectureId", required = true, description = "snutt lecture id")],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = SnuttEvLectureSummaryDto::class))])],
-        ),
+        path = "/v1/ev/lectures/{lectureId}/summary",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getLectureEvaluationSummary",
+                parameters = [Parameter(`in` = ParameterIn.QUERY, name = "lectureId", required = true, description = "snutt lecture id")],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = SnuttEvLectureSummaryDto::class))],
+                    ),
+                ],
+            ),
     ),
 )
 annotation class EvDocs

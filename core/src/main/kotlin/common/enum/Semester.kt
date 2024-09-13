@@ -14,7 +14,8 @@ enum class Semester(
     SPRING(1, "1학기"),
     SUMMER(2, "여름학기"),
     AUTUMN(3, "2학기"),
-    WINTER(4, "겨울학기");
+    WINTER(4, "겨울학기"),
+    ;
 
     companion object {
         private val valueMap = entries.associateBy { e -> e.value }

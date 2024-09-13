@@ -13,20 +13,22 @@ class NotificationHandler(
     private val notificationService: NotificationService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiDefaultMiddleware
-) {
-    suspend fun getNotifications(req: ServerRequest) = handle(req) {
-        val offset = req.parseQueryParam<Long>("offset") ?: 0
-        val limit = req.parseQueryParam<Int>("limit") ?: 20
-        val explicit = (req.parseQueryParam<Int>("explicit") ?: 0) > 0
+        handlerMiddleware = snuttRestApiDefaultMiddleware,
+    ) {
+    suspend fun getNotifications(req: ServerRequest) =
+        handle(req) {
+            val offset = req.parseQueryParam<Long>("offset") ?: 0
+            val limit = req.parseQueryParam<Int>("limit") ?: 20
+            val explicit = (req.parseQueryParam<Int>("explicit") ?: 0) > 0
 
-        val notifications = notificationService.getNotifications(NotificationQuery(offset, limit, explicit, req.getContext().user!!))
-        notifications.map { NotificationResponse.from(it) }
-    }
+            val notifications = notificationService.getNotifications(NotificationQuery(offset, limit, explicit, req.getContext().user!!))
+            notifications.map { NotificationResponse.from(it) }
+        }
 
-    suspend fun getUnreadCounts(req: ServerRequest) = handle(req) {
-        val user = req.getContext().user!!
-        val unreadCount = notificationService.getUnreadCount(user)
-        NotificationCountResponse(unreadCount)
-    }
+    suspend fun getUnreadCounts(req: ServerRequest) =
+        handle(req) {
+            val user = req.getContext().user!!
+            val unreadCount = notificationService.getUnreadCount(user)
+            NotificationCountResponse(unreadCount)
+        }
 }

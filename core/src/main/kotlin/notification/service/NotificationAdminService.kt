@@ -13,15 +13,17 @@ class NotificationAdminService(
     private val userRepository: UserRepository,
 ) {
     suspend fun insertNotification(request: InsertNotificationRequest) {
-        val user = request.userId?.let {
-            userRepository.findByIdAndActiveTrue(it) ?: throw UserNotFoundException
-        }
+        val user =
+            request.userId?.let {
+                userRepository.findByIdAndActiveTrue(it) ?: throw UserNotFoundException
+            }
 
-        val pushMessage = PushMessage(
-            request.title,
-            request.body,
-            request.dataPayload,
-        )
+        val pushMessage =
+            PushMessage(
+                request.title,
+                request.body,
+                request.dataPayload,
+            )
         val notificationType = request.type
 
         if (request.insertFcm) {

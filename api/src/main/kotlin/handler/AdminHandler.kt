@@ -26,60 +26,68 @@ class AdminHandler(
     private val popupService: PopupService,
     snuttRestAdminApiMiddleware: SnuttRestAdminApiMiddleware,
 ) : ServiceHandler(snuttRestAdminApiMiddleware) {
-    suspend fun insertNotification(req: ServerRequest) = handle(req) {
-        val body = req.awaitBody<InsertNotificationRequest>()
-        notificationAdminService.insertNotification(body)
+    suspend fun insertNotification(req: ServerRequest) =
+        handle(req) {
+            val body = req.awaitBody<InsertNotificationRequest>()
+            notificationAdminService.insertNotification(body)
 
-        OkResponse()
-    }
+            OkResponse()
+        }
 
-    suspend fun postConfig(req: ServerRequest) = handle(req) {
-        val name = req.pathVariable("name")
-        val body = req.awaitBody<PostConfigRequest>()
+    suspend fun postConfig(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
+            val body = req.awaitBody<PostConfigRequest>()
 
-        val config = configService.postConfig(name, body)
-        ConfigResponse.from(config)
-    }
+            val config = configService.postConfig(name, body)
+            ConfigResponse.from(config)
+        }
 
-    suspend fun getConfigs(req: ServerRequest) = handle(req) {
-        val name = req.pathVariable("name")
+    suspend fun getConfigs(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
 
-        val configs = configService.getConfigsByName(name)
-        configs.map { ConfigResponse.from(it) }
-    }
+            val configs = configService.getConfigsByName(name)
+            configs.map { ConfigResponse.from(it) }
+        }
 
-    suspend fun deleteConfig(req: ServerRequest) = handle(req) {
-        val name = req.pathVariable("name")
-        val configId = req.pathVariable("id")
+    suspend fun deleteConfig(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
+            val configId = req.pathVariable("id")
 
-        configService.deleteConfig(name, configId)
-    }
+            configService.deleteConfig(name, configId)
+        }
 
-    suspend fun patchConfig(req: ServerRequest) = handle(req) {
-        val name = req.pathVariable("name")
-        val configId = req.pathVariable("id")
-        val body = req.awaitBody<PatchConfigRequest>()
+    suspend fun patchConfig(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
+            val configId = req.pathVariable("id")
+            val body = req.awaitBody<PatchConfigRequest>()
 
-        val config = configService.patchConfig(name, configId, body)
-        ConfigResponse.from(config)
-    }
+            val config = configService.patchConfig(name, configId, body)
+            ConfigResponse.from(config)
+        }
 
-    suspend fun getUploadSignedUris(req: ServerRequest) = handle(req) {
-        val source = StorageSource.from(req.pathVariable("source")) ?: throw ServerWebInputException("Invalid source")
-        val count = req.parseQueryParam<Int>("count") ?: 1
+    suspend fun getUploadSignedUris(req: ServerRequest) =
+        handle(req) {
+            val source = StorageSource.from(req.pathVariable("source")) ?: throw ServerWebInputException("Invalid source")
+            val count = req.parseQueryParam<Int>("count") ?: 1
 
-        storageService.getUploadSignedUris(source, count)
-    }
+            storageService.getUploadSignedUris(source, count)
+        }
 
-    suspend fun postPopup(req: ServerRequest) = handle(req) {
-        val body = req.awaitBody<PostPopupRequest>()
+    suspend fun postPopup(req: ServerRequest) =
+        handle(req) {
+            val body = req.awaitBody<PostPopupRequest>()
 
-        popupService.postPopup(body).let(::PopupResponse)
-    }
+            popupService.postPopup(body).let(::PopupResponse)
+        }
 
-    suspend fun deletePopup(req: ServerRequest) = handle(req) {
-        val popupId = req.pathVariable("id")
+    suspend fun deletePopup(req: ServerRequest) =
+        handle(req) {
+            val popupId = req.pathVariable("id")
 
-        popupService.deletePopup(popupId)
-    }
+            popupService.deletePopup(popupId)
+        }
 }

@@ -15,7 +15,11 @@ import java.net.URLEncoder
 
 interface DynamicLinkClient {
     suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse
-    suspend fun generateLink(link: String, mobileCtaLink: String): DynamicLinkResponse
+
+    suspend fun generateLink(
+        link: String,
+        mobileCtaLink: String,
+    ): DynamicLinkResponse
 }
 
 @Service
@@ -33,37 +37,44 @@ class FirebaseDynamicLinkClient(
         const val SHORT_LINK_PATH = "shortLinks"
     }
 
-    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse = runCatching {
-        firebaseDynamicLinkApi
-            .post()
-            .uri { builder ->
-                builder
-                    .path(SHORT_LINK_PATH)
-                    .queryParam("key", apiKey)
-                    .build()
-            }
-            .bodyValue(dynamicLinkRequest)
-            .retrieve()
-            .awaitBody<DynamicLinkResponse>()
-    }.getOrElse {
-        log.error("링크 생성 실패 (payload: {}, error: {}", dynamicLinkRequest, it.message)
-        throw DynamicLinkGenerationFailedException
-    }
+    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse =
+        runCatching {
+            firebaseDynamicLinkApi
+                .post()
+                .uri { builder ->
+                    builder
+                        .path(SHORT_LINK_PATH)
+                        .queryParam("key", apiKey)
+                        .build()
+                }
+                .bodyValue(dynamicLinkRequest)
+                .retrieve()
+                .awaitBody<DynamicLinkResponse>()
+        }.getOrElse {
+            log.error("링크 생성 실패 (payload: {}, error: {}", dynamicLinkRequest, it.message)
+            throw DynamicLinkGenerationFailedException
+        }
 
-    override suspend fun generateLink(link: String, mobileCtaLink: String): DynamicLinkResponse {
-        val dynamicLinkRequest = DynamicLinkRequest(
-            DynamicLinkInfo(
-                domainUriPrefix = domainUriPrefix,
-                link = DynamicLinkSimplePayload(link, mobileCtaLink).fullLink,
-                androidInfo = AndroidInfo(
-                    androidPackageName = androidPackageName
-                ),
-                iosInfo = IosInfo(
-                    iosBundleId = iosBundleId,
-                    iosAppStoreId = iosAppStoreId
+    override suspend fun generateLink(
+        link: String,
+        mobileCtaLink: String,
+    ): DynamicLinkResponse {
+        val dynamicLinkRequest =
+            DynamicLinkRequest(
+                DynamicLinkInfo(
+                    domainUriPrefix = domainUriPrefix,
+                    link = DynamicLinkSimplePayload(link, mobileCtaLink).fullLink,
+                    androidInfo =
+                        AndroidInfo(
+                            androidPackageName = androidPackageName,
+                        ),
+                    iosInfo =
+                        IosInfo(
+                            iosBundleId = iosBundleId,
+                            iosAppStoreId = iosAppStoreId,
+                        ),
                 ),
             )
-        )
         return generateLink(dynamicLinkRequest)
     }
 }

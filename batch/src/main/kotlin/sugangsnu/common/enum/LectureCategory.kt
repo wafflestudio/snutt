@@ -24,5 +24,5 @@ enum class LectureCategory(val parentCategory: String, val queryValue: Long, val
     GENERAL_CREATIVITY("06", 55, "창의와 융합"),
     GENERAL_KOREAN("06", 56, "한국의 이해"),
 
-    NONE("", 0, "전체");
+    NONE("", 0, "전체"),
 }

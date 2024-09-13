@@ -33,7 +33,10 @@ class SecretsManagerConfig : EnvironmentAware, BeanFactoryPostProcessor {
         }
     }
 
-    fun getSecretString(secretName: String, region: Region): String {
+    fun getSecretString(
+        secretName: String,
+        region: Region,
+    ): String {
         val client = SecretsManagerClient.builder().region(region).build()
         val request = GetSecretValueRequest.builder().secretId(secretName).build()
         return client.getSecretValue(request).secretString()

@@ -12,8 +12,7 @@ interface CoursebookService {
 
 @Service
 class CoursebookServiceImpl(private val coursebookRepository: CoursebookRepository) : CoursebookService {
-    override suspend fun getLatestCoursebook(): Coursebook =
-        coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
+    override suspend fun getLatestCoursebook(): Coursebook = coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
 
     override suspend fun getCoursebooks(): List<Coursebook> = coursebookRepository.findAllByOrderByYearDescSemesterDesc()
 }

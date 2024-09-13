@@ -4,5 +4,4 @@ enum class VacancyNotificationJobResult {
     REGISTRATION_IS_NOT_STARTED,
     OVERLOAD_PERIOD,
     SUCCESS,
-    ;
 }
