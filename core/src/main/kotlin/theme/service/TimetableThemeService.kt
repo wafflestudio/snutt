@@ -30,7 +30,11 @@ interface TimetableThemeService {
 
     suspend fun getFriendsThemes(userId: String): List<TimetableTheme>
 
-    suspend fun addTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme
+    suspend fun addTheme(
+        userId: String,
+        name: String,
+        colors: List<ColorSet>,
+    ): TimetableTheme
 
     suspend fun modifyTheme(
         userId: String,
@@ -39,11 +43,23 @@ interface TimetableThemeService {
         colors: List<ColorSet>?,
     ): TimetableTheme
 
-    suspend fun publishTheme(userId: String, themeId: String, publishName: String, authorAnonymous: Boolean)
+    suspend fun publishTheme(
+        userId: String,
+        themeId: String,
+        publishName: String,
+        authorAnonymous: Boolean,
+    )
 
-    suspend fun downloadTheme(downloadedUserId: String, themeId: String, name: String): TimetableTheme
+    suspend fun downloadTheme(
+        downloadedUserId: String,
+        themeId: String,
+        name: String,
+    ): TimetableTheme
 
-    suspend fun deleteTheme(userId: String, themeId: String)
+    suspend fun deleteTheme(
+        userId: String,
+        themeId: String,
+    )
 
     suspend fun copyTheme(
         userId: String,
@@ -116,7 +132,11 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.findByUserIdInAndStatus(friendIds, ThemeStatus.PUBLISHED)
     }
 
-    override suspend fun addTheme(userId: String, name: String, colors: List<ColorSet>): TimetableTheme {
+    override suspend fun addTheme(
+        userId: String,
+        name: String,
+        colors: List<ColorSet>,
+    ): TimetableTheme {
         if (colors.size !in 1..MAX_COLOR_COUNT) throw InvalidThemeColorCountException
         if (timetableThemeRepository.existsByUserIdAndName(userId, name)) throw DuplicateThemeNameException
 
@@ -164,41 +184,56 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.save(theme)
     }
 
-    override suspend fun publishTheme(userId: String, themeId: String, publishName: String, authorAnonymous: Boolean) {
+    override suspend fun publishTheme(
+        userId: String,
+        themeId: String,
+        publishName: String,
+        authorAnonymous: Boolean,
+    ) {
         val theme = getCustomTheme(userId, themeId)
         theme.apply {
             status = ThemeStatus.PUBLISHED
-            publishInfo = ThemeMarketInfo(
-                publishName = publishName,
-                authorAnonymous = authorAnonymous,
-                downloads = 0,
-            )
+            publishInfo =
+                ThemeMarketInfo(
+                    publishName = publishName,
+                    authorAnonymous = authorAnonymous,
+                    downloads = 0,
+                )
         }
         timetableThemeRepository.save(theme)
     }
 
-    override suspend fun downloadTheme(downloadedUserId: String, themeId: String, name: String): TimetableTheme {
+    override suspend fun downloadTheme(
+        downloadedUserId: String,
+        themeId: String,
+        name: String,
+    ): TimetableTheme {
         val theme = timetableThemeRepository.findById(themeId) ?: throw ThemeNotFoundException
         if (theme.status != ThemeStatus.PUBLISHED) throw ThemeNotFoundException
         if (timetableThemeRepository.existsByOriginId(themeId)) throw AlreadyDownloadedThemeException
-        val downloadedTheme = theme.copy(
-            id = null,
-            name = name,
-            userId = downloadedUserId,
-            origin = ThemeOrigin(
-                originId = theme.id!!,
-                authorId = theme.userId,
-            ),
-            status = ThemeStatus.DOWNLOADED,
-            publishInfo = null,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
-        )
+        val downloadedTheme =
+            theme.copy(
+                id = null,
+                name = name,
+                userId = downloadedUserId,
+                origin =
+                    ThemeOrigin(
+                        originId = theme.id!!,
+                        authorId = theme.userId,
+                    ),
+                status = ThemeStatus.DOWNLOADED,
+                publishInfo = null,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+            )
         timetableThemeRepository.addDownloadCount(themeId)
         return timetableThemeRepository.save(downloadedTheme)
     }
 
-    override suspend fun deleteTheme(userId: String, themeId: String) {
+    override suspend fun deleteTheme(
+        userId: String,
+        themeId: String,
+    ) {
         val theme = getCustomTheme(userId, themeId)
 
         val timetables = timetableRepository.findByUserIdAndThemeId(userId, themeId)
@@ -309,7 +344,10 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.findPublishedTimetablesByPublishNameContaining(keyword)
     }
 
-    private suspend fun getCustomTheme(userId: String, themeId: String): TimetableTheme {
+    private suspend fun getCustomTheme(
+        userId: String,
+        themeId: String,
+    ): TimetableTheme {
         return timetableThemeRepository.findByIdAndUserId(themeId, userId)?.also {
             if (!it.isCustom) throw InvalidThemeTypeException
         } ?: throw ThemeNotFoundException

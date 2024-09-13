@@ -51,9 +51,10 @@ class UserNicknameService(
     suspend fun appendNewTag(nickname: String): String {
         if (!isValidNickname(nickname)) throw InvalidNicknameException
 
-        val tagsWithSameNickname = userRepository.findAllByNicknameStartingWith(nickname)
-            .mapNotNull { it.nicknameTag }
-            .toSet()
+        val tagsWithSameNickname =
+            userRepository.findAllByNicknameStartingWith(nickname)
+                .mapNotNull { it.nicknameTag }
+                .toSet()
         val newTag = createTag(tagsWithSameNickname)
 
         return "$nickname$TAG_DELIMITER$newTag"

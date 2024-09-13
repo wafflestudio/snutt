@@ -12,6 +12,13 @@ interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, Str
 
     suspend fun findByUserIdAndIsCustomTrueOrderByUpdatedAtDesc(userId: String): List<TimetableTheme>
 
-    suspend fun existsByUserIdAndName(userId: String, name: String): Boolean
-    suspend fun findByUserIdInAndStatus(userIds: List<String>, status: ThemeStatus): List<TimetableTheme>
+    suspend fun existsByUserIdAndName(
+        userId: String,
+        name: String,
+    ): Boolean
+
+    suspend fun findByUserIdInAndStatus(
+        userIds: List<String>,
+        status: ThemeStatus,
+    ): List<TimetableTheme>
 }

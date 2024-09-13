@@ -27,21 +27,23 @@ class TimetableThemeHandler(
             timetableThemeService.getThemes(userId).map(::TimetableThemeDto)
         }
 
-    suspend fun getBestThemes(req: ServerRequest) = handle(req) {
-        val page = req.parseRequiredQueryParam<Int>("page")
+    suspend fun getBestThemes(req: ServerRequest) =
+        handle(req) {
+            val page = req.parseRequiredQueryParam<Int>("page")
 
-        val themes = timetableThemeService.getBestThemes(page)
-        val result = timetableThemeService.convertThemesToTimetableDtos(themes)
-        ListResponse(result)
-    }
+            val themes = timetableThemeService.getBestThemes(page)
+            val result = timetableThemeService.convertThemesToTimetableDtos(themes)
+            ListResponse(result)
+        }
 
-    suspend fun getFriendsThemes(req: ServerRequest) = handle(req) {
-        val userId = req.userId
+    suspend fun getFriendsThemes(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
 
-        val themes = timetableThemeService.getFriendsThemes(userId)
-        val result = timetableThemeService.convertThemesToTimetableDtos(themes)
-        ListResponse(result)
-    }
+            val themes = timetableThemeService.getFriendsThemes(userId)
+            val result = timetableThemeService.convertThemesToTimetableDtos(themes)
+            ListResponse(result)
+        }
 
     suspend fun addTheme(req: ServerRequest) =
         handle(req) {
@@ -60,35 +62,39 @@ class TimetableThemeHandler(
             timetableThemeService.modifyTheme(userId, themeId, body.name, body.colors).let(::TimetableThemeDto)
         }
 
-    suspend fun publishTheme(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val themeId = req.pathVariable("themeId")
-        val body = req.awaitBody<TimetableThemePublishRequestDto>()
+    suspend fun publishTheme(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val themeId = req.pathVariable("themeId")
+            val body = req.awaitBody<TimetableThemePublishRequestDto>()
 
-        timetableThemeService.publishTheme(userId, themeId, body.publishName, body.isAnonymous)
-        OkResponse()
-    }
+            timetableThemeService.publishTheme(userId, themeId, body.publishName, body.isAnonymous)
+            OkResponse()
+        }
 
-    suspend fun downloadTheme(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val themeId = req.pathVariable("themeId")
-        val body = req.awaitBody<TimetableThemeDownloadRequestDto>()
+    suspend fun downloadTheme(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val themeId = req.pathVariable("themeId")
+            val body = req.awaitBody<TimetableThemeDownloadRequestDto>()
 
-        val downloaded = timetableThemeService.downloadTheme(userId, themeId, body.name)
-        TimetableThemeDto(downloaded)
-    }
+            val downloaded = timetableThemeService.downloadTheme(userId, themeId, body.name)
+            TimetableThemeDto(downloaded)
+        }
 
-    suspend fun searchThemes(req: ServerRequest) = handle(req) {
-        val query = req.parseRequiredQueryParam<String>("query")
+    suspend fun searchThemes(req: ServerRequest) =
+        handle(req) {
+            val query = req.parseRequiredQueryParam<String>("query")
 
-        val themes = timetableThemeService.searchThemes(query)
-        val result = timetableThemeService.convertThemesToTimetableDtos(themes)
-        ListResponse(result)
-    }
+            val themes = timetableThemeService.searchThemes(query)
+            val result = timetableThemeService.convertThemesToTimetableDtos(themes)
+            ListResponse(result)
+        }
 
-    suspend fun deleteTheme(req: ServerRequest) = handle(req) {
-        val userId = req.userId
-        val themeId = req.pathVariable("themeId")
+    suspend fun deleteTheme(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val themeId = req.pathVariable("themeId")
 
             timetableThemeService.deleteTheme(userId, themeId)
         }

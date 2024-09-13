@@ -25,9 +25,13 @@ interface TimetableThemeCustomRepository {
         userId: String,
         name: String,
     ): TimetableTheme?
+
     suspend fun findPublishedTimetablesByPublishNameContaining(name: String): List<TimetableTheme>
+
     suspend fun findPublishedTimetablesOrderByDownloadsDesc(page: Int): List<TimetableTheme>
+
     suspend fun existsByOriginId(originId: String): Boolean
+
     suspend fun addDownloadCount(id: String)
 }
 
@@ -51,7 +55,7 @@ class TimetableThemeCustomRepositoryImpl(
         return reactiveMongoTemplate.find<TimetableTheme>(
             Query.query(
                 (TimetableTheme::publishInfo / ThemeMarketInfo::publishName)
-                    .regex(""".*${Regex.escape(name)}.*""")
+                    .regex(""".*${Regex.escape(name)}.*"""),
             ).with(TimetableTheme::name.desc()),
         ).collectList().awaitSingle()
     }
@@ -59,14 +63,14 @@ class TimetableThemeCustomRepositoryImpl(
     override suspend fun findPublishedTimetablesOrderByDownloadsDesc(page: Int): List<TimetableTheme> {
         return reactiveMongoTemplate.find<TimetableTheme>(
             Query.query(
-                TimetableTheme::status isEqualTo ThemeStatus.PUBLISHED
-            ).with((TimetableTheme::publishInfo / ThemeMarketInfo::downloads).desc())
+                TimetableTheme::status isEqualTo ThemeStatus.PUBLISHED,
+            ).with((TimetableTheme::publishInfo / ThemeMarketInfo::downloads).desc()),
         ).skip((page - 1) * 10L).take(10).collectList().awaitSingle()
     }
 
     override suspend fun existsByOriginId(originId: String): Boolean =
         reactiveMongoTemplate.exists<TimetableTheme>(
-            Query.query((TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId)
+            Query.query((TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId),
         ).awaitSingle()
 
     override suspend fun addDownloadCount(id: String) {

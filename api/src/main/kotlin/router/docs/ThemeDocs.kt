@@ -36,19 +36,35 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/themes/best", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getBestThemes",
-            parameters = [Parameter(`in` = ParameterIn.QUERY, name = "page", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ThemesResponse::class))])],
-        ),
+        path = "/v1/themes/best",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getBestThemes",
+                parameters = [Parameter(`in` = ParameterIn.QUERY, name = "page", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = ThemesResponse::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
-        path = "/v1/themes/friends", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getFriendsThemes",
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ThemesResponse::class))])],
-        ),
+        path = "/v1/themes/friends",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getFriendsThemes",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = ThemesResponse::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/themes",
@@ -145,36 +161,57 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/themes/{themeId}/publish", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "publishTheme",
-            parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
-            requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = TimetableThemePublishRequestDto::class))],
-                required = true,
+        path = "/v1/themes/{themeId}/publish",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "publishTheme",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
+                requestBody =
+                    RequestBody(
+                        content = [Content(schema = Schema(implementation = TimetableThemePublishRequestDto::class))],
+                        required = true,
+                    ),
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])],
             ),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])],
-        ),
     ),
     RouterOperation(
-        path = "/v1/themes/{themeId}/download", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "downloadTheme",
-            parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
-            requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = TimetableThemeDownloadRequestDto::class))],
-                required = true,
+        path = "/v1/themes/{themeId}/download",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "downloadTheme",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
+                requestBody =
+                    RequestBody(
+                        content = [Content(schema = Schema(implementation = TimetableThemeDownloadRequestDto::class))],
+                        required = true,
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableThemeDto::class))],
+                    ),
+                ],
             ),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = TimetableThemeDto::class))])],
-        ),
     ),
     RouterOperation(
-        path = "/v1/themes/search", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "searchThemes",
-            parameters = [Parameter(`in` = ParameterIn.QUERY, name = "query", required = true)],
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = ThemesResponse::class)))]),],
-        ),
+        path = "/v1/themes/search",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "searchThemes",
+                parameters = [Parameter(`in` = ParameterIn.QUERY, name = "query", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = ThemesResponse::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/themes/basic/{basicThemeTypeValue}/default",

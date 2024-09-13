@@ -41,25 +41,28 @@ fun TimetableThemeDto(timetableTheme: TimetableTheme) =
         )
     }
 
-fun TimetableThemeDto(timetableTheme: TimetableTheme, userNickname: String?) =
-    userNickname?.let { nickname ->
-        with(timetableTheme) {
-            TimetableThemeDto(
-                id = toIdForTimetable(),
-                theme = toBasicThemeType(),
-                name = name,
-                colors = colors,
-                isDefault = isDefault,
-                isCustom = isCustom,
-                origin = origin,
-                status = status,
-                publishInfo = publishInfo?.let {
+fun TimetableThemeDto(
+    timetableTheme: TimetableTheme,
+    userNickname: String?,
+) = userNickname?.let { nickname ->
+    with(timetableTheme) {
+        TimetableThemeDto(
+            id = toIdForTimetable(),
+            theme = toBasicThemeType(),
+            name = name,
+            colors = colors,
+            isDefault = isDefault,
+            isCustom = isCustom,
+            origin = origin,
+            status = status,
+            publishInfo =
+                publishInfo?.let {
                     ThemeMarketInfoDto(
                         publishName = it.publishName,
                         authorName = if (it.authorAnonymous) "익명" else nickname,
                         downloads = it.downloads,
                     )
                 },
-            )
-        }
+        )
     }
+}
