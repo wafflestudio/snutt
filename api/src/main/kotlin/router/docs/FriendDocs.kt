@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "requestFriend",
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = FriendRequest::class))],
+                content = [Content(schema = Schema(implementation = FriendRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
             ),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = FriendsResponse::class))])]
@@ -61,7 +61,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation = Operation(
             operationId = "updateFriendDisplayName",
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = UpdateFriendDisplayNameRequest::class))],
+                content = [Content(schema = Schema(implementation = UpdateFriendDisplayNameRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
             ),
             parameters = [Parameter(`in` = ParameterIn.PATH, name = "friendId", required = true)],

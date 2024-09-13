@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod
             operationId = "insertNotification",
             description = "어드민 권한으로 알림 보내기",
             requestBody = RequestBody(
-                content = [Content(schema = Schema(implementation = InsertNotificationRequest::class))],
+                content = [Content(schema = Schema(implementation = InsertNotificationRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)],
                 required = true,
                 description = "userId null이면 모든 유저에게 보냄"
             ),
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/admin/configs/{name}", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "postConfig",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PostConfigRequest::class))], required = true),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PostConfigRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)], required = true),
             parameters = [
                 Parameter(`in` = ParameterIn.PATH, name = "name", required = true)
             ],
@@ -71,7 +71,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/admin/configs/{name}/{id}", method = [RequestMethod.PATCH], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "patchConfig",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PatchConfigRequest::class))], required = true),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PatchConfigRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)], required = true),
             parameters = [
                 Parameter(`in` = ParameterIn.PATH, name = "name", required = true),
                 Parameter(`in` = ParameterIn.PATH, name = "id", required = true)
@@ -94,7 +94,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         path = "/v1/admin/popups", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
         operation = Operation(
             operationId = "postPopup",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PostPopupRequest::class))], required = true),
+            requestBody = RequestBody(content = [Content(schema = Schema(implementation = PostPopupRequest::class), mediaType = MediaType.APPLICATION_JSON_VALUE)], required = true),
             responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = PopupResponse::class))])],
         ),
     ),
