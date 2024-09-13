@@ -174,6 +174,7 @@ class TimetableThemeServiceImpl(
                 downloads = 0,
             )
         }
+        timetableThemeRepository.save(theme)
     }
 
     override suspend fun downloadTheme(downloadedUserId: String, themeId: String, name: String): TimetableTheme {

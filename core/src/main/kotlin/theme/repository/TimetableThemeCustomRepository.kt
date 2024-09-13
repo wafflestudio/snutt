@@ -3,6 +3,9 @@ package com.wafflestudio.snu4t.theme.repository
 import com.wafflestudio.snu4t.common.extension.desc
 import com.wafflestudio.snu4t.common.extension.isEqualTo
 import com.wafflestudio.snu4t.common.extension.regex
+import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
+import com.wafflestudio.snu4t.theme.data.ThemeOrigin
+import com.wafflestudio.snu4t.theme.data.ThemeStatus
 import com.wafflestudio.snu4t.theme.data.TimetableTheme
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -61,11 +64,10 @@ class TimetableThemeCustomRepositoryImpl(
         ).skip((page - 1) * 10L).take(10).collectList().awaitSingle()
     }
 
-    override suspend fun existsByOriginId(originId: String): Boolean {
-        return reactiveMongoTemplate.exists<TimetableTheme>(
+    override suspend fun existsByOriginId(originId: String): Boolean =
+        reactiveMongoTemplate.exists<TimetableTheme>(
             Query.query((TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId)
         ).awaitSingle()
-    }
 
     override suspend fun addDownloadCount(id: String) {
         reactiveMongoTemplate.updateFirst<TimetableTheme>(
