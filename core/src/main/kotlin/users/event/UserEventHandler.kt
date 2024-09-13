@@ -10,7 +10,7 @@ class UserEventHandler(
     private val timetableService: TimetableService,
 ) {
     @EventListener
-    suspend fun createDefaultTimetable(event: SignupEvent) {
+    suspend fun handleSignupEvent(event: SignupEvent) {
         timetableService.createDefaultTable(event.userId)
     }
 }
