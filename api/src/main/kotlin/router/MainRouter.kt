@@ -13,6 +13,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.PopupHandler
+import com.wafflestudio.snu4t.handler.StaticHandler
 import com.wafflestudio.snu4t.handler.TagHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
@@ -41,6 +42,7 @@ import org.springframework.web.reactive.function.server.CoRouterFunctionDsl
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.coRouter
+import org.springframework.web.reactive.function.server.router
 
 @Component
 class MainRouter(
@@ -63,6 +65,7 @@ class MainRouter(
     private val evHandler: EvHandler,
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
+    private val staticHandler: StaticHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -295,5 +298,13 @@ class MainRouter(
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) =
         coRouter {
             path("/v1").or("").nest(r)
+        }
+
+    @Bean
+    fun staticRouter() =
+        coRouter {
+            GET("/member", staticHandler::memberPage)
+            GET("/privacy_policy", staticHandler::privacyPolicyPage)
+            GET("/terms_of_service", staticHandler::termsOfServicePage)
         }
 }
