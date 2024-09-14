@@ -303,8 +303,8 @@ class MainRouter(
     @Bean
     fun staticRouter() =
         coRouter {
-            GET("/member", staticHandler::memberPage)
-            GET("/privacy_policy", staticHandler::privacyPolicyPage)
-            GET("/terms_of_service", staticHandler::termsOfServicePage)
+            GET("/member").invoke { staticHandler.memberPage() }
+            GET("/privacy_policy").invoke { staticHandler.privacyPolicyPage() }
+            GET("/terms_of_service").invoke { staticHandler.termsOfServicePage() }
         }
 }
