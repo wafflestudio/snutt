@@ -13,7 +13,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.PopupHandler
-import com.wafflestudio.snu4t.handler.StaticHandler
+import com.wafflestudio.snu4t.handler.StaticPageHandler
 import com.wafflestudio.snu4t.handler.TagHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
@@ -42,7 +42,6 @@ import org.springframework.web.reactive.function.server.CoRouterFunctionDsl
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.coRouter
-import org.springframework.web.reactive.function.server.router
 
 @Component
 class MainRouter(
@@ -65,7 +64,7 @@ class MainRouter(
     private val evHandler: EvHandler,
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
-    private val staticHandler: StaticHandler,
+    private val staticPageHandler: StaticPageHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -301,10 +300,10 @@ class MainRouter(
         }
 
     @Bean
-    fun staticRouter() =
+    fun staticPageRouter() =
         coRouter {
-            GET("/member").invoke { staticHandler.memberPage() }
-            GET("/privacy_policy").invoke { staticHandler.privacyPolicyPage() }
-            GET("/terms_of_service").invoke { staticHandler.termsOfServicePage() }
+            GET("/member").invoke { staticPageHandler.member() }
+            GET("/privacy_policy").invoke { staticPageHandler.privacyPolicy() }
+            GET("/terms_of_service").invoke { staticPageHandler.termsOfService() }
         }
 }
