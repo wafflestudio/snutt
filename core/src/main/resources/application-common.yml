@@ -27,6 +27,9 @@ google:
 http:
   response-timeout: 3s
 
+github:
+  token:
+
 api:
   server:
     snuttev:
