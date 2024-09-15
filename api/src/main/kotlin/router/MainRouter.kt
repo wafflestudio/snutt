@@ -8,6 +8,7 @@ import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.CoursebookHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.EvHandler
+import com.wafflestudio.snu4t.handler.FeedbackHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
@@ -63,6 +64,7 @@ class MainRouter(
     private val evHandler: EvHandler,
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
+    private val feedbackHandler: FeedbackHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -289,6 +291,14 @@ class MainRouter(
                 GET("", coursebookHandler::getCoursebooks)
                 GET("/recent", coursebookHandler::getLatestCoursebook)
                 GET("/official", coursebookHandler::getCoursebookOfficial)
+            }
+        }
+
+    @Bean
+    fun feedbackRouter() =
+        v1CoRouter {
+            "/feedback".nest {
+                POST("", feedbackHandler::postFeedback)
             }
         }
 
