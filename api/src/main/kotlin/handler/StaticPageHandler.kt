@@ -1,5 +1,4 @@
 package com.wafflestudio.snu4t.handler
-import com.wafflestudio.snu4t.middleware.Middleware
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.CacheControl
 import org.springframework.stereotype.Component
@@ -8,7 +7,7 @@ import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import java.time.Duration
 
 @Component
-class StaticPageHandler : ServiceHandler(Middleware.NoOp) {
+class StaticPageHandler {
     companion object {
         const val RESOURCE_PATH = "/views"
         private val memberHtml = ClassPathResource("$RESOURCE_PATH/member.html")
