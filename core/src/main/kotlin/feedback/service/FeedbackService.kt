@@ -7,6 +7,8 @@ import com.wafflestudio.snu4t.common.github.dto.GithubIssue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 interface FeedbackService {
@@ -35,8 +37,14 @@ class FeedbackServiceImpl(
         deviceModel: String,
     ) {
         val osTypeString = osType.toString().lowercase()
-        val platform = osVersion?.let { "$osTypeString (v$osVersion)" } ?: osTypeString
-        val currentUtcTime = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+        val platform = osVersion?.let { "$osTypeString ($osVersion)" } ?: osTypeString
+        val currentSeoulTime =
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
+                ZonedDateTime.ofInstant(
+                    Instant.now(),
+                    ZoneId.of("Asia/Seoul"),
+                ),
+            )
         githubRestApiClient.addRepoIssue(
             repoOwner = repoOwner,
             repoName = repoName,
@@ -45,11 +53,11 @@ class FeedbackServiceImpl(
                     title = message,
                     header =
                         mapOf(
-                            "이메일" to email,
+                            "이메일" to "`$email`",
                             "플랫폼" to platform,
                             "버전" to appVersion,
                             "디바이스" to deviceModel,
-                            "날짜/시간(UTC)" to currentUtcTime,
+                            "날짜/시간(UTC+9)" to currentSeoulTime,
                         ),
                     body = message,
                     labels = listOf(osTypeString),

@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.client.AppVersion
+import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.feedback.dto.FeedbackPostRequestDto
 import com.wafflestudio.snu4t.feedback.service.FeedbackService
 import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
@@ -26,5 +27,6 @@ class FeedbackHandler(
                 appVersion = clientInfo.appVersion ?: AppVersion("Unknown"),
                 deviceModel = clientInfo.deviceModel ?: "Unknown",
             )
+            OkResponse()
         }
 }
