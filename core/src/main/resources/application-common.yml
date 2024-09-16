@@ -29,6 +29,10 @@ http:
 
 github:
   token:
+  feedback:
+    repo:
+      owner:
+      name:
 
 api:
   server:
