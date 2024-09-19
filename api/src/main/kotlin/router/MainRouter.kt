@@ -107,6 +107,12 @@ class MainRouter(
                 POST("/email/verification/code", userHandler::confirmEmailVerification)
                 POST("/password", userHandler::attachLocal)
                 PUT("/password", userHandler::changePassword)
+                POST("/facebook", userHandler::attachFacebook)
+                POST("/google", userHandler::attachGoogle)
+                POST("/kakao", userHandler::attachKakao)
+                DELETE("/facebook", userHandler::detachFacebook)
+                DELETE("/google", userHandler::detachGoogle)
+                DELETE("/kakao", userHandler::detachKakao)
             }
             "/users".nest {
                 GET("/me", userHandler::getUserMe)

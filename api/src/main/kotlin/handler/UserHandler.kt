@@ -8,6 +8,7 @@ import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
+import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -97,6 +98,45 @@ class UserHandler(
             val user = req.getContext().user!!
             val body = req.awaitBody<LocalLoginRequest>()
             userService.attachLocal(user, body)
+        }
+
+    suspend fun attachFacebook(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachFacebook(user, socialLoginRequest)
+        }
+
+    suspend fun attachGoogle(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachGoogle(user, socialLoginRequest)
+        }
+
+    suspend fun attachKakao(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachKakao(user, socialLoginRequest)
+        }
+
+    suspend fun detachFacebook(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachFacebook(user)
+        }
+
+    suspend fun detachGoogle(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachGoogle(user)
+        }
+
+    suspend fun detachKakao(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachKakao(user)
         }
 
     suspend fun changePassword(req: ServerRequest): ServerResponse =
