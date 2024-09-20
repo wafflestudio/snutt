@@ -406,21 +406,19 @@ class UserServiceImpl(
         if (user.credential.fbId != null) throw AlreadySocialAccountException
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.FACEBOOK, token)
-        val presentUser = userRepository.findByCredentialFbIdAndActiveTrue(token)
 
-        if (presentUser != null) {
+        if (userRepository.existsByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)) {
             throw DuplicateSocialAccountException
         }
-
-        val credential = authService.buildFacebookCredential(oauth2UserResponse)
+        val socialCredential = authService.buildFacebookCredential(oauth2UserResponse)
 
         checkNotNull(oauth2UserResponse.email) { "facebook email is null: $oauth2UserResponse" }
         userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(SocialProvider.FACEBOOK)
         }
         user.apply {
-            credential.fbId = token
-            credential.fbName = oauth2UserResponse.name
+            credential.fbId = socialCredential.fbId
+            credential.fbName = socialCredential.fbName
             credentialHash = authService.generateCredentialHash(credential)
         }
         userRepository.save(user)
@@ -434,21 +432,19 @@ class UserServiceImpl(
         if (user.credential.googleSub != null) throw AlreadySocialAccountException
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.GOOGLE, token)
-        val presentUser = userRepository.findByCredentialGoogleSubAndActiveTrue(token)
 
-        if (presentUser != null) {
+        if (userRepository.existsByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)) {
             throw DuplicateSocialAccountException
         }
-
-        val credential = authService.buildGoogleCredential(oauth2UserResponse)
+        val socialCredential = authService.buildGoogleCredential(oauth2UserResponse)
 
         checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
         userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(SocialProvider.GOOGLE)
         }
         user.apply {
-            credential.googleSub = token
-            credential.googleEmail = oauth2UserResponse.email
+            credential.googleSub = socialCredential.googleSub
+            credential.googleEmail = socialCredential.googleEmail
             credentialHash = authService.generateCredentialHash(credential)
         }
         userRepository.save(user)
@@ -462,21 +458,19 @@ class UserServiceImpl(
         if (user.credential.kakaoSub != null) throw AlreadySocialAccountException
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(SocialProvider.KAKAO, token)
-        val presentUser = userRepository.findByCredentialKakaoSubAndActiveTrue(token)
 
-        if (presentUser != null) {
+        if (userRepository.existsByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)) {
             throw DuplicateSocialAccountException
         }
-
-        val credential = authService.buildKakaoCredential(oauth2UserResponse)
+        val socialCredential = authService.buildKakaoCredential(oauth2UserResponse)
 
         checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
         userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(SocialProvider.KAKAO)
         }
         user.apply {
-            credential.kakaoSub = token
-            credential.kakaoEmail = oauth2UserResponse.email
+            credential.kakaoSub = socialCredential.kakaoSub
+            credential.kakaoEmail = socialCredential.kakaoEmail
             credentialHash = authService.generateCredentialHash(credential)
         }
         userRepository.save(user)
