@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.common.extension.toZonedDateTime
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
@@ -104,39 +105,39 @@ class UserHandler(
         handle(req) {
             val user = req.getContext().user!!
             val socialLoginRequest: SocialLoginRequest = req.awaitBody()
-            userService.attachFacebook(user, socialLoginRequest)
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.FACEBOOK)
         }
 
     suspend fun attachGoogle(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
             val socialLoginRequest: SocialLoginRequest = req.awaitBody()
-            userService.attachGoogle(user, socialLoginRequest)
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.GOOGLE)
         }
 
     suspend fun attachKakao(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
             val socialLoginRequest: SocialLoginRequest = req.awaitBody()
-            userService.attachKakao(user, socialLoginRequest)
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.KAKAO)
         }
 
     suspend fun detachFacebook(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
-            userService.detachFacebook(user)
+            userService.detachSocial(user, SocialProvider.FACEBOOK)
         }
 
     suspend fun detachGoogle(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
-            userService.detachGoogle(user)
+            userService.detachSocial(user, SocialProvider.GOOGLE)
         }
 
     suspend fun detachKakao(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
-            userService.detachKakao(user)
+            userService.detachSocial(user, SocialProvider.KAKAO)
         }
 
     suspend fun changePassword(req: ServerRequest): ServerResponse =
