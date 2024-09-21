@@ -12,14 +12,15 @@ class PopupHandler(
     private val popupService: PopupService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(snuttRestApiNoAuthMiddleware) {
-    suspend fun getPopups(req: ServerRequest) = handle(req) {
-        val clientInfo = req.clientInfo!!
+    suspend fun getPopups(req: ServerRequest) =
+        handle(req) {
+            val clientInfo = req.clientInfo!!
 
-        val popups = popupService.getPopups(clientInfo)
+            val popups = popupService.getPopups(clientInfo)
 
-        ListResponse(
-            content = popups.map(::PopupResponse),
-            totalCount = popups.size,
-        )
-    }
+            ListResponse(
+                content = popups.map(::PopupResponse),
+                totalCount = popups.size,
+            )
+        }
 }

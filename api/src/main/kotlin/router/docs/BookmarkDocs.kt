@@ -17,40 +17,74 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/bookmarks", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getBookmark",
-            parameters = [
-                Parameter(`in` = ParameterIn.QUERY, name = "year", required = true),
-                Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
-            ],
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = BookmarkResponse::class))])]
-        ),
+        path = "/v1/bookmarks",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getBookmark",
+                parameters = [
+                    Parameter(`in` = ParameterIn.QUERY, name = "year", required = true),
+                    Parameter(`in` = ParameterIn.QUERY, name = "semester", required = true),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = BookmarkResponse::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
-        path = "/v1/bookmarks/lectures/{lectureId}/state", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "existsBookmarkLecture",
-            responses = [
-                ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ExistenceResponse::class))]),
-            ]
-        ),
+        path = "/v1/bookmarks/lectures/{lectureId}/state",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "existsBookmarkLecture",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "lectureId", required = true)],
+                responses = [
+                    ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ExistenceResponse::class))]),
+                ],
+            ),
     ),
     RouterOperation(
-        path = "/v1/bookmarks/lecture", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "addLecture",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = BookmarkLectureModifyRequest::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
-        ),
+        path = "/v1/bookmarks/lecture",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "addLecture",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = BookmarkLectureModifyRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])],
+            ),
     ),
     RouterOperation(
-        path = "/v1/bookmarks/lecture", method = [RequestMethod.DELETE], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "deleteBookmark",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = BookmarkLectureModifyRequest::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])]
-        ),
+        path = "/v1/bookmarks/lecture",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "deleteBookmark",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = BookmarkLectureModifyRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])],
+            ),
     ),
 )
 annotation class BookmarkDocs

@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.tag.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snu4t.common.enum.SortCriteria
 
 data class TagListResponse(
     val classification: List<String>,
@@ -14,13 +15,19 @@ data class TagListResponse(
     @JsonProperty("updated_at")
     val updatedAt: Long,
 )
-fun TagListResponse(tagList: TagList) = TagListResponse(
-    classification = tagList.tagCollection.classification,
-    department = tagList.tagCollection.department,
-    academicYear = tagList.tagCollection.academicYear,
-    credit = tagList.tagCollection.credit,
-    instructor = tagList.tagCollection.instructor,
-    category = tagList.tagCollection.category,
-    sortCriteria = tagList.tagCollection.sortCriteria,
-    updatedAt = tagList.updatedAt.toEpochMilli()
-)
+
+fun TagListResponse(tagList: TagList) =
+    TagListResponse(
+        classification = tagList.tagCollection.classification,
+        department = tagList.tagCollection.department,
+        academicYear = tagList.tagCollection.academicYear,
+        credit = tagList.tagCollection.credit,
+        instructor = tagList.tagCollection.instructor,
+        category = tagList.tagCollection.category,
+        sortCriteria =
+            SortCriteria.entries
+                .sortedBy { it.value }
+                .map { it.fullName }
+                .filterNot { it == "기본값" },
+        updatedAt = tagList.updatedAt.toEpochMilli(),
+    )

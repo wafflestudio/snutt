@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CoursebookRepository : CoroutineCrudRepository<Coursebook, String> {
     suspend fun findFirstByOrderByYearDescSemesterDesc(): Coursebook
+
+    suspend fun findAllByOrderByYearDescSemesterDesc(): List<Coursebook>
 }

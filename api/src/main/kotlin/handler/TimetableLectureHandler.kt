@@ -18,80 +18,85 @@ class TimetableLectureHandler(
     private val timetableService: TimetableService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiDefaultMiddleware
-) {
-    suspend fun addCustomLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val customTimetable = req.awaitBody<CustomTimetableLectureAddLegacyRequestDto>()
-        val isForced = req.parseQueryParam<Boolean>("isForced") ?: customTimetable.isForced
+        handlerMiddleware = snuttRestApiDefaultMiddleware,
+    ) {
+    suspend fun addCustomLecture(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val timetableId = req.pathVariable("timetableId")
+            val customTimetable = req.awaitBody<CustomTimetableLectureAddLegacyRequestDto>()
+            val isForced = req.parseQueryParam<Boolean>("isForced") ?: customTimetable.isForced
 
-        timetableLectureService.addCustomTimetableLecture(
-            userId = userId,
-            timetableId = timetableId,
-            timetableLectureRequest = customTimetable,
-            isForced = isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
-    }
+            timetableLectureService.addCustomTimetableLecture(
+                userId = userId,
+                timetableId = timetableId,
+                timetableLectureRequest = customTimetable,
+                isForced = isForced,
+            ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        }
 
-    suspend fun addLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val lectureId = req.pathVariable("lectureId")
-        val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
+    suspend fun addLecture(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val timetableId = req.pathVariable("timetableId")
+            val lectureId = req.pathVariable("lectureId")
+            val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
 
-        timetableLectureService.addLecture(
-            userId = userId,
-            timetableId = timetableId,
-            lectureId = lectureId,
-            isForced = isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
-    }
+            timetableLectureService.addLecture(
+                userId = userId,
+                timetableId = timetableId,
+                lectureId = lectureId,
+                isForced = isForced,
+            ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        }
 
-    suspend fun resetTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val timetableLectureId = req.pathVariable("timetableLectureId")
-        val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
+    suspend fun resetTimetableLecture(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val timetableId = req.pathVariable("timetableId")
+            val timetableLectureId = req.pathVariable("timetableLectureId")
+            val isForced = req.parseQueryParam<Boolean>("isForced") ?: req.awaitBodyOrNull<ForcedReq>()?.isForced ?: false
 
-        timetableLectureService.resetTimetableLecture(
-            userId = userId,
-            timetableId = timetableId,
-            timetableLectureId = timetableLectureId,
-            isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
-    }
+            timetableLectureService.resetTimetableLecture(
+                userId = userId,
+                timetableId = timetableId,
+                timetableLectureId = timetableLectureId,
+                isForced,
+            ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        }
 
-    suspend fun modifyTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val timetableLectureId = req.pathVariable("timetableLectureId")
-        val modifyRequestDto = req.awaitBody<TimetableLectureModifyLegacyRequestDto>()
-        val isForced = req.parseQueryParam<Boolean>("isForced") ?: modifyRequestDto.isForced
+    suspend fun modifyTimetableLecture(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val timetableId = req.pathVariable("timetableId")
+            val timetableLectureId = req.pathVariable("timetableLectureId")
+            val modifyRequestDto = req.awaitBody<TimetableLectureModifyLegacyRequestDto>()
+            val isForced = req.parseQueryParam<Boolean>("isForced") ?: modifyRequestDto.isForced
 
-        timetableLectureService.modifyTimetableLecture(
-            userId = userId,
-            timetableId = timetableId,
-            timetableLectureId = timetableLectureId,
-            modifyTimetableLectureRequestDto = modifyRequestDto,
-            isForced = isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
-    }
+            timetableLectureService.modifyTimetableLecture(
+                userId = userId,
+                timetableId = timetableId,
+                timetableLectureId = timetableLectureId,
+                modifyTimetableLectureRequestDto = modifyRequestDto,
+                isForced = isForced,
+            ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        }
 
-    suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val timetableId = req.pathVariable("timetableId")
-        val timetableLectureId = req.pathVariable("timetableLectureId")
+    suspend fun deleteTimetableLecture(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val timetableId = req.pathVariable("timetableId")
+            val timetableLectureId = req.pathVariable("timetableLectureId")
 
-        timetableLectureService.deleteTimetableLecture(
-            userId = userId,
-            timetableId = timetableId,
-            timetableLectureId = timetableLectureId,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
-    }
+            timetableLectureService.deleteTimetableLecture(
+                userId = userId,
+                timetableId = timetableId,
+                timetableLectureId = timetableLectureId,
+            ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        }
 
     data class ForcedReq(
         @JsonProperty("is_forced")
-        val isForced: Boolean?
+        val isForced: Boolean?,
     )
 }

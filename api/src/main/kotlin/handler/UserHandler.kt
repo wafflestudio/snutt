@@ -25,85 +25,96 @@ class UserHandler(
     private val userNicknameService: UserNicknameService,
     snuttRestApiDefaultMiddleware: SnuttRestApiDefaultMiddleware,
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
-    suspend fun getUserMe(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
+    suspend fun getUserMe(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
 
-        val user = userService.getUser(userId)
-        buildUserDto(user)
-    }
+            val user = userService.getUser(userId)
+            buildUserDto(user)
+        }
 
-    suspend fun getUserInfo(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val user = userService.getUser(userId)
+    suspend fun getUserInfo(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val user = userService.getUser(userId)
 
-        UserLegacyDto(
+            UserLegacyDto(
+                isAdmin = user.isAdmin,
+                regDate = user.regDate.toZonedDateTime(),
+                notificationCheckedAt = user.notificationCheckedAt.toZonedDateTime(),
+                email = user.email,
+                localId = user.credential.localId,
+                fbName = user.credential.fbName,
+            )
+        }
+
+    suspend fun patchUserInfo(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val body = req.awaitBody<UserPatchRequest>()
+
+            val user = userService.patchUserInfo(userId, body)
+            buildUserDto(user)
+        }
+
+    suspend fun deleteAccount(req: ServerRequest): ServerResponse =
+        handle(req) {
+            userService.update(req.getContext().user!!.copy(active = false))
+            OkResponse()
+        }
+
+    suspend fun sendVerificationEmail(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val email = req.awaitBody<SendEmailRequest>().email
+            userService.sendVerificationCode(user, email)
+            OkResponse()
+        }
+
+    suspend fun confirmEmailVerification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val code = req.awaitBody<VerificationCodeRequest>().code
+            userService.verifyEmail(user, code)
+            EmailVerificationResultDto(true)
+        }
+
+    suspend fun resetEmailVerification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.resetEmailVerification(user)
+            EmailVerificationResultDto(false)
+        }
+
+    suspend fun getEmailVerification(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            EmailVerificationResultDto(user.isEmailVerified ?: false)
+        }
+
+    suspend fun attachLocal(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val body = req.awaitBody<LocalLoginRequest>()
+            userService.attachLocal(user, body)
+        }
+
+    suspend fun changePassword(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val body = req.awaitBody<PasswordChangeRequest>()
+            userService.changePassword(user, body)
+        }
+
+    private fun buildUserDto(user: User) =
+        UserDto(
+            id = user.id!!,
             isAdmin = user.isAdmin,
-            regDate = user.regDate.toZonedDateTime(),
-            notificationCheckedAt = user.notificationCheckedAt.toZonedDateTime(),
+            regDate = user.regDate,
+            notificationCheckedAt = user.notificationCheckedAt,
             email = user.email,
             localId = user.credential.localId,
             fbName = user.credential.fbName,
+            nickname = userNicknameService.getNicknameDto(user.nickname!!),
         )
-    }
-
-    suspend fun patchUserInfo(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val body = req.awaitBody<UserPatchRequest>()
-
-        val user = userService.patchUserInfo(userId, body)
-        buildUserDto(user)
-    }
-
-    suspend fun deleteAccount(req: ServerRequest): ServerResponse = handle(req) {
-        userService.update(req.getContext().user!!.copy(active = false))
-        OkResponse()
-    }
-
-    suspend fun sendVerificationEmail(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        val email = req.awaitBody<SendEmailRequest>().email
-        userService.sendVerificationCode(user, email)
-        OkResponse()
-    }
-
-    suspend fun confirmEmailVerification(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        val code = req.awaitBody<VerificationCodeRequest>().code
-        userService.verifyEmail(user, code)
-        EmailVerificationResultDto(true)
-    }
-
-    suspend fun resetEmailVerification(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        userService.resetEmailVerification(user)
-        EmailVerificationResultDto(false)
-    }
-
-    suspend fun getEmailVerification(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        EmailVerificationResultDto(user.isEmailVerified ?: false)
-    }
-
-    suspend fun attachLocal(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        val body = req.awaitBody<LocalLoginRequest>()
-        userService.attachLocal(user, body)
-    }
-
-    suspend fun changePassword(req: ServerRequest): ServerResponse = handle(req) {
-        val user = req.getContext().user!!
-        val body = req.awaitBody<PasswordChangeRequest>()
-        userService.changePassword(user, body)
-    }
-
-    private fun buildUserDto(user: User) = UserDto(
-        id = user.id!!,
-        isAdmin = user.isAdmin,
-        regDate = user.regDate,
-        notificationCheckedAt = user.notificationCheckedAt,
-        email = user.email,
-        localId = user.credential.localId,
-        fbName = user.credential.fbName,
-        nickname = userNicknameService.getNicknameDto(user.nickname!!),
-    )
 }

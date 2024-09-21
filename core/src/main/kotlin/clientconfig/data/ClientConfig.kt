@@ -30,8 +30,23 @@ data class ClientConfig(
     @Field
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
-    fun isAdaptable(osType: OsType, appVersion: AppVersion): Boolean {
-        return (osType == OsType.IOS && ((minIosVersion == null || appVersion >= minIosVersion) && (maxIosVersion == null || appVersion <= maxIosVersion))) ||
-            (osType == OsType.ANDROID && ((minAndroidVersion == null || appVersion >= minAndroidVersion) && (maxAndroidVersion == null || appVersion <= maxAndroidVersion)))
+    fun isAdaptable(
+        osType: OsType,
+        appVersion: AppVersion,
+    ): Boolean {
+        return (
+            osType == OsType.IOS &&
+                (
+                    (minIosVersion == null || appVersion >= minIosVersion) &&
+                        (maxIosVersion == null || appVersion <= maxIosVersion)
+                )
+        ) ||
+            (
+                osType == OsType.ANDROID &&
+                    (
+                        (minAndroidVersion == null || appVersion >= minAndroidVersion) &&
+                            (maxAndroidVersion == null || appVersion <= maxAndroidVersion)
+                    )
+            )
     }
 }

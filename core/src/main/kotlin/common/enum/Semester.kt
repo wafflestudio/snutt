@@ -14,10 +14,11 @@ enum class Semester(
     SPRING(1, "1학기"),
     SUMMER(2, "여름학기"),
     AUTUMN(3, "2학기"),
-    WINTER(4, "겨울학기");
+    WINTER(4, "겨울학기"),
+    ;
 
     companion object {
-        private val valueMap = values().associateBy { e -> e.value }
+        private val valueMap = entries.associateBy { e -> e.value }
 
         fun getOfValue(semesterValue: Int): Semester? = valueMap[semesterValue]
     }
@@ -27,6 +28,12 @@ enum class Semester(
 @Component
 class SemesterReadConverter : Converter<Int, Semester> {
     override fun convert(source: Int): Semester = Semester.getOfValue(source)!!
+}
+
+@ReadingConverter
+@Component
+class SemesterNumberReadConverter : Converter<Number, Semester> {
+    override fun convert(source: Number): Semester = Semester.getOfValue(source.toInt())!!
 }
 
 @Component

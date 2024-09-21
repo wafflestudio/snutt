@@ -13,18 +13,25 @@ class SugangSnuApiConfig() {
 
     @Bean
     fun sugangSnuApi(): SugangSnuApi {
-        val exchangeStrategies: ExchangeStrategies = ExchangeStrategies.builder()
-            .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
-            .build()
+        val exchangeStrategies: ExchangeStrategies =
+            ExchangeStrategies.builder()
+                .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
+                .build()
 
         return WebClient.builder().baseUrl(SUGANG_SNU_BASEURL)
             .exchangeStrategies(exchangeStrategies) // set exchange strategies
             .defaultHeaders {
                 it.setAll(
                     mapOf(
-                        "User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36",
-                        "Referrer" to "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action"
-                    )
+                        "User-Agent" to
+                            """
+                            Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
+                            AppleWebKit/537.36 (KHTML, like Gecko)
+                            Chrome/86.0.4240.80
+                            Safari/537.36
+                            """.trimIndent().replace("\n", " "),
+                        "Referrer" to "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action",
+                    ),
                 )
             }
             .build().let(::SugangSnuApi)

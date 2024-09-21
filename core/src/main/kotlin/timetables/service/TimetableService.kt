@@ -15,6 +15,9 @@ import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
 import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.dto.placeInfos
+import com.wafflestudio.snu4t.theme.service.TimetableThemeService
+import com.wafflestudio.snu4t.theme.service.toBasicThemeType
+import com.wafflestudio.snu4t.theme.service.toIdForTimetable
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.dto.TimetableDto
 import com.wafflestudio.snu4t.timetables.dto.TimetableLectureDto
@@ -34,21 +37,76 @@ import java.time.Instant
 
 interface TimetableService {
     suspend fun getTimetables(userId: String): List<Timetable>
+
     suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable
-    fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable>
-    suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable
-    suspend fun getTimetableLink(userId: String, timetableId: String): DynamicLinkResponse
-    suspend fun getTimetable(userId: String, timetableId: String): Timetable
-    suspend fun modifyTimetableTitle(userId: String, timetableId: String, title: String): Timetable
-    suspend fun deleteTimetable(userId: String, timetableId: String)
-    suspend fun modifyTimetableTheme(userId: String, timetableId: String, basicThemeType: BasicThemeType?, themeId: String?): Timetable
-    suspend fun copyTimetable(userId: String, timetableId: String, title: String? = null): Timetable
-    suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable
+
+    fun getTimetablesBySemester(
+        userId: String,
+        year: Int,
+        semester: Semester,
+    ): Flow<Timetable>
+
+    suspend fun addTimetable(
+        userId: String,
+        timetableRequest: TimetableAddRequestDto,
+    ): Timetable
+
+    suspend fun getTimetableLink(
+        userId: String,
+        timetableId: String,
+    ): DynamicLinkResponse
+
+    suspend fun getTimetable(
+        userId: String,
+        timetableId: String,
+    ): Timetable
+
+    suspend fun modifyTimetableTitle(
+        userId: String,
+        timetableId: String,
+        title: String,
+    ): Timetable
+
+    suspend fun deleteTimetable(
+        userId: String,
+        timetableId: String,
+    )
+
+    suspend fun modifyTimetableTheme(
+        userId: String,
+        timetableId: String,
+        basicThemeType: BasicThemeType?,
+        themeId: String?,
+    ): Timetable
+
+    suspend fun copyTimetable(
+        userId: String,
+        timetableId: String,
+        title: String? = null,
+    ): Timetable
+
+    suspend fun getUserPrimaryTable(
+        userId: String,
+        year: Int,
+        semester: Semester,
+    ): Timetable
+
     suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto>
+
     suspend fun createDefaultTable(userId: String)
-    suspend fun setPrimary(userId: String, timetableId: String)
-    suspend fun unSetPrimary(userId: String, timetableId: String)
+
+    suspend fun setPrimary(
+        userId: String,
+        timetableId: String,
+    )
+
+    suspend fun unSetPrimary(
+        userId: String,
+        timetableId: String,
+    )
+
     suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto
+
     suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto
 }
 
@@ -62,16 +120,21 @@ class TimetableServiceImpl(
     private val dynamicLinkClient: DynamicLinkClient,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
-    override suspend fun getTimetables(userId: String): List<Timetable> =
-        timetableRepository.findAllByUserId(userId).toList()
+    override suspend fun getTimetables(userId: String): List<Timetable> = timetableRepository.findAllByUserId(userId).toList()
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findFirstByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
 
-    override fun getTimetablesBySemester(userId: String, year: Int, semester: Semester): Flow<Timetable> =
-        timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester)
+    override fun getTimetablesBySemester(
+        userId: String,
+        year: Int,
+        semester: Semester,
+    ): Flow<Timetable> = timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester)
 
-    override suspend fun addTimetable(userId: String, timetableRequest: TimetableAddRequestDto): Timetable {
+    override suspend fun addTimetable(
+        userId: String,
+        timetableRequest: TimetableAddRequestDto,
+    ): Timetable {
         validateTimetableTitle(userId, timetableRequest.year, timetableRequest.semester, timetableRequest.title)
 
         val defaultTheme = timetableThemeService.getDefaultTheme(userId)
@@ -82,38 +145,56 @@ class TimetableServiceImpl(
             title = timetableRequest.title,
             theme = defaultTheme.toBasicThemeType(),
             themeId = defaultTheme.toIdForTimetable(),
-            isPrimary = timetableRepository
-                .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
-                .toList()
-                .isEmpty()
+            isPrimary =
+                timetableRepository
+                    .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
+                    .toList()
+                    .isEmpty(),
         ).let { timetableRepository.save(it) }
     }
 
-    override suspend fun getTimetableLink(userId: String, timetableId: String): DynamicLinkResponse {
+    override suspend fun getTimetableLink(
+        userId: String,
+        timetableId: String,
+    ): DynamicLinkResponse {
         timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         return dynamicLinkClient.generateLink(
             linkPrefix,
-            "snutt://share?timetableId=$timetableId"
+            "snutt://share?timetableId=$timetableId",
         )
     }
 
-    override suspend fun getTimetable(userId: String, timetableId: String): Timetable {
+    override suspend fun getTimetable(
+        userId: String,
+        timetableId: String,
+    ): Timetable {
         return timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
     }
 
-    override suspend fun modifyTimetableTitle(userId: String, timetableId: String, title: String): Timetable =
+    override suspend fun modifyTimetableTitle(
+        userId: String,
+        timetableId: String,
+        title: String,
+    ): Timetable =
         getTimetable(userId, timetableId)
             .also { validateTimetableTitle(userId, it.year, it.semester, title) }
             .apply { this.title = title }
             .let { timetableRepository.save(it) }
 
-    override suspend fun deleteTimetable(userId: String, timetableId: String) {
+    override suspend fun deleteTimetable(
+        userId: String,
+        timetableId: String,
+    ) {
         if (timetableRepository.countAllByUserId(userId) <= 1L) throw TableDeleteErrorException
         getTimetable(userId, timetableId)
         timetableRepository.deleteById(timetableId)
     }
 
-    override suspend fun copyTimetable(userId: String, timetableId: String, title: String?): Timetable {
+    override suspend fun copyTimetable(
+        userId: String,
+        timetableId: String,
+        title: String?,
+    ): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
         val latestCopiedTimetableNumber =
@@ -127,7 +208,12 @@ class TimetableServiceImpl(
         ).let { timetableRepository.save(it) }
     }
 
-    override suspend fun modifyTimetableTheme(userId: String, timetableId: String, basicThemeType: BasicThemeType?, themeId: String?): Timetable {
+    override suspend fun modifyTimetableTheme(
+        userId: String,
+        timetableId: String,
+        basicThemeType: BasicThemeType?,
+        themeId: String?,
+    ): Timetable {
         require((themeId == null) xor (basicThemeType == null))
 
         val timetable = getTimetable(userId, timetableId)
@@ -149,7 +235,11 @@ class TimetableServiceImpl(
         return timetableRepository.save(timetable)
     }
 
-    override suspend fun getUserPrimaryTable(userId: String, year: Int, semester: Semester): Timetable {
+    override suspend fun getUserPrimaryTable(
+        userId: String,
+        year: Int,
+        semester: Semester,
+    ): Timetable {
         return timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
             .toList()
             .ifEmpty { throw TimetableNotFoundException }
@@ -167,14 +257,15 @@ class TimetableServiceImpl(
         val coursebook = coursebookService.getLatestCoursebook()
         val defaultTheme = timetableThemeService.getDefaultTheme(userId)
 
-        val timetable = Timetable(
-            userId = userId,
-            year = coursebook.year,
-            semester = coursebook.semester,
-            title = "나의 시간표",
-            theme = defaultTheme.toBasicThemeType(),
-            themeId = defaultTheme.toIdForTimetable(),
-        )
+        val timetable =
+            Timetable(
+                userId = userId,
+                year = coursebook.year,
+                semester = coursebook.semester,
+                title = "나의 시간표",
+                theme = defaultTheme.toBasicThemeType(),
+                themeId = defaultTheme.toIdForTimetable(),
+            )
         timetableRepository.save(timetable)
     }
 
@@ -182,14 +273,19 @@ class TimetableServiceImpl(
         userId: String,
         year: Int,
         semester: Semester,
-        title: String
+        title: String,
     ): Int {
         val baseTitle = title.replace(Regex("""\s\(\d+\)$"""), "")
         return timetableRepository.findLatestChildTimetable(userId, year, semester, baseTitle)?.title
             ?.replace(baseTitle, "")?.filter { it.isDigit() }?.toIntOrNull() ?: 0
     }
 
-    private suspend fun validateTimetableTitle(userId: String, year: Int, semester: Semester, title: String) {
+    private suspend fun validateTimetableTitle(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        title: String,
+    ) {
         if (title.isEmpty()) {
             throw InvalidTimetableTitleException
         }
@@ -198,19 +294,24 @@ class TimetableServiceImpl(
         }
     }
 
-    override suspend fun setPrimary(userId: String, timetableId: String) {
-        val newPrimaryTable = timetableRepository.findById(timetableId)
-            ?: throw TimetableNotFoundException
+    override suspend fun setPrimary(
+        userId: String,
+        timetableId: String,
+    ) {
+        val newPrimaryTable =
+            timetableRepository.findById(timetableId)
+                ?: throw TimetableNotFoundException
 
         if (newPrimaryTable.isPrimary == true) {
             return
         }
 
-        val primaryTableBefore = timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(
-            userId,
-            newPrimaryTable.year,
-            newPrimaryTable.semester
-        )
+        val primaryTableBefore =
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(
+                userId,
+                newPrimaryTable.year,
+                newPrimaryTable.semester,
+            )
 
         if (primaryTableBefore == null) {
             timetableRepository.save(newPrimaryTable.copy(isPrimary = true))
@@ -221,7 +322,10 @@ class TimetableServiceImpl(
         }
     }
 
-    override suspend fun unSetPrimary(userId: String, timetableId: String) {
+    override suspend fun unSetPrimary(
+        userId: String,
+        timetableId: String,
+    ) {
         val table = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         if (table.isPrimary != true) throw TimetableNotPrimaryException
         timetableRepository.save(table.copy(isPrimary = false))
@@ -241,18 +345,19 @@ class TimetableServiceImpl(
         return TimetableDto(timetable, timetableLectures)
     }
 
-    private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto = coroutineScope {
-        val placeInfosAll =
-            lectures.flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }
-                .distinct()
-        val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
-        lectures.forEach {
-            it.classPlaceAndTimes.forEach { classPlaceAndTime ->
-                classPlaceAndTime.apply {
-                    lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
+    private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto =
+        coroutineScope {
+            val placeInfosAll =
+                lectures.flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }
+                    .distinct()
+            val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
+            lectures.forEach {
+                it.classPlaceAndTimes.forEach { classPlaceAndTime ->
+                    classPlaceAndTime.apply {
+                        lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
+                    }
                 }
             }
+            this@addLectureBuildings
         }
-        this@addLectureBuildings
-    }
 }

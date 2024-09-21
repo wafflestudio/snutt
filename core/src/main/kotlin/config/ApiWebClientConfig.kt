@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 @Configuration
 @EnableConfigurationProperties(ApiConfigs::class)
 class ApiWebClientConfig(
-    private val apiConfigs: ApiConfigs
+    private val apiConfigs: ApiConfigs,
 ) {
     @Bean
     @Profile("!test")
@@ -27,15 +27,16 @@ class ApiWebClientConfig(
     }
 
     private fun create(apiConfig: ApiConfig): WebClient {
-        val connector = ReactorClientHttpConnector(
-            HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiConfig.connectTimeout) // Connection Timeout
-                .doOnConnected { conn: Connection ->
-                    conn
-                        .addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
-                        .addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
-                }
-        )
+        val connector =
+            ReactorClientHttpConnector(
+                HttpClient.create()
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiConfig.connectTimeout) // Connection Timeout
+                    .doOnConnected { conn: Connection ->
+                        conn
+                            .addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
+                            .addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
+                    },
+            )
         return WebClient.builder().clientConnector(connector).baseUrl(apiConfig.baseUrl).build()
     }
 }

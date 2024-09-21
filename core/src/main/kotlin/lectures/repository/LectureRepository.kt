@@ -6,5 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface LectureRepository : CoroutineCrudRepository<Lecture, String>, LectureCustomRepository {
-    fun findAllByYearAndSemester(year: Int, semester: Semester): Flow<Lecture>
+    fun findAllByYearAndSemester(
+        year: Int,
+        semester: Semester,
+    ): Flow<Lecture>
 }

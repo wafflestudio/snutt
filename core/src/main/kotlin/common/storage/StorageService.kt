@@ -14,7 +14,10 @@ class StorageService(
         private const val MAX_FILE_COUNT = 10
     }
 
-    suspend fun getUploadSignedUris(storageSource: StorageSource, count: Int): List<FileUploadUriDto> {
+    suspend fun getUploadSignedUris(
+        storageSource: StorageSource,
+        count: Int,
+    ): List<FileUploadUriDto> {
         if (count > MAX_FILE_COUNT) throw TooManyFilesException
 
         val storageType = storageSource.storageType

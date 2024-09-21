@@ -41,12 +41,13 @@ class NotificationServiceImpl(
 ) : NotificationService {
     override suspend fun getNotifications(query: NotificationQuery): List<Notification> {
         val user = query.user
-        val notifications = notificationRepository.findNotifications(
-            userId = user.id!!,
-            createdAt = user.regDate,
-            offset = query.offset,
-            limit = query.limit,
-        ).toList()
+        val notifications =
+            notificationRepository.findNotifications(
+                userId = user.id!!,
+                createdAt = user.regDate,
+                offset = query.offset,
+                limit = query.limit,
+            ).toList()
 
         if (query.explicit) {
             userService.update(user.apply { notificationCheckedAt = LocalDateTime.now() })

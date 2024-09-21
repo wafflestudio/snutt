@@ -7,9 +7,15 @@ import java.time.LocalDateTime
 
 @Repository
 interface NotificationRepository : CoroutineCrudRepository<Notification, String>, NotificationCustomRepository {
-    suspend fun countByUserIdInAndCreatedAtAfter(userIds: List<String?>, createdAt: LocalDateTime): Long
+    suspend fun countByUserIdInAndCreatedAtAfter(
+        userIds: List<String?>,
+        createdAt: LocalDateTime,
+    ): Long
 }
 
-suspend fun NotificationRepository.countUnreadNotifications(userId: String, createdAt: LocalDateTime): Long {
+suspend fun NotificationRepository.countUnreadNotifications(
+    userId: String,
+    createdAt: LocalDateTime,
+): Long {
     return countByUserIdInAndCreatedAtAfter(listOf(userId, null), createdAt)
 }

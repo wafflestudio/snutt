@@ -15,8 +15,9 @@ data class Popup(
     val key: String,
     @Field
     val imageOriginUri: String,
+    // null 이면 '당분간 보지 않기' 눌러도 매번 노출
     @Field
-    val hiddenDays: Int?, // null 이면 '당분간 보지 않기' 눌러도 매번 노출
+    val hiddenDays: Int?,
     @Field
     val createdAt: LocalDateTime = LocalDateTime.now(),
     @Field

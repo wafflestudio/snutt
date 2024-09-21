@@ -6,7 +6,7 @@ enum class StorageSource(val value: String, val storageType: StorageType, val pa
 
     companion object {
         fun from(value: String): StorageSource? {
-            return values().find { it.value == value }
+            return entries.find { it.value == value }
         }
     }
 }

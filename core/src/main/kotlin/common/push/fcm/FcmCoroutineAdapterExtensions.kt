@@ -14,9 +14,7 @@ suspend fun <F : Any> ApiFuture<F>.await(): F {
     return this.await { it }
 }
 
-suspend fun <F : Any, R : Any?> ApiFuture<F>.await(
-    successHandler: (F) -> R,
-): R {
+suspend fun <F : Any, R : Any?> ApiFuture<F>.await(successHandler: (F) -> R): R {
     return suspendCoroutine { cont ->
         ApiFutures.addCallback(
             this,
@@ -29,7 +27,7 @@ suspend fun <F : Any, R : Any?> ApiFuture<F>.await(
                     cont.resume(successHandler(result))
                 }
             },
-            Dispatchers.IO.asExecutor()
+            Dispatchers.IO.asExecutor(),
         )
     }
 }

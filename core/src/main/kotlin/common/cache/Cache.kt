@@ -23,7 +23,10 @@ interface Cache {
         supplier: (suspend () -> T?)? = null,
     ): T?
 
-    suspend fun <T : Any> set(builtKey: BuiltCacheKey, value: T?)
+    suspend fun <T : Any> set(
+        builtKey: BuiltCacheKey,
+        value: T?,
+    )
 
     suspend fun delete(builtKey: BuiltCacheKey)
 
@@ -48,7 +51,7 @@ class RedisCache(
     override suspend fun <T : Any> Cache.get(
         builtKey: BuiltCacheKey,
         typeRef: TypeReference<T>,
-        supplier: (suspend () -> T?)?
+        supplier: (suspend () -> T?)?,
     ): T? {
         try {
             log.debug("[CACHE GET] {}", builtKey.key)
@@ -69,7 +72,10 @@ class RedisCache(
         return value
     }
 
-    override suspend fun <T : Any> set(builtKey: BuiltCacheKey, value: T?) {
+    override suspend fun <T : Any> set(
+        builtKey: BuiltCacheKey,
+        value: T?,
+    ) {
         runCatching {
             val redisValue = objectMapper.writeValueAsString(value)
 

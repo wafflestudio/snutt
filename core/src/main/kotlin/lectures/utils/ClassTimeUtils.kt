@@ -27,16 +27,20 @@ object ClassTimeUtils {
             }
         }
 
-    fun timesOverlap(times1: List<ClassPlaceAndTime>, times2: List<ClassPlaceAndTime>) =
-        times1.any { classTime1 ->
-            times2.any { classTime2 ->
-                twoTimesOverlap(classTime1, classTime2)
-            }
+    fun timesOverlap(
+        times1: List<ClassPlaceAndTime>,
+        times2: List<ClassPlaceAndTime>,
+    ) = times1.any { classTime1 ->
+        times2.any { classTime2 ->
+            twoTimesOverlap(classTime1, classTime2)
         }
+    }
 
-    fun twoTimesOverlap(time1: ClassPlaceAndTime, time2: ClassPlaceAndTime) =
-        time1.day == time2.day &&
-            time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
+    fun twoTimesOverlap(
+        time1: ClassPlaceAndTime,
+        time2: ClassPlaceAndTime,
+    ) = time1.day == time2.day &&
+        time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
 }
 
 fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"

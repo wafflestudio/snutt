@@ -16,10 +16,11 @@ enum class NotificationType(
     LECTURE_REMOVE(3),
     LECTURE_VACANCY(4),
     FRIEND(5),
-    FEATURE_NEW(6);
+    FEATURE_NEW(6),
+    ;
 
     companion object {
-        private val valueMap = NotificationType.values().associateBy { e -> e.value }
+        private val valueMap = NotificationType.entries.associateBy { e -> e.value }
 
         fun getOfValue(value: Int): NotificationType? = valueMap[value]
     }

@@ -21,7 +21,7 @@ data class TagList(
     val updatedAt: Instant = Instant.now(),
     @Field("tags")
     @JsonProperty("tags")
-    val tagCollection: TagCollection
+    val tagCollection: TagCollection,
 )
 
 data class TagCollection(
@@ -32,5 +32,4 @@ data class TagCollection(
     val credit: List<String>,
     val instructor: List<String>,
     val category: List<String>,
-    val sortCriteria: List<String> = listOf()
 )

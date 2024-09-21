@@ -7,5 +7,5 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 data class PasswordResetRequest(
     val userId: String,
     val password: String,
-    val code: String
+    val code: String,
 )

@@ -16,12 +16,13 @@ data class ClassPlaceAndTimeDto(
     val endMinute: Int,
 )
 
-fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeDto = ClassPlaceAndTimeDto(
-    day = classPlaceAndTime.day,
-    place = classPlaceAndTime.place,
-    startMinute = classPlaceAndTime.startMinute,
-    endMinute = classPlaceAndTime.endMinute,
-)
+fun ClassPlaceAndTimeDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeDto =
+    ClassPlaceAndTimeDto(
+        day = classPlaceAndTime.day,
+        place = classPlaceAndTime.place,
+        startMinute = classPlaceAndTime.startMinute,
+        endMinute = classPlaceAndTime.endMinute,
+    )
 
 data class ClassPlaceAndTimeLegacyDto(
     val day: DayOfWeek,
@@ -39,16 +40,17 @@ data class ClassPlaceAndTimeLegacyDto(
     var lectureBuildings: List<LectureBuilding>? = null,
 )
 
-fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeLegacyDto = ClassPlaceAndTimeLegacyDto(
-    day = classPlaceAndTime.day,
-    place = classPlaceAndTime.place,
-    startMinute = classPlaceAndTime.startMinute,
-    endMinute = classPlaceAndTime.endMinute,
-    startTime = minuteToString(classPlaceAndTime.startMinute),
-    endTime = minuteToString(classPlaceAndTime.endMinute),
-    startPeriod = classPlaceAndTime.startPeriod,
-    periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
-)
+fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeLegacyDto =
+    ClassPlaceAndTimeLegacyDto(
+        day = classPlaceAndTime.day,
+        place = classPlaceAndTime.place,
+        startMinute = classPlaceAndTime.startMinute,
+        endMinute = classPlaceAndTime.endMinute,
+        startTime = minuteToString(classPlaceAndTime.startMinute),
+        endTime = minuteToString(classPlaceAndTime.endMinute),
+        startPeriod = classPlaceAndTime.startPeriod,
+        periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
+    )
 
 val ClassPlaceAndTimeLegacyDto.placeInfos: List<PlaceInfo>
     get() = place?.let { PlaceInfo.getValuesOf(it) } ?: emptyList()

@@ -16,7 +16,7 @@ enum class StorageType(bucketName: String, val acl: Acl = Acl.PRIVATE) {
         private const val BUCKET_NAME_DEV_SUFFIX = "-dev"
 
         fun from(bucketName: String): StorageType {
-            return values().first { it.bucketName == bucketName }
+            return entries.first { it.bucketName == bucketName }
         }
     }
 }

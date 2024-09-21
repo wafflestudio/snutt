@@ -9,9 +9,18 @@ import org.springframework.stereotype.Service
  * 유저 기기에 푸시를 보내는 서비스입니다.
  */
 interface PushService {
-    suspend fun sendPush(pushMessage: PushMessage, userId: String)
-    suspend fun sendPushes(pushMessage: PushMessage, userIds: List<String>)
+    suspend fun sendPush(
+        pushMessage: PushMessage,
+        userId: String,
+    )
+
+    suspend fun sendPushes(
+        pushMessage: PushMessage,
+        userIds: List<String>,
+    )
+
     suspend fun sendGlobalPush(pushMessage: PushMessage)
+
     suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>)
 }
 
@@ -20,19 +29,26 @@ class PushServiceImpl internal constructor(
     private val deviceService: DeviceService,
     private val pushClient: PushClient,
 ) : PushService {
-    override suspend fun sendPush(pushMessage: PushMessage, userId: String) {
+    override suspend fun sendPush(
+        pushMessage: PushMessage,
+        userId: String,
+    ) {
         val userDevices = deviceService.getUserDevices(userId).ifEmpty { return }
 
         val targetedPushMessageWithTokens = userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
         pushClient.sendMessages(targetedPushMessageWithTokens)
     }
 
-    override suspend fun sendPushes(pushMessage: PushMessage, userIds: List<String>) {
+    override suspend fun sendPushes(
+        pushMessage: PushMessage,
+        userIds: List<String>,
+    ) {
         val userIdToDevices = deviceService.getUsersDevices(userIds).ifEmpty { return }
 
-        val targetedPushMessageWithTokens = userIdToDevices.values.flatMap { userDevices ->
-            userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
-        }
+        val targetedPushMessageWithTokens =
+            userIdToDevices.values.flatMap { userDevices ->
+                userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
+            }
 
         pushClient.sendMessages(targetedPushMessageWithTokens)
     }

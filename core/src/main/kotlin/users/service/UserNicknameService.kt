@@ -51,9 +51,10 @@ class UserNicknameService(
     suspend fun appendNewTag(nickname: String): String {
         if (!isValidNickname(nickname)) throw InvalidNicknameException
 
-        val tagsWithSameNickname = userRepository.findAllByNicknameStartingWith(nickname)
-            .mapNotNull { it.getNicknameTag() }
-            .toSet()
+        val tagsWithSameNickname =
+            userRepository.findAllByNicknameStartingWith(nickname)
+                .mapNotNull { it.nicknameTag }
+                .toSet()
         val newTag = createTag(tagsWithSameNickname)
 
         return "$nickname$TAG_DELIMITER$newTag"
@@ -63,9 +64,10 @@ class UserNicknameService(
         return nickname.isNotBlank() && nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
     }
 
-    private val nicknames = adjectives
-        .flatMap { adj -> nouns.map { "$adj $it" } }
-        .filter { it.length <= NICKNAME_MAX_LENGTH }
+    private val nicknames =
+        adjectives
+            .flatMap { adj -> nouns.map { "$adj $it" } }
+            .filter { it.length <= NICKNAME_MAX_LENGTH }
 
     private fun createRandomNickname(): String {
         return nicknames.random()

@@ -19,7 +19,10 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration
 class SugangSnuSyncJobConfig {
     @Bean
-    fun sugangSnuMigrationJob(jobRepository: JobRepository, syncSugangSnuStep: Step): Job =
+    fun sugangSnuMigrationJob(
+        jobRepository: JobRepository,
+        syncSugangSnuStep: Step,
+    ): Job =
         JobBuilder("sugangSnuMigrationJob", jobRepository)
             .start(syncSugangSnuStep).build()
 
@@ -31,23 +34,24 @@ class SugangSnuSyncJobConfig {
         coursebookService: CoursebookService,
         sugangSnuNotificationService: SugangSnuNotificationService,
         vacancyNotificationService: VacancyNotificationService,
-    ): Step = StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
-        { _, _ ->
-            runBlocking {
-                val existingCoursebook = coursebookService.getLatestCoursebook()
-                if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
-                    val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
-                    sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
-                } else {
-                    val newCoursebook = existingCoursebook.nextCoursebook()
-                    vacancyNotificationService.deleteAll()
-                    sugangSnuSyncService.addCoursebook(newCoursebook)
-                    sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
+    ): Step =
+        StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
+            { _, _ ->
+                runBlocking {
+                    val existingCoursebook = coursebookService.getLatestCoursebook()
+                    if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
+                        val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
+                        sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
+                    } else {
+                        val newCoursebook = existingCoursebook.nextCoursebook()
+                        vacancyNotificationService.deleteAll()
+                        sugangSnuSyncService.addCoursebook(newCoursebook)
+                        sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
+                    }
+                    sugangSnuSyncService.flushCache()
                 }
-                sugangSnuSyncService.flushCache()
-            }
-            RepeatStatus.FINISHED
-        },
-        transactionManager
-    ).build()
+                RepeatStatus.FINISHED
+            },
+            transactionManager,
+        ).build()
 }

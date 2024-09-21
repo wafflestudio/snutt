@@ -9,7 +9,10 @@ import org.springframework.web.reactive.function.server.ServerRequest
 
 @Component
 class AdminApiMiddleware(private val userService: UserService) : Middleware {
-    override suspend fun invoke(req: ServerRequest, context: RequestContext): RequestContext {
+    override suspend fun invoke(
+        req: ServerRequest,
+        context: RequestContext,
+    ): RequestContext {
         val token = req.headers().firstHeader("x-access-token") ?: throw NoUserTokenException
         val currentUser = userService.getUserByCredentialHash(token)
 

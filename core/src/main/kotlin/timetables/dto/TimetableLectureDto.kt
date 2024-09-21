@@ -5,7 +5,7 @@ import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeLegacyDto
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.timetables.data.ColorSet
+import com.wafflestudio.snu4t.theme.data.ColorSet
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 
 data class TimetableLectureDto(
@@ -29,7 +29,10 @@ data class TimetableLectureDto(
     val snuttEvLecture: SnuttEvLectureIdDto? = null,
 )
 
-fun TimetableLectureDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureIdDto? = null) = TimetableLectureDto(
+fun TimetableLectureDto(
+    timetableLecture: TimetableLecture,
+    snuttEvLecture: SnuttEvLectureIdDto? = null,
+) = TimetableLectureDto(
     id = timetableLecture.id,
     academicYear = timetableLecture.academicYear,
     category = timetableLecture.category,
@@ -77,31 +80,32 @@ data class TimetableLectureLegacyDto(
     @JsonProperty("lecture_id")
     var lectureId: String? = null,
     val snuttEvLecture: SnuttEvLectureIdDto? = null,
-
     // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
     @JsonProperty("class_time_mask")
     val classTimeMask: List<Int> = emptyList(),
 )
 
-fun TimetableLectureLegacyDto(timetableLecture: TimetableLecture, snuttEvLecture: SnuttEvLectureIdDto? = null) =
-    TimetableLectureLegacyDto(
-        id = timetableLecture.id,
-        academicYear = timetableLecture.academicYear,
-        category = timetableLecture.category,
-        classPlaceAndTimes = timetableLecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
-        classification = timetableLecture.classification,
-        credit = timetableLecture.credit,
-        department = timetableLecture.department,
-        instructor = timetableLecture.instructor,
-        lectureNumber = timetableLecture.lectureNumber,
-        quota = timetableLecture.quota,
-        freshmanQuota = timetableLecture.freshmanQuota,
-        remark = timetableLecture.remark,
-        courseNumber = timetableLecture.courseNumber,
-        courseTitle = timetableLecture.courseTitle,
-        color = timetableLecture.color,
-        colorIndex = timetableLecture.colorIndex,
-        lectureId = timetableLecture.lectureId,
-        classTimeMask = ClassTimeUtils.classTimeToBitmask(timetableLecture.classPlaceAndTimes),
-        snuttEvLecture = snuttEvLecture,
-    )
+fun TimetableLectureLegacyDto(
+    timetableLecture: TimetableLecture,
+    snuttEvLecture: SnuttEvLectureIdDto? = null,
+) = TimetableLectureLegacyDto(
+    id = timetableLecture.id,
+    academicYear = timetableLecture.academicYear,
+    category = timetableLecture.category,
+    classPlaceAndTimes = timetableLecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
+    classification = timetableLecture.classification,
+    credit = timetableLecture.credit,
+    department = timetableLecture.department,
+    instructor = timetableLecture.instructor,
+    lectureNumber = timetableLecture.lectureNumber,
+    quota = timetableLecture.quota,
+    freshmanQuota = timetableLecture.freshmanQuota,
+    remark = timetableLecture.remark,
+    courseNumber = timetableLecture.courseNumber,
+    courseTitle = timetableLecture.courseTitle,
+    color = timetableLecture.color,
+    colorIndex = timetableLecture.colorIndex,
+    lectureId = timetableLecture.lectureId,
+    classTimeMask = ClassTimeUtils.classTimeToBitmask(timetableLecture.classPlaceAndTimes),
+    snuttEvLecture = snuttEvLecture,
+)

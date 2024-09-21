@@ -25,70 +25,82 @@ class AuthHandler(
     private val userService: UserService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(snuttRestApiNoAuthMiddleware) {
-    suspend fun registerLocal(req: ServerRequest): ServerResponse = handle(req) {
-        val localRegisterRequest: LocalRegisterRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.registerLocal(localRegisterRequest)
-    }
+    suspend fun registerLocal(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val localRegisterRequest: LocalRegisterRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.registerLocal(localRegisterRequest)
+        }
 
-    suspend fun loginLocal(req: ServerRequest): ServerResponse = handle(req) {
-        val localLoginRequest: LocalLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginLocal(localLoginRequest)
-    }
+    suspend fun loginLocal(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val localLoginRequest: LocalLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.loginLocal(localLoginRequest)
+        }
 
-    suspend fun loginFacebookLegacy(req: ServerRequest): ServerResponse = handle(req) {
-        val facebookLoginRequest: FacebookLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginFacebook(SocialLoginRequest(facebookLoginRequest.fbToken))
-    }
+    suspend fun loginFacebookLegacy(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val facebookLoginRequest: FacebookLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.loginFacebook(SocialLoginRequest(facebookLoginRequest.fbToken))
+        }
 
-    suspend fun loginFacebook(req: ServerRequest): ServerResponse = handle(req) {
-        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginFacebook(socialLoginRequest)
-    }
+    suspend fun loginFacebook(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.loginFacebook(socialLoginRequest)
+        }
 
-    suspend fun loginGoogle(req: ServerRequest): ServerResponse = handle(req) {
-        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginGoogle(socialLoginRequest)
-    }
+    suspend fun loginGoogle(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.loginGoogle(socialLoginRequest)
+        }
 
-    suspend fun loginKakao(req: ServerRequest): ServerResponse = handle(req) {
-        val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.loginKakao(socialLoginRequest)
-    }
+    suspend fun loginKakao(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.loginKakao(socialLoginRequest)
+        }
 
-    suspend fun logout(req: ServerRequest): ServerResponse = handle(req) {
-        val userId = req.userId
-        val logoutRequest: LogoutRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-        userService.logout(userId, logoutRequest)
+    suspend fun logout(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val userId = req.userId
+            val logoutRequest: LogoutRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
+            userService.logout(userId, logoutRequest)
 
-        OkResponse()
-    }
+            OkResponse()
+        }
 
-    suspend fun findId(req: ServerRequest): ServerResponse = handle(req) {
-        val email = req.awaitBody<SendEmailRequest>().email
-        userService.sendLocalIdToEmail(email)
-        OkResponse()
-    }
+    suspend fun findId(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val email = req.awaitBody<SendEmailRequest>().email
+            userService.sendLocalIdToEmail(email)
+            OkResponse()
+        }
 
-    suspend fun sendResetPasswordCode(req: ServerRequest): ServerResponse = handle(req) {
-        val email = req.awaitBody<SendEmailRequest>().email
-        userService.sendResetPasswordCode(email)
-        OkResponse()
-    }
+    suspend fun sendResetPasswordCode(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val email = req.awaitBody<SendEmailRequest>().email
+            userService.sendResetPasswordCode(email)
+            OkResponse()
+        }
 
-    suspend fun verifyResetPasswordCode(req: ServerRequest): ServerResponse = handle(req) {
-        val body = req.awaitBody<VerificationCodeRequest>()
-        userService.verifyResetPasswordCode(body.userId!!, body.code)
-        OkResponse()
-    }
+    suspend fun verifyResetPasswordCode(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val body = req.awaitBody<VerificationCodeRequest>()
+            userService.verifyResetPasswordCode(body.userId!!, body.code)
+            OkResponse()
+        }
 
-    suspend fun getMaskedEmail(req: ServerRequest): ServerResponse = handle(req) {
-        val id = req.awaitBody<GetMaskedEmailRequest>().userId
-        EmailResponse(userService.getMaskedEmail(id))
-    }
+    suspend fun getMaskedEmail(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val id = req.awaitBody<GetMaskedEmailRequest>().userId
+            EmailResponse(userService.getMaskedEmail(id))
+        }
 
-    suspend fun resetPassword(req: ServerRequest): ServerResponse = handle(req) {
-        val body = req.awaitBody<PasswordResetRequest>()
-        userService.resetPassword(body.userId, body.password, body.code)
-        OkResponse()
-    }
+    suspend fun resetPassword(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val body = req.awaitBody<PasswordResetRequest>()
+            userService.resetPassword(body.userId, body.password, body.code)
+            OkResponse()
+        }
 }

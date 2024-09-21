@@ -16,13 +16,14 @@ import org.springframework.stereotype.Service
 
 interface LectureBuildingService {
     suspend fun getLectureBuildings(placeInfos: List<PlaceInfo>): List<LectureBuilding>
+
     suspend fun updateLectureBuildings(placeInfos: List<PlaceInfo>)
 }
 
 @Service
 class LectureBuildingServiceImpl(
     private val snuMapRepository: SnuMapRepository,
-    private val lectureBuildingRepository: LectureBuildingRepository
+    private val lectureBuildingRepository: LectureBuildingRepository,
 ) : LectureBuildingService {
     override suspend fun getLectureBuildings(placeInfos: List<PlaceInfo>): List<LectureBuilding> {
         val buildingNumbers = placeInfos.filter { it.campus == Campus.GWANAK }.map { it.buildingNumber }
@@ -43,13 +44,14 @@ class LectureBuildingServiceImpl(
                     buildingNameEng = it.englishName ?: "",
                     locationInDMS = GeoCoordinate(it.latitudeInDMS, it.longitudeInDMS),
                     locationInDecimal = GeoCoordinate(it.latitudeInDecimal, it.longitudeInDecimal),
-                    campus = Campus.GWANAK
+                    campus = Campus.GWANAK,
                 )
             }
         }.let { lectureBuildingRepository.saveAll(it) }
     }
 
-    private fun SnuMapSearchResult.getMostProbableSearchItem(buildingNumber: String): SnuMapSearchItem? = searchList
-        .filter { it.contentType == "F" && it.facType == "OTHER" && it.buildingNumber == buildingNumber }
-        .minByOrNull { it.name.count() }
+    private fun SnuMapSearchResult.getMostProbableSearchItem(buildingNumber: String): SnuMapSearchItem? =
+        searchList
+            .filter { it.contentType == "F" && it.facType == "OTHER" && it.buildingNumber == buildingNumber }
+            .minByOrNull { it.name.count() }
 }

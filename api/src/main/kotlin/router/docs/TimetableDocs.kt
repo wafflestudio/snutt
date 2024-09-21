@@ -1,11 +1,11 @@
 package com.wafflestudio.snu4t.router.docs
 
+import com.wafflestudio.snu4t.theme.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyThemeRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -22,263 +22,379 @@ import timetables.dto.TimetableBriefDto
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/tables", method = [RequestMethod.GET], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getBrief",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-                )
-            ]
-        ),
+        path = "/v1/tables",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getBrief",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/recent",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getMostRecentlyUpdatedTimetables",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "getMostRecentlyUpdatedTimetables",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{year}/{semester}",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getTimetablesBySemester",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableLegacyDto::class)))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "getTimetablesBySemester",
+                parameters = [
+                    Parameter(`in` = ParameterIn.PATH, name = "year", required = true),
+                    Parameter(`in` = ParameterIn.PATH, name = "semester", required = true),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableLegacyDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "addTimetable",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableAddRequestDto::class))]),
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "addTimetable",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = TimetableAddRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "getTimetable",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "getTimetable",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}",
         method = [RequestMethod.PUT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "modifyTimetable",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyRequestDto::class))]),
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "modifyTimetable",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = TimetableModifyRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "deleteTimetable",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "deleteTimetable",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/copy",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "copyTimetable",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "copyTimetable",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableBriefDto::class)))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/theme",
         method = [RequestMethod.PUT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "modifyTimetableTheme",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableModifyThemeRequestDto::class))]),
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "modifyTimetableTheme",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = TimetableModifyThemeRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/primary",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "setPrimary",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = Unit::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "setPrimary",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = Unit::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/primary",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "unSetPrimary",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = Unit::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "unSetPrimary",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "timetableId", required = true)],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = Unit::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/lecture",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "addCustomLecture",
-            parameters = [
-                Parameter(
-                    `in` = ParameterIn.QUERY,
-                    name = "isForced",
-                    required = false,
-                    description = "시간 겹치는 강의 강제로 삭제 후 실행"
-                ),
-            ],
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = CustomTimetableLectureAddLegacyRequestDto::class))]),
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "addCustomLecture",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.QUERY,
+                        name = "isForced",
+                        required = false,
+                        description = "시간 겹치는 강의 강제로 삭제 후 실행",
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableId",
+                        required = true,
+                    ),
+                ],
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = CustomTimetableLectureAddLegacyRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/lecture/{lectureId}",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "addLecture",
-            parameters = [
-                Parameter(
-                    `in` = ParameterIn.QUERY,
-                    name = "isForced",
-                    required = false,
-                    description = "시간 겹치는 강의 강제로 삭제 후 실행"
-                ),
-            ],
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "addLecture",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.QUERY,
+                        name = "isForced",
+                        required = false,
+                        description = "시간 겹치는 강의 강제로 삭제 후 실행",
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableId",
+                        required = true,
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "lectureId",
+                        required = true,
+                    ),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/lecture/{timetableLectureId}/reset",
         method = [RequestMethod.PUT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "resetTimetableLecture",
-            parameters = [
-                Parameter(
-                    `in` = ParameterIn.QUERY,
-                    name = "isForced",
-                    required = false,
-                    description = "시간 겹치는 강의 강제로 삭제 후 실행"
-                ),
-            ],
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "resetTimetableLecture",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.QUERY,
+                        name = "isForced",
+                        required = false,
+                        description = "시간 겹치는 강의 강제로 삭제 후 실행",
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableId",
+                        required = true,
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableLectureId",
+                        required = true,
+                    ),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/lecture/{timetableLectureId}",
         method = [RequestMethod.PUT],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "modifyTimetableLecture",
-            parameters = [
-                Parameter(
-                    `in` = ParameterIn.QUERY,
-                    name = "isForced",
-                    required = false,
-                    description = "시간 겹치는 강의 강제로 삭제 후 실행"
-                ),
-            ],
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = TimetableLectureModifyLegacyRequestDto::class))]),
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "modifyTimetableLecture",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.QUERY,
+                        name = "isForced",
+                        required = false,
+                        description = "시간 겹치는 강의 강제로 삭제 후 실행",
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableId",
+                        required = true,
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableLectureId",
+                        required = true,
+                    ),
+                ],
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = TimetableLectureModifyLegacyRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
     RouterOperation(
         path = "/v1/tables/{timetableId}/lecture/{timetableLectureId}",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "deleteTimetableLecture",
-            responses = [
-                ApiResponse(
-                    responseCode = "200",
-                    content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))]
-                )
-            ]
-        ),
+        operation =
+            Operation(
+                operationId = "deleteTimetableLecture",
+                parameters = [
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableId",
+                        required = true,
+                    ),
+                    Parameter(
+                        `in` = ParameterIn.PATH,
+                        name = "timetableLectureId",
+                        required = true,
+                    ),
+                ],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
+                    ),
+                ],
+            ),
     ),
 )
 annotation class TimetableDocs

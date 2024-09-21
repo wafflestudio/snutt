@@ -15,12 +15,28 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @RouterOperations(
     RouterOperation(
-        path = "/v1/search_query", method = [RequestMethod.POST], produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation = Operation(
-            operationId = "searchLecture",
-            requestBody = RequestBody(content = [Content(schema = Schema(implementation = SearchQueryLegacy::class))]),
-            responses = [ApiResponse(responseCode = "200", content = [Content(array = ArraySchema(schema = Schema(implementation = LectureDto::class)))])]
-        ),
+        path = "/v1/search_query",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "searchLecture",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SearchQueryLegacy::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = LectureDto::class)))],
+                    ),
+                ],
+            ),
     ),
 )
 annotation class LectureSearchDocs

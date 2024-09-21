@@ -16,11 +16,12 @@ data class SugangSnuCoursebookCondition(
             return semesterFlagPrev + semesterFlagNext
         }
     val latestSemester: Semester
-        get() = when (latestSugangSnuSemester) {
-            "U000200001U000300001" -> Semester.SPRING
-            "U000200001U000300002" -> Semester.SUMMER
-            "U000200002U000300001" -> Semester.AUTUMN
-            "U000200002U000300002" -> Semester.WINTER
-            else -> throw IllegalArgumentException()
-        }
+        get() =
+            when (latestSugangSnuSemester) {
+                "U000200001U000300001" -> Semester.SPRING
+                "U000200001U000300002" -> Semester.SUMMER
+                "U000200002U000300001" -> Semester.AUTUMN
+                "U000200002U000300002" -> Semester.WINTER
+                else -> throw IllegalArgumentException()
+            }
 }

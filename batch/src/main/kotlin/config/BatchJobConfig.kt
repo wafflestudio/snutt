@@ -11,7 +11,8 @@ import javax.sql.DataSource
 class BatchJobConfig {
     @Bean("batchDataSource")
     @BatchDataSource
-    fun batchDataSource(): DataSource = EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-        .addScript("/org/springframework/batch/core/schema-h2.sql")
-        .generateUniqueName(true).build()
+    fun batchDataSource(): DataSource =
+        EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+            .addScript("/org/springframework/batch/core/schema-h2.sql")
+            .generateUniqueName(true).build()
 }

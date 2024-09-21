@@ -32,19 +32,20 @@ data class BookmarkLecture(
     var courseTitle: String,
 )
 
-fun BookmarkLecture(lecture: Lecture): BookmarkLecture = BookmarkLecture(
-    id = lecture.id,
-    academicYear = lecture.academicYear,
-    category = lecture.category,
-    classPlaceAndTimes = lecture.classPlaceAndTimes,
-    classification = lecture.classification,
-    credit = lecture.credit,
-    department = lecture.department,
-    instructor = lecture.instructor,
-    quota = lecture.quota,
-    freshmanQuota = lecture.freshmanQuota,
-    remark = lecture.remark,
-    lectureNumber = lecture.lectureNumber,
-    courseNumber = lecture.courseNumber,
-    courseTitle = lecture.courseTitle,
-)
+fun BookmarkLecture(lecture: Lecture): BookmarkLecture =
+    BookmarkLecture(
+        id = lecture.id,
+        academicYear = lecture.academicYear,
+        category = lecture.category,
+        classPlaceAndTimes = lecture.classPlaceAndTimes,
+        classification = lecture.classification,
+        credit = lecture.credit,
+        department = lecture.department,
+        instructor = lecture.instructor,
+        quota = lecture.quota,
+        freshmanQuota = lecture.freshmanQuota,
+        remark = lecture.remark,
+        lectureNumber = lecture.lectureNumber,
+        courseNumber = lecture.courseNumber,
+        courseTitle = lecture.courseTitle,
+    )

@@ -9,6 +9,7 @@ import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongSemesterException
 import com.wafflestudio.snu4t.lectures.repository.LectureRepository
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snu4t.theme.service.TimetableThemeService
 import com.wafflestudio.snu4t.timetables.data.Timetable
 import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
@@ -17,29 +18,40 @@ import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {
-    suspend fun addLecture(userId: String, timetableId: String, lectureId: String, isForced: Boolean): Timetable
+    suspend fun addLecture(
+        userId: String,
+        timetableId: String,
+        lectureId: String,
+        isForced: Boolean,
+    ): Timetable
+
     suspend fun addCustomTimetableLecture(
         userId: String,
         timetableId: String,
         timetableLectureRequest: CustomTimetableLectureAddLegacyRequestDto,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable
 
     suspend fun resetTimetableLecture(
         userId: String,
         timetableId: String,
         timetableLectureId: String,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable
+
     suspend fun modifyTimetableLecture(
         userId: String,
         timetableId: String,
         timetableLectureId: String,
         modifyTimetableLectureRequestDto: TimetableLectureModifyLegacyRequestDto,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable
 
-    suspend fun deleteTimetableLecture(userId: String, timetableId: String, timetableLectureId: String): Timetable
+    suspend fun deleteTimetableLecture(
+        userId: String,
+        timetableId: String,
+        timetableLectureId: String,
+    ): Timetable
 }
 
 @Service
@@ -48,7 +60,12 @@ class TimetableLectureServiceImpl(
     private val timetableRepository: TimetableRepository,
     private val lectureRepository: LectureRepository,
 ) : TimetableLectureService {
-    override suspend fun addLecture(userId: String, timetableId: String, lectureId: String, isForced: Boolean): Timetable {
+    override suspend fun addLecture(
+        userId: String,
+        timetableId: String,
+        lectureId: String,
+        isForced: Boolean,
+    ): Timetable {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val lecture = lectureRepository.findById(lectureId) ?: throw LectureNotFoundException
         if (!(timetable.year == lecture.year && timetable.semester == lecture.semester)) throw WrongSemesterException
@@ -65,7 +82,7 @@ class TimetableLectureServiceImpl(
         userId: String,
         timetableId: String,
         timetableLectureRequest: CustomTimetableLectureAddLegacyRequestDto,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetableLectureRequest.toTimetableLecture()
@@ -78,7 +95,7 @@ class TimetableLectureServiceImpl(
         userId: String,
         timetableId: String,
         timetableLectureId: String,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw LectureNotFoundException
@@ -102,12 +119,13 @@ class TimetableLectureServiceImpl(
         timetableId: String,
         timetableLectureId: String,
         modifyTimetableLectureRequestDto: TimetableLectureModifyLegacyRequestDto,
-        isForced: Boolean
+        isForced: Boolean,
     ): Timetable {
         val timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw LectureNotFoundException
-        val newClassPlaceAndTimes = modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() }
-            ?: timetableLecture.classPlaceAndTimes
+        val newClassPlaceAndTimes =
+            modifyTimetableLectureRequestDto.classPlaceAndTimes?.map { it.toClassPlaceAndTime() }
+                ?: timetableLecture.classPlaceAndTimes
         if (ClassTimeUtils.timesOverlap(newClassPlaceAndTimes)) throw InvalidTimeException
         timetableLecture.apply {
             courseTitle = modifyTimetableLectureRequestDto.courseTitle ?: courseTitle
@@ -125,7 +143,11 @@ class TimetableLectureServiceImpl(
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
-    override suspend fun deleteTimetableLecture(userId: String, timetableId: String, timetableLectureId: String): Timetable {
+    override suspend fun deleteTimetableLecture(
+        userId: String,
+        timetableId: String,
+        timetableLectureId: String,
+    ): Timetable {
         timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
         return timetableRepository.pullTimetableLecture(timetableId, timetableLectureId)
     }
@@ -133,14 +155,15 @@ class TimetableLectureServiceImpl(
     private suspend fun resolveTimeConflict(
         timetable: Timetable,
         timetableLecture: TimetableLecture,
-        isForced: Boolean
+        isForced: Boolean,
     ) {
-        val overlappingLectures = timetable.lectures.filter {
-            timetableLecture.id != it.id &&
-                ClassTimeUtils.timesOverlap(
-                    timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes
-                )
-        }
+        val overlappingLectures =
+            timetable.lectures.filter {
+                timetableLecture.id != it.id &&
+                    ClassTimeUtils.timesOverlap(
+                        timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes,
+                    )
+            }
         when {
             overlappingLectures.isNotEmpty() && !isForced -> {
                 val confirmMessage = makeOverwritingConfirmMessage(overlappingLectures)

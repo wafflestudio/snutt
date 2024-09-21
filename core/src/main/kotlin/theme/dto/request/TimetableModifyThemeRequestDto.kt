@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.timetables.dto.request
+package com.wafflestudio.snu4t.theme.dto.request
 
 import com.wafflestudio.snu4t.common.enum.BasicThemeType
 

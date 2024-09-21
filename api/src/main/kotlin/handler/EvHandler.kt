@@ -11,10 +11,11 @@ class EvHandler(
     private val lectureService: LectureService,
     snuttRestApiNoAuthMiddleware: SnuttRestApiNoAuthMiddleware,
 ) : ServiceHandler(
-    handlerMiddleware = snuttRestApiNoAuthMiddleware
-) {
-    suspend fun getLectureEvaluationSummary(req: ServerRequest): ServerResponse = handle(req) {
-        val lectureId = req.pathVariable("lectureId")
-        lectureService.getEvSummary(lectureId)
-    }
+        handlerMiddleware = snuttRestApiNoAuthMiddleware,
+    ) {
+    suspend fun getLectureEvaluationSummary(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val lectureId = req.pathVariable("lectureId")
+            lectureService.getEvSummary(lectureId)
+        }
 }
