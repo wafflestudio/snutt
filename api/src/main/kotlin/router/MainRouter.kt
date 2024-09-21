@@ -14,6 +14,7 @@ import com.wafflestudio.snu4t.handler.FriendTableHandler
 import com.wafflestudio.snu4t.handler.LectureSearchHandler
 import com.wafflestudio.snu4t.handler.NotificationHandler
 import com.wafflestudio.snu4t.handler.PopupHandler
+import com.wafflestudio.snu4t.handler.StaticPageHandler
 import com.wafflestudio.snu4t.handler.TagHandler
 import com.wafflestudio.snu4t.handler.TimetableHandler
 import com.wafflestudio.snu4t.handler.TimetableLectureHandler
@@ -66,6 +67,7 @@ class MainRouter(
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
     private val feedbackHandler: FeedbackHandler,
+    private val staticPageHandler: StaticPageHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -307,5 +309,13 @@ class MainRouter(
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) =
         coRouter {
             path("/v1").or("").nest(r)
+        }
+
+    @Bean
+    fun staticPageRouter() =
+        coRouter {
+            GET("/member").invoke { staticPageHandler.member() }
+            GET("/privacy_policy").invoke { staticPageHandler.privacyPolicy() }
+            GET("/terms_of_service").invoke { staticPageHandler.termsOfService() }
         }
 }
