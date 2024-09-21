@@ -4,6 +4,7 @@ import com.wafflestudio.snu4t.common.client.AppVersion
 import com.wafflestudio.snu4t.common.client.OsType
 import com.wafflestudio.snu4t.common.github.client.GithubRestApiClient
 import com.wafflestudio.snu4t.common.github.dto.GithubIssue
+import com.wafflestudio.snu4t.feedback.dto.FeedbackDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -51,15 +52,15 @@ class FeedbackServiceImpl(
             issue =
                 GithubIssue(
                     title = message,
-                    header =
-                        mapOf(
-                            "이메일" to "`$email`",
-                            "플랫폼" to platform,
-                            "버전" to appVersion,
-                            "디바이스" to deviceModel,
-                            "날짜/시간(UTC+9)" to currentSeoulTime,
-                        ),
-                    body = message,
+                    body =
+                        FeedbackDto(
+                            email = email,
+                            platform = platform,
+                            appVersion = appVersion.toString(),
+                            deviceModel = deviceModel,
+                            currentSeoulTime = currentSeoulTime,
+                            message = message,
+                        ).toGithubIssueBody(),
                     labels = listOf(osTypeString),
                 ),
         )
