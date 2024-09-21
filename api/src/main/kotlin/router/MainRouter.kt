@@ -117,6 +117,7 @@ class MainRouter(
             "/users".nest {
                 GET("/me", userHandler::getUserMe)
                 PATCH("/me", userHandler::patchUserInfo)
+                GET("/me/social_providers", userHandler::checkSocialProviders)
             }
         }
 

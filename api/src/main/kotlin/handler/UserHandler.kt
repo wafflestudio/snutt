@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.SocialProvidersCheckDto
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -138,6 +139,19 @@ class UserHandler(
         handle(req) {
             val user = req.getContext().user!!
             userService.detachSocial(user, SocialProvider.KAKAO)
+        }
+
+    suspend fun checkSocialProviders(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+
+            SocialProvidersCheckDto(
+                local = user.credential.localId != null,
+                facebook = user.credential.fbName != null,
+                google = user.credential.googleSub != null,
+                kakao = user.credential.kakaoSub != null,
+                apple = user.credential.appleSub != null,
+            )
         }
 
     suspend fun changePassword(req: ServerRequest): ServerResponse =
