@@ -27,6 +27,7 @@ import com.wafflestudio.snu4t.router.docs.BuildingsDocs
 import com.wafflestudio.snu4t.router.docs.ConfigDocs
 import com.wafflestudio.snu4t.router.docs.CoursebookDocs
 import com.wafflestudio.snu4t.router.docs.EvDocs
+import com.wafflestudio.snu4t.router.docs.FeedbackDocs
 import com.wafflestudio.snu4t.router.docs.FriendDocs
 import com.wafflestudio.snu4t.router.docs.LectureSearchDocs
 import com.wafflestudio.snu4t.router.docs.NotificationDocs
@@ -295,6 +296,7 @@ class MainRouter(
         }
 
     @Bean
+    @FeedbackDocs
     fun feedbackRouter() =
         v1CoRouter {
             "/feedback".nest {
