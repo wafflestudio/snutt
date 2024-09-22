@@ -222,7 +222,7 @@ class UserServiceImpl(
             log.warn("facebook email is null: $oauth2UserResponse")
         }
 
-        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
+        return signup(credential, oauth2UserResponse.email, false)
     }
 
     override suspend fun loginGoogle(socialLoginRequest: SocialLoginRequest): LoginResponse {
@@ -245,7 +245,7 @@ class UserServiceImpl(
 
         val credential = authService.buildGoogleCredential(oauth2UserResponse)
 
-        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
+        return signup(credential, oauth2UserResponse.email, false)
     }
 
     override suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse {
@@ -268,7 +268,7 @@ class UserServiceImpl(
 
         val credential = authService.buildKakaoCredential(oauth2UserResponse)
 
-        return signup(credential, oauth2UserResponse.email, oauth2UserResponse.isEmailVerified)
+        return signup(credential, oauth2UserResponse.email, false)
     }
 
     private fun getSocialProvider(user: User): SocialProvider {
@@ -326,7 +326,7 @@ class UserServiceImpl(
         email: String,
     ) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
-        if (!authService.isValidEmail(email)) throw InvalidEmailException
+        if (!authService.isValidSnuMail(email)) throw InvalidEmailException
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException(getSocialProvider(user))
         val key = VERIFICATION_CODE_PREFIX + user.id
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
