@@ -396,8 +396,9 @@ class UserServiceImpl(
     ): TokenResponse {
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(socialProvider, token)
+        val presentUser = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email!!)
 
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email!!)) {
+        if (presentUser != null && presentUser.id != user.id) {
             throw DuplicateEmailException(socialProvider)
         }
         when (socialProvider) {
