@@ -20,6 +20,8 @@ interface AuthService {
 
     fun isValidEmail(email: String): Boolean
 
+    fun isValidSnuMail(email: String): Boolean
+
     fun isMatchedPassword(
         user: User,
         password: String,
@@ -64,6 +66,8 @@ class AuthServiceImpl(
     override fun isValidPassword(password: String) = password.matches(passwordRegex)
 
     override fun isValidEmail(email: String) = email.matches(emailRegex)
+
+    override fun isValidSnuMail(email: String) = email.matches(emailRegex) && email.endsWith("@snu.ac.kr")
 
     override fun isMatchedPassword(
         user: User,

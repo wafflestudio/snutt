@@ -11,8 +11,9 @@ data class User(
     @Id
     val id: String? = null,
     var email: String?,
+    // TODO: apple 로그인 마이그레이션 이후 nickname nullable 하지 않게 수정
     @Indexed(unique = true, sparse = true)
-    var nickname: String,
+    var nickname: String?,
     var isEmailVerified: Boolean?,
     var credential: Credential,
     var credentialHash: String,
@@ -26,17 +27,14 @@ data class User(
     var lastLoginTimestamp: Long = System.currentTimeMillis(),
     var notificationCheckedAt: LocalDateTime = LocalDateTime.now(),
 ) {
-    val nicknameTag: Int
+    val nicknameTag: Int?
         get() {
-            return nickname
-                .substringAfterLast(NICKNAME_TAG_DELIMITER)
-                .toInt()
+            return nickname?.substringAfterLast(NICKNAME_TAG_DELIMITER)?.toInt()
         }
 
-    val nicknameWithoutTag: String
+    val nicknameWithoutTag: String?
         get() {
-            return nickname
-                .substringBeforeLast(NICKNAME_TAG_DELIMITER)
+            return nickname?.substringBeforeLast(NICKNAME_TAG_DELIMITER)
         }
 
     companion object {
