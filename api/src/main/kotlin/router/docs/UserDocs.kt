@@ -5,6 +5,8 @@ import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
+import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.SocialProvidersCheckDto
 import com.wafflestudio.snu4t.users.dto.TokenResponse
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
@@ -76,6 +78,21 @@ import org.springframework.web.bind.annotation.RequestMethod
                         ],
                     ),
                 responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = UserDto::class))])],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/users/me/social_providers",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getSocialProviders",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = SocialProvidersCheckDto::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -222,6 +239,123 @@ import org.springframework.web.bind.annotation.RequestMethod
                             ),
                         ],
                     ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/facebook",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "attachFacebook",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SocialLoginRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/google",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "attachGoogle",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SocialLoginRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/kakao",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "attachKakao",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SocialLoginRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/facebook",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "detachFacebook",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/google",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "detachGoogle",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/kakao",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "detachKakao",
                 responses = [
                     ApiResponse(
                         responseCode = "200",

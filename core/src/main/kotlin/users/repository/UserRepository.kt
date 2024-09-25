@@ -34,5 +34,11 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
+    suspend fun existsByCredentialFbIdAndActiveTrue(fbId: String): Boolean
+
+    suspend fun existsByCredentialGoogleSubAndActiveTrue(googleSub: String): Boolean
+
+    suspend fun existsByCredentialKakaoSubAndActiveTrue(kakaoSub: String): Boolean
+
     fun findAllByNicknameStartingWith(nickname: String): Flow<User>
 }
