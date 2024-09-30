@@ -489,14 +489,12 @@ class UserServiceImpl(
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
-        if (!authService.isValidEmail(email)) throw InvalidEmailException
-        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, localId = user.credential.localId ?: throw UserNotFoundException)
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
-        if (!authService.isValidEmail(email)) throw InvalidEmailException
-        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
         saveNewVerificationValue(email, code, key)
