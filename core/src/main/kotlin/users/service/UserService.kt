@@ -342,7 +342,7 @@ class UserServiceImpl(
         email: String,
     ) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
-        if (!authService.isValidSnuMail(email)) throw InvalidEmailException
+        if (!authService.isValidEmail(email)) throw InvalidEmailException
         if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException(getSocialProvider(user))
         val key = VERIFICATION_CODE_PREFIX + user.id
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
