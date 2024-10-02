@@ -6,8 +6,10 @@ import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.exception.AlreadyLocalAccountException
+import com.wafflestudio.snu4t.common.exception.AlreadySocialAccountException
 import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
+import com.wafflestudio.snu4t.common.exception.DuplicateSocialAccountException
 import com.wafflestudio.snu4t.common.exception.EmailAlreadyVerifiedException
 import com.wafflestudio.snu4t.common.exception.InvalidEmailException
 import com.wafflestudio.snu4t.common.exception.InvalidLocalIdException
@@ -88,6 +90,17 @@ interface UserService {
     suspend fun attachLocal(
         user: User,
         localLoginRequest: LocalLoginRequest,
+    ): TokenResponse
+
+    suspend fun attachSocial(
+        user: User,
+        socialLoginRequest: SocialLoginRequest,
+        socialProvider: SocialProvider,
+    ): TokenResponse
+
+    suspend fun detachSocial(
+        user: User,
+        socialProvider: SocialProvider,
     ): TokenResponse
 
     suspend fun changePassword(
@@ -271,13 +284,16 @@ class UserServiceImpl(
         return signup(credential, oauth2UserResponse.email, false)
     }
 
-    private fun getSocialProvider(user: User): SocialProvider {
+    private fun getSocialProvider(
+        user: User,
+        filter: SocialProvider? = null,
+    ): SocialProvider {
         return when {
-            user.credential.fbId != null -> SocialProvider.FACEBOOK
-            user.credential.appleSub != null -> SocialProvider.APPLE
-            user.credential.googleSub != null -> SocialProvider.GOOGLE
-            user.credential.kakaoSub != null -> SocialProvider.KAKAO
-            user.credential.localId != null -> SocialProvider.LOCAL
+            user.credential.fbId != null && filter != SocialProvider.FACEBOOK -> SocialProvider.FACEBOOK
+            user.credential.appleSub != null && filter != SocialProvider.APPLE -> SocialProvider.APPLE
+            user.credential.googleSub != null && filter != SocialProvider.GOOGLE -> SocialProvider.GOOGLE
+            user.credential.kakaoSub != null && filter != SocialProvider.KAKAO -> SocialProvider.KAKAO
+            user.credential.localId != null && filter != SocialProvider.LOCAL -> SocialProvider.LOCAL
             else -> throw IllegalStateException("Unknown social provider")
         }
     }
@@ -373,6 +389,91 @@ class UserServiceImpl(
         return TokenResponse(token = user.credentialHash)
     }
 
+    override suspend fun attachSocial(
+        user: User,
+        socialLoginRequest: SocialLoginRequest,
+        socialProvider: SocialProvider,
+    ): TokenResponse {
+        val token = socialLoginRequest.token
+        val oauth2UserResponse = authService.socialLoginWithAccessToken(socialProvider, token)
+        val presentUser = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email!!)
+
+        if (presentUser != null && presentUser.id != user.id) {
+            throw DuplicateEmailException(socialProvider)
+        }
+        when (socialProvider) {
+            SocialProvider.FACEBOOK -> {
+                if (user.credential.fbId != null) throw AlreadySocialAccountException
+                if (userRepository.existsByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)) {
+                    throw DuplicateSocialAccountException
+                }
+                val facebookCredential = authService.buildFacebookCredential(oauth2UserResponse)
+                user.credential.apply {
+                    fbId = facebookCredential.fbId
+                    fbName = facebookCredential.fbName
+                }
+            }
+            SocialProvider.GOOGLE -> {
+                if (user.credential.googleSub != null) throw AlreadySocialAccountException
+                if (userRepository.existsByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)) {
+                    throw DuplicateSocialAccountException
+                }
+                val googleCredential = authService.buildGoogleCredential(oauth2UserResponse)
+                user.credential.apply {
+                    googleSub = googleCredential.googleSub
+                    googleEmail = googleCredential.googleEmail
+                }
+            }
+            SocialProvider.KAKAO -> {
+                if (user.credential.kakaoSub != null) throw AlreadySocialAccountException
+                if (userRepository.existsByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)) {
+                    throw DuplicateSocialAccountException
+                }
+                val kakaoCredential = authService.buildKakaoCredential(oauth2UserResponse)
+                user.credential.apply {
+                    kakaoSub = kakaoCredential.kakaoSub
+                    kakaoEmail = kakaoCredential.kakaoEmail
+                }
+            }
+            else -> throw IllegalStateException("Unknown social provider")
+        }
+
+        user.credentialHash = authService.generateCredentialHash(user.credential)
+        userRepository.save(user)
+        return TokenResponse(token = user.credentialHash)
+    }
+
+    override suspend fun detachSocial(
+        user: User,
+        socialProvider: SocialProvider,
+    ): TokenResponse {
+        getSocialProvider(user, filter = socialProvider)
+        when (socialProvider) {
+            SocialProvider.FACEBOOK -> {
+                user.credential.apply {
+                    fbId = null
+                    fbName = null
+                }
+            }
+            SocialProvider.GOOGLE -> {
+                user.credential.apply {
+                    googleSub = null
+                    googleEmail = null
+                }
+            }
+            SocialProvider.KAKAO -> {
+                user.credential.apply {
+                    kakaoSub = null
+                    kakaoEmail = null
+                }
+            }
+            else -> throw IllegalStateException("Unknown social provider")
+        }
+        user.credentialHash = authService.generateCredentialHash(user.credential)
+        userRepository.save(user)
+        return TokenResponse(token = user.credentialHash)
+    }
+
     override suspend fun changePassword(
         user: User,
         passwordChangeRequest: PasswordChangeRequest,
@@ -388,14 +489,12 @@ class UserServiceImpl(
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
-        if (!authService.isValidEmail(email)) throw InvalidEmailException
-        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, localId = user.credential.localId ?: throw UserNotFoundException)
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
-        if (!authService.isValidEmail(email)) throw InvalidEmailException
-        val user = userRepository.findByEmailAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
         saveNewVerificationValue(email, code, key)

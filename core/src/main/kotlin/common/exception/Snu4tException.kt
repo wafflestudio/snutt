@@ -77,6 +77,8 @@ object InvalidVerificationCodeException : Snu4tException(ErrorType.INVALID_VERIF
 
 object AlreadyLocalAccountException : Snu4tException(ErrorType.ALREADY_LOCAL_ACCOUNT)
 
+object AlreadySocialAccountException : Snu4tException(ErrorType.ALREADY_SOCIAL_ACCOUNT)
+
 object SocialConnectFailException : Snu4tException(ErrorType.SOCIAL_CONNECT_FAIL)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
@@ -134,5 +136,7 @@ object InvalidThemeTypeException : Snu4tException(ErrorType.INVALID_THEME_TYPE)
 object DuplicatePopupKeyException : Snu4tException(ErrorType.DUPLICATE_POPUP_KEY)
 
 object AlreadyDownloadedThemeException : Snu4tException(ErrorType.ALREADY_DOWNLOADED_THEME)
+
+object DuplicateSocialAccountException : Snu4tException(ErrorType.DUPLICATE_SOCIAL_ACCOUNT)
 
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

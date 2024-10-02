@@ -1,5 +1,6 @@
 package com.wafflestudio.snu4t.handler
 
+import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.dto.OkResponse
 import com.wafflestudio.snu4t.common.extension.toZonedDateTime
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
@@ -8,6 +9,8 @@ import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
+import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
+import com.wafflestudio.snu4t.users.dto.SocialProvidersCheckDto
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
 import com.wafflestudio.snu4t.users.dto.UserPatchRequest
@@ -97,6 +100,58 @@ class UserHandler(
             val user = req.getContext().user!!
             val body = req.awaitBody<LocalLoginRequest>()
             userService.attachLocal(user, body)
+        }
+
+    suspend fun attachFacebook(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.FACEBOOK)
+        }
+
+    suspend fun attachGoogle(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.GOOGLE)
+        }
+
+    suspend fun attachKakao(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachSocial(user, socialLoginRequest, SocialProvider.KAKAO)
+        }
+
+    suspend fun detachFacebook(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachSocial(user, SocialProvider.FACEBOOK)
+        }
+
+    suspend fun detachGoogle(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachSocial(user, SocialProvider.GOOGLE)
+        }
+
+    suspend fun detachKakao(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachSocial(user, SocialProvider.KAKAO)
+        }
+
+    suspend fun checkSocialProviders(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+
+            SocialProvidersCheckDto(
+                local = user.credential.localId != null,
+                facebook = user.credential.fbName != null,
+                google = user.credential.googleSub != null,
+                kakao = user.credential.kakaoSub != null,
+                apple = user.credential.appleSub != null,
+            )
         }
 
     suspend fun changePassword(req: ServerRequest): ServerResponse =
