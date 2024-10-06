@@ -25,8 +25,8 @@ http:
   responseTimeout: 3s
 
 github:
-  token:
   feedback:
+    token:
     repo:
       owner:
       name:

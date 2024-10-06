@@ -28,8 +28,8 @@ http:
   response-timeout: 3s
 
 github:
-  token:
   feedback:
+    token:
     repo:
       owner:
       name:

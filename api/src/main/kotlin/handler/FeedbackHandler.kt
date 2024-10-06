@@ -19,7 +19,7 @@ class FeedbackHandler(
         handle(req) {
             val body = req.awaitBody<FeedbackPostRequestDto>()
             val clientInfo = req.clientInfo!!
-            feedbackService.add(
+            feedbackService.addGithubIssue(
                 email = body.email,
                 message = body.message,
                 osType = clientInfo.osType,

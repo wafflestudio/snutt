@@ -6,17 +6,17 @@ data class FeedbackDto(
     val appVersion: String,
     val deviceModel: String,
     val currentSeoulTime: String,
+    val profileName: String,
     val message: String,
 ) {
-    fun toGithubIssueBody(): String {
-        val header =
-            mapOf(
-                "이메일" to "`$email`",
-                "플랫폼" to platform,
-                "버전" to appVersion,
-                "디바이스" to deviceModel,
-                "날짜/시간(UTC+9)" to currentSeoulTime,
-            )
-        return header.map { "${it.key}: ${it.value}" }.joinToString("\n") + "\n\n$message"
-    }
+    fun toGithubIssueBody() =
+        """
+        이메일: `$email`
+        플랫폼/디바이스: $platform / $deviceModel
+        버전: $appVersion
+        프로필: $profileName
+        날짜/시간(UTC+9): $currentSeoulTime
+            
+        $message
+        """.trimIndent()
 }
