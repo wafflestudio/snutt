@@ -401,11 +401,13 @@ class UserServiceImpl(
     ): TokenResponse {
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(socialProvider, token)
-        val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email!!)
-
-        if (presentUser != null && presentUser.id != user.id) {
-            throw DuplicateEmailException(socialProvider)
+        if (oauth2UserResponse.email != null) {
+            val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
+            if (presentUser != null && presentUser.id != user.id) {
+                throw DuplicateEmailException(socialProvider)
+            }
         }
+
         when (socialProvider) {
             SocialProvider.FACEBOOK -> {
                 if (user.credential.fbId != null) throw AlreadySocialAccountException
