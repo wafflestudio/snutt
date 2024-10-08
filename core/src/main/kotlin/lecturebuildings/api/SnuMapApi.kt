@@ -30,7 +30,7 @@ class SnuMapApiConfig() {
                             Chrome/86.0.4240.80
                             Safari/537.36
                             """.trimIndent().replace("\n", " "),
-                        "Referrer" to "https://map.snu.ac.kr/web/main.action",
+                        "Referer" to "https://map.snu.ac.kr/web/main.action",
                     ),
                 )
             }
