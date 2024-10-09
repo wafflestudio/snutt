@@ -183,7 +183,7 @@ class UserServiceImpl(
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
             email?.let {
                 if (!authService.isValidEmail(email)) throw InvalidEmailException
-                userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
+                userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
                     throw DuplicateEmailException(getSocialProvider(it))
                 }
             }
@@ -228,7 +228,7 @@ class UserServiceImpl(
         val credential = authService.buildFacebookCredential(oauth2UserResponse)
 
         if (oauth2UserResponse.email != null) {
-            userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+            userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
                 throw DuplicateEmailException(getSocialProvider(it))
             }
         } else {
@@ -252,7 +252,7 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
-        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getSocialProvider(it))
         }
 
@@ -275,7 +275,7 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
-        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getSocialProvider(it))
         }
 
@@ -343,7 +343,12 @@ class UserServiceImpl(
     ) {
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
         if (!authService.isValidSnuMail(email)) throw InvalidEmailException
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) throw DuplicateEmailException(getSocialProvider(user))
+        if (userRepository.existsByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(
+                email,
+            )
+        ) {
+            throw DuplicateEmailException(getSocialProvider(user))
+        }
         val key = VERIFICATION_CODE_PREFIX + user.id
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
         saveNewVerificationValue(email, code, key)
@@ -396,11 +401,13 @@ class UserServiceImpl(
     ): TokenResponse {
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(socialProvider, token)
-        val presentUser = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email!!)
-
-        if (presentUser != null && presentUser.id != user.id) {
-            throw DuplicateEmailException(socialProvider)
+        if (oauth2UserResponse.email != null) {
+            val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
+            if (presentUser != null && presentUser.id != user.id) {
+                throw DuplicateEmailException(socialProvider)
+            }
         }
+
         when (socialProvider) {
             SocialProvider.FACEBOOK -> {
                 if (user.credential.fbId != null) throw AlreadySocialAccountException
@@ -489,12 +496,12 @@ class UserServiceImpl(
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
-        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, localId = user.credential.localId ?: throw UserNotFoundException)
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
-        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
         saveNewVerificationValue(email, code, key)

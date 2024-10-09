@@ -30,7 +30,7 @@ class SugangSnuApiConfig() {
                             Chrome/86.0.4240.80
                             Safari/537.36
                             """.trimIndent().replace("\n", " "),
-                        "Referrer" to "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action",
+                        "Referer" to "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action",
                     ),
                 )
             }
