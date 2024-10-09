@@ -23,3 +23,10 @@ google:
 
 http:
   responseTimeout: 3s
+
+github:
+  feedback:
+    token:
+    repo:
+      owner:
+      name:

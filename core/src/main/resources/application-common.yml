@@ -27,6 +27,13 @@ google:
 http:
   response-timeout: 3s
 
+github:
+  feedback:
+    token:
+    repo:
+      owner:
+      name:
+
 api:
   server:
     snuttev:
