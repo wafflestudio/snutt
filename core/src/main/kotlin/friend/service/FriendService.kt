@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.friend.service
 
 import com.wafflestudio.snu4t.common.exception.DuplicateFriendException
+import com.wafflestudio.snu4t.common.exception.FriendLinkNotFoundException
 import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
 import com.wafflestudio.snu4t.common.exception.InvalidDisplayNameException
 import com.wafflestudio.snu4t.common.exception.InvalidFriendException
@@ -232,7 +233,7 @@ class FriendServiceImpl(
     ): Pair<Friend, User> {
         val fromUserId =
             redisTemplate.opsForValue()
-                .getAndAwait(FRIEND_LINK_REDIS_PREFIX + requestToken) ?: throw FriendNotFoundException
+                .getAndAwait(FRIEND_LINK_REDIS_PREFIX + requestToken) ?: throw FriendLinkNotFoundException
         val fromUser = userRepository.findByIdAndActiveTrue(fromUserId) ?: throw UserNotFoundException
         if (fromUser.id == userId) {
             throw InvalidFriendException

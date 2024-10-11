@@ -110,6 +110,8 @@ object ConfigNotFoundException : Snu4tException(ErrorType.CONFIG_NOT_FOUND)
 
 object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 
+object FriendLinkNotFoundException : Snu4tException(ErrorType.FRIEND_LINK_NOT_FOUND)
+
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
