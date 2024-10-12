@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.awaitSingle
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.deleteAndAwait
@@ -33,8 +32,6 @@ interface Cache {
     suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean
 
     suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean
-
-    suspend fun flushDatabase()
 }
 
 @Component
@@ -103,10 +100,6 @@ class RedisCache(
     override suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean {
         log.debug("[CACHE DEL] {}", builtKey.key)
         return redisTemplate.deleteAndAwait(builtKey.key) > 0
-    }
-
-    override suspend fun flushDatabase() {
-        redisTemplate.execute { it.serverCommands().flushDb() }.awaitSingle()
     }
 }
 

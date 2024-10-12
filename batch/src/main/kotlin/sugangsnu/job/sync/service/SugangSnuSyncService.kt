@@ -41,8 +41,6 @@ interface SugangSnuSyncService {
     suspend fun addCoursebook(coursebook: Coursebook)
 
     suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
-
-    suspend fun flushCache()
 }
 
 @Service
@@ -84,8 +82,6 @@ class SugangSnuSyncServiceImpl(
         val sugangSnuLatestCoursebook = sugangSnuRepository.getCoursebookCondition()
         return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
     }
-
-    override suspend fun flushCache() = cache.flushDatabase()
 
     private fun compareLectures(
         newLectures: Iterable<Lecture>,
