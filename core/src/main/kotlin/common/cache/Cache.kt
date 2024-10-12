@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.common.cache
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.wafflestudio.snu4t.friend.service.FriendServiceImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,6 +47,7 @@ class RedisCache(
 
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val flushExcept = setOf(FriendServiceImpl.FRIEND_LINK_REDIS_PREFIX)
     }
 
     override suspend fun <T : Any> Cache.get(
@@ -105,9 +107,10 @@ class RedisCache(
         return redisTemplate.deleteAndAwait(builtKey.key) > 0
     }
 
-    override suspend fun flushDatabase() {
-        redisTemplate.execute { it.serverCommands().flushDb() }.awaitSingle()
-    }
+    override suspend fun flushDatabase() =
+        redisTemplate.keys("*").collectList().awaitSingle()
+            .filterNot { key -> flushExcept.any { key.startsWith(it) } }
+            .forEach { redisTemplate.delete(it).subscribe() }
 }
 
 suspend inline fun <reified T : Any> Cache.get(

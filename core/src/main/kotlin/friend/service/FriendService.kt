@@ -87,7 +87,7 @@ class FriendServiceImpl(
         private val friendDisplayNameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
         private val friendLinkTtl = Duration.ofDays(14)
         private const val DISPLAY_NAME_MAX_LENGTH = 10
-        private const val FRIEND_LINK_REDIS_PREFIX = "friend-link:"
+        const val FRIEND_LINK_REDIS_PREFIX = "friend-link:"
     }
 
     override suspend fun getMyFriends(
