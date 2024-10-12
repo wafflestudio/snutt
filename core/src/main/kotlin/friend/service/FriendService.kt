@@ -10,7 +10,9 @@ import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.push.DeeplinkType
 import com.wafflestudio.snu4t.common.push.dto.PushMessage
 import com.wafflestudio.snu4t.friend.data.Friend
+import com.wafflestudio.snu4t.friend.data.FriendLink
 import com.wafflestudio.snu4t.friend.dto.FriendState
+import com.wafflestudio.snu4t.friend.repository.FriendLinkRepository
 import com.wafflestudio.snu4t.friend.repository.FriendRepository
 import com.wafflestudio.snu4t.notification.data.NotificationType
 import com.wafflestudio.snu4t.notification.service.PushWithNotificationService
@@ -22,15 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.springframework.data.redis.core.ReactiveStringRedisTemplate
-import org.springframework.data.redis.core.getAndAwait
-import org.springframework.data.redis.core.hasKeyAndAwait
-import org.springframework.data.redis.core.setAndAwait
 import org.springframework.stereotype.Service
-import java.security.SecureRandom
-import java.time.Duration
 import java.time.LocalDateTime
-import java.util.Base64
 
 interface FriendService {
     suspend fun getMyFriends(
@@ -80,14 +75,12 @@ class FriendServiceImpl(
     private val userNicknameService: UserNicknameService,
     private val friendRepository: FriendRepository,
     private val userRepository: UserRepository,
-    private val redisTemplate: ReactiveStringRedisTemplate,
+    private val friendLinkRepository: FriendLinkRepository,
 ) : FriendService {
     companion object {
         private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
         private val friendDisplayNameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
-        private val friendLinkTtl = Duration.ofDays(14)
         private const val DISPLAY_NAME_MAX_LENGTH = 10
-        private const val FRIEND_LINK_REDIS_PREFIX = "friend-link:"
     }
 
     override suspend fun getMyFriends(
@@ -216,24 +209,13 @@ class FriendServiceImpl(
         return friendRepository.findById(friendId)
     }
 
-    override suspend fun generateFriendRequestLink(userId: String): String {
-        val bytes = ByteArray(8)
-        var encodedKey: String
-        do {
-            SecureRandom.getInstanceStrong().nextBytes(bytes)
-            encodedKey = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
-        } while (redisTemplate.hasKeyAndAwait(FRIEND_LINK_REDIS_PREFIX + encodedKey))
-        redisTemplate.opsForValue().setAndAwait(FRIEND_LINK_REDIS_PREFIX + encodedKey, userId, friendLinkTtl)
-        return encodedKey
-    }
+    override suspend fun generateFriendRequestLink(userId: String): String = friendLinkRepository.save(FriendLink(fromUserId = userId)).id!!
 
     override suspend fun acceptFriendByLink(
         userId: String,
         requestToken: String,
     ): Pair<Friend, User> {
-        val fromUserId =
-            redisTemplate.opsForValue()
-                .getAndAwait(FRIEND_LINK_REDIS_PREFIX + requestToken) ?: throw FriendLinkNotFoundException
+        val fromUserId = friendLinkRepository.findById(requestToken)?.fromUserId ?: throw FriendLinkNotFoundException
         val fromUser = userRepository.findByIdAndActiveTrue(fromUserId) ?: throw UserNotFoundException
         if (fromUser.id == userId) {
             throw InvalidFriendException
