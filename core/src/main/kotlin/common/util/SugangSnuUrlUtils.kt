@@ -4,6 +4,14 @@ import com.wafflestudio.snu4t.common.enum.Semester
 import org.springframework.web.util.DefaultUriBuilderFactory
 
 object SugangSnuUrlUtils {
+    val redirectPrefixUrl =
+        DefaultUriBuilderFactory().builder()
+            .scheme("http")
+            .host("libproxy.snu.ac.kr")
+            .path("/_Lib_Proxy_Url/")
+            .build()
+            .toString()
+
     fun convertSemesterToSugangSnuSearchString(semester: Semester): String =
         when (semester) {
             Semester.SPRING -> "U000200001U000300001"
@@ -18,18 +26,19 @@ object SugangSnuUrlUtils {
         courseNumber: String,
         lectureNumber: String,
     ): String =
-        DefaultUriBuilderFactory().builder()
-            .scheme("http")
-            .host("sugang.snu.ac.kr")
-            .path("/sugang/cc/cc103.action")
-            .queryParam("openSchyy", year)
-            .queryParam("openShtmFg", makeOpenShtmFg(semester))
-            .queryParam("openDetaShtmFg", makeOpenDetaShtmFg(semester))
-            .queryParam("sbjtCd", courseNumber)
-            .queryParam("ltNo", lectureNumber)
-            .queryParam("sbjtSubhCd", "000")
-            .build()
-            .toString()
+        redirectPrefixUrl +
+            DefaultUriBuilderFactory().builder()
+                .scheme("https")
+                .host("sugang.snu.ac.kr")
+                .path("/sugang/cc/cc103.action")
+                .queryParam("openSchyy", year)
+                .queryParam("openShtmFg", makeOpenShtmFg(semester))
+                .queryParam("openDetaShtmFg", makeOpenDetaShtmFg(semester))
+                .queryParam("sbjtCd", courseNumber)
+                .queryParam("ltNo", lectureNumber)
+                .queryParam("sbjtSubhCd", "000")
+                .build()
+                .toString()
 
     private fun makeOpenShtmFg(semester: Semester) =
         when (semester) {
