@@ -39,8 +39,8 @@ class CoursebookHandler(
                     lectureNumber = req.parseRequiredQueryParam("lecture_number"),
                 )
             CoursebookOfficialResponse(
-                url = REDIRECT_PREFIX_URL + url,
-                rawUrl = url,
+                noProxyUrl = url,
+                proxyUrl = REDIRECT_PREFIX_URL + url,
             )
         }
 }
