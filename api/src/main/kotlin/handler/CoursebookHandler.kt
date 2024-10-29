@@ -1,6 +1,7 @@
 package com.wafflestudio.snu4t.handler
 
 import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snu4t.common.util.SugangSnuUrlUtils.REDIRECT_PREFIX_URL
 import com.wafflestudio.snu4t.common.util.SugangSnuUrlUtils.parseSyllabusUrl
 import com.wafflestudio.snu4t.coursebook.data.CoursebookOfficialResponse
 import com.wafflestudio.snu4t.coursebook.data.CoursebookResponse
@@ -37,6 +38,9 @@ class CoursebookHandler(
                     courseNumber = req.parseRequiredQueryParam("course_number"),
                     lectureNumber = req.parseRequiredQueryParam("lecture_number"),
                 )
-            CoursebookOfficialResponse(url)
+            CoursebookOfficialResponse(
+                noProxyUrl = url,
+                proxyUrl = REDIRECT_PREFIX_URL + url,
+            )
         }
 }
