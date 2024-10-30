@@ -13,6 +13,9 @@ import ErrorCode from "@app/api/enum/ErrorCode";
 import TimetableService = require('@app/core/timetable/TimetableService');
 import UserRepository = require('@app/core/user/UserRepository');
 import CourseBookService = require('@app/core/coursebook/CourseBookService');
+import * as winston from "winston";
+
+var logger = winston.loggers.get('default');
 
 export function getVerifiedByEmail(email: string): Promise<User> {
   return UserRepository.findActiveByVerifiedEmail(email);
@@ -197,6 +200,9 @@ export async function verifyResetPasswordCode(user: User, codeSubmitted: string)
   const verificationValue: RedisVerificationValue = JSON.parse(await RedisUtil.get(key))
 
   if (!verificationValue) {
+    logger.info(`userid: ${user._id}`)
+    logger.info(`codesubmitted: ${codeSubmitted}`)
+    logger.info(`value: ${verificationValue}`)
     throw new ApiError(409, ErrorCode.RESET_PASSWORD_NO_REQUEST, "비밀번호 재설정을 다시 시도해주세요.")
   }
 
