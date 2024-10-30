@@ -187,10 +187,10 @@ restPost(router, '/password/reset/email/send')(async function(context, req) {
     throw new ApiError(400, ErrorCode.NO_EMAIL, "이메일을 입력해주세요.")
   }
 
-  let user = await UserService.getByEmail(email)
+  let user = await UserService.getVerifiedByEmail(email)
 
   if (!user) {
-    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 가입된 사용자가 없습니다.");
+    throw new ApiError(404, ErrorCode.USER_NOT_FOUND, "해당 이메일로 인증된 사용자가 없습니다.");
   }
 
   await UserService.sendResetPasswordCode(user)
