@@ -152,4 +152,6 @@ object AlreadyDownloadedThemeException : Snu4tException(ErrorType.ALREADY_DOWNLO
 
 object DuplicateSocialAccountException : Snu4tException(ErrorType.DUPLICATE_SOCIAL_ACCOUNT)
 
+object CannotRemoveLastAuthProviderException : Snu4tException(ErrorType.CANNOT_REMOVE_LAST_AUTH_PROVIDER)
+
 object DynamicLinkGenerationFailedException : Snu4tException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)

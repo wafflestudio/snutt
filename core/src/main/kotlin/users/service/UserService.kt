@@ -7,6 +7,7 @@ import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.common.cache.CacheKey
 import com.wafflestudio.snu4t.common.exception.AlreadyLocalAccountException
 import com.wafflestudio.snu4t.common.exception.AlreadySocialAccountException
+import com.wafflestudio.snu4t.common.exception.CannotRemoveLastAuthProviderException
 import com.wafflestudio.snu4t.common.exception.DuplicateEmailException
 import com.wafflestudio.snu4t.common.exception.DuplicateLocalIdException
 import com.wafflestudio.snu4t.common.exception.DuplicateSocialAccountException
@@ -453,6 +454,7 @@ class UserServiceImpl(
     ): TokenResponse {
         val attachedAuthProviders = getAttachedAuthProviders(user)
         if (!attachedAuthProviders.contains(authProvider)) throw SocialProviderNotAttachedException
+        if (attachedAuthProviders.size == 1) throw CannotRemoveLastAuthProviderException
         when (authProvider) {
             AuthProvider.FACEBOOK -> {
                 user.credential.apply {
