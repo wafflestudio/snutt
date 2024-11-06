@@ -478,6 +478,7 @@ class UserServiceImpl(
                 user.credential.apply {
                     appleSub = null
                     appleEmail = null
+                    appleTransferSub = null
                 }
             }
             AuthProvider.LOCAL -> throw IllegalStateException("Cannot detach local account")
