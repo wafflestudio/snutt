@@ -1,12 +1,11 @@
 package com.wafflestudio.snu4t.common.exception
 
-import com.wafflestudio.snu4t.auth.SocialProvider
+import com.wafflestudio.snu4t.auth.AuthProvider
 
 open class Snu4tException(
     val error: ErrorType = ErrorType.DEFAULT_ERROR,
     val errorMessage: String = error.errorMessage,
     val displayMessage: String = error.displayMessage,
-    val detail: Any? = null,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제
     val ext: Map<String, String> = mapOf(),
 ) : RuntimeException(errorMessage)
@@ -95,7 +94,6 @@ object WrongSemesterException : Snu4tException(ErrorType.WRONG_SEMESTER)
 class LectureTimeOverlapException(confirmMessage: String) : Snu4tException(
     error = ErrorType.LECTURE_TIME_OVERLAP,
     displayMessage = confirmMessage,
-    ext = mapOf("confirm_message" to confirmMessage),
 )
 
 object CustomLectureResetException : Snu4tException(ErrorType.CANNOT_RESET_CUSTOM_LECTURE)
@@ -112,6 +110,8 @@ object FriendNotFoundException : Snu4tException(ErrorType.FRIEND_NOT_FOUND)
 
 object FriendLinkNotFoundException : Snu4tException(ErrorType.FRIEND_LINK_NOT_FOUND)
 
+object SocialProviderNotAttachedException : Snu4tException(ErrorType.SOCIAL_PROVIDER_NOT_ATTACHED)
+
 object UserNotFoundByNicknameException : Snu4tException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : Snu4tException(ErrorType.THEME_NOT_FOUND)
@@ -122,9 +122,20 @@ object TagListNotFoundException : Snu4tException(ErrorType.TAG_LIST_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : Snu4tException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 
-class DuplicateEmailException(socialProvider: SocialProvider) : Snu4tException(
+class DuplicateEmailException(authProviders: List<AuthProvider>) : Snu4tException(
     ErrorType.DUPLICATE_EMAIL,
-    detail = mapOf("socialProvider" to socialProvider),
+    displayMessage =
+        run {
+            val socialProviders = authProviders.filter { it != AuthProvider.LOCAL }
+            when {
+                authProviders.contains(AuthProvider.LOCAL) && socialProviders.isEmpty() -> "이미 가입된 이메일입니다. 아이디 찾기를 이용해주세요."
+                authProviders.contains(AuthProvider.LOCAL) && socialProviders.isNotEmpty() ->
+                    "이미 가입된 이메일입니다. (${socialProviders.joinToString(", ") { it.value }}) 중 하나의 계정으로 로그인하거나 '아이디 찾기'를 이용해주세요."
+
+                socialProviders.isNotEmpty() -> "이미 가입된 이메일입니다. 이전에 가입한 ${socialProviders.joinToString(", ") { it.value }} 계정으로 로그인해주세요."
+                else -> throw IllegalStateException("로그인 방법이 없는 계정")
+            }
+        },
 )
 
 object DuplicateFriendException : Snu4tException(ErrorType.DUPLICATE_FRIEND)

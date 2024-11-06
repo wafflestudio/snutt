@@ -1,9 +1,9 @@
 package com.wafflestudio.snu4t.users.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wafflestudio.snu4t.auth.AuthProvider
 import com.wafflestudio.snu4t.auth.OAuth2Client
 import com.wafflestudio.snu4t.auth.OAuth2UserResponse
-import com.wafflestudio.snu4t.auth.SocialProvider
 import com.wafflestudio.snu4t.common.exception.SocialConnectFailException
 import com.wafflestudio.snu4t.users.data.Credential
 import com.wafflestudio.snu4t.users.data.User
@@ -41,7 +41,7 @@ interface AuthService {
     fun buildKakaoCredential(oAuth2UserResponse: OAuth2UserResponse): Credential
 
     suspend fun socialLoginWithAccessToken(
-        socialProvider: SocialProvider,
+        authProvider: AuthProvider,
         token: String,
     ): OAuth2UserResponse
 }
@@ -59,7 +59,7 @@ class AuthServiceImpl(
         private val emailRegex = """^[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*@[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*.[a-zA-Z]{2,3}$""".toRegex()
     }
 
-    private val clients = clients.mapKeys { SocialProvider.valueOf(it.key) }
+    private val clients = clients.mapKeys { AuthProvider.valueOf(it.key) }
 
     override fun isValidLocalId(localId: String) = localId.matches(localIdRegex)
 
@@ -116,10 +116,10 @@ class AuthServiceImpl(
     }
 
     override suspend fun socialLoginWithAccessToken(
-        socialProvider: SocialProvider,
+        authProvider: AuthProvider,
         token: String,
     ): OAuth2UserResponse {
-        val oAuth2Client = checkNotNull(clients[socialProvider])
+        val oAuth2Client = checkNotNull(clients[authProvider])
 
         return oAuth2Client.getMe(token) ?: throw SocialConnectFailException
     }

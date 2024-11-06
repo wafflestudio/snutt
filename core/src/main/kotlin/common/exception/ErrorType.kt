@@ -65,6 +65,7 @@ enum class ErrorType(
     EV_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 40407, "강의평 데이터를 찾을 수 없습니다.", "강의평 데이터를 찾을 수 없습니다."),
     TAG_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, 40408, "태그 리스트를 찾을 수 없습니다.", "태그 리스트를 찾을 수 없습니다."),
     FRIEND_LINK_NOT_FOUND(HttpStatus.NOT_FOUND, 40409, "친구 링크가 유효하지 않습니다.", "친구 링크가 유효하지 않습니다."),
+    SOCIAL_PROVIDER_NOT_ATTACHED(HttpStatus.NOT_FOUND, 40410, "소셜 계정이 연동되지 않았습니다.", "소셜 계정이 연동되지 않았습니다."),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.CONFLICT, 40900, "빈자리 알림 중복", "이미 등록된 빈자리 알림입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다.", "이미 사용 중인 이메일입니다."),
