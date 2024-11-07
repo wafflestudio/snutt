@@ -400,7 +400,7 @@ class UserServiceImpl(
         val oauth2UserResponse = authService.socialLoginWithAccessToken(authProvider, token)
         if (oauth2UserResponse.email != null) {
             val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
-            if (presentUser?.id != user.id) {
+            if (presentUser != null && presentUser.id != user.id) {
                 throw DuplicateEmailException(getAttachedAuthProviders(user))
             }
         }
