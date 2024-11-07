@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.users.dto
 
-data class SocialProvidersCheckDto(
+data class AuthProvidersCheckDto(
     val local: Boolean,
     val facebook: Boolean,
     val google: Boolean,

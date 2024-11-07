@@ -1,6 +1,6 @@
 package com.wafflestudio.snu4t.auth
 
-enum class SocialProvider(val value: String) {
+enum class AuthProvider(val value: String) {
     LOCAL("local"),
     FACEBOOK("facebook"),
     APPLE("apple"),
@@ -11,6 +11,6 @@ enum class SocialProvider(val value: String) {
     companion object {
         private val mapping = entries.associateBy { e -> e.value }
 
-        fun from(value: String): SocialProvider? = mapping[value]
+        fun from(value: String): AuthProvider? = mapping[value]
     }
 }

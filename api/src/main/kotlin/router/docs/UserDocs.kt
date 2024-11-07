@@ -1,12 +1,12 @@
 package com.wafflestudio.snu4t.router.docs
 
 import com.wafflestudio.snu4t.common.dto.OkResponse
+import com.wafflestudio.snu4t.users.dto.AuthProvidersCheckDto
 import com.wafflestudio.snu4t.users.dto.EmailVerificationResultDto
 import com.wafflestudio.snu4t.users.dto.LocalLoginRequest
 import com.wafflestudio.snu4t.users.dto.PasswordChangeRequest
 import com.wafflestudio.snu4t.users.dto.SendEmailRequest
 import com.wafflestudio.snu4t.users.dto.SocialLoginRequest
-import com.wafflestudio.snu4t.users.dto.SocialProvidersCheckDto
 import com.wafflestudio.snu4t.users.dto.TokenResponse
 import com.wafflestudio.snu4t.users.dto.UserDto
 import com.wafflestudio.snu4t.users.dto.UserLegacyDto
@@ -81,16 +81,16 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/users/me/social_providers",
+        path = "/v1/users/me/auth-providers",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getSocialProviders",
+                operationId = "getAuthProviders",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(schema = Schema(implementation = SocialProvidersCheckDto::class))],
+                        content = [Content(schema = Schema(implementation = AuthProvidersCheckDto::class))],
                     ),
                 ],
             ),
