@@ -401,7 +401,7 @@ class UserServiceImpl(
         if (oauth2UserResponse.email != null) {
             val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
             if (presentUser != null && presentUser.id != user.id) {
-                throw DuplicateEmailException(getAttachedAuthProviders(user))
+                throw DuplicateEmailException(getAttachedAuthProviders(presentUser))
             }
         }
 
