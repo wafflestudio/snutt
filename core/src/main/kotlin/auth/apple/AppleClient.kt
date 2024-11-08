@@ -3,7 +3,6 @@ package com.wafflestudio.snu4t.auth.apple
 import com.wafflestudio.snu4t.auth.OAuth2Client
 import com.wafflestudio.snu4t.auth.OAuth2UserResponse
 import com.wafflestudio.snu4t.common.extension.get
-import com.wafflestudio.snu4t.users.repository.UserRepository
 import io.jsonwebtoken.Jwts
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
@@ -19,7 +18,6 @@ import java.util.Base64
 @Component("APPLE")
 class AppleClient(
     webClientBuilder: WebClient.Builder,
-    private val userRepository: UserRepository,
 ) : OAuth2Client {
     private val webClient =
         webClientBuilder.clientConnector(
@@ -44,14 +42,12 @@ class AppleClient(
         val publicKey = convertJwkToPublicKey(appleJwk)
         val jwtPayload = verifyAndDecodeToken(token, publicKey)
         val appleUserInfo = AppleUserInfo(jwtPayload)
-        if (appleUserInfo.transferSub != null) {
-            transferAppleCredential(appleUserInfo.transferSub, appleUserInfo.sub, appleUserInfo.email)
-        }
         return OAuth2UserResponse(
             socialId = appleUserInfo.sub,
             name = null,
             email = appleUserInfo.email,
             isEmailVerified = appleUserInfo.emailVerified ?: true,
+            transferInfo = appleUserInfo.transferSub,
         )
     }
 
@@ -68,19 +64,4 @@ class AppleClient(
         token: String,
         publicKey: PublicKey,
     ) = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).body
-
-    private suspend fun transferAppleCredential(
-        transferSub: String,
-        sub: String,
-        email: String?,
-    ) {
-        userRepository.findByCredentialAppleTransferSubAndActiveTrue(transferSub)?.let {
-            it.credential.apply {
-                appleSub = sub
-                appleEmail = email
-                appleTransferSub = transferSub
-            }
-            userRepository.save(it)
-        }
-    }
 }
