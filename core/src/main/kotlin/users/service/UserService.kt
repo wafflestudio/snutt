@@ -65,7 +65,10 @@ interface UserService {
 
     suspend fun loginLocal(localRegisterRequest: LocalLoginRequest): LoginResponse
 
-    suspend fun socialLogin(socialLoginRequest: SocialLoginRequest, authProvider: AuthProvider): LoginResponse
+    suspend fun socialLogin(
+        socialLoginRequest: SocialLoginRequest,
+        authProvider: AuthProvider,
+    ): LoginResponse
 
     suspend fun logout(
         userId: String,
@@ -175,7 +178,7 @@ class UserServiceImpl(
 
         val cacheKey = CacheKey.LOCK_REGISTER_LOCAL.build(localId)
 
-       return runCatching {
+        return runCatching {
             if (!cache.acquireLock(cacheKey)) throw DuplicateLocalIdException
 
             if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
@@ -190,7 +193,7 @@ class UserServiceImpl(
             if (userRepository.existsByCredentialLocalIdAndActiveTrue(localId)) throw DuplicateLocalIdException
 
             val credential = authService.buildLocalCredential(localId, password)
-            val user =  signup(credential, email, isEmailVerified = false)
+            val user = signup(credential, email, isEmailVerified = false)
 
             LoginResponse(
                 userId = user.id!!,
@@ -216,34 +219,36 @@ class UserServiceImpl(
         )
     }
 
-    override suspend fun socialLogin(socialLoginRequest: SocialLoginRequest, authProvider: AuthProvider): LoginResponse {
+    override suspend fun socialLogin(
+        socialLoginRequest: SocialLoginRequest,
+        authProvider: AuthProvider,
+    ): LoginResponse {
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(authProvider, token)
 
-        val user = when (authProvider) {
-            AuthProvider.FACEBOOK -> userRepository.findByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId)
-                ?: signupFacebook(oauth2UserResponse)
-            AuthProvider.GOOGLE -> userRepository.findByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)
-                ?: signupGoogle(oauth2UserResponse)
-            AuthProvider.KAKAO -> userRepository.findByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)
-                ?: signupKakao(oauth2UserResponse)
-            AuthProvider.APPLE -> {
-                if(oauth2UserResponse.transferInfo != null) {
-                    transferAppleCredential(oauth2UserResponse.transferInfo, oauth2UserResponse.socialId, oauth2UserResponse.email)
+        val user =
+            when (authProvider) {
+                AuthProvider.FACEBOOK ->
+                    userRepository.findByCredentialFbIdAndActiveTrue(oauth2UserResponse.socialId) ?: signupFacebook(oauth2UserResponse)
+                AuthProvider.GOOGLE ->
+                    userRepository.findByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId) ?: signupGoogle(oauth2UserResponse)
+                AuthProvider.KAKAO ->
+                    userRepository.findByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId) ?: signupKakao(oauth2UserResponse)
+                AuthProvider.APPLE -> {
+                    if (oauth2UserResponse.transferInfo != null) {
+                        transferAppleCredential(oauth2UserResponse.transferInfo, oauth2UserResponse.socialId, oauth2UserResponse.email)
+                    }
+                    userRepository.findByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId) ?: signupApple(oauth2UserResponse)
                 }
-                userRepository.findByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId) ?: signupApple(oauth2UserResponse)
+                AuthProvider.LOCAL -> throw IllegalStateException("local login is not supported in this method")
             }
-            AuthProvider.LOCAL -> throw IllegalStateException("local login is not supported in this method")
-        }
         return LoginResponse(
             userId = user.id!!,
             token = user.credentialHash,
         )
     }
 
-    private suspend fun signupFacebook(
-        oauth2UserResponse: OAuth2UserResponse,
-    ): User {
+    private suspend fun signupFacebook(oauth2UserResponse: OAuth2UserResponse): User {
         if (oauth2UserResponse.email != null) {
             userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
                 throw DuplicateEmailException(getAttachedAuthProviders(it))
@@ -256,9 +261,7 @@ class UserServiceImpl(
         return signup(credential, oauth2UserResponse.email, false)
     }
 
-    private suspend fun signupGoogle(
-        oauth2UserResponse: OAuth2UserResponse,
-    ): User {
+    private suspend fun signupGoogle(oauth2UserResponse: OAuth2UserResponse): User {
         checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
         userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
@@ -268,9 +271,7 @@ class UserServiceImpl(
         return signup(credential, oauth2UserResponse.email, false)
     }
 
-    private suspend fun signupKakao(
-        oauth2UserResponse: OAuth2UserResponse,
-    ): User {
+    private suspend fun signupKakao(oauth2UserResponse: OAuth2UserResponse): User {
         checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
         userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
@@ -280,9 +281,7 @@ class UserServiceImpl(
         return signup(credential, oauth2UserResponse.email, false)
     }
 
-    private suspend fun signupApple(
-        oauth2UserResponse: OAuth2UserResponse,
-    ): User {
+    private suspend fun signupApple(oauth2UserResponse: OAuth2UserResponse): User {
         checkNotNull(oauth2UserResponse.email) { "apple email is null: $oauth2UserResponse" }
         userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
