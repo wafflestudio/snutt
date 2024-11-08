@@ -70,6 +70,8 @@ interface UserService {
 
     suspend fun loginKakao(socialLoginRequest: SocialLoginRequest): LoginResponse
 
+    suspend fun loginApple(socialLoginRequest: SocialLoginRequest): LoginResponse
+
     suspend fun logout(
         userId: String,
         logoutRequest: LogoutRequest,
@@ -284,6 +286,49 @@ class UserServiceImpl(
         val credential = authService.buildKakaoCredential(oauth2UserResponse)
 
         return signup(credential, oauth2UserResponse.email, false)
+    }
+
+    override suspend fun loginApple(socialLoginRequest: SocialLoginRequest): LoginResponse {
+        val token = socialLoginRequest.token
+        val oauth2UserResponse = authService.socialLoginWithAccessToken(AuthProvider.APPLE, token)
+
+        if (oauth2UserResponse.transferInfo != null) {
+            transferAppleCredential(oauth2UserResponse.transferInfo, oauth2UserResponse.socialId, oauth2UserResponse.email)
+        }
+
+        val user = userRepository.findByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId)
+
+        if (user != null) {
+            return LoginResponse(
+                userId = user.id!!,
+                token = user.credentialHash,
+            )
+        }
+
+        checkNotNull(oauth2UserResponse.email) { "apple email is null: $oauth2UserResponse" }
+        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+            throw DuplicateEmailException(getAttachedAuthProviders(it))
+        }
+
+        val credential = authService.buildAppleCredential(oauth2UserResponse)
+
+        return signup(credential, oauth2UserResponse.email, false)
+    }
+
+    private suspend fun transferAppleCredential(
+        transferSub: String,
+        sub: String,
+        email: String?,
+    ) {
+        userRepository.findByCredentialAppleTransferSubAndActiveTrue(transferSub)?.let {
+            it.credential.apply {
+                appleSub = sub
+                appleEmail = email
+                appleTransferSub = transferSub
+            }
+            it.credentialHash = authService.generateCredentialHash(it.credential)
+            userRepository.save(it)
+        }
     }
 
     private fun getAttachedAuthProviders(user: User): List<AuthProvider> =
