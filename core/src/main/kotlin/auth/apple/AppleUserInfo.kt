@@ -7,11 +7,12 @@ data class AppleUserInfo(
     val email: String?,
     val emailVerified: Boolean?,
     val transferSub: String?,
-) {
-    constructor(jwtPayload: Claims) : this(
+)
+
+fun AppleUserInfo(jwtPayload: Claims): AppleUserInfo =
+    AppleUserInfo(
         sub = jwtPayload.subject,
         email = jwtPayload["email"] as? String,
         emailVerified = jwtPayload["email_verified"] as? Boolean,
         transferSub = jwtPayload["transfer_sub"] as? String,
     )
-}

@@ -36,7 +36,7 @@ class AppleClient(
         val jwtHeader = extractJwtHeader(token)
         val appleJwk =
             webClient.get<List<AppleJwk>>(uri = APPLE_JWK_URI).getOrNull()
-                ?.firstOrNull {
+                ?.find {
                     it.kid == jwtHeader.keyId && it.alg == jwtHeader.algorithm
                 } ?: return null
         val publicKey = convertJwkToPublicKey(appleJwk)
