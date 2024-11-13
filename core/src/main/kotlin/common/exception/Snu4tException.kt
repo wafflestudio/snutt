@@ -78,6 +78,8 @@ object AlreadyLocalAccountException : Snu4tException(ErrorType.ALREADY_LOCAL_ACC
 
 object AlreadySocialAccountException : Snu4tException(ErrorType.ALREADY_SOCIAL_ACCOUNT)
 
+object UpdateAppVersionException : Snu4tException(ErrorType.UPDATE_APP_VERSION)
+
 object SocialConnectFailException : Snu4tException(ErrorType.SOCIAL_CONNECT_FAIL)
 
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
