@@ -9,7 +9,6 @@ dependencies {
     implementation("software.amazon.awssdk:sts:2.25.15")
     implementation("software.amazon.awssdk:ses:2.25.15")
     implementation("com.google.firebase:firebase-admin:9.3.0")
-    implementation("io.jsonwebtoken:jjwt:0.9.1")
 
     testFixturesImplementation("org.testcontainers:mongodb:1.19.0")
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
