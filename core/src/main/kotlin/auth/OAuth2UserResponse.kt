@@ -5,4 +5,5 @@ data class OAuth2UserResponse(
     val name: String?,
     val email: String?,
     val isEmailVerified: Boolean,
+    val transferInfo: String? = null,
 )

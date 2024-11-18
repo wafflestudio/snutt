@@ -20,9 +20,11 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByCredentialFbIdAndActiveTrue(fbId: String): User?
 
-    suspend fun findByCredentialGoogleSubAndActiveTrue(fbId: String): User?
+    suspend fun findByCredentialGoogleSubAndActiveTrue(googleSub: String): User?
 
-    suspend fun findByCredentialKakaoSubAndActiveTrue(fbId: String): User?
+    suspend fun findByCredentialKakaoSubAndActiveTrue(kakaoSub: String): User?
+
+    suspend fun findByCredentialAppleSubAndActiveTrue(appleSub: String): User?
 
     suspend fun findByNicknameAndActiveTrue(nickname: String): User?
 
@@ -39,4 +41,6 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
     suspend fun existsByCredentialKakaoSubAndActiveTrue(kakaoSub: String): Boolean
 
     fun findAllByNicknameStartingWith(nickname: String): Flow<User>
+
+    suspend fun findByCredentialAppleTransferSubAndActiveTrue(appleTransferSub: String): User?
 }
