@@ -40,8 +40,6 @@ interface AuthService {
 
     fun buildKakaoCredential(oAuth2UserResponse: OAuth2UserResponse): Credential
 
-    fun buildAppleCredential(oAuth2UserResponse: OAuth2UserResponse): Credential
-
     suspend fun socialLoginWithAccessToken(
         authProvider: AuthProvider,
         token: String,
@@ -107,13 +105,6 @@ class AuthServiceImpl(
         Credential(
             kakaoSub = oAuth2UserResponse.socialId,
             kakaoEmail = oAuth2UserResponse.email,
-        )
-
-    override fun buildAppleCredential(oAuth2UserResponse: OAuth2UserResponse) =
-        Credential(
-            appleSub = oAuth2UserResponse.socialId,
-            appleEmail = oAuth2UserResponse.email,
-            appleTransferSub = oAuth2UserResponse.transferInfo,
         )
 
     private fun hmacSHA256Hex(data: String): String {

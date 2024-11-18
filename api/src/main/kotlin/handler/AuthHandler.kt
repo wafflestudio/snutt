@@ -61,12 +61,6 @@ class AuthHandler(
             userService.loginKakao(socialLoginRequest)
         }
 
-    suspend fun loginApple(req: ServerRequest): ServerResponse =
-        handle(req) {
-            val socialLoginRequest: SocialLoginRequest = req.awaitBodyOrNull() ?: throw ServerWebInputException("Invalid body")
-            userService.loginApple(socialLoginRequest)
-        }
-
     suspend fun logout(req: ServerRequest): ServerResponse =
         handle(req) {
             val userId = req.userId
