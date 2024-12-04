@@ -52,6 +52,7 @@ enum class ErrorType(
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, 40018, "인증 코드가 유효하지 않습니다.", "인증 코드가 유효하지 않습니다."),
     ALREADY_LOCAL_ACCOUNT(HttpStatus.BAD_REQUEST, 40019, "이미 로컬 계정이 존재합니다.", "이미 로컬 계정이 존재합니다."),
     ALREADY_SOCIAL_ACCOUNT(HttpStatus.BAD_REQUEST, 40020, "이미 소셜 계정이 존재합니다.", "이미 소셜 계정이 존재합니다."),
+    UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요.", "앱 버전을 업데이트해주세요."),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다.", "소셜 로그인에 실패했습니다."),
 

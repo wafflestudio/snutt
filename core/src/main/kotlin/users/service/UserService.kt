@@ -19,6 +19,7 @@ import com.wafflestudio.snu4t.common.exception.InvalidVerificationCodeException
 import com.wafflestudio.snu4t.common.exception.Snu4tException
 import com.wafflestudio.snu4t.common.exception.SocialProviderNotAttachedException
 import com.wafflestudio.snu4t.common.exception.TooManyVerificationCodeRequestException
+import com.wafflestudio.snu4t.common.exception.UpdateAppVersionException
 import com.wafflestudio.snu4t.common.exception.UserNotFoundException
 import com.wafflestudio.snu4t.common.exception.WrongLocalIdException
 import com.wafflestudio.snu4t.common.exception.WrongPasswordException
@@ -553,6 +554,7 @@ class UserServiceImpl(
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
+        if (email.replace(emailMaskRegex, "*") == email) throw UpdateAppVersionException
         val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
