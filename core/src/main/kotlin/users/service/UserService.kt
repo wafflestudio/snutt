@@ -569,7 +569,7 @@ class UserServiceImpl(
         val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         checkVerificationValue(key, code)
-        redisTemplate.opsForValue().getAndExpire(key, Duration.ofMinutes(3)).subscribe()
+        redisTemplate.expire(key, Duration.ofMinutes(3)).subscribe()
     }
 
     override suspend fun getMaskedEmail(localId: String): String {
