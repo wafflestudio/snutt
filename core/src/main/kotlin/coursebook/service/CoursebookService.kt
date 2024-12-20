@@ -8,6 +8,8 @@ interface CoursebookService {
     suspend fun getLatestCoursebook(): Coursebook
 
     suspend fun getCoursebooks(): List<Coursebook>
+
+    suspend fun getLastTwoCourseBooks(): List<Coursebook>
 }
 
 @Service
@@ -15,4 +17,6 @@ class CoursebookServiceImpl(private val coursebookRepository: CoursebookReposito
     override suspend fun getLatestCoursebook(): Coursebook = coursebookRepository.findFirstByOrderByYearDescSemesterDesc()
 
     override suspend fun getCoursebooks(): List<Coursebook> = coursebookRepository.findAllByOrderByYearDescSemesterDesc()
+
+    override suspend fun getLastTwoCourseBooks(): List<Coursebook> = coursebookRepository.findTop2ByOrderByYearDescSemesterDesc()
 }

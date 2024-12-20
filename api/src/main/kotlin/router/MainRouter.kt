@@ -300,6 +300,7 @@ class MainRouter(
     @Bean
     fun evServiceRouter() =
         v1CoRouter {
+            GET("/ev-service/v1/users/me/lectures/latest", evServiceHandler::getMyLatestLectures)
             GET("/ev-service/{*requestPath}", evServiceHandler::handleGet)
             POST("/ev-service/{*requestPath}", evServiceHandler::handlePost)
             DELETE("/ev-service/{*requestPath}", evServiceHandler::handleDelete)
