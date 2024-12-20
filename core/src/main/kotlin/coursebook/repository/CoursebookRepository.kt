@@ -10,5 +10,5 @@ interface CoursebookRepository : CoroutineCrudRepository<Coursebook, String> {
 
     suspend fun findAllByOrderByYearDescSemesterDesc(): List<Coursebook>
 
-    suspend fun findTop2ByOrderByYearDescSemesterDesc(): List<Coursebook>
+    suspend fun findTop3ByOrderByYearDescSemesterDesc(): List<Coursebook>
 }

@@ -9,7 +9,7 @@ interface CoursebookService {
 
     suspend fun getCoursebooks(): List<Coursebook>
 
-    suspend fun getLastTwoCourseBooks(): List<Coursebook>
+    suspend fun getLastTwoCourseBooksBeforeCurrent(): List<Coursebook>
 }
 
 @Service
@@ -18,5 +18,8 @@ class CoursebookServiceImpl(private val coursebookRepository: CoursebookReposito
 
     override suspend fun getCoursebooks(): List<Coursebook> = coursebookRepository.findAllByOrderByYearDescSemesterDesc()
 
-    override suspend fun getLastTwoCourseBooks(): List<Coursebook> = coursebookRepository.findTop2ByOrderByYearDescSemesterDesc()
+    override suspend fun getLastTwoCourseBooksBeforeCurrent(): List<Coursebook> =
+        coursebookRepository.findTop3ByOrderByYearDescSemesterDesc().slice(
+            1..2,
+        )
 }
