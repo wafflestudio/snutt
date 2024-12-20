@@ -1,11 +1,10 @@
 package com.wafflestudio.snu4t.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.common.enum.Semester
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
+import com.wafflestudio.snu4t.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpHeaders
@@ -61,7 +60,7 @@ class EvServiceHandler(
                         .toList()
                         .flatMap {
                                 timetable ->
-                            timetable.lectures.map { lecture -> EvLectureDto(lecture, coursebook.year, coursebook.semester) }
+                            timetable.lectures.map { lecture -> EvLectureInfoDto(lecture, coursebook.year, coursebook.semester) }
                         }
                 }
             val recentLecturesJson = ObjectMapper().writeValueAsString(recentLectures).filterNot { it.isWhitespace() }
@@ -82,22 +81,3 @@ class EvServiceHandler(
                 .awaitBody()
         }
 }
-
-data class EvLectureDto(
-    val year: Int,
-    val semester: Int,
-    val instructor: String?,
-    val courseNumber: String?,
-)
-
-fun EvLectureDto(
-    timetableLecture: TimetableLecture,
-    year: Int,
-    semester: Semester,
-): EvLectureDto =
-    EvLectureDto(
-        year = year,
-        semester = semester.value,
-        instructor = timetableLecture.instructor,
-        courseNumber = timetableLecture.courseNumber,
-    )
