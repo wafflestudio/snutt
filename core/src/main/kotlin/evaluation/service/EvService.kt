@@ -11,15 +11,19 @@ import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.withContext
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.client.awaitBody
+import org.springframework.web.reactive.function.client.bodyToMono
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
+import reactor.core.publisher.Mono
 import java.net.URLEncoder
 
 @Service
@@ -43,7 +47,9 @@ class EvService(
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(BodyInserters.fromValue(originalBody))
                 .retrieve()
-                .awaitBody<MutableMap<String, Any?>>()
+                .onStatus(HttpStatusCode::isError) { response -> Mono.error(ResponseStatusException(response.statusCode())) }
+                .bodyToMono<MutableMap<String, Any?>>()
+                .awaitSingle()
         return updateUserInfo(result)
     }
 
@@ -87,7 +93,9 @@ class EvService(
             .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .retrieve()
-            .awaitBody()
+            .onStatus(HttpStatusCode::isError) { response -> Mono.error(ResponseStatusException(response.statusCode())) }
+            .bodyToMono<MutableMap<String, Any?>>()
+            .awaitSingle()
     }
 
     private suspend fun updateUserInfo(data: MutableMap<String, Any?>): MutableMap<String, Any?> {
