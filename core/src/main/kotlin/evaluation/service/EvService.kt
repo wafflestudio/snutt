@@ -10,7 +10,6 @@ import com.wafflestudio.snu4t.timetables.service.TimetableService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -23,7 +22,6 @@ import java.net.URLEncoder
 
 @Service
 class EvService(
-    @Qualifier("snuttevServer")
     private val snuttEvWebClient: SnuttEvWebClient,
     private val timetableService: TimetableService,
     private val coursebookService: CoursebookService,
