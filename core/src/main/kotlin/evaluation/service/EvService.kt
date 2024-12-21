@@ -44,6 +44,8 @@ class EvService(
             snuttEvWebClient.method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
                 .header("Snutt-User-Id", userId)
+                .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(BodyInserters.fromValue(originalBody))
                 .retrieve()
