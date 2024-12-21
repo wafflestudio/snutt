@@ -100,6 +100,7 @@ class EvService(
             .awaitSingle()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private suspend fun updateUserInfo(data: MutableMap<String, Any?>): MutableMap<String, Any?> {
         val updatedMap: MutableMap<String, Any?> = mutableMapOf()
         for ((k, v) in data.entries) {
