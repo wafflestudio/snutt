@@ -34,7 +34,7 @@ class EvService(
         method: HttpMethod,
     ): Map<String, Any> =
         snuttEvWebClient.method(method)
-            .uri { builder -> builder.path("/v1").path(requestPath).queryParams(requestQueryParams).build() }
+            .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
             .header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(BodyInserters.fromValue(originalBody))
