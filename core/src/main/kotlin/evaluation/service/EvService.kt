@@ -6,7 +6,9 @@ import com.wafflestudio.snu4t.common.util.buildMultiValueMap
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
 import com.wafflestudio.snu4t.evaluation.dto.EvLectureInfoDto
+import com.wafflestudio.snu4t.evaluation.dto.EvUserDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
+import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
@@ -25,6 +27,7 @@ class EvService(
     private val snuttEvWebClient: SnuttEvWebClient,
     private val timetableService: TimetableService,
     private val coursebookService: CoursebookService,
+    private val userService: UserService,
 ) {
     suspend fun handleRouting(
         userId: String,
@@ -32,19 +35,22 @@ class EvService(
         requestQueryParams: MultiValueMap<String, String> = buildMultiValueMap(mapOf()),
         originalBody: String,
         method: HttpMethod,
-    ): Map<String, Any> =
-        snuttEvWebClient.method(method)
-            .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
-            .header("Snutt-User-Id", userId)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(BodyInserters.fromValue(originalBody))
-            .retrieve()
-            .awaitBody()
+    ): Map<String, Any?> {
+        val result: MutableMap<String, Any?> =
+            snuttEvWebClient.method(method)
+                .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
+                .header("Snutt-User-Id", userId)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(BodyInserters.fromValue(originalBody))
+                .retrieve()
+                .awaitBody<MutableMap<String, Any?>>()
+        return updateUserInfo(result)
+    }
 
     suspend fun getMyLatestLectures(
         userId: String,
         requestQueryParams: MultiValueMap<String, String>? = null,
-    ): Map<String, Any> {
+    ): Map<String, Any?> {
         val recentLectures: List<EvLectureInfoDto> =
             coursebookService.getLastTwoCourseBooksBeforeCurrent().flatMap { coursebook ->
                 timetableService.getTimetablesBySemester(userId, coursebook.year, coursebook.semester)
@@ -82,5 +88,22 @@ class EvService(
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .retrieve()
             .awaitBody()
+    }
+
+    private suspend fun updateUserInfo(data: MutableMap<String, Any?>): MutableMap<String, Any?> {
+        val updatedMap: MutableMap<String, Any?> = mutableMapOf()
+        for ((k, v) in data.entries) {
+            if (k == "user_id") {
+                val userDto = runCatching { EvUserDto(userService.getUser(v as String)) }.getOrNull()
+                updatedMap["user"] = userDto
+            } else {
+                when (v) {
+                    is List<*> -> updatedMap[k] = v.map { updateUserInfo(it as MutableMap<String, Any?>) }
+                    is MutableMap<*, *> -> updatedMap[k] = updateUserInfo(v as MutableMap<String, Any?>)
+                    else -> updatedMap[k] = v
+                }
+            }
+        }
+        return updatedMap
     }
 }
