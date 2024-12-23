@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.evaluation.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.wafflestudio.snu4t.common.exception.ProxyException
 import com.wafflestudio.snu4t.common.util.buildMultiValueMap
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.bodyToMono
-import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URLEncoder
@@ -45,11 +45,15 @@ class EvService(
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
                 .header("Snutt-User-Id", userId)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .body(BodyInserters.fromValue(originalBody))
                 .retrieve()
-                .onStatus(HttpStatusCode::isError) { response -> Mono.error(ResponseStatusException(response.statusCode())) }
+                .onStatus(HttpStatusCode::isError) { response ->
+                    response.bodyToMono<Map<String, Any?>>()
+                        .flatMap { errorBody ->
+                            Mono.error(ProxyException(response.statusCode(), errorBody))
+                        }
+                }
                 .bodyToMono<MutableMap<String, Any?>>()
                 .awaitSingle()
         return updateUserInfo(result)
@@ -74,12 +78,12 @@ class EvService(
                     }
             }
 
-        val recentLecturesJson =
-            ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-                .writeValueAsString(recentLectures)
         val encodedJson =
             withContext(Dispatchers.IO) {
-                URLEncoder.encode(recentLecturesJson, "UTF-8")
+                URLEncoder.encode(
+                    ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).writeValueAsString(recentLectures),
+                    "UTF-8",
+                )
             }
 
         return snuttEvWebClient.get()
@@ -92,10 +96,14 @@ class EvService(
             }
             .header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
-            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .retrieve()
-            .onStatus(HttpStatusCode::isError) { response -> Mono.error(ResponseStatusException(response.statusCode())) }
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono<Map<String, Any?>>()
+                    .flatMap { errorBody ->
+                        Mono.error(ProxyException(response.statusCode(), errorBody))
+                    }
+            }
             .bodyToMono<MutableMap<String, Any?>>()
             .awaitSingle()
     }
