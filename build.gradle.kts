@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
@@ -12,6 +13,7 @@ plugins {
 group = "com.wafflestudio"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 allprojects {
     repositories {
@@ -64,9 +66,9 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 

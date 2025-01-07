@@ -16,7 +16,5 @@ data class FeedbackDto(
         버전: $appVersion
         프로필: $profileName
         날짜/시간(UTC+9): $currentSeoulTime
-            
-        $message
-        """.trimIndent()
+        """.trimIndent() + "\n\n" + message
 }

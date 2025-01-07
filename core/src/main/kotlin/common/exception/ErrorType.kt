@@ -52,6 +52,7 @@ enum class ErrorType(
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, 40018, "인증 코드가 유효하지 않습니다.", "인증 코드가 유효하지 않습니다."),
     ALREADY_LOCAL_ACCOUNT(HttpStatus.BAD_REQUEST, 40019, "이미 로컬 계정이 존재합니다.", "이미 로컬 계정이 존재합니다."),
     ALREADY_SOCIAL_ACCOUNT(HttpStatus.BAD_REQUEST, 40020, "이미 소셜 계정이 존재합니다.", "이미 소셜 계정이 존재합니다."),
+    UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요.", "앱 버전을 업데이트해주세요."),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다.", "소셜 로그인에 실패했습니다."),
 
@@ -65,6 +66,7 @@ enum class ErrorType(
     EV_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 40407, "강의평 데이터를 찾을 수 없습니다.", "강의평 데이터를 찾을 수 없습니다."),
     TAG_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, 40408, "태그 리스트를 찾을 수 없습니다.", "태그 리스트를 찾을 수 없습니다."),
     FRIEND_LINK_NOT_FOUND(HttpStatus.NOT_FOUND, 40409, "친구 링크가 유효하지 않습니다.", "친구 링크가 유효하지 않습니다."),
+    SOCIAL_PROVIDER_NOT_ATTACHED(HttpStatus.NOT_FOUND, 40410, "소셜 계정이 연동되지 않았습니다.", "소셜 계정이 연동되지 않았습니다."),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.CONFLICT, 40900, "빈자리 알림 중복", "이미 등록된 빈자리 알림입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다.", "이미 사용 중인 이메일입니다."),
@@ -75,6 +77,7 @@ enum class ErrorType(
     DUPLICATE_POPUP_KEY(HttpStatus.CONFLICT, 40906, "중복된 팝업 키입니다.", "중복된 팝업 키입니다."),
     ALREADY_DOWNLOADED_THEME(HttpStatus.CONFLICT, 40907, "이미 다운로드한 테마입니다.", "이미 다운로드한 테마입니다."),
     DUPLICATE_SOCIAL_ACCOUNT(HttpStatus.CONFLICT, 40908, "이미 연결된 소셜 계정입니다.", "이미 연결된 소셜 계정입니다."),
+    CANNOT_REMOVE_LAST_AUTH_PROVIDER(HttpStatus.CONFLICT, 40909, "최소 한 개의 로그인 수단은 유지해야 합니다.", "최소 한 개의 로그인 수단은 유지해야 합니다."),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
 }

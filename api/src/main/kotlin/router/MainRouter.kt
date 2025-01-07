@@ -86,6 +86,7 @@ class MainRouter(
                 POST("/login/facebook", authHandler::loginFacebook)
                 POST("/login/google", authHandler::loginGoogle)
                 POST("/login/kakao", authHandler::loginKakao)
+                POST("/login/apple", authHandler::loginApple)
                 POST("/logout", authHandler::logout)
                 POST("/password/reset/email/check", authHandler::getMaskedEmail)
                 POST("/password/reset/email/send", authHandler::sendResetPasswordCode)
@@ -120,7 +121,8 @@ class MainRouter(
             "/users".nest {
                 GET("/me", userHandler::getUserMe)
                 PATCH("/me", userHandler::patchUserInfo)
-                GET("/me/social_providers", userHandler::checkSocialProviders)
+                GET("/me/social_providers", userHandler::checkAuthProviders)
+                GET("/me/auth-providers", userHandler::checkAuthProviders)
             }
         }
 
@@ -263,6 +265,7 @@ class MainRouter(
                 GET("/best", timetableThemeHandler::getBestThemes)
                 GET("/friends", timetableThemeHandler::getFriendsThemes)
                 POST("", timetableThemeHandler::addTheme)
+                GET("/{themeId}", timetableThemeHandler::getTheme)
                 PATCH("/{themeId}", timetableThemeHandler::modifyTheme)
                 DELETE("/{themeId}", timetableThemeHandler::deleteTheme)
                 POST("/{themeId}/copy", timetableThemeHandler::copyTheme)

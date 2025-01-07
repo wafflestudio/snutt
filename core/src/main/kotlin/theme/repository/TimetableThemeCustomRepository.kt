@@ -45,7 +45,7 @@ class TimetableThemeCustomRepositoryImpl(
         return reactiveMongoTemplate.findOne(
             Query.query(
                 TimetableTheme::userId isEqualTo userId and
-                    TimetableTheme::name regex """${Regex.escape(name)}(\s+\(\d+\))?""",
+                    TimetableTheme::name regex """^${Regex.escape(name)}(\s+\(\d+\))?$""",
             ).with(TimetableTheme::name.desc()),
             TimetableTheme::class.java,
         ).awaitSingleOrNull()
