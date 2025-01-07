@@ -9,6 +9,7 @@ snutt:
 
 server:
   netty:
+    connection-timeout: 5s
     idle-timeout: 5s
 
 ---
