@@ -1,8 +1,5 @@
 package com.wafflestudio.snu4t.config
 
-import io.netty.channel.ChannelOption
-import io.netty.handler.timeout.ReadTimeoutHandler
-import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -11,9 +8,8 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 @Configuration
 @EnableConfigurationProperties(ApiConfigs::class)
@@ -27,16 +23,8 @@ class ApiWebClientConfig(
     }
 
     private fun create(apiConfig: ApiConfig): WebClient {
-        val connector =
-            ReactorClientHttpConnector(
-                HttpClient.create()
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiConfig.connectTimeout) // Connection Timeout
-                    .doOnConnected { conn: Connection ->
-                        conn
-                            .addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
-                            .addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
-                    },
-            )
+        val httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(apiConfig.responseTimeout))
+        val connector = ReactorClientHttpConnector(httpClient)
         return WebClient.builder().clientConnector(connector).baseUrl(apiConfig.baseUrl).build()
     }
 }
@@ -48,8 +36,7 @@ class ApiConfigs {
 }
 
 class ApiConfig {
-    var connectTimeout: Int = 800
-    var readTimeout: Long = 1000
+    var responseTimeout: Long = 2000
     lateinit var baseUrl: String
 }
 
