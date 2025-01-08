@@ -485,7 +485,18 @@ class UserServiceImpl(
                     kakaoEmail = kakaoCredential.kakaoEmail
                 }
             }
-            AuthProvider.APPLE -> throw IllegalStateException("Apple login is not supported")
+            AuthProvider.APPLE -> {
+                if (user.credential.appleSub != null) throw AlreadySocialAccountException
+                if (userRepository.existsByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId)) {
+                    throw DuplicateSocialAccountException
+                }
+                val appleCredential = authService.buildAppleCredential(oauth2UserResponse)
+                user.credential.apply {
+                    appleSub = appleCredential.appleSub
+                    appleEmail = appleCredential.appleEmail
+                    appleTransferSub = appleCredential.appleTransferSub
+                }
+            }
             AuthProvider.LOCAL -> throw IllegalStateException("Cannot attach local account")
         }
 

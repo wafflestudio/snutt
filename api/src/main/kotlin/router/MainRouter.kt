@@ -114,9 +114,11 @@ class MainRouter(
                 POST("/facebook", userHandler::attachFacebook)
                 POST("/google", userHandler::attachGoogle)
                 POST("/kakao", userHandler::attachKakao)
+                POST("/apple", userHandler::attachApple)
                 DELETE("/facebook", userHandler::detachFacebook)
                 DELETE("/google", userHandler::detachGoogle)
                 DELETE("/kakao", userHandler::detachKakao)
+                DELETE("/apple", userHandler::detachApple)
             }
             "/users".nest {
                 GET("/me", userHandler::getUserMe)

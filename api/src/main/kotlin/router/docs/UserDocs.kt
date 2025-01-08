@@ -320,6 +320,30 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
+        path = "/v1/user/apple",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "attachApple",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SocialLoginRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
         path = "/v1/user/facebook",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -356,6 +380,21 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation =
             Operation(
                 operationId = "detachKakao",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = TokenResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/user/apple",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "detachApple",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
