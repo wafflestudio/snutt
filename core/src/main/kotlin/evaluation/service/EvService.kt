@@ -10,10 +10,8 @@ import com.wafflestudio.snu4t.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snu4t.evaluation.dto.EvUserDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.service.UserService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.withContext
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
@@ -22,9 +20,7 @@ import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.bodyToMono
-import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
-import java.net.URLEncoder
 
 @Service
 class EvService(
@@ -61,7 +57,7 @@ class EvService(
 
     suspend fun getMyLatestLectures(
         userId: String,
-        requestQueryParams: MultiValueMap<String, String>? = null,
+        requestQueryParams: MultiValueMap<String, String> = buildMultiValueMap(mapOf()),
     ): Map<String, Any?> {
         val recentLectures: List<EvLectureInfoDto> =
             coursebookService.getLastTwoCourseBooksBeforeCurrent().flatMap { coursebook ->
@@ -78,21 +74,17 @@ class EvService(
                     }
             }
 
-        val encodedJson =
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode(
-                    ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).writeValueAsString(recentLectures),
-                    "UTF-8",
-                )
-            }
-
+        val lectureInfoParam =
+            ObjectMapper().setPropertyNamingStrategy(
+                PropertyNamingStrategies.SNAKE_CASE,
+            ).writeValueAsString(recentLectures)
         return snuttEvWebClient.get()
             .uri { builder ->
-                UriComponentsBuilder.fromUri(builder.build())
+                builder
                     .path("/v1/users/me/lectures/latest")
-                    .queryParam("snutt_lecture_info", encodedJson)
+                    .queryParam("snutt_lecture_info", "{lectureInfoParam}")
                     .queryParams(requestQueryParams)
-                    .build(true).toUri()
+                    .build(lectureInfoParam)
             }
             .header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
