@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.evaluation.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
 import com.wafflestudio.snu4t.common.util.buildMultiValueMap
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
@@ -28,6 +27,7 @@ class EvService(
     private val timetableService: TimetableService,
     private val coursebookService: CoursebookService,
     private val userService: UserService,
+    private val objectMapper: ObjectMapper,
 ) {
     suspend fun handleRouting(
         userId: String,
@@ -74,10 +74,7 @@ class EvService(
                     }
             }
 
-        val lectureInfoParam =
-            ObjectMapper().setPropertyNamingStrategy(
-                PropertyNamingStrategies.SNAKE_CASE,
-            ).writeValueAsString(recentLectures)
+        val lectureInfoParam = objectMapper.writeValueAsString(recentLectures)
         return snuttEvWebClient.get()
             .uri { builder ->
                 builder
