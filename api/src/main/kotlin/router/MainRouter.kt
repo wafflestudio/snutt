@@ -267,6 +267,7 @@ class MainRouter(
                 GET("/best", timetableThemeHandler::getBestThemes)
                 GET("/friends", timetableThemeHandler::getFriendsThemes)
                 POST("", timetableThemeHandler::addTheme)
+                GET("/{themeId}", timetableThemeHandler::getTheme)
                 PATCH("/{themeId}", timetableThemeHandler::modifyTheme)
                 DELETE("/{themeId}", timetableThemeHandler::deleteTheme)
                 POST("/{themeId}/copy", timetableThemeHandler::copyTheme)
