@@ -3,6 +3,7 @@ package com.wafflestudio.snu4t.auth.apple
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.auth.OAuth2Client
 import com.wafflestudio.snu4t.auth.OAuth2UserResponse
+import com.wafflestudio.snu4t.common.exception.InvalidAppleLoginTokenException
 import com.wafflestudio.snu4t.common.extension.get
 import io.jsonwebtoken.Jwts
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -39,7 +40,7 @@ class AppleClient(
         val appleJwk =
             webClient.get<Map<String, List<AppleJwk>>>(uri = APPLE_JWK_URI).getOrNull()
                 ?.get("keys")?.find {
-                    it.kid == jwtHeader["kid"] && it.alg == jwtHeader["alg"]
+                    it.kid == jwtHeader.kid && it.alg == jwtHeader.alg
                 } ?: return null
         val publicKey = convertJwkToPublicKey(appleJwk)
         val jwtPayload = verifyAndDecodeToken(token, publicKey)
@@ -53,14 +54,14 @@ class AppleClient(
         )
     }
 
-    private suspend fun extractJwtHeader(token: String): Map<String, String> {
+    private suspend fun extractJwtHeader(token: String): AppleJwtHeader {
         val headerJson = Base64.getDecoder().decode(token.substringBefore(".")).toString(Charsets.UTF_8)
         val headerMap = objectMapper.readValue(headerJson, Map::class.java)
-        val kid = headerMap["kid"] as? String ?: throw IllegalArgumentException("유효하지 않은 애플 로그인 토큰")
-        val alg = headerMap["alg"] as? String ?: throw IllegalArgumentException("유효하지 않은 애플 로그인 토큰")
-        return mapOf(
-            "kid" to kid,
-            "alg" to alg,
+        val kid = headerMap["kid"] as? String ?: throw InvalidAppleLoginTokenException
+        val alg = headerMap["alg"] as? String ?: throw InvalidAppleLoginTokenException
+        return AppleJwtHeader(
+            kid = kid,
+            alg = alg,
         )
     }
 
@@ -76,3 +77,8 @@ class AppleClient(
         publicKey: PublicKey,
     ) = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).body
 }
+
+private data class AppleJwtHeader(
+    val kid: String,
+    val alg: String,
+)
