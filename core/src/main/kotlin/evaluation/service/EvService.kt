@@ -2,7 +2,7 @@ package com.wafflestudio.snu4t.evaluation.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.wafflestudio.snu4t.common.exception.ProxyException
+import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
 import com.wafflestudio.snu4t.common.util.buildMultiValueMap
 import com.wafflestudio.snu4t.config.SnuttEvWebClient
 import com.wafflestudio.snu4t.coursebook.service.CoursebookService
@@ -51,7 +51,7 @@ class EvService(
                 .onStatus(HttpStatusCode::isError) { response ->
                     response.bodyToMono<Map<String, Any?>>()
                         .flatMap { errorBody ->
-                            Mono.error(ProxyException(response.statusCode(), errorBody))
+                            Mono.error(EvServiceProxyException(response.statusCode(), errorBody))
                         }
                 }
                 .bodyToMono<MutableMap<String, Any?>>()
@@ -101,7 +101,7 @@ class EvService(
             .onStatus(HttpStatusCode::isError) { response ->
                 response.bodyToMono<Map<String, Any?>>()
                     .flatMap { errorBody ->
-                        Mono.error(ProxyException(response.statusCode(), errorBody))
+                        Mono.error(EvServiceProxyException(response.statusCode(), errorBody))
                     }
             }
             .bodyToMono<MutableMap<String, Any?>>()

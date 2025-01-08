@@ -2,7 +2,7 @@ package com.wafflestudio.snu4t.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.common.exception.ErrorType
-import com.wafflestudio.snu4t.common.exception.ProxyException
+import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
 import com.wafflestudio.snu4t.common.exception.Snu4tException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -27,52 +27,40 @@ class ErrorWebFilter(
     ): Mono<Void> {
         return chain.filter(exchange)
             .onErrorResume { throwable ->
-                if (throwable is ProxyException) {
-                    exchange.response.statusCode = throwable.statusCode
-                    exchange.response.headers.contentType = MediaType.APPLICATION_JSON
-                    exchange.response.writeWith(
-                        Mono.just(
-                            exchange.response
-                                .bufferFactory()
-                                .wrap(objectMapper.writeValueAsBytes(throwable.errorBody)),
-                        ),
-                    )
-                } else {
-                    val errorBody: ErrorBody
-                    val httpStatusCode: HttpStatusCode
-                    when (throwable) {
-                        is Snu4tException -> {
-                            httpStatusCode = throwable.error.httpStatus
-                            errorBody = makeErrorBody(throwable)
-                        }
-
-                        is ResponseStatusException -> {
-                            httpStatusCode = throwable.statusCode
-                            errorBody =
-                                makeErrorBody(
-                                    Snu4tException(
-                                        errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage,
-                                    ),
-                                )
-                        }
-
-                        else -> {
-                            log.error(throwable.message, throwable)
-                            httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
-                            errorBody = makeErrorBody(Snu4tException())
-                        }
+                val errorBody: Any
+                val httpStatusCode: HttpStatusCode
+                when (throwable) {
+                    is EvServiceProxyException -> {
+                        httpStatusCode = throwable.statusCode
+                        errorBody = throwable.errorBody
                     }
-
-                    exchange.response.statusCode = httpStatusCode
-                    exchange.response.headers.contentType = MediaType.APPLICATION_JSON
-                    exchange.response.writeWith(
-                        Mono.just(
-                            exchange.response
-                                .bufferFactory()
-                                .wrap(objectMapper.writeValueAsBytes(errorBody)),
-                        ),
-                    )
+                    is Snu4tException -> {
+                        httpStatusCode = throwable.error.httpStatus
+                        errorBody = makeErrorBody(throwable)
+                    }
+                    is ResponseStatusException -> {
+                        httpStatusCode = throwable.statusCode
+                        errorBody =
+                            makeErrorBody(
+                                Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
+                            )
+                    }
+                    else -> {
+                        log.error(throwable.message, throwable)
+                        httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
+                        errorBody = makeErrorBody(Snu4tException())
+                    }
                 }
+
+                exchange.response.statusCode = httpStatusCode
+                exchange.response.headers.contentType = MediaType.APPLICATION_JSON
+                exchange.response.writeWith(
+                    Mono.just(
+                        exchange.response
+                            .bufferFactory()
+                            .wrap(objectMapper.writeValueAsBytes(errorBody)),
+                    ),
+                )
             }
     }
 
