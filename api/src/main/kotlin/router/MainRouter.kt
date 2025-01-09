@@ -8,6 +8,7 @@ import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.CoursebookHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.EvHandler
+import com.wafflestudio.snu4t.handler.EvServiceHandler
 import com.wafflestudio.snu4t.handler.FeedbackHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.FriendTableHandler
@@ -68,6 +69,7 @@ class MainRouter(
     private val tagHandler: TagHandler,
     private val feedbackHandler: FeedbackHandler,
     private val staticPageHandler: StaticPageHandler,
+    private val evServiceHandler: EvServiceHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -296,6 +298,16 @@ class MainRouter(
     fun evRouter() =
         v1CoRouter {
             GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
+        }
+
+    @Bean
+    fun evServiceRouter() =
+        v1CoRouter {
+            GET("/ev-service/v1/users/me/lectures/latest", evServiceHandler::getMyLatestLectures)
+            GET("/ev-service/{*requestPath}", evServiceHandler::handleGet)
+            POST("/ev-service/{*requestPath}", evServiceHandler::handlePost)
+            DELETE("/ev-service/{*requestPath}", evServiceHandler::handleDelete)
+            PATCH("/ev-service/{*requestPath}", evServiceHandler::handlePatch)
         }
 
     @Bean

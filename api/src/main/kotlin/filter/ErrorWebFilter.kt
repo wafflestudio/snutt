@@ -2,6 +2,7 @@ package com.wafflestudio.snu4t.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.common.exception.ErrorType
+import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
 import com.wafflestudio.snu4t.common.exception.Snu4tException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -26,9 +27,13 @@ class ErrorWebFilter(
     ): Mono<Void> {
         return chain.filter(exchange)
             .onErrorResume { throwable ->
-                val errorBody: ErrorBody
+                val errorBody: Any
                 val httpStatusCode: HttpStatusCode
                 when (throwable) {
+                    is EvServiceProxyException -> {
+                        httpStatusCode = throwable.statusCode
+                        errorBody = throwable.errorBody
+                    }
                     is Snu4tException -> {
                         httpStatusCode = throwable.error.httpStatus
                         errorBody = makeErrorBody(throwable)
