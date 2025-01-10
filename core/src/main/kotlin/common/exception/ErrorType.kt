@@ -55,6 +55,7 @@ enum class ErrorType(
     UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요.", "앱 버전을 업데이트해주세요."),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다.", "소셜 로그인에 실패했습니다."),
+    INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다.", "소셜 로그인에 실패했습니다."),
 
     TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "timetable_id가 유효하지 않습니다", "존재하지 않는 시간표입니다."),
     PRIMARY_TIMETABLE_NOT_FOUND(HttpStatus.NOT_FOUND, 40401, "timetable_id가 유효하지 않습니다", "대표 시간표가 존재하지 않습니다."),

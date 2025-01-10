@@ -1,7 +1,9 @@
 package com.wafflestudio.snu4t.auth.apple
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snu4t.auth.OAuth2Client
 import com.wafflestudio.snu4t.auth.OAuth2UserResponse
+import com.wafflestudio.snu4t.common.exception.InvalidAppleLoginTokenException
 import com.wafflestudio.snu4t.common.extension.get
 import io.jsonwebtoken.Jwts
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -18,6 +20,7 @@ import java.util.Base64
 @Component("APPLE")
 class AppleClient(
     webClientBuilder: WebClient.Builder,
+    private val objectMapper: ObjectMapper,
 ) : OAuth2Client {
     private val webClient =
         webClientBuilder.clientConnector(
@@ -35,9 +38,9 @@ class AppleClient(
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val jwtHeader = extractJwtHeader(token)
         val appleJwk =
-            webClient.get<List<AppleJwk>>(uri = APPLE_JWK_URI).getOrNull()
-                ?.find {
-                    it.kid == jwtHeader.keyId && it.alg == jwtHeader.algorithm
+            webClient.get<Map<String, List<AppleJwk>>>(uri = APPLE_JWK_URI).getOrNull()
+                ?.get("keys")?.find {
+                    it.kid == jwtHeader.kid && it.alg == jwtHeader.alg
                 } ?: return null
         val publicKey = convertJwkToPublicKey(appleJwk)
         val jwtPayload = verifyAndDecodeToken(token, publicKey)
@@ -51,7 +54,16 @@ class AppleClient(
         )
     }
 
-    private suspend fun extractJwtHeader(token: String) = Jwts.parser().parseClaimsJws(token).header
+    private suspend fun extractJwtHeader(token: String): AppleJwtHeader {
+        val headerJson = Base64.getDecoder().decode(token.substringBefore(".")).toString(Charsets.UTF_8)
+        val headerMap = objectMapper.readValue(headerJson, Map::class.java)
+        val kid = headerMap["kid"] as? String ?: throw InvalidAppleLoginTokenException
+        val alg = headerMap["alg"] as? String ?: throw InvalidAppleLoginTokenException
+        return AppleJwtHeader(
+            kid = kid,
+            alg = alg,
+        )
+    }
 
     private suspend fun convertJwkToPublicKey(jwk: AppleJwk): PublicKey {
         val modulus = BigInteger(1, Base64.getUrlDecoder().decode(jwk.n))
@@ -65,3 +77,8 @@ class AppleClient(
         publicKey: PublicKey,
     ) = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).body
 }
+
+private data class AppleJwtHeader(
+    val kid: String,
+    val alg: String,
+)

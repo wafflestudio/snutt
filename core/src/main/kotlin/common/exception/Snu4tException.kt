@@ -82,6 +82,8 @@ object UpdateAppVersionException : Snu4tException(ErrorType.UPDATE_APP_VERSION)
 
 object SocialConnectFailException : Snu4tException(ErrorType.SOCIAL_CONNECT_FAIL)
 
+object InvalidAppleLoginTokenException : Snu4tException(ErrorType.INVALID_APPLE_LOGIN_TOKEN)
+
 object NoUserFcmKeyException : Snu4tException(ErrorType.NO_USER_FCM_KEY)
 
 object InvalidRegistrationForPreviousSemesterCourseException :

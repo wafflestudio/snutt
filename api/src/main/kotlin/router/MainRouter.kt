@@ -88,6 +88,7 @@ class MainRouter(
                 POST("/login/facebook", authHandler::loginFacebook)
                 POST("/login/google", authHandler::loginGoogle)
                 POST("/login/kakao", authHandler::loginKakao)
+                POST("/login_apple", authHandler::loginAppleLegacy)
                 POST("/login/apple", authHandler::loginApple)
                 POST("/logout", authHandler::logout)
                 POST("/password/reset/email/check", authHandler::getMaskedEmail)
