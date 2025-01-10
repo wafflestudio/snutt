@@ -14,6 +14,7 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
+import reactor.netty.channel.AbortedException
 
 @Component
 class ErrorWebFilter(
@@ -44,6 +45,10 @@ class ErrorWebFilter(
                             makeErrorBody(
                                 Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
                             )
+                    }
+                    is AbortedException -> {
+                        httpStatusCode = HttpStatus.GATEWAY_TIMEOUT
+                        errorBody = makeErrorBody(Snu4tException())
                     }
                     else -> {
                         log.error(throwable.message, throwable)
