@@ -8,6 +8,7 @@ import com.wafflestudio.snu4t.handler.ConfigHandler
 import com.wafflestudio.snu4t.handler.CoursebookHandler
 import com.wafflestudio.snu4t.handler.DeviceHandler
 import com.wafflestudio.snu4t.handler.EvHandler
+import com.wafflestudio.snu4t.handler.EvServiceHandler
 import com.wafflestudio.snu4t.handler.FeedbackHandler
 import com.wafflestudio.snu4t.handler.FriendHandler
 import com.wafflestudio.snu4t.handler.FriendTableHandler
@@ -68,6 +69,7 @@ class MainRouter(
     private val tagHandler: TagHandler,
     private val feedbackHandler: FeedbackHandler,
     private val staticPageHandler: StaticPageHandler,
+    private val evServiceHandler: EvServiceHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -86,6 +88,7 @@ class MainRouter(
                 POST("/login/facebook", authHandler::loginFacebook)
                 POST("/login/google", authHandler::loginGoogle)
                 POST("/login/kakao", authHandler::loginKakao)
+                POST("/login_apple", authHandler::loginAppleLegacy)
                 POST("/login/apple", authHandler::loginApple)
                 POST("/logout", authHandler::logout)
                 POST("/password/reset/email/check", authHandler::getMaskedEmail)
@@ -114,9 +117,11 @@ class MainRouter(
                 POST("/facebook", userHandler::attachFacebook)
                 POST("/google", userHandler::attachGoogle)
                 POST("/kakao", userHandler::attachKakao)
+                POST("/apple", userHandler::attachApple)
                 DELETE("/facebook", userHandler::detachFacebook)
                 DELETE("/google", userHandler::detachGoogle)
                 DELETE("/kakao", userHandler::detachKakao)
+                DELETE("/apple", userHandler::detachApple)
             }
             "/users".nest {
                 GET("/me", userHandler::getUserMe)
@@ -294,6 +299,16 @@ class MainRouter(
     fun evRouter() =
         v1CoRouter {
             GET("/ev/lectures/{lectureId}/summary", evHandler::getLectureEvaluationSummary)
+        }
+
+    @Bean
+    fun evServiceRouter() =
+        v1CoRouter {
+            GET("/ev-service/v1/users/me/lectures/latest", evServiceHandler::getMyLatestLectures)
+            GET("/ev-service/{*requestPath}", evServiceHandler::handleGet)
+            POST("/ev-service/{*requestPath}", evServiceHandler::handlePost)
+            DELETE("/ev-service/{*requestPath}", evServiceHandler::handleDelete)
+            PATCH("/ev-service/{*requestPath}", evServiceHandler::handlePatch)
         }
 
     @Bean

@@ -40,6 +40,8 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun existsByCredentialKakaoSubAndActiveTrue(kakaoSub: String): Boolean
 
+    suspend fun existsByCredentialAppleSubAndActiveTrue(appleSub: String): Boolean
+
     fun findAllByNicknameStartingWith(nickname: String): Flow<User>
 
     suspend fun findByCredentialAppleTransferSubAndActiveTrue(appleTransferSub: String): User?

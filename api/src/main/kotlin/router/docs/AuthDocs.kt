@@ -168,6 +168,30 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
+        path = "/v1/auth/login/apple",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "loginApple",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = SocialLoginRequest::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                    ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = LoginResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
         path = "/v1/auth/logout",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],

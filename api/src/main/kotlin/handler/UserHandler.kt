@@ -123,6 +123,13 @@ class UserHandler(
             userService.attachSocial(user, socialLoginRequest, AuthProvider.KAKAO)
         }
 
+    suspend fun attachApple(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            val socialLoginRequest: SocialLoginRequest = req.awaitBody()
+            userService.attachSocial(user, socialLoginRequest, AuthProvider.APPLE)
+        }
+
     suspend fun detachFacebook(req: ServerRequest): ServerResponse =
         handle(req) {
             val user = req.getContext().user!!
@@ -139,6 +146,12 @@ class UserHandler(
         handle(req) {
             val user = req.getContext().user!!
             userService.detachSocial(user, AuthProvider.KAKAO)
+        }
+
+    suspend fun detachApple(req: ServerRequest): ServerResponse =
+        handle(req) {
+            val user = req.getContext().user!!
+            userService.detachSocial(user, AuthProvider.APPLE)
         }
 
     suspend fun checkAuthProviders(req: ServerRequest): ServerResponse =
