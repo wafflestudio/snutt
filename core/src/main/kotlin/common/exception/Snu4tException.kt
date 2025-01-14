@@ -98,7 +98,7 @@ object WrongSemesterException : Snu4tException(ErrorType.WRONG_SEMESTER)
 class LectureTimeOverlapException(confirmMessage: String) : Snu4tException(
     error = ErrorType.LECTURE_TIME_OVERLAP,
     displayMessage = confirmMessage,
-    ext = mapOf("confirm_message" to confirmMessage)
+    ext = mapOf("confirm_message" to confirmMessage),
 )
 
 object CustomLectureResetException : Snu4tException(ErrorType.CANNOT_RESET_CUSTOM_LECTURE)
