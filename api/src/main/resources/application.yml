@@ -28,3 +28,7 @@ spring:
   data:
     mongodb:
       uri:
+
+logging:
+  level:
+    reactor.netty: OFF
