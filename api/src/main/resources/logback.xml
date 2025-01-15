@@ -1,3 +1,0 @@
-<configuration>
-    <logger name="reactor.netty" level="OFF"/>
-</configuration>
