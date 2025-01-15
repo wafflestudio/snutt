@@ -6,12 +6,6 @@ spring:
 
 snutt:
   secret-key:
-
-server:
-  netty:
-    connection-timeout: 5s
-    idle-timeout: 5s
-
 ---
 spring:
   config:
@@ -28,7 +22,3 @@ spring:
   data:
     mongodb:
       uri:
-
-logging:
-  level:
-    reactor.netty: OFF
