@@ -61,9 +61,10 @@ class SugangSnuSyncServiceImpl(
         val oldCategoryMap = oldCategoryFetchService.getOldCategories()
         val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
             .map { lecture ->
-                oldCategoryMap[lecture.courseNumber]?.let { category ->
-                    lecture.copy(category = category)
-                } ?: lecture
+                if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
+                    return@map lecture
+                }
+                lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
             }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
