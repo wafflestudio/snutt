@@ -15,7 +15,6 @@ class OldCategoryRepository(
     companion object {
         const val SPREADSHEET_PATH = "/spreadsheets/d"
         const val SPREADSHEET_KEY = "/1Ok2gu7rW1VYlKmC_zSjNmcljef0kstm19P9zJ_5s_QA"
-        const val EXPORT_XLSX = "/export?format=xlsx"
     }
 
     suspend fun fetchOldCategories(): PooledDataBuffer =
@@ -23,7 +22,8 @@ class OldCategoryRepository(
                 builder.run {
                     path(SPREADSHEET_PATH)
                     path(SPREADSHEET_KEY)
-                    path(EXPORT_XLSX)
+                    path("/export")
+                    queryParam("format", "xlsx")
                     build()
                 }
             }.accept(MediaType.TEXT_HTML).awaitExchange {

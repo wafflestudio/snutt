@@ -1,31 +1,55 @@
 package com.wafflestudio.snu4t.oldcategory.service
 
+import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.oldcategory.repository.OldCategoryRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 
 @Service
 class OldCategoryFetchService(
-    private val oldCategoryRepository: OldCategoryRepository
+    private val oldCategoryRepository: OldCategoryRepository,
+    private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun applyOldCategories() {
+        val oldCategories = getOldCategories()
+        oldCategories.forEach { (courseNumber, oldCategory) ->
+            reactiveMongoTemplate.updateMulti(
+                Query(Criteria.where("courseNumber").`is`(courseNumber)),
+                Update().set("oldCategory", oldCategory),
+                Lecture::class.java
+            ).awaitSingle()
+        }
+    }
+
     suspend fun getOldCategories(): Map<String, String> {
         val oldCategoriesXlsx = oldCategoryRepository.fetchOldCategories()
-        val workbook = SXSSFWorkbook(WorkbookFactory.create(oldCategoriesXlsx.asInputStream()) as XSSFWorkbook)
-
-        return workbook.sheetIterator().asFlow().flatMapConcat {
-            it.rowIterator().asFlow().map { row ->
-                val currentCourseNumber = row.getCell(8).stringCellValue
-                val oldCategory = row.getCell(1).stringCellValue
-                currentCourseNumber to oldCategory
+        val workbook = WorkbookFactory.create(oldCategoriesXlsx.asInputStream())
+        return workbook.sheetIterator().asSequence()
+            .flatMap { sheet ->
+                sheet.rowIterator().asSequence()
+                    .drop(3)
+                    .filter { row ->
+                        row.getCell(8) != null && row.getCell(1) != null
+                    }
+                    .map { row ->
+                        try {
+                            val currentCourseNumber = row.getCell(7).stringCellValue
+                            val oldCategory = row.getCell(1).stringCellValue
+                            if (currentCourseNumber.isBlank() || oldCategory.isBlank()) {
+                                return@map null
+                            }
+                            currentCourseNumber to oldCategory
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    .filterNotNull()
             }
-        }.toList().toMap()
+            .toMap()
     }
 }
