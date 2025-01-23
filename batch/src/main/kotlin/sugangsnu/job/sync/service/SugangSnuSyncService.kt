@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snu4t.oldcategory.service.OldCategoryFetchService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuFetchService
@@ -46,6 +47,7 @@ interface SugangSnuSyncService {
 @Service
 class SugangSnuSyncServiceImpl(
     private val sugangSnuFetchService: SugangSnuFetchService,
+    private val oldCategoryFetchService: OldCategoryFetchService,
     private val lectureService: LectureService,
     private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -56,7 +58,13 @@ class SugangSnuSyncServiceImpl(
     private val cache: Cache,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
+        val oldCategoryMap = oldCategoryFetchService.getOldCategories()
         val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+            .map { lecture ->
+                oldCategoryMap[lecture.courseNumber]?.let { category ->
+                    lecture.copy(category = category)
+                } ?: lecture
+            }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -125,6 +133,7 @@ class SugangSnuSyncServiceImpl(
                     credit = acc.credit + lecture.credit,
                     instructor = acc.instructor + lecture.instructor,
                     category = acc.category + lecture.category,
+                    oldCategory = acc.oldCategory + lecture.oldCategory,
                 )
             }.let { parsedTag ->
                 TagCollection(
@@ -135,6 +144,7 @@ class SugangSnuSyncServiceImpl(
                     credit = parsedTag.credit.sorted().map { "${it}학점" },
                     instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
                     category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                    oldCategory = parsedTag.oldCategory.filterNotNull().filter { it.isNotBlank() }.sorted()
                 )
             }
         val tagList =
@@ -347,4 +357,5 @@ data class ParsedTags(
     val instructor: Set<String?> = setOf(),
     val category: Set<String?> = setOf(),
     val etc: Set<String?> = setOf(),
+    val oldCategory: Set<String?> = setOf(),
 )
