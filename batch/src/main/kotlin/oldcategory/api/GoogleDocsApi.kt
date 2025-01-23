@@ -20,9 +20,10 @@ class GoogleDocsApiConfig {
                 .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
                 .build()
 
-        val httpClient = HttpClient.create()
-            .followRedirect(true)
-            .compress(true)
+        val httpClient =
+            HttpClient.create()
+                .followRedirect(true)
+                .compress(true)
 
         return WebClient.builder()
             .baseUrl(GOOGLE_DOCS_BASE_URL)

@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.createExceptionAndAwait
 
 @Component
 class OldCategoryRepository(
-    private val googleDocsApi: GoogleDocsApi
+    private val googleDocsApi: GoogleDocsApi,
 ) {
     companion object {
         const val SPREADSHEET_PATH = "/spreadsheets/d"
@@ -19,18 +19,18 @@ class OldCategoryRepository(
 
     suspend fun fetchOldCategories(): PooledDataBuffer =
         googleDocsApi.get().uri { builder ->
-                builder.run {
-                    path(SPREADSHEET_PATH)
-                    path(SPREADSHEET_KEY)
-                    path("/export")
-                    queryParam("format", "xlsx")
-                    build()
-                }
-            }.accept(MediaType.TEXT_HTML).awaitExchange {
-                if (it.statusCode().is2xxSuccessful) {
-                    it.awaitBody()
-                } else {
-                    throw it.createExceptionAndAwait()
-                }
+            builder.run {
+                path(SPREADSHEET_PATH)
+                path(SPREADSHEET_KEY)
+                path("/export")
+                queryParam("format", "xlsx")
+                build()
             }
+        }.accept(MediaType.TEXT_HTML).awaitExchange {
+            if (it.statusCode().is2xxSuccessful) {
+                it.awaitBody()
+            } else {
+                throw it.createExceptionAndAwait()
+            }
+        }
 }

@@ -59,13 +59,14 @@ class SugangSnuSyncServiceImpl(
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         val oldCategoryMap = oldCategoryFetchService.getOldCategories()
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
-            .map { lecture ->
-                if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
-                    return@map lecture
+        val newLectures =
+            sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+                .map { lecture ->
+                    if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
+                        return@map lecture
+                    }
+                    lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
                 }
-                lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
-            }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -81,13 +82,14 @@ class SugangSnuSyncServiceImpl(
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
         val oldCategoryMap = oldCategoryFetchService.getOldCategories()
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
-            .map { lecture ->
-                if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
-                    return@map lecture
+        val newLectures =
+            sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+                .map { lecture ->
+                    if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
+                        return@map lecture
+                    }
+                    lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
                 }
-                lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
-            }
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 
@@ -152,7 +154,7 @@ class SugangSnuSyncServiceImpl(
                     credit = parsedTag.credit.sorted().map { "${it}학점" },
                     instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
                     category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                    oldCategory = parsedTag.oldCategory.filterNotNull().filter { it.isNotBlank() }.sorted()
+                    oldCategory = parsedTag.oldCategory.filterNotNull().filter { it.isNotBlank() }.sorted(),
                 )
             }
         val tagList =
