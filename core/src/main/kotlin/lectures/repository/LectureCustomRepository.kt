@@ -80,6 +80,7 @@ class LectureCustomRepositoryImpl(
                                 ),
                             )
                         },
+                        searchCondition.oldCategory?.takeIf { it.isNotEmpty() }?.let { Lecture::oldCategory inValues it },
                         *searchCondition.etcTags.orEmpty().map { etcTag ->
                             when (etcTag) {
                                 "E" -> Lecture::remark regex ".*ⓔ.*"
