@@ -16,7 +16,7 @@ class OldCategoryFetchService(
                 sheet.rowIterator().asSequence()
                     .drop(3)
                     .filter { row ->
-                        row.getCell(8) != null && row.getCell(1) != null
+                        row.getCell(7).stringCellValue.isNotBlank() && row.getCell(1).stringCellValue.isNotBlank()
                     }
                     .map { row ->
                         try {
