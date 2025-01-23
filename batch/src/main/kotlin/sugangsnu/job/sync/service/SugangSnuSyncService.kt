@@ -80,7 +80,14 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
+        val oldCategoryMap = oldCategoryFetchService.getOldCategories()
         val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+            .map { lecture ->
+                if (oldCategoryMap[lecture.courseNumber] == null || lecture.year < 2025) {
+                    return@map lecture
+                }
+                lecture.copy(oldCategory = oldCategoryMap[lecture.courseNumber])
+            }
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 

@@ -14,7 +14,7 @@ data class TagListResponse(
     val sortCriteria: List<String>,
     @JsonProperty("updated_at")
     val updatedAt: Long,
-    val oldCategory: List<String>,
+    val oldCategory: List<String>?,
 )
 
 fun TagListResponse(tagList: TagList) =

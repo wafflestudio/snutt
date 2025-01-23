@@ -1,31 +1,13 @@
 package com.wafflestudio.snu4t.oldcategory.service
 
-import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.oldcategory.repository.OldCategoryRepository
-import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 
 @Service
 class OldCategoryFetchService(
     private val oldCategoryRepository: OldCategoryRepository,
-    private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) {
-    suspend fun applyOldCategories() {
-        val oldCategories = getOldCategories()
-        oldCategories.forEach { (courseNumber, oldCategory) ->
-            reactiveMongoTemplate.updateMulti(
-                Query(Criteria.where("courseNumber").`is`(courseNumber)),
-                Update().set("oldCategory", oldCategory),
-                Lecture::class.java
-            ).awaitSingle()
-        }
-    }
-
     suspend fun getOldCategories(): Map<String, String> {
         val oldCategoriesXlsx = oldCategoryRepository.fetchOldCategories()
         val workbook = WorkbookFactory.create(oldCategoriesXlsx.asInputStream())
