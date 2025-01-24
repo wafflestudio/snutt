@@ -33,7 +33,7 @@ SNU Timetable API 서버
 - [snutt-ev](https://github.com/wafflestudio/snutt-ev) : 강의평 서비스 서버
 
 ### Front-end Clients
-* [Web Client]([https://github.com/wafflestudio/snutt-webclient/](https://github.com/wafflestudio/snutt-frontend))
+* [Web Client](https://github.com/wafflestudio/snutt-frontend)
 * [Android Client](https://github.com/wafflestudio/SNUTT-android)
 * [iOS Client](https://github.com/wafflestudio/SNUTT-iOS)
 
