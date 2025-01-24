@@ -1,4 +1,29 @@
+<br />
+<div align="center">
+  <a href="https://github.com/wafflestudio/snutt">
+    <img src="https://user-images.githubusercontent.com/33917774/199519767-60590904-b15a-4464-ab21-e3a424649d5c.svg" alt="Logo" width="70" height="70">
+  </a>
+
+  <h3 align="center">SNUTT</h3>
+
+  <p align="center">
+    The best timetable application for SNU students, developed and maintained by SNU students.
+    <div style=" padding-bottom: 1rem;">
+    <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring-boot&logoColor=white" />
+    <img src="https://img.shields.io/badge/Kotlin-B125EA?style=for-the-badge&logo=kotlin&logoColor=white" />
+    <img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Redis-FF4438?style=for-the-badge&logo=redis&logoColor=white"/>
+    </div>
+    <a href="https://github.com/wafflestudio/snutt/issues">Request Feature</a>
+    ·
+    <a href="https://github.com/wafflestudio/snutt/issues">Report Bug</a>
+    ·
+    <a href="https://wafflestudio.com/">Wafflestudio</a>
+  </p>
+</div>
+
 # snutt
+
 SNU Timetable API 서버
 
 서울대학교 수강편람 검색 및 시간표 관리를 위한 애플리케이션입니다.
@@ -8,7 +33,7 @@ SNU Timetable API 서버
 - [snutt-ev](https://github.com/wafflestudio/snutt-ev) : 강의평 서비스 서버
 
 ### Front-end Clients
-* [Web Client](https://github.com/wafflestudio/snutt-webclient/)
+* [Web Client]([https://github.com/wafflestudio/snutt-webclient/](https://github.com/wafflestudio/snutt-frontend))
 * [Android Client](https://github.com/wafflestudio/SNUTT-android)
 * [iOS Client](https://github.com/wafflestudio/SNUTT-iOS)
 
