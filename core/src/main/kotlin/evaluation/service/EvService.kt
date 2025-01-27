@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.evaluation.dto.EvUserDto
 import com.wafflestudio.snu4t.timetables.service.TimetableService
 import com.wafflestudio.snu4t.users.service.UserService
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -35,8 +36,8 @@ class EvService(
         requestQueryParams: MultiValueMap<String, String> = buildMultiValueMap(mapOf()),
         originalBody: String,
         method: HttpMethod,
-    ): Map<String, Any?> {
-        val result: MutableMap<String, Any?> =
+    ): Map<String, Any?>? {
+        val result: MutableMap<String, Any?>? =
             snuttEvWebClient.method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
                 .header("Snutt-User-Id", userId)
@@ -51,7 +52,7 @@ class EvService(
                         }
                 }
                 .bodyToMono<MutableMap<String, Any?>>()
-                .awaitSingle()
+                .awaitFirstOrNull()
         return updateUserInfo(result)
     }
 
@@ -98,7 +99,8 @@ class EvService(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun updateUserInfo(data: MutableMap<String, Any?>): MutableMap<String, Any?> {
+    private suspend fun updateUserInfo(data: MutableMap<String, Any?>?): MutableMap<String, Any?>? {
+        if (data == null) return null
         val updatedMap: MutableMap<String, Any?> = mutableMapOf()
         for ((k, v) in data.entries) {
             if (k == "user_id") {
