@@ -14,7 +14,7 @@ data class TagListResponse(
     val sortCriteria: List<String>,
     @JsonProperty("updated_at")
     val updatedAt: Long,
-    val oldCategory: List<String>?,
+    val categoryPre2025: List<String>,
 )
 
 fun TagListResponse(tagList: TagList) =
@@ -31,5 +31,5 @@ fun TagListResponse(tagList: TagList) =
                 .map { it.fullName }
                 .filterNot { it == "기본값" },
         updatedAt = tagList.updatedAt.toEpochMilli(),
-        oldCategory = tagList.tagCollection.oldCategory,
+        categoryPre2025 = tagList.tagCollection.categoryPre2025,
     )

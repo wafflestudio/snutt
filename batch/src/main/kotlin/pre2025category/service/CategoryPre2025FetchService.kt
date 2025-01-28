@@ -1,23 +1,20 @@
-package com.wafflestudio.snu4t.oldcategory.service
+package com.wafflestudio.snu4t.pre2025category.service
 
-import com.wafflestudio.snu4t.oldcategory.repository.OldCategoryRepository
+import com.wafflestudio.snu4t.pre2025category.repository.CategoryPre2025Repository
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
 
 @Service
-class OldCategoryFetchService(
-    private val oldCategoryRepository: OldCategoryRepository,
+class CategoryPre2025FetchService(
+    private val categoryPre2025Repository: CategoryPre2025Repository,
 ) {
-    suspend fun getOldCategories(): Map<String, String> {
-        val oldCategoriesXlsx = oldCategoryRepository.fetchOldCategories()
+    suspend fun getCategoriesPre2025(): Map<String, String> {
+        val oldCategoriesXlsx = categoryPre2025Repository.fetchCategoriesPre2025()
         val workbook = WorkbookFactory.create(oldCategoriesXlsx.asInputStream())
         return workbook.sheetIterator().asSequence()
             .flatMap { sheet ->
                 sheet.rowIterator().asSequence()
                     .drop(3)
-                    .filter { row ->
-                        row.getCell(7).stringCellValue.isNotBlank() && row.getCell(1).stringCellValue.isNotBlank()
-                    }
                     .map { row ->
                         try {
                             val currentCourseNumber = row.getCell(7).stringCellValue

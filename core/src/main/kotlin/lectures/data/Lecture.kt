@@ -37,7 +37,7 @@ data class Lecture(
     var registrationCount: Int = 0,
     var wasFull: Boolean = false,
     val evInfo: EvInfo? = null,
-    val oldCategory: String?,
+    val categoryPre2025: String?,
 ) {
     infix fun equalsMetadata(other: Lecture): Boolean {
         return this === other ||

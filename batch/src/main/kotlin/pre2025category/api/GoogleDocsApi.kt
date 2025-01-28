@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.oldcategory.api
+package com.wafflestudio.snu4t.pre2025category.api
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.oldcategory.repository
+package com.wafflestudio.snu4t.pre2025category.repository
 
-import com.wafflestudio.snu4t.oldcategory.api.GoogleDocsApi
+import com.wafflestudio.snu4t.pre2025category.api.GoogleDocsApi
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
 
 @Component
-class OldCategoryRepository(
+class CategoryPre2025Repository(
     private val googleDocsApi: GoogleDocsApi,
 ) {
     companion object {
@@ -17,7 +17,7 @@ class OldCategoryRepository(
         const val SPREADSHEET_KEY = "/1Ok2gu7rW1VYlKmC_zSjNmcljef0kstm19P9zJ_5s_QA"
     }
 
-    suspend fun fetchOldCategories(): PooledDataBuffer =
+    suspend fun fetchCategoriesPre2025(): PooledDataBuffer =
         googleDocsApi.get().uri { builder ->
             builder.run {
                 path(SPREADSHEET_PATH)
