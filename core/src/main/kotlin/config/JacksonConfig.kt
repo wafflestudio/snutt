@@ -18,7 +18,20 @@ import java.time.temporal.ChronoField
 class JacksonConfig {
     @Bean
     fun objectMapper(): ObjectMapper {
-        val timeFormatter =
+        val zonedDateTimeFormatter =
+            DateTimeFormatterBuilder()
+                .append(DateTimeFormatter.ISO_LOCAL_DATE)
+                .appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendFraction(ChronoField.NANO_OF_SECOND, 3, 3, true)
+                .appendOffsetId()
+                .toFormatter()
+
+        val localDateTimeFormatter =
             DateTimeFormatterBuilder()
                 .append(DateTimeFormatter.ISO_LOCAL_DATE)
                 .appendLiteral('T')
@@ -34,11 +47,11 @@ class JacksonConfig {
             JavaTimeModule().apply {
                 addSerializer(
                     ZonedDateTime::class.java,
-                    ZonedDateTimeSerializer(timeFormatter),
+                    ZonedDateTimeSerializer(zonedDateTimeFormatter),
                 )
                 addSerializer(
                     LocalDateTime::class.java,
-                    LocalDateTimeSerializer(timeFormatter),
+                    LocalDateTimeSerializer(localDateTimeFormatter),
                 )
             }
 
