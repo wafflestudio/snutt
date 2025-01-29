@@ -55,6 +55,7 @@ data class Lecture(
             semester == other.semester &&
             year == other.year &&
             courseNumber == other.courseNumber &&
-            courseTitle == other.courseTitle
+            courseTitle == other.courseTitle &&
+            categoryPre2025 == other.categoryPre2025
     }
 }
