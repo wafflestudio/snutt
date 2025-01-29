@@ -19,4 +19,5 @@ data class TimetableLectureModifyLegacyRequestDto(
     val colorIndex: Int?,
     @JsonProperty("is_forced")
     val isForced: Boolean = false,
+    val categoryPre2025: String?,
 )

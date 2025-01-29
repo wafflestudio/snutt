@@ -103,12 +103,15 @@ class TimetableLectureServiceImpl(
         val originalLecture = lectureRepository.findById(originalLectureId) ?: throw LectureNotFoundException
         timetableLecture.apply {
             courseTitle = originalLecture.courseTitle
+            academicYear = originalLecture.academicYear
+            category = originalLecture.category
             instructor = originalLecture.instructor
             classification = originalLecture.classification
             department = originalLecture.department
             credit = originalLecture.credit
             remark = originalLecture.remark
             classPlaceAndTimes = originalLecture.classPlaceAndTimes
+            categoryPre2025 = originalLecture.categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
@@ -138,6 +141,7 @@ class TimetableLectureServiceImpl(
             color = modifyTimetableLectureRequestDto.color ?: color
             colorIndex = modifyTimetableLectureRequestDto.colorIndex ?: colorIndex
             classPlaceAndTimes = newClassPlaceAndTimes
+            categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)

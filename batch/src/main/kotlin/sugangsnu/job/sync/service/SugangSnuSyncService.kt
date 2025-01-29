@@ -10,6 +10,7 @@ import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import com.wafflestudio.snu4t.lectures.service.LectureService
 import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snu4t.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snu4t.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snu4t.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuFetchService
@@ -46,6 +47,7 @@ interface SugangSnuSyncService {
 @Service
 class SugangSnuSyncServiceImpl(
     private val sugangSnuFetchService: SugangSnuFetchService,
+    private val categoryPre2025FetchService: CategoryPre2025FetchService,
     private val lectureService: LectureService,
     private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -56,7 +58,15 @@ class SugangSnuSyncServiceImpl(
     private val cache: Cache,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
+        val newLectures =
+            sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+                .map { lecture ->
+                    if (courseNumberCategoryPre2025Map[lecture.courseNumber] == null || lecture.year < 2025) {
+                        return@map lecture
+                    }
+                    lecture.copy(categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber])
+                }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -71,7 +81,15 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
-        val newLectures = sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
+        val newLectures =
+            sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
+                .map { lecture ->
+                    if (courseNumberCategoryPre2025Map[lecture.courseNumber] == null || lecture.year < 2025) {
+                        return@map lecture
+                    }
+                    lecture.copy(categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber])
+                }
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 
@@ -125,6 +143,7 @@ class SugangSnuSyncServiceImpl(
                     credit = acc.credit + lecture.credit,
                     instructor = acc.instructor + lecture.instructor,
                     category = acc.category + lecture.category,
+                    categoryPre2025 = acc.categoryPre2025 + lecture.categoryPre2025,
                 )
             }.let { parsedTag ->
                 TagCollection(
@@ -135,6 +154,7 @@ class SugangSnuSyncServiceImpl(
                     credit = parsedTag.credit.sorted().map { "${it}학점" },
                     instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
                     category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
+                    categoryPre2025 = parsedTag.categoryPre2025.filterNotNull().filter { it.isNotBlank() }.sorted(),
                 )
             }
         val tagList =
@@ -347,4 +367,5 @@ data class ParsedTags(
     val instructor: Set<String?> = setOf(),
     val category: Set<String?> = setOf(),
     val etc: Set<String?> = setOf(),
+    val categoryPre2025: Set<String?> = setOf(),
 )

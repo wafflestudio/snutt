@@ -35,6 +35,7 @@ data class CustomTimetableLectureAddLegacyRequestDto(
             quota = null,
             freshmanQuota = null,
             academicYear = null,
+            categoryPre2025 = null,
         )
     }
 }
