@@ -44,7 +44,12 @@ class LectureCustomRepositoryImpl(
                         searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
                         searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
                         searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
-                        searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
+                        listOfNotNull(
+                            searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
+                            searchCondition.categoryPre2025?.takeIf { it.isNotEmpty() }?.let { Lecture::categoryPre2025 inValues it },
+                        ).takeIf { it.isNotEmpty() }?.let {
+                            Criteria().orOperator(it)
+                        },
                         searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
                         searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
                             Criteria().andOperator(
@@ -80,7 +85,6 @@ class LectureCustomRepositoryImpl(
                                 ),
                             )
                         },
-                        searchCondition.categoryPre2025?.takeIf { it.isNotEmpty() }?.let { Lecture::categoryPre2025 inValues it },
                         *searchCondition.etcTags.orEmpty().map { etcTag ->
                             when (etcTag) {
                                 "E" -> Lecture::remark regex ".*ⓔ.*"
