@@ -62,10 +62,9 @@ class SugangSnuSyncServiceImpl(
         val newLectures =
             sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
                 .map { lecture ->
-                    if (courseNumberCategoryPre2025Map[lecture.courseNumber] == null || lecture.year < 2025) {
-                        return@map lecture
+                    lecture.apply {
+                        categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
                     }
-                    lecture.copy(categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber])
                 }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
@@ -85,10 +84,9 @@ class SugangSnuSyncServiceImpl(
         val newLectures =
             sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
                 .map { lecture ->
-                    if (courseNumberCategoryPre2025Map[lecture.courseNumber] == null || lecture.year < 2025) {
-                        return@map lecture
+                    lecture.apply {
+                        categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
                     }
-                    lecture.copy(categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber])
                 }
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
