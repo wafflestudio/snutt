@@ -217,6 +217,7 @@ class SugangSnuSyncServiceImpl(
                     lectureNumber = updatedLecture.newData.lectureNumber
                     courseNumber = updatedLecture.newData.courseNumber
                     courseTitle = updatedLecture.newData.courseTitle
+                    categoryPre2025 = updatedLecture.newData.categoryPre2025
                 }
             }
         }.let {
@@ -270,6 +271,7 @@ class SugangSnuSyncServiceImpl(
                     remark = updatedLecture.newData.remark
                     courseNumber = updatedLecture.newData.courseNumber
                     courseTitle = updatedLecture.newData.courseTitle
+                    categoryPre2025 = updatedLecture.newData.categoryPre2025
                 }
                 updatedAt = Instant.now()
             }
