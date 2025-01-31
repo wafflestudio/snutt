@@ -15,8 +15,9 @@ fun KProperty1<Lecture, *>.toKoreanFieldName(): String =
         Lecture::instructor -> "교수"
         Lecture::quota -> "정원"
         Lecture::remark -> "비고"
-        Lecture::category -> "교양 구분"
+        Lecture::category -> "교양영역"
         Lecture::classPlaceAndTimes -> "강의 시간/장소"
+        Lecture::categoryPre2025 -> "구) 교양영역"
         else -> "기타"
     }
 

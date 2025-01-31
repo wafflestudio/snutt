@@ -30,6 +30,7 @@ data class BookmarkLecture(
     var courseNumber: String,
     @Field("course_title")
     var courseTitle: String,
+    var categoryPre2025: String?,
 )
 
 fun BookmarkLecture(lecture: Lecture): BookmarkLecture =
@@ -48,4 +49,5 @@ fun BookmarkLecture(lecture: Lecture): BookmarkLecture =
         lectureNumber = lecture.lectureNumber,
         courseNumber = lecture.courseNumber,
         courseTitle = lecture.courseTitle,
+        categoryPre2025 = lecture.categoryPre2025,
     )

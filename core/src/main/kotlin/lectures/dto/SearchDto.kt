@@ -19,4 +19,5 @@ data class SearchDto(
     val offset: Long = page * 20L,
     val limit: Int = 20,
     val sortBy: String?,
+    val categoryPre2025: List<String>? = null,
 )

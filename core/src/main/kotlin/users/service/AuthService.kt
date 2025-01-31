@@ -58,7 +58,7 @@ class AuthServiceImpl(
     companion object {
         private val localIdRegex = """^[a-zA-Z0-9]{4,32}$""".toRegex()
         private val passwordRegex = """^(?=.*\d)(?=.*[a-zA-Z])\S{6,20}$""".toRegex()
-        private val emailRegex = """^[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*@[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*.[a-zA-Z]{2,3}$""".toRegex()
+        private val emailRegex = """^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$""".toRegex()
     }
 
     private val clients = clients.mapKeys { AuthProvider.valueOf(it.key) }

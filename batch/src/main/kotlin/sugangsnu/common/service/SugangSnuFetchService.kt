@@ -136,6 +136,7 @@ class SugangSnuFetchServiceImpl(
             category = "",
             classPlaceAndTimes = classTimes,
             registrationCount = registrationCount,
+            categoryPre2025 = null,
         )
     }
 }

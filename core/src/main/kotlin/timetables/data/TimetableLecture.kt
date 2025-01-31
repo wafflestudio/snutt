@@ -44,6 +44,7 @@ data class TimetableLecture(
     @Field("lecture_id", targetType = FieldType.OBJECT_ID)
     @Indexed
     var lectureId: String? = null,
+    var categoryPre2025: String?,
 )
 
 fun TimetableLecture(
@@ -67,4 +68,5 @@ fun TimetableLecture(
     courseTitle = lecture.courseTitle,
     colorIndex = colorIndex,
     color = color,
+    categoryPre2025 = lecture.categoryPre2025,
 )
