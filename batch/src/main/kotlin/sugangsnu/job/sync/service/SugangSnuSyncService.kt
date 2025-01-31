@@ -1,7 +1,6 @@
 package com.wafflestudio.snu4t.sugangsnu.job.sync.service
 
 import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snu4t.common.cache.Cache
 import com.wafflestudio.snu4t.coursebook.data.Coursebook
 import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snu4t.lecturebuildings.data.Campus
@@ -55,7 +54,6 @@ class SugangSnuSyncServiceImpl(
     private val bookmarkRepository: BookmarkRepository,
     private val tagListRepository: TagListRepository,
     private val lectureBuildingService: LectureBuildingService,
-    private val cache: Cache,
 ) : SugangSnuSyncService {
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
@@ -200,8 +198,8 @@ class SugangSnuSyncServiceImpl(
             updatedLecture.oldData.semester,
             updatedLecture.oldData.id!!,
         ).map { bookmark ->
-            bookmark.apply {
-                lectures.find { it.id == updatedLecture.oldData.id }?.apply {
+            val updatedBookmarkLecture =
+                bookmark.lectures.find { it.id == updatedLecture.oldData.id }?.apply {
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
@@ -216,10 +214,8 @@ class SugangSnuSyncServiceImpl(
                     courseNumber = updatedLecture.newData.courseNumber
                     courseTitle = updatedLecture.newData.courseTitle
                     categoryPre2025 = updatedLecture.newData.categoryPre2025
-                }
-            }
-        }.let {
-            bookmarkRepository.saveAll(it)
+                }!!
+            bookmarkRepository.updateLecture(bookmark.id!!, updatedBookmarkLecture)
         }.map { bookmark ->
             BookmarkLectureUpdateResult(
                 bookmark.year,
@@ -254,8 +250,8 @@ class SugangSnuSyncServiceImpl(
         updatedLecture: UpdatedLecture,
     ): Flow<TimetableLectureUpdateResult> =
         timetables.map { timetable ->
-            timetable.apply {
-                lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
+            val updatedTimetableLecture =
+                timetable.lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
@@ -271,10 +267,7 @@ class SugangSnuSyncServiceImpl(
                     courseTitle = updatedLecture.newData.courseTitle
                     categoryPre2025 = updatedLecture.newData.categoryPre2025
                 }
-                updatedAt = Instant.now()
-            }
-        }.let {
-            timeTableRepository.saveAll(it)
+            timeTableRepository.updateTimetableLecture(timetable.id!!, updatedTimetableLecture!!)
         }.map { timetable ->
             TimetableLectureUpdateResult(
                 year = timetable.year,
