@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import kotlin.reflect.full.memberProperties
 
