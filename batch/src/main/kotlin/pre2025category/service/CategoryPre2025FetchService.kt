@@ -14,7 +14,7 @@ class CategoryPre2025FetchService(
         return workbook.sheetIterator().asSequence()
             .flatMap { sheet ->
                 sheet.rowIterator().asSequence()
-                    .drop(3)
+                    .drop(4)
                     .map { row ->
                         try {
                             val currentCourseNumber = row.getCell(7).stringCellValue
