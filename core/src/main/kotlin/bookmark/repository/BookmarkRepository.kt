@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.bookmark.repository
+package com.wafflestudio.snutt.bookmark.repository
 
-import com.wafflestudio.snu4t.bookmark.data.Bookmark
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snutt.bookmark.data.Bookmark
+import com.wafflestudio.snutt.common.enum.Semester
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 

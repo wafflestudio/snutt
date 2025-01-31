@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.tag
+package com.wafflestudio.snutt.tag
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.TagListNotFoundException
-import com.wafflestudio.snu4t.tag.data.TagList
-import com.wafflestudio.snu4t.tag.repository.TagListRepository
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.TagListNotFoundException
+import com.wafflestudio.snutt.tag.data.TagList
+import com.wafflestudio.snutt.tag.repository.TagListRepository
 import org.springframework.stereotype.Service
 
 interface TagListService {

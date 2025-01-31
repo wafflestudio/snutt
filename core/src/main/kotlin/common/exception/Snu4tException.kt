@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.common.exception
+package com.wafflestudio.snutt.common.exception
 
-import com.wafflestudio.snu4t.auth.AuthProvider
+import com.wafflestudio.snutt.auth.AuthProvider
 
 open class Snu4tException(
     val error: ErrorType = ErrorType.DEFAULT_ERROR,

@@ -1,6 +1,6 @@
 package notification.dto
 
-import com.wafflestudio.snu4t.notification.data.NotificationType
+import com.wafflestudio.snutt.notification.data.NotificationType
 
 data class InsertNotificationRequest(
     /**

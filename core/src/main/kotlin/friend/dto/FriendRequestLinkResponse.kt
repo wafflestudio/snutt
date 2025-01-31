@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.friend.dto
+package com.wafflestudio.snutt.friend.dto
 
 data class FriendRequestLinkResponse(
     val requestToken: String,

@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.client.AppVersion
-import com.wafflestudio.snu4t.common.dto.OkResponse
-import com.wafflestudio.snu4t.feedback.dto.FeedbackPostRequestDto
-import com.wafflestudio.snu4t.feedback.service.FeedbackService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snutt.common.client.AppVersion
+import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.feedback.dto.FeedbackPostRequestDto
+import com.wafflestudio.snutt.feedback.service.FeedbackService
+import com.wafflestudio.snutt.middleware.SnuttRestApiNoAuthMiddleware
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

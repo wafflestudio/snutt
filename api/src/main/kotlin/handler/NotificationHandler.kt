@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.notification.dto.NotificationCountResponse
-import com.wafflestudio.snu4t.notification.dto.NotificationQuery
-import com.wafflestudio.snu4t.notification.dto.NotificationResponse
-import com.wafflestudio.snu4t.notification.service.NotificationService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.notification.dto.NotificationCountResponse
+import com.wafflestudio.snutt.notification.dto.NotificationQuery
+import com.wafflestudio.snutt.notification.dto.NotificationResponse
+import com.wafflestudio.snutt.notification.service.NotificationService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.storage
+package com.wafflestudio.snutt.common.storage
 
 enum class FileExtension(val value: String) {
     JPG("jpg"),

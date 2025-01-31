@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.sugangsnu.job.vacancynotification
+package com.wafflestudio.snutt.sugangsnu.job.vacancynotification
 
-import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.sugangsnu.common.service.SugangSnuNotificationService
-import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
-import com.wafflestudio.snu4t.sugangsnu.job.vacancynotification.service.VacancyNotifierService
+import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuNotificationService
+import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
+import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.service.VacancyNotifierService
 import kotlinx.coroutines.runBlocking
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step

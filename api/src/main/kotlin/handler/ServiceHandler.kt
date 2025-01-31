@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.exception.InvalidQueryParameterException
-import com.wafflestudio.snu4t.common.exception.MissingRequiredParameterException
-import com.wafflestudio.snu4t.middleware.Middleware
-import com.wafflestudio.snu4t.middleware.plus
+import com.wafflestudio.snutt.common.exception.InvalidQueryParameterException
+import com.wafflestudio.snutt.common.exception.MissingRequiredParameterException
+import com.wafflestudio.snutt.middleware.Middleware
+import com.wafflestudio.snutt.middleware.plus
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

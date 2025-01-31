@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lecturebuildings.data
+package com.wafflestudio.snutt.lecturebuildings.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.popup.dto.PopupResponse
+import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.popup.dto.PopupResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

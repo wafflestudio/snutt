@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.clientconfig.dto
+package com.wafflestudio.snutt.clientconfig.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.wafflestudio.snu4t.clientconfig.data.ClientConfig
-import com.wafflestudio.snu4t.common.client.AppVersion
+import com.wafflestudio.snutt.clientconfig.data.ClientConfig
+import com.wafflestudio.snutt.common.client.AppVersion
 
 data class PostConfigRequest(
     val data: JsonNode,

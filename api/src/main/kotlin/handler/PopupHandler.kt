@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
-import com.wafflestudio.snu4t.popup.dto.PopupResponse
-import com.wafflestudio.snu4t.popup.service.PopupService
+import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snutt.popup.dto.PopupResponse
+import com.wafflestudio.snutt.popup.service.PopupService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

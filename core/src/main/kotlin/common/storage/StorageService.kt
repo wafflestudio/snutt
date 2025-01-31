@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.common.storage
+package com.wafflestudio.snutt.common.storage
 
-import com.wafflestudio.snu4t.common.exception.TooManyFilesException
-import com.wafflestudio.snu4t.common.storage.FileExtension.JPG
-import com.wafflestudio.snu4t.common.storage.dto.FileUploadUriDto
+import com.wafflestudio.snutt.common.exception.TooManyFilesException
+import com.wafflestudio.snutt.common.storage.FileExtension.JPG
+import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
 import org.springframework.stereotype.Service
 import java.util.UUID
 

@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.users.event
+package com.wafflestudio.snutt.users.event
 
-import com.wafflestudio.snu4t.timetables.service.TimetableService
-import com.wafflestudio.snu4t.users.event.data.SignupEvent
+import com.wafflestudio.snutt.timetables.service.TimetableService
+import com.wafflestudio.snutt.users.event.data.SignupEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 

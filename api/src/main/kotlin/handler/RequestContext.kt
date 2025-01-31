@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.client.ClientInfo
-import com.wafflestudio.snu4t.common.exception.WrongUserTokenException
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.exception.WrongUserTokenException
+import com.wafflestudio.snutt.users.data.User
 import org.springframework.web.reactive.function.server.ServerRequest
 
 const val CONTEXT_ATTRIBUTE_KEY = "context"

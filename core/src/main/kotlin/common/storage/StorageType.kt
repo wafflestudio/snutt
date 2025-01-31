@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.common.storage
+package com.wafflestudio.snutt.common.storage
 
-import com.wafflestudio.snu4t.config.PhaseUtils
+import com.wafflestudio.snutt.config.PhaseUtils
 
 enum class StorageType(bucketName: String, val acl: Acl = Acl.PRIVATE) {
     ASSETS("snutt-asset", Acl.PUBLIC_READ),

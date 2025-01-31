@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.tag.data
+package com.wafflestudio.snutt.tag.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.SortCriteria
+import com.wafflestudio.snutt.common.enum.SortCriteria
 
 data class TagListResponse(
     val classification: List<String>,

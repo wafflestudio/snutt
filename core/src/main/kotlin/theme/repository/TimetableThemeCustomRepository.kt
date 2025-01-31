@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.theme.repository
+package com.wafflestudio.snutt.theme.repository
 
-import com.wafflestudio.snu4t.common.extension.desc
-import com.wafflestudio.snu4t.common.extension.isEqualTo
-import com.wafflestudio.snu4t.common.extension.regex
-import com.wafflestudio.snu4t.theme.data.ThemeMarketInfo
-import com.wafflestudio.snu4t.theme.data.ThemeOrigin
-import com.wafflestudio.snu4t.theme.data.ThemeStatus
-import com.wafflestudio.snu4t.theme.data.TimetableTheme
+import com.wafflestudio.snutt.common.extension.desc
+import com.wafflestudio.snutt.common.extension.isEqualTo
+import com.wafflestudio.snutt.common.extension.regex
+import com.wafflestudio.snutt.theme.data.ThemeMarketInfo
+import com.wafflestudio.snutt.theme.data.ThemeOrigin
+import com.wafflestudio.snutt.theme.data.ThemeStatus
+import com.wafflestudio.snutt.theme.data.TimetableTheme
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.data.mapping.div

@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.common.dynamiclink.client
+package com.wafflestudio.snutt.common.dynamiclink.client
 
-import com.wafflestudio.snu4t.common.dynamiclink.api.FirebaseDynamicLinkApi
-import com.wafflestudio.snu4t.common.dynamiclink.dto.AndroidInfo
-import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkInfo
-import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkRequest
-import com.wafflestudio.snu4t.common.dynamiclink.dto.DynamicLinkResponse
-import com.wafflestudio.snu4t.common.dynamiclink.dto.IosInfo
-import com.wafflestudio.snu4t.common.exception.DynamicLinkGenerationFailedException
+import com.wafflestudio.snutt.common.dynamiclink.api.FirebaseDynamicLinkApi
+import com.wafflestudio.snutt.common.dynamiclink.dto.AndroidInfo
+import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkInfo
+import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkRequest
+import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
+import com.wafflestudio.snutt.common.dynamiclink.dto.IosInfo
+import com.wafflestudio.snutt.common.exception.DynamicLinkGenerationFailedException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

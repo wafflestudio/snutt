@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.lectures.dto
+package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
+import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 
 data class LectureDto(
     @JsonProperty("_id")

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.evaluation.dto
+package com.wafflestudio.snutt.evaluation.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

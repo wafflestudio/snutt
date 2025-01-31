@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.notification.service
+package com.wafflestudio.snutt.notification.service
 
-import com.wafflestudio.snu4t.common.push.PushClient
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
 import org.springframework.stereotype.Service
 
 /**

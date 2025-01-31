@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.clientconfig.dto.ConfigResponse
-import com.wafflestudio.snu4t.clientconfig.dto.PatchConfigRequest
-import com.wafflestudio.snu4t.clientconfig.dto.PostConfigRequest
-import com.wafflestudio.snu4t.common.dto.OkResponse
-import com.wafflestudio.snu4t.common.storage.dto.FileUploadUriDto
-import com.wafflestudio.snu4t.popup.dto.PopupResponse
-import com.wafflestudio.snu4t.popup.dto.PostPopupRequest
+import com.wafflestudio.snutt.clientconfig.dto.ConfigResponse
+import com.wafflestudio.snutt.clientconfig.dto.PatchConfigRequest
+import com.wafflestudio.snutt.clientconfig.dto.PostConfigRequest
+import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
+import com.wafflestudio.snutt.popup.dto.PopupResponse
+import com.wafflestudio.snutt.popup.dto.PostPopupRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

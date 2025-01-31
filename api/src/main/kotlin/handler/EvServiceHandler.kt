@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.evaluation.service.EvService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.evaluation.service.EvService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component

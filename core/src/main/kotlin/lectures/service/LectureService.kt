@@ -1,15 +1,15 @@
-package com.wafflestudio.snu4t.lectures.service
+package com.wafflestudio.snutt.lectures.service
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.EvDataNotFoundException
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
-import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snu4t.lecturebuildings.service.LectureBuildingService
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
-import com.wafflestudio.snu4t.lectures.dto.SearchDto
-import com.wafflestudio.snu4t.lectures.dto.placeInfos
-import com.wafflestudio.snu4t.lectures.repository.LectureRepository
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.EvDataNotFoundException
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
+import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
+import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.lectures.dto.LectureDto
+import com.wafflestudio.snutt.lectures.dto.SearchDto
+import com.wafflestudio.snutt.lectures.dto.placeInfos
+import com.wafflestudio.snutt.lectures.repository.LectureRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect

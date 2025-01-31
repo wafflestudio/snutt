@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t
+package com.wafflestudio.snutt
 
 import org.springframework.context.annotation.Configuration
 

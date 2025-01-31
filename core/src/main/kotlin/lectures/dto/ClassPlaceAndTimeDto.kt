@@ -1,13 +1,13 @@
-package com.wafflestudio.snu4t.lectures.dto
+package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuilding
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
-import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
-import com.wafflestudio.snu4t.lectures.utils.endPeriod
-import com.wafflestudio.snu4t.lectures.utils.minuteToString
-import com.wafflestudio.snu4t.lectures.utils.startPeriod
+import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.lecturebuildings.data.LectureBuilding
+import com.wafflestudio.snutt.lecturebuildings.data.PlaceInfo
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.lectures.utils.endPeriod
+import com.wafflestudio.snutt.lectures.utils.minuteToString
+import com.wafflestudio.snutt.lectures.utils.startPeriod
 
 data class ClassPlaceAndTimeDto(
     val day: DayOfWeek,

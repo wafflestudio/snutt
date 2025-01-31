@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.notification.repository
+package com.wafflestudio.snutt.notification.repository
 
-import com.wafflestudio.snu4t.notification.data.UserDevice
+import com.wafflestudio.snutt.notification.data.UserDevice
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface UserDeviceRepository : CoroutineCrudRepository<UserDevice, String> {

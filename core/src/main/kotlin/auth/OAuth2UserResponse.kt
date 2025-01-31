@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.auth
+package com.wafflestudio.snutt.auth
 
 data class OAuth2UserResponse(
     val socialId: String,

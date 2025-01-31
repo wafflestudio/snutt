@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t
+package com.wafflestudio.snutt
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

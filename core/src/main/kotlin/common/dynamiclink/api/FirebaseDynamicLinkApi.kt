@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.dynamiclink.api
+package com.wafflestudio.snutt.common.dynamiclink.api
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

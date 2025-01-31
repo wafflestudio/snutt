@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.timetables.dto
+package com.wafflestudio.snutt.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureIdDto
-import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeDto
-import com.wafflestudio.snu4t.lectures.dto.ClassPlaceAndTimeLegacyDto
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.theme.data.ColorSet
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
+import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeDto
+import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeLegacyDto
+import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snutt.theme.data.ColorSet
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 
 data class TimetableLectureDto(
     var id: String? = null,

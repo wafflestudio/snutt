@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.notification.service
+package com.wafflestudio.snutt.notification.service
 
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.notification.data.NotificationType
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.notification.data.NotificationType
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.popup.data
+package com.wafflestudio.snutt.popup.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed

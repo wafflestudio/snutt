@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.friend.data
+package com.wafflestudio.snutt.friend.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex

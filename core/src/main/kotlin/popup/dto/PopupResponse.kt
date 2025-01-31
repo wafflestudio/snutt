@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.popup.dto
+package com.wafflestudio.snutt.popup.dto
 
-import com.wafflestudio.snu4t.common.storage.toGetUri
-import com.wafflestudio.snu4t.popup.data.Popup
+import com.wafflestudio.snutt.common.storage.toGetUri
+import com.wafflestudio.snutt.popup.data.Popup
 
 data class PopupResponse(
     val id: String,

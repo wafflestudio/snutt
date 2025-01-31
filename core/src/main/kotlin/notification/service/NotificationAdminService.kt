@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.notification.service
+package com.wafflestudio.snutt.notification.service
 
-import com.wafflestudio.snu4t.common.exception.UserNotFoundException
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.users.repository.UserRepository
+import com.wafflestudio.snutt.common.exception.UserNotFoundException
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.users.repository.UserRepository
 import notification.dto.InsertNotificationRequest
 import org.springframework.stereotype.Service
 

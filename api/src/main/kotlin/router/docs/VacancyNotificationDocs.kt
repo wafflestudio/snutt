@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.common.dto.ExistenceResponse
-import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
+import com.wafflestudio.snutt.common.dto.ExistenceResponse
+import com.wafflestudio.snutt.vacancynotification.dto.VacancyNotificationLecturesResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

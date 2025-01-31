@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.users.data
+package com.wafflestudio.snutt.users.data
 
-import com.wafflestudio.snu4t.notification.data.UserDevice
+import com.wafflestudio.snutt.notification.data.UserDevice
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.notification.data
+package com.wafflestudio.snutt.notification.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex

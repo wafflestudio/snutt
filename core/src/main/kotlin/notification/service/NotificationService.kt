@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.notification.service
+package com.wafflestudio.snutt.notification.service
 
-import com.wafflestudio.snu4t.notification.data.Notification
-import com.wafflestudio.snu4t.notification.dto.NotificationQuery
-import com.wafflestudio.snu4t.notification.repository.NotificationRepository
-import com.wafflestudio.snu4t.notification.repository.countUnreadNotifications
-import com.wafflestudio.snu4t.users.data.User
-import com.wafflestudio.snu4t.users.service.UserService
+import com.wafflestudio.snutt.notification.data.Notification
+import com.wafflestudio.snutt.notification.dto.NotificationQuery
+import com.wafflestudio.snutt.notification.repository.NotificationRepository
+import com.wafflestudio.snutt.notification.repository.countUnreadNotifications
+import com.wafflestudio.snutt.users.data.User
+import com.wafflestudio.snutt.users.service.UserService
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service

@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.timetables.dto.request
+package com.wafflestudio.snutt.timetables.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.theme.data.ColorSet
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.theme.data.ColorSet
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 
 data class CustomTimetableLectureAddLegacyRequestDto(
     @JsonProperty("course_title")

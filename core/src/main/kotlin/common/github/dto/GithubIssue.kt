@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.github.dto
+package com.wafflestudio.snutt.common.github.dto
 
 data class GithubIssue(
     val title: String,

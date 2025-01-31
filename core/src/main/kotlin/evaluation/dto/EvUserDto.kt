@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.evaluation.dto
+package com.wafflestudio.snutt.evaluation.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.users.data.User
 
 data class EvUserDto(
     val id: String?,

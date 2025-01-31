@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.sugangsnu.job.sync.data
+package com.wafflestudio.snutt.sugangsnu.job.sync.data
 
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snutt.lectures.data.Lecture
 
 class SugangSnuLectureCompareResult(
     val createdLectureList: List<Lecture>,

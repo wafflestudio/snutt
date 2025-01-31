@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.coursebook.data.CoursebookOfficialResponse
-import com.wafflestudio.snu4t.coursebook.data.CoursebookResponse
+import com.wafflestudio.snutt.coursebook.data.CoursebookOfficialResponse
+import com.wafflestudio.snutt.coursebook.data.CoursebookResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

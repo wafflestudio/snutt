@@ -1,7 +1,7 @@
 package timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.Timetable
 import java.time.Instant
 
 data class TimetableBriefDto(

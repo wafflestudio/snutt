@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.filter
+package com.wafflestudio.snutt.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.common.exception.ErrorType
-import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
-import com.wafflestudio.snu4t.common.exception.Snu4tException
+import com.wafflestudio.snutt.common.exception.ErrorType
+import com.wafflestudio.snutt.common.exception.EvServiceProxyException
+import com.wafflestudio.snutt.common.exception.Snu4tException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode

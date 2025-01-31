@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.timetables.repository
+package com.wafflestudio.snutt.timetables.repository
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.extension.desc
-import com.wafflestudio.snu4t.common.extension.elemMatch
-import com.wafflestudio.snu4t.common.extension.isEqualTo
-import com.wafflestudio.snu4t.common.extension.regex
-import com.wafflestudio.snu4t.timetables.data.Timetable
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.extension.desc
+import com.wafflestudio.snutt.common.extension.elemMatch
+import com.wafflestudio.snutt.common.extension.isEqualTo
+import com.wafflestudio.snutt.common.extension.regex
+import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull

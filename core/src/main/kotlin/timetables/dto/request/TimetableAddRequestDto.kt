@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.timetables.dto.request
+package com.wafflestudio.snutt.timetables.dto.request
 
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snutt.common.enum.Semester
 
 data class TimetableAddRequestDto(
     val year: Int,

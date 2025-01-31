@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.theme.dto.request
+package com.wafflestudio.snutt.theme.dto.request
 
-import com.wafflestudio.snu4t.common.enum.BasicThemeType
+import com.wafflestudio.snutt.common.enum.BasicThemeType
 
 data class TimetableModifyThemeRequestDto(
     val theme: BasicThemeType?,

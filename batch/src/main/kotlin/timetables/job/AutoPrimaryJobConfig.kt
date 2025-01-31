@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.timetables.job
+package com.wafflestudio.snutt.timetables.job
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.timetables.data.Timetable
-import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import io.github.resilience4j.kotlin.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.kotlin.ratelimiter.executeSuspendFunction
 import io.github.resilience4j.kotlin.ratelimiter.rateLimiter

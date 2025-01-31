@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.sugangsnu.common.utils
+package com.wafflestudio.snutt.sugangsnu.common.utils
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.coursebook.data.Coursebook
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.coursebook.data.Coursebook
+import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
 fun KProperty1<Lecture, *>.toKoreanFieldName(): String =

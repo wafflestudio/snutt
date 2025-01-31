@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.common.enum
+package com.wafflestudio.snutt.common.enum
 
 import com.fasterxml.jackson.annotation.JsonValue
-import com.wafflestudio.snu4t.common.extension.desc
-import com.wafflestudio.snu4t.lectures.data.EvInfo
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snutt.common.extension.desc
+import com.wafflestudio.snutt.lectures.data.EvInfo
+import com.wafflestudio.snutt.lectures.data.Lecture
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.div
 

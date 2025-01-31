@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.feedback.dto
+package com.wafflestudio.snutt.feedback.dto
 
 data class FeedbackPostRequestDto(
     val email: String,
