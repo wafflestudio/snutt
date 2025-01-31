@@ -8,6 +8,7 @@ import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
 import com.wafflestudio.snu4t.lectures.data.Lecture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
+import org.bson.types.ObjectId
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -43,6 +44,11 @@ interface BookmarkCustomRepository {
         timeTableId: String,
         lectureId: String,
     )
+
+    suspend fun updateLecture(
+        bookmarkId: String,
+        lecture: BookmarkLecture,
+    ): Bookmark
 }
 
 class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMongoTemplate) :
@@ -100,5 +106,12 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         ).apply(
             Update().pull(Bookmark::lectures.toDotPath(), Query.query(BookmarkLecture::id isEqualTo lectureId)),
         ).findModifyAndAwait()
+    }
+
+    override suspend fun updateLecture(bookmarkId: String, lecture: BookmarkLecture): Bookmark {
+        return reactiveMongoTemplate.update<Bookmark>().matching(
+            Bookmark::id.isEqualTo(bookmarkId).and("lectures._id").isEqualTo(ObjectId(lecture.id)),
+        ).apply(Update().set("""lectures.$""", lecture))
+            .withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
     }
 }

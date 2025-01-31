@@ -152,7 +152,7 @@ class TimetableCustomRepositoryImpl(
     ): Timetable =
         reactiveMongoTemplate.update<Timetable>().matching(
             Timetable::id.isEqualTo(timeTableId).and("lecture_list._id").isEqualTo(ObjectId(timetableLecture.id)),
-        ).apply(Update().apply { set("""lecture_list.$""", timetableLecture) })
+        ).apply(Update().apply { set("""lecture_list.$""", timetableLecture) }.currentDate(Timetable::updatedAt.toDotPath()))
             .withOptions(FindAndModifyOptions.options().returnNew(true)).findModifyAndAwait()
 
     override suspend fun findLatestChildTimetable(
