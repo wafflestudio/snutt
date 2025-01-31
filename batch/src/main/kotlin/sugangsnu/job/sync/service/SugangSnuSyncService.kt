@@ -198,7 +198,8 @@ class SugangSnuSyncServiceImpl(
             updatedLecture.oldData.semester,
             updatedLecture.oldData.id!!,
         ).map { bookmark ->
-            val updatedBookmarkLecture = bookmark.lectures.find { it.id == updatedLecture.oldData.id }?.apply {
+            val updatedBookmarkLecture =
+                bookmark.lectures.find { it.id == updatedLecture.oldData.id }?.apply {
                     academicYear = updatedLecture.newData.academicYear
                     category = updatedLecture.newData.category
                     classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
@@ -213,7 +214,7 @@ class SugangSnuSyncServiceImpl(
                     courseNumber = updatedLecture.newData.courseNumber
                     courseTitle = updatedLecture.newData.courseTitle
                     categoryPre2025 = updatedLecture.newData.categoryPre2025
-            }!!
+                }!!
             bookmarkRepository.updateLecture(bookmark.id!!, updatedBookmarkLecture)
         }.map { bookmark ->
             BookmarkLectureUpdateResult(
@@ -249,22 +250,23 @@ class SugangSnuSyncServiceImpl(
         updatedLecture: UpdatedLecture,
     ): Flow<TimetableLectureUpdateResult> =
         timetables.map { timetable ->
-            val updatedTimetableLecture = timetable.lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
-                academicYear = updatedLecture.newData.academicYear
-                category = updatedLecture.newData.category
-                classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
-                classification = updatedLecture.newData.classification
-                credit = updatedLecture.newData.credit
-                department = updatedLecture.newData.department
-                instructor = updatedLecture.newData.instructor
-                lectureNumber = updatedLecture.newData.lectureNumber
-                quota = updatedLecture.newData.quota
-                freshmanQuota = updatedLecture.newData.freshmanQuota
-                remark = updatedLecture.newData.remark
-                courseNumber = updatedLecture.newData.courseNumber
-                courseTitle = updatedLecture.newData.courseTitle
-                categoryPre2025 = updatedLecture.newData.categoryPre2025
-            }
+            val updatedTimetableLecture =
+                timetable.lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
+                    academicYear = updatedLecture.newData.academicYear
+                    category = updatedLecture.newData.category
+                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
+                    classification = updatedLecture.newData.classification
+                    credit = updatedLecture.newData.credit
+                    department = updatedLecture.newData.department
+                    instructor = updatedLecture.newData.instructor
+                    lectureNumber = updatedLecture.newData.lectureNumber
+                    quota = updatedLecture.newData.quota
+                    freshmanQuota = updatedLecture.newData.freshmanQuota
+                    remark = updatedLecture.newData.remark
+                    courseNumber = updatedLecture.newData.courseNumber
+                    courseTitle = updatedLecture.newData.courseTitle
+                    categoryPre2025 = updatedLecture.newData.categoryPre2025
+                }
             timeTableRepository.updateTimetableLecture(timetable.id!!, updatedTimetableLecture!!)
         }.map { timetable ->
             TimetableLectureUpdateResult(

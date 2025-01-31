@@ -108,7 +108,10 @@ class BookmarkCustomRepositoryImpl(private val reactiveMongoTemplate: ReactiveMo
         ).findModifyAndAwait()
     }
 
-    override suspend fun updateLecture(bookmarkId: String, lecture: BookmarkLecture): Bookmark {
+    override suspend fun updateLecture(
+        bookmarkId: String,
+        lecture: BookmarkLecture,
+    ): Bookmark {
         return reactiveMongoTemplate.update<Bookmark>().matching(
             Bookmark::id.isEqualTo(bookmarkId).and("lectures._id").isEqualTo(ObjectId(lecture.id)),
         ).apply(Update().set("""lectures.$""", lecture))
