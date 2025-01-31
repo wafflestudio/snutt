@@ -31,7 +31,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import kotlin.reflect.full.memberProperties
 
@@ -55,6 +57,8 @@ class SugangSnuSyncServiceImpl(
     private val tagListRepository: TagListRepository,
     private val lectureBuildingService: LectureBuildingService,
 ) : SugangSnuSyncService {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val newLectures =
@@ -69,10 +73,10 @@ class SugangSnuSyncServiceImpl(
         val compareResult = compareLectures(newLectures, oldLectures)
 
         syncLectures(compareResult)
-        updateLectureBuildings(compareResult)
         val syncUserLecturesResults = syncSavedUserLectures(compareResult)
         syncTagList(coursebook, newLectures)
         coursebookRepository.save(coursebook.apply { updatedAt = Instant.now() })
+        runCatching { updateLectureBuildings(compareResult) }.onFailure { log.error("Failed to update lecture buildings", it) }
 
         return syncUserLecturesResults
     }
