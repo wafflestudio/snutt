@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.util.SugangSnuUrlUtils.REDIRECT_PREFIX_URL
-import com.wafflestudio.snu4t.common.util.SugangSnuUrlUtils.parseSyllabusUrl
-import com.wafflestudio.snu4t.coursebook.data.CoursebookOfficialResponse
-import com.wafflestudio.snu4t.coursebook.data.CoursebookResponse
-import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.REDIRECT_PREFIX_URL
+import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.parseSyllabusUrl
+import com.wafflestudio.snutt.coursebook.data.CoursebookOfficialResponse
+import com.wafflestudio.snutt.coursebook.data.CoursebookResponse
+import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.middleware.SnuttRestApiNoAuthMiddleware
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

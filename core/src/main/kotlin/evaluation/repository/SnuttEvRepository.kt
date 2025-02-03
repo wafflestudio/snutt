@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.evaluation.repository
+package com.wafflestudio.snutt.evaluation.repository
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.config.SnuttEvWebClient
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureIdDto
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
+import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.config.SnuttEvWebClient
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 

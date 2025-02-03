@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.users.data
+package com.wafflestudio.snutt.users.data
 
 data class Credential(
     var localId: String? = null,

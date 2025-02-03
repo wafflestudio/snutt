@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.vacancynotification.repository
+package com.wafflestudio.snutt.vacancynotification.repository
 
-import com.wafflestudio.snu4t.vacancynotification.data.VacancyNotification
+import com.wafflestudio.snutt.vacancynotification.data.VacancyNotification
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 

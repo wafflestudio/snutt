@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.users.event.data
+package com.wafflestudio.snutt.users.event.data
 
 /**
- * @see com.wafflestudio.snu4t.users.event.UserEventHandler.handleSignupEvent
+ * @see com.wafflestudio.snutt.users.event.UserEventHandler.handleSignupEvent
  */
 data class SignupEvent(
     val userId: String,

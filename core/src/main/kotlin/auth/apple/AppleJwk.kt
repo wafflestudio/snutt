@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.auth.apple
+package com.wafflestudio.snutt.auth.apple
 
 data class AppleJwk(
     val kty: String,

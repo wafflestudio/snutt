@@ -1,20 +1,20 @@
-package com.wafflestudio.snu4t.timetables.service
+package com.wafflestudio.snutt.timetables.service
 
-import com.wafflestudio.snu4t.common.exception.CustomLectureResetException
-import com.wafflestudio.snu4t.common.exception.DuplicateTimetableLectureException
-import com.wafflestudio.snu4t.common.exception.InvalidTimeException
-import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
-import com.wafflestudio.snu4t.common.exception.LectureTimeOverlapException
-import com.wafflestudio.snu4t.common.exception.TimetableNotFoundException
-import com.wafflestudio.snu4t.common.exception.WrongSemesterException
-import com.wafflestudio.snu4t.lectures.repository.LectureRepository
-import com.wafflestudio.snu4t.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snu4t.theme.service.TimetableThemeService
-import com.wafflestudio.snu4t.timetables.data.Timetable
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
-import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import com.wafflestudio.snutt.common.exception.CustomLectureResetException
+import com.wafflestudio.snutt.common.exception.DuplicateTimetableLectureException
+import com.wafflestudio.snutt.common.exception.InvalidTimeException
+import com.wafflestudio.snutt.common.exception.LectureNotFoundException
+import com.wafflestudio.snutt.common.exception.LectureTimeOverlapException
+import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
+import com.wafflestudio.snutt.common.exception.WrongSemesterException
+import com.wafflestudio.snutt.lectures.repository.LectureRepository
+import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snutt.theme.service.TimetableThemeService
+import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {

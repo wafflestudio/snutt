@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.notification.service
+package com.wafflestudio.snutt.notification.service
 
-import com.wafflestudio.snu4t.common.cache.Cache
-import com.wafflestudio.snu4t.common.cache.CacheKey
-import com.wafflestudio.snu4t.common.client.ClientInfo
-import com.wafflestudio.snu4t.common.push.PushClient
-import com.wafflestudio.snu4t.notification.data.UserDevice
-import com.wafflestudio.snu4t.notification.repository.UserDeviceRepository
-import com.wafflestudio.snu4t.users.repository.UserRepository
+import com.wafflestudio.snutt.common.cache.Cache
+import com.wafflestudio.snutt.common.cache.CacheKey
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.notification.data.UserDevice
+import com.wafflestudio.snutt.notification.repository.UserDeviceRepository
+import com.wafflestudio.snutt.users.repository.UserRepository
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service

@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.dto.SearchDto
-import com.wafflestudio.snu4t.lectures.dto.SearchTimeDto
-import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.lectures.dto.SearchDto
+import com.wafflestudio.snutt.lectures.dto.SearchTimeDto
+import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.middleware.SnuttRestApiNoAuthMiddleware
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

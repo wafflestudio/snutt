@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.middleware
+package com.wafflestudio.snutt.middleware
 
-import com.wafflestudio.snu4t.common.exception.WrongApiKeyException
-import com.wafflestudio.snu4t.handler.RequestContext
+import com.wafflestudio.snutt.common.exception.WrongApiKeyException
+import com.wafflestudio.snutt.handler.RequestContext
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

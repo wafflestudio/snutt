@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.common.push
+package com.wafflestudio.snutt.common.push
 
-import com.wafflestudio.snu4t.config.PhaseUtils
+import com.wafflestudio.snutt.config.PhaseUtils
 
 enum class DeeplinkType(private val url: String) {
     NOTIFICATIONS("notifications"),

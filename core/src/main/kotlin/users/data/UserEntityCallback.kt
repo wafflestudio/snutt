@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.users.data
+package com.wafflestudio.snutt.users.data
 
-import com.wafflestudio.snu4t.users.repository.UserRepository
-import com.wafflestudio.snu4t.users.service.UserNicknameService
+import com.wafflestudio.snutt.users.repository.UserRepository
+import com.wafflestudio.snutt.users.service.UserNicknameService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
 import org.bson.Document

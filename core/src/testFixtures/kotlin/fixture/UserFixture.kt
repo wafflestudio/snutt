@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.fixture
+package com.wafflestudio.snutt.fixture
 
-import com.wafflestudio.snu4t.users.data.Credential
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.users.data.Credential
+import com.wafflestudio.snutt.users.data.User
 import org.springframework.stereotype.Component
 
 @Component

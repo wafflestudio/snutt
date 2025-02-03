@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.config
+package com.wafflestudio.snutt.config
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info

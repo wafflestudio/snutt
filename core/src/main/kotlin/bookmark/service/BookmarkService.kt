@@ -1,13 +1,13 @@
-package com.wafflestudio.snu4t.bookmark.service
+package com.wafflestudio.snutt.bookmark.service
 
-import com.wafflestudio.snu4t.bookmark.data.Bookmark
-import com.wafflestudio.snu4t.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
-import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
-import com.wafflestudio.snu4t.lectures.dto.BookmarkLectureDto
-import com.wafflestudio.snu4t.lectures.service.LectureService
+import com.wafflestudio.snutt.bookmark.data.Bookmark
+import com.wafflestudio.snutt.bookmark.repository.BookmarkRepository
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.LectureNotFoundException
+import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.lectures.data.BookmarkLecture
+import com.wafflestudio.snutt.lectures.dto.BookmarkLectureDto
+import com.wafflestudio.snutt.lectures.service.LectureService
 import org.springframework.stereotype.Service
 
 interface BookmarkService {

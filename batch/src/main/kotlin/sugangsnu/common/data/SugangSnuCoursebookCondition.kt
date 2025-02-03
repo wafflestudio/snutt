@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.sugangsnu.common.data
+package com.wafflestudio.snutt.sugangsnu.common.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snutt.common.enum.Semester
 
 data class SugangSnuCoursebookCondition(
     @JsonProperty("currSchyy")

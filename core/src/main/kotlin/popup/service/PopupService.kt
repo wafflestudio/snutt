@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.popup.service
+package com.wafflestudio.snutt.popup.service
 
-import com.wafflestudio.snu4t.common.client.ClientInfo
-import com.wafflestudio.snu4t.common.exception.DuplicatePopupKeyException
-import com.wafflestudio.snu4t.popup.data.Popup
-import com.wafflestudio.snu4t.popup.dto.PostPopupRequest
-import com.wafflestudio.snu4t.popup.repository.PopupRepository
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.exception.DuplicatePopupKeyException
+import com.wafflestudio.snutt.popup.data.Popup
+import com.wafflestudio.snutt.popup.dto.PostPopupRequest
+import com.wafflestudio.snutt.popup.repository.PopupRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service

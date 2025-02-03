@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.theme.dto.request
+package com.wafflestudio.snutt.theme.dto.request
 
-import com.wafflestudio.snu4t.theme.data.ColorSet
+import com.wafflestudio.snutt.theme.data.ColorSet
 
 data class TimetableThemeModifyRequestDto(
     val name: String?,

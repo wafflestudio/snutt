@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.mail.service
+package com.wafflestudio.snutt.mail.service
 
-import com.wafflestudio.snu4t.common.exception.InvalidEmailException
-import com.wafflestudio.snu4t.common.mail.MailClient
-import com.wafflestudio.snu4t.mail.data.MailContent
-import com.wafflestudio.snu4t.mail.data.UserMailType
-import com.wafflestudio.snu4t.users.service.AuthService
+import com.wafflestudio.snutt.common.exception.InvalidEmailException
+import com.wafflestudio.snutt.common.mail.MailClient
+import com.wafflestudio.snutt.mail.data.MailContent
+import com.wafflestudio.snutt.mail.data.UserMailType
+import com.wafflestudio.snutt.users.service.AuthService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service

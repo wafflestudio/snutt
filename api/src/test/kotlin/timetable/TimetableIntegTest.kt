@@ -1,16 +1,16 @@
-package com.wafflestudio.snu4t.timetable
+package com.wafflestudio.snutt.timetable
 
 import BaseIntegTest
 import com.ninjasquad.springmockk.MockkBean
-import com.wafflestudio.snu4t.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snu4t.evaluation.service.EvService
-import com.wafflestudio.snu4t.fixture.TimetableFixture
-import com.wafflestudio.snu4t.fixture.UserFixture
-import com.wafflestudio.snu4t.handler.RequestContext
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.router.MainRouter
-import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
-import com.wafflestudio.snu4t.timetables.repository.TimetableRepository
+import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.evaluation.service.EvService
+import com.wafflestudio.snutt.fixture.TimetableFixture
+import com.wafflestudio.snutt.fixture.UserFixture
+import com.wafflestudio.snutt.handler.RequestContext
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.router.MainRouter
+import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe

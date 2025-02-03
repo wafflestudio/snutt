@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.extension
+package com.wafflestudio.snutt.common.extension
 
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.toDotPath

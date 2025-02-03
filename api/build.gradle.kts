@@ -18,5 +18,5 @@ dependencies {
 }
 
 tasks.bootJar {
-    archiveFileName.set("snu4t-api.jar")
+    archiveFileName.set("snutt-api.jar")
 }

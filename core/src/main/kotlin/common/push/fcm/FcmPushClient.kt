@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.push.fcm
+package com.wafflestudio.snutt.common.push.fcm
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
@@ -6,11 +6,11 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
-import com.wafflestudio.snu4t.common.push.PushClient
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessage
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithTopic
+import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessage
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithTopic
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.common.github.client
+package com.wafflestudio.snutt.common.github.client
 
-import com.wafflestudio.snu4t.common.extension.post
-import com.wafflestudio.snu4t.common.github.api.GithubRestApi
-import com.wafflestudio.snu4t.common.github.dto.GithubIssue
+import com.wafflestudio.snutt.common.extension.post
+import com.wafflestudio.snutt.common.github.api.GithubRestApi
+import com.wafflestudio.snutt.common.github.dto.GithubIssue
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.stereotype.Service
 

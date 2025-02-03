@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.theme.dto.request.TimetableModifyThemeRequestDto
-import com.wafflestudio.snu4t.timetables.dto.TimetableLegacyDto
-import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
+import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
+import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
+import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableModifyRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

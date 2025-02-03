@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.config
+package com.wafflestudio.snutt.config
 
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler

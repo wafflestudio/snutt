@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.lecturebuildings.repository
+package com.wafflestudio.snutt.lecturebuildings.repository
 
-import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuilding
+import com.wafflestudio.snutt.lecturebuildings.data.LectureBuilding
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 

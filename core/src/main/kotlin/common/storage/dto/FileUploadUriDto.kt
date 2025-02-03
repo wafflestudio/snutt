@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.storage.dto
+package com.wafflestudio.snutt.common.storage.dto
 
 data class FileUploadUriDto(
     val uploadUri: String,

@@ -1,6 +1,6 @@
 package mock.api
 
-import com.wafflestudio.snu4t.config.SnuttEvWebClient
+import com.wafflestudio.snutt.config.SnuttEvWebClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component

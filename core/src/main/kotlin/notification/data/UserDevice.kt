@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.notification.data
+package com.wafflestudio.snutt.notification.data
 
-import com.wafflestudio.snu4t.common.client.AppType
-import com.wafflestudio.snu4t.common.client.AppVersion
-import com.wafflestudio.snu4t.common.client.OsType
+import com.wafflestudio.snutt.common.client.AppType
+import com.wafflestudio.snutt.common.client.AppVersion
+import com.wafflestudio.snutt.common.client.OsType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document

@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.common.push.dto
+package com.wafflestudio.snutt.common.push.dto
 
-import com.wafflestudio.snu4t.common.push.DeeplinkType
-import com.wafflestudio.snu4t.notification.data.Notification
-import com.wafflestudio.snu4t.notification.data.NotificationType
+import com.wafflestudio.snutt.common.push.DeeplinkType
+import com.wafflestudio.snutt.notification.data.Notification
+import com.wafflestudio.snutt.notification.data.NotificationType
 
 sealed class TargetedPushMessage(
     open val message: PushMessage,

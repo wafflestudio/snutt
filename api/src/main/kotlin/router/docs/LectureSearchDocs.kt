@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.handler.SearchQueryLegacy
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
+import com.wafflestudio.snutt.handler.SearchQueryLegacy
+import com.wafflestudio.snutt.lectures.dto.LectureDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content

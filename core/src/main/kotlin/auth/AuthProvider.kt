@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.auth
+package com.wafflestudio.snutt.auth
 
 enum class AuthProvider(val value: String) {
     LOCAL("local"),

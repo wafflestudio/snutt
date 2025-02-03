@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.auth.kakao
+package com.wafflestudio.snutt.auth.kakao
 
-import com.wafflestudio.snu4t.auth.OAuth2Client
-import com.wafflestudio.snu4t.auth.OAuth2UserResponse
-import com.wafflestudio.snu4t.common.extension.get
+import com.wafflestudio.snutt.auth.OAuth2Client
+import com.wafflestudio.snutt.auth.OAuth2UserResponse
+import com.wafflestudio.snutt.common.extension.get
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector

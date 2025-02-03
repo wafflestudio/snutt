@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiNoAuthMiddleware
+import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.middleware.SnuttRestApiNoAuthMiddleware
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

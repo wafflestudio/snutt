@@ -1,13 +1,13 @@
-package com.wafflestudio.snu4t.vacancynotification.service
+package com.wafflestudio.snutt.vacancynotification.service
 
-import com.wafflestudio.snu4t.common.exception.DuplicateVacancyNotificationException
-import com.wafflestudio.snu4t.common.exception.InvalidRegistrationForPreviousSemesterCourseException
-import com.wafflestudio.snu4t.common.exception.LectureNotFoundException
-import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.repository.LectureRepository
-import com.wafflestudio.snu4t.vacancynotification.data.VacancyNotification
-import com.wafflestudio.snu4t.vacancynotification.repository.VacancyNotificationRepository
+import com.wafflestudio.snutt.common.exception.DuplicateVacancyNotificationException
+import com.wafflestudio.snutt.common.exception.InvalidRegistrationForPreviousSemesterCourseException
+import com.wafflestudio.snutt.common.exception.LectureNotFoundException
+import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.lectures.repository.LectureRepository
+import com.wafflestudio.snutt.vacancynotification.data.VacancyNotification
+import com.wafflestudio.snutt.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.map

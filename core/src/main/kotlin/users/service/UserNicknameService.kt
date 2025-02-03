@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.users.service
+package com.wafflestudio.snutt.users.service
 
-import com.wafflestudio.snu4t.common.exception.InvalidNicknameException
-import com.wafflestudio.snu4t.users.dto.NicknameDto
-import com.wafflestudio.snu4t.users.repository.UserRepository
+import com.wafflestudio.snutt.common.exception.InvalidNicknameException
+import com.wafflestudio.snutt.users.dto.NicknameDto
+import com.wafflestudio.snutt.users.repository.UserRepository
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toSet
 import org.springframework.beans.factory.annotation.Value

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.config
+package com.wafflestudio.snutt.config
 
 import org.springframework.boot.autoconfigure.batch.BatchDataSource
 import org.springframework.context.annotation.Bean

@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.mock.notification
+package com.wafflestudio.snutt.mock.notification
 
-import com.wafflestudio.snu4t.common.push.PushClient
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithTopic
+import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithTopic
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service
 

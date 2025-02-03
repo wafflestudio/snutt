@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.client
+package com.wafflestudio.snutt.common.client
 
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lectures.data
+package com.wafflestudio.snutt.lectures.data
 
 data class EvInfo(
     val evId: String? = null,

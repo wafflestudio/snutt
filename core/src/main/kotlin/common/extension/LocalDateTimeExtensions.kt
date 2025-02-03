@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.extension
+package com.wafflestudio.snutt.common.extension
 
 import java.time.LocalDateTime
 import java.time.ZoneId

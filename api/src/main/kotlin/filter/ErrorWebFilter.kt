@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.filter
+package com.wafflestudio.snutt.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.common.exception.ErrorType
-import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
-import com.wafflestudio.snu4t.common.exception.Snu4tException
+import com.wafflestudio.snutt.common.exception.ErrorType
+import com.wafflestudio.snutt.common.exception.EvServiceProxyException
+import com.wafflestudio.snutt.common.exception.SnuttException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -35,7 +35,7 @@ class ErrorWebFilter(
                         httpStatusCode = throwable.statusCode
                         errorBody = throwable.errorBody
                     }
-                    is Snu4tException -> {
+                    is SnuttException -> {
                         httpStatusCode = throwable.error.httpStatus
                         errorBody = makeErrorBody(throwable)
                     }
@@ -43,17 +43,17 @@ class ErrorWebFilter(
                         httpStatusCode = throwable.statusCode
                         errorBody =
                             makeErrorBody(
-                                Snu4tException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
+                                SnuttException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
                             )
                     }
                     is AbortedException -> {
                         httpStatusCode = HttpStatus.GATEWAY_TIMEOUT
-                        errorBody = makeErrorBody(Snu4tException())
+                        errorBody = makeErrorBody(SnuttException())
                     }
                     else -> {
                         log.error(throwable.message, throwable)
                         httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
-                        errorBody = makeErrorBody(Snu4tException())
+                        errorBody = makeErrorBody(SnuttException())
                     }
                 }
 
@@ -69,7 +69,7 @@ class ErrorWebFilter(
             }
     }
 
-    private fun makeErrorBody(exception: Snu4tException): ErrorBody {
+    private fun makeErrorBody(exception: SnuttException): ErrorBody {
         return ErrorBody(exception.error.errorCode, exception.errorMessage, exception.displayMessage, exception.ext)
     }
 }

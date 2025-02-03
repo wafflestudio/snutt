@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.tag.TagListService
-import com.wafflestudio.snu4t.tag.data.TagListResponse
-import com.wafflestudio.snu4t.tag.data.TagListUpdateTimeResponse
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.tag.TagListService
+import com.wafflestudio.snutt.tag.data.TagListResponse
+import com.wafflestudio.snutt.tag.data.TagListUpdateTimeResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

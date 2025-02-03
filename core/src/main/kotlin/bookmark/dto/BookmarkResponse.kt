@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.bookmark.dto
+package com.wafflestudio.snutt.bookmark.dto
 
-import com.wafflestudio.snu4t.lectures.dto.BookmarkLectureDto
+import com.wafflestudio.snutt.lectures.dto.BookmarkLectureDto
 
 class BookmarkResponse(
     val year: Int,

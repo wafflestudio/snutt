@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.mail.data
+package com.wafflestudio.snutt.mail.data
 
 data class MailContent(
     val subject: String,

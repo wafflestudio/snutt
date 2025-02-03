@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.client
+package com.wafflestudio.snutt.common.client
 
 data class ClientInfo(
     val osType: OsType,

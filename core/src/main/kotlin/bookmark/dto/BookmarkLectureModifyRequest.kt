@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.bookmark.dto
+package com.wafflestudio.snutt.bookmark.dto
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming

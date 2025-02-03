@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.notification.repository
+package com.wafflestudio.snutt.notification.repository
 
-import com.wafflestudio.snu4t.common.extension.desc
-import com.wafflestudio.snu4t.notification.data.Notification
+import com.wafflestudio.snutt.common.extension.desc
+import com.wafflestudio.snutt.notification.data.Notification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate

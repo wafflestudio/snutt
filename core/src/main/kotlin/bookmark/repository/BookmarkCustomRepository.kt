@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.bookmark.repository
+package com.wafflestudio.snutt.bookmark.repository
 
-import com.wafflestudio.snu4t.bookmark.data.Bookmark
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.extension.elemMatch
-import com.wafflestudio.snu4t.common.extension.isEqualTo
-import com.wafflestudio.snu4t.lectures.data.BookmarkLecture
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snutt.bookmark.data.Bookmark
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.extension.elemMatch
+import com.wafflestudio.snutt.common.extension.isEqualTo
+import com.wafflestudio.snutt.lectures.data.BookmarkLecture
+import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import org.bson.types.ObjectId

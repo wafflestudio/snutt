@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.mail
+package com.wafflestudio.snutt.common.mail
 
 import kotlinx.coroutines.future.await
 import org.springframework.stereotype.Component

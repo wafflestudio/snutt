@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.coursebook.repository
+package com.wafflestudio.snutt.coursebook.repository
 
-import com.wafflestudio.snu4t.coursebook.data.Coursebook
+import com.wafflestudio.snutt.coursebook.data.Coursebook
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 

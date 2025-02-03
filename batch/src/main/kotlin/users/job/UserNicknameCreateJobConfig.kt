@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.users.job
+package com.wafflestudio.snutt.users.job
 
-import com.wafflestudio.snu4t.common.extension.isEqualTo
-import com.wafflestudio.snu4t.users.data.User
-import com.wafflestudio.snu4t.users.service.UserNicknameService
+import com.wafflestudio.snutt.common.extension.isEqualTo
+import com.wafflestudio.snutt.users.data.User
+import com.wafflestudio.snutt.users.service.UserNicknameService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow

@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.pre2025category.repository
+package com.wafflestudio.snutt.pre2025category.repository
 
-import com.wafflestudio.snu4t.pre2025category.api.GoogleDocsApi
+import com.wafflestudio.snutt.pre2025category.api.GoogleDocsApi
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component

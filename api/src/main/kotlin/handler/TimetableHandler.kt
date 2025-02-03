@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.InvalidPathParameterException
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.theme.dto.request.TimetableModifyThemeRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableAddRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableModifyRequestDto
-import com.wafflestudio.snu4t.timetables.service.TimetableService
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableModifyRequestDto
+import com.wafflestudio.snutt.timetables.service.TimetableService
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest

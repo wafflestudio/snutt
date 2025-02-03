@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.notification.dto
+package com.wafflestudio.snutt.notification.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.extension.toZonedDateTime
-import com.wafflestudio.snu4t.notification.data.Notification
-import com.wafflestudio.snu4t.notification.data.NotificationType
+import com.wafflestudio.snutt.common.extension.toZonedDateTime
+import com.wafflestudio.snutt.notification.data.Notification
+import com.wafflestudio.snutt.notification.data.NotificationType
 import java.time.ZonedDateTime
 
 data class NotificationResponse(

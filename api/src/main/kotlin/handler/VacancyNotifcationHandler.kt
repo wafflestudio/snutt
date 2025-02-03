@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.dto.ExistenceResponse
-import com.wafflestudio.snu4t.lectures.service.LectureService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.vacancynotification.dto.VacancyNotificationLecturesResponse
-import com.wafflestudio.snu4t.vacancynotification.service.VacancyNotificationService
+import com.wafflestudio.snutt.common.dto.ExistenceResponse
+import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.vacancynotification.dto.VacancyNotificationLecturesResponse
+import com.wafflestudio.snutt.vacancynotification.service.VacancyNotificationService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
