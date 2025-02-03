@@ -16,7 +16,7 @@ import com.wafflestudio.snutt.common.exception.InvalidEmailException
 import com.wafflestudio.snutt.common.exception.InvalidLocalIdException
 import com.wafflestudio.snutt.common.exception.InvalidPasswordException
 import com.wafflestudio.snutt.common.exception.InvalidVerificationCodeException
-import com.wafflestudio.snutt.common.exception.Snu4tException
+import com.wafflestudio.snutt.common.exception.SnuttException
 import com.wafflestudio.snutt.common.exception.SocialProviderNotAttachedException
 import com.wafflestudio.snutt.common.exception.TooManyVerificationCodeRequestException
 import com.wafflestudio.snutt.common.exception.UpdateAppVersionException
@@ -198,7 +198,7 @@ class UserServiceImpl(
             val credential = authService.buildLocalCredential(localId, password)
             return signup(credential, email, isEmailVerified = false)
         }.getOrElse {
-            if (it is Snu4tException) cache.releaseLock(cacheKey)
+            if (it is SnuttException) cache.releaseLock(cacheKey)
             throw it
         }
     }

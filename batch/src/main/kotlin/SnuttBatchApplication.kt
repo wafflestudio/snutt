@@ -8,13 +8,13 @@ import org.springframework.boot.runApplication
 import kotlin.system.exitProcess
 
 @SpringBootApplication
-class Snu4tBatchApplication
+class SnuttBatchApplication
 
-val log: Logger = LoggerFactory.getLogger(Snu4tBatchApplication::class.java)
+val log: Logger = LoggerFactory.getLogger(SnuttBatchApplication::class.java)
 
 fun main(args: Array<String>) {
     runCatching {
-        val applicationContext = runApplication<Snu4tBatchApplication>(*args)
+        val applicationContext = runApplication<SnuttBatchApplication>(*args)
         Thread.sleep(30000)
         exitProcess(SpringApplication.exit(applicationContext))
     }.onFailure { exception -> log.error("배치 실패", exception) }
