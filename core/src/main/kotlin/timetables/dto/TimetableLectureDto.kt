@@ -82,9 +82,6 @@ data class TimetableLectureLegacyDto(
     @JsonProperty("lecture_id")
     var lectureId: String? = null,
     val snuttEvLecture: SnuttEvLectureIdDto? = null,
-    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
-    @JsonProperty("class_time_mask")
-    val classTimeMask: List<Int> = emptyList(),
     val categoryPre2025: String?,
 )
 
@@ -109,7 +106,6 @@ fun TimetableLectureLegacyDto(
     color = timetableLecture.color,
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,
-    classTimeMask = ClassTimeUtils.classTimeToBitmask(timetableLecture.classPlaceAndTimes),
     snuttEvLecture = snuttEvLecture,
     categoryPre2025 = timetableLecture.categoryPre2025,
 )

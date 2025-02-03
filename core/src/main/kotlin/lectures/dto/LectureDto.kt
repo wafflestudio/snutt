@@ -33,9 +33,6 @@ data class LectureDto(
     val wasFull: Boolean,
     val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
     val categoryPre2025: String?,
-    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
-    @JsonProperty("class_time_mask")
-    val classTimeMask: List<Int> = emptyList(),
 )
 
 fun LectureDto(
@@ -63,5 +60,4 @@ fun LectureDto(
         wasFull = lecture.wasFull,
         snuttEvLecture = snuttevLecture,
         categoryPre2025 = lecture.categoryPre2025,
-        classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
     )
