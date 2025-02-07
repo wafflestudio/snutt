@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.middleware
+package com.wafflestudio.snutt.middleware
 
-import com.wafflestudio.snu4t.handler.RequestContext
+import com.wafflestudio.snutt.handler.RequestContext
 import org.springframework.web.reactive.function.server.ServerRequest
 
 fun interface Middleware {

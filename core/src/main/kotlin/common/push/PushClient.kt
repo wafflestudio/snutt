@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.common.push
+package com.wafflestudio.snutt.common.push
 
-import com.wafflestudio.snu4t.common.push.dto.PushMessage
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithToken
-import com.wafflestudio.snu4t.common.push.dto.TargetedPushMessageWithTopic
+import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithTopic
 
 interface PushClient {
     suspend fun sendMessage(pushMessage: TargetedPushMessageWithToken)

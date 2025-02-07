@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.tag.data.TagListResponse
-import com.wafflestudio.snu4t.tag.data.TagListUpdateTimeResponse
+import com.wafflestudio.snutt.tag.data.TagListResponse
+import com.wafflestudio.snutt.tag.data.TagListUpdateTimeResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

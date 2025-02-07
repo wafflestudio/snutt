@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.vacancynotification.data
+package com.wafflestudio.snutt.vacancynotification.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.Id

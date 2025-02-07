@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.lectures.repository
+package com.wafflestudio.snutt.lectures.repository
 
-import com.wafflestudio.snu4t.common.enum.SortCriteria
-import com.wafflestudio.snu4t.common.extension.isEqualTo
-import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.lectures.dto.SearchDto
+import com.wafflestudio.snutt.common.enum.SortCriteria
+import com.wafflestudio.snutt.common.extension.isEqualTo
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.lectures.dto.SearchDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate

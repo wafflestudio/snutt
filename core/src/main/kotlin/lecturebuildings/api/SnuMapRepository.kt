@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.lecturebuildings.api
+package com.wafflestudio.snutt.lecturebuildings.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.wafflestudio.snu4t.lecturebuildings.data.SnuMapSearchResult
+import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchResult
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 

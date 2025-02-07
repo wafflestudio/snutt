@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.storage
+package com.wafflestudio.snutt.common.storage
 
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component

@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.users.service
+package com.wafflestudio.snutt.users.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.auth.AuthProvider
-import com.wafflestudio.snu4t.auth.OAuth2Client
-import com.wafflestudio.snu4t.auth.OAuth2UserResponse
-import com.wafflestudio.snu4t.common.exception.SocialConnectFailException
-import com.wafflestudio.snu4t.users.data.Credential
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.auth.AuthProvider
+import com.wafflestudio.snutt.auth.OAuth2Client
+import com.wafflestudio.snutt.auth.OAuth2UserResponse
+import com.wafflestudio.snutt.common.exception.SocialConnectFailException
+import com.wafflestudio.snutt.users.data.Credential
+import com.wafflestudio.snutt.users.data.User
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service

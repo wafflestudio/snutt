@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.util
+package com.wafflestudio.snutt.common.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule

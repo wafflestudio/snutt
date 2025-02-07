@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
-import com.wafflestudio.snu4t.timetables.service.TimetableLectureService
-import com.wafflestudio.snu4t.timetables.service.TimetableService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.service.TimetableLectureService
+import com.wafflestudio.snutt.timetables.service.TimetableService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse

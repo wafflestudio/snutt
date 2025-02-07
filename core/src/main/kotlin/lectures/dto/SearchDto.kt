@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.lectures.dto
+package com.wafflestudio.snutt.lectures.dto
 
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snutt.common.enum.Semester
 
 data class SearchDto(
     val year: Int,

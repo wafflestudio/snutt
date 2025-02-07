@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.lectures.data
+package com.wafflestudio.snutt.lectures.data
 
-import com.wafflestudio.snu4t.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enum.DayOfWeek
 
 data class ClassPlaceAndTime(
     val day: DayOfWeek,

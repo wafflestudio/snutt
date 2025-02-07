@@ -1,14 +1,14 @@
-package com.wafflestudio.snu4t.evaluation.service
+package com.wafflestudio.snutt.evaluation.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.common.exception.EvServiceProxyException
-import com.wafflestudio.snu4t.common.util.buildMultiValueMap
-import com.wafflestudio.snu4t.config.SnuttEvWebClient
-import com.wafflestudio.snu4t.coursebook.service.CoursebookService
-import com.wafflestudio.snu4t.evaluation.dto.EvLectureInfoDto
-import com.wafflestudio.snu4t.evaluation.dto.EvUserDto
-import com.wafflestudio.snu4t.timetables.service.TimetableService
-import com.wafflestudio.snu4t.users.service.UserService
+import com.wafflestudio.snutt.common.exception.EvServiceProxyException
+import com.wafflestudio.snutt.common.util.buildMultiValueMap
+import com.wafflestudio.snutt.config.SnuttEvWebClient
+import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.evaluation.dto.EvLectureInfoDto
+import com.wafflestudio.snutt.evaluation.dto.EvUserDto
+import com.wafflestudio.snutt.timetables.service.TimetableService
+import com.wafflestudio.snutt.users.service.UserService
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.awaitSingle

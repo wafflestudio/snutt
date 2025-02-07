@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.bookmark.dto.BookmarkLectureModifyRequest
-import com.wafflestudio.snu4t.bookmark.dto.BookmarkResponse
-import com.wafflestudio.snu4t.bookmark.service.BookmarkService
-import com.wafflestudio.snu4t.common.dto.ExistenceResponse
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.bookmark.dto.BookmarkLectureModifyRequest
+import com.wafflestudio.snutt.bookmark.dto.BookmarkResponse
+import com.wafflestudio.snutt.bookmark.service.BookmarkService
+import com.wafflestudio.snutt.common.dto.ExistenceResponse
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBody

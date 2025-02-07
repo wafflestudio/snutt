@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.dto.OkResponse
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.notification.service.DeviceService
-import com.wafflestudio.snu4t.users.data.User
-import com.wafflestudio.snu4t.users.service.UserNicknameService
-import com.wafflestudio.snu4t.users.service.UserService
+import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.notification.service.DeviceService
+import com.wafflestudio.snutt.users.data.User
+import com.wafflestudio.snutt.users.service.UserNicknameService
+import com.wafflestudio.snutt.users.service.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

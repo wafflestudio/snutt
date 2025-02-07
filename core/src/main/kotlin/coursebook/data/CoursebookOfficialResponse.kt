@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.coursebook.data
+package com.wafflestudio.snutt.coursebook.data
 
 data class CoursebookOfficialResponse(
     val noProxyUrl: String,

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lecturebuildings.api
+package com.wafflestudio.snutt.lecturebuildings.api
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

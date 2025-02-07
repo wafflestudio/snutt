@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.notification.repository
+package com.wafflestudio.snutt.notification.repository
 
-import com.wafflestudio.snu4t.notification.data.Notification
+import com.wafflestudio.snutt.notification.data.Notification
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime

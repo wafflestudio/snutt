@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.sugangsnu.job.sync.data
+package com.wafflestudio.snutt.sugangsnu.job.sync.data
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.lectures.data.Lecture
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
 sealed class UserLectureSyncResult(open val userId: String, open val lectureId: String)

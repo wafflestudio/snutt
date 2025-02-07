@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.clientconfig.repository
+package com.wafflestudio.snutt.clientconfig.repository
 
-import com.wafflestudio.snu4t.clientconfig.data.ClientConfig
-import com.wafflestudio.snu4t.common.client.AppVersion
+import com.wafflestudio.snutt.clientconfig.data.ClientConfig
+import com.wafflestudio.snutt.common.client.AppVersion
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface ClientConfigRepository : CoroutineCrudRepository<ClientConfig, String> {

@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.timetables.dto.request
+package com.wafflestudio.snutt.timetables.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.DayOfWeek
-import com.wafflestudio.snu4t.common.exception.InvalidTimeException
-import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.exception.InvalidTimeException
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 
 data class ClassPlaceAndTimeLegacyRequestDto(
     val day: DayOfWeek,

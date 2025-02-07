@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.lectures.dto
+package com.wafflestudio.snutt.lectures.dto
 
-import com.wafflestudio.snu4t.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enum.DayOfWeek
 
 data class SearchTimeDto(
     val day: DayOfWeek,

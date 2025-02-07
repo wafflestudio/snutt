@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.notification.dto
+package com.wafflestudio.snutt.notification.dto
 
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.users.data.User
 
 data class NotificationQuery(
     val offset: Long,

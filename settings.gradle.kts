@@ -1,4 +1,4 @@
-rootProject.name = "snu4t"
+rootProject.name = "snutt"
 include("core")
 include("batch")
 include("api")

@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.users.repository
+package com.wafflestudio.snutt.users.repository
 
-import com.wafflestudio.snu4t.users.data.User
+import com.wafflestudio.snutt.users.data.User
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 

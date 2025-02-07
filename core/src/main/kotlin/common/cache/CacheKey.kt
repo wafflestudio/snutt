@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.cache
+package com.wafflestudio.snutt.common.cache
 
 import java.time.Duration
 

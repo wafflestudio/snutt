@@ -1,13 +1,13 @@
-package com.wafflestudio.snu4t.lecturebuildings.service
+package com.wafflestudio.snutt.lecturebuildings.service
 
-import com.wafflestudio.snu4t.lecturebuildings.api.SnuMapRepository
-import com.wafflestudio.snu4t.lecturebuildings.data.Campus
-import com.wafflestudio.snu4t.lecturebuildings.data.GeoCoordinate
-import com.wafflestudio.snu4t.lecturebuildings.data.LectureBuilding
-import com.wafflestudio.snu4t.lecturebuildings.data.PlaceInfo
-import com.wafflestudio.snu4t.lecturebuildings.data.SnuMapSearchItem
-import com.wafflestudio.snu4t.lecturebuildings.data.SnuMapSearchResult
-import com.wafflestudio.snu4t.lecturebuildings.repository.LectureBuildingRepository
+import com.wafflestudio.snutt.lecturebuildings.api.SnuMapRepository
+import com.wafflestudio.snutt.lecturebuildings.data.Campus
+import com.wafflestudio.snutt.lecturebuildings.data.GeoCoordinate
+import com.wafflestudio.snutt.lecturebuildings.data.LectureBuilding
+import com.wafflestudio.snutt.lecturebuildings.data.PlaceInfo
+import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchItem
+import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchResult
+import com.wafflestudio.snutt.lecturebuildings.repository.LectureBuildingRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

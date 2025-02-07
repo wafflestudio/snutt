@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.friend.dto
+package com.wafflestudio.snutt.friend.dto
 
-import com.wafflestudio.snu4t.users.dto.NicknameDto
+import com.wafflestudio.snutt.users.dto.NicknameDto
 import java.time.LocalDateTime
 
 data class FriendResponse(

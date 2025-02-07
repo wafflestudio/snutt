@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.config
+package com.wafflestudio.snutt.config
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

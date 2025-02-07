@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.lectures.utils
+package com.wafflestudio.snutt.lectures.utils
 
-import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import kotlin.math.ceil
 import kotlin.math.floor
 

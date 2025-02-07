@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.pre2025category.service
+package com.wafflestudio.snutt.pre2025category.service
 
-import com.wafflestudio.snu4t.pre2025category.repository.CategoryPre2025Repository
+import com.wafflestudio.snutt.pre2025category.repository.CategoryPre2025Repository
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
 

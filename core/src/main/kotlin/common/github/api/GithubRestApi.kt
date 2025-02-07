@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.github.api
+package com.wafflestudio.snutt.common.github.api
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

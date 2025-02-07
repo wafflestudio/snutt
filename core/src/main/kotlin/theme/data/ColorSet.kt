@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.theme.data
+package com.wafflestudio.snutt.theme.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.mongodb.core.mapping.Field

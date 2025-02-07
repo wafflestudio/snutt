@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.vacancynotification.dto
+package com.wafflestudio.snutt.vacancynotification.dto
 
-import com.wafflestudio.snu4t.lectures.dto.LectureDto
+import com.wafflestudio.snutt.lectures.dto.LectureDto
 
 data class VacancyNotificationLecturesResponse(
     val lectures: List<LectureDto>,

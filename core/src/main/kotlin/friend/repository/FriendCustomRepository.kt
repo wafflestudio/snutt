@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.friend.repository
+package com.wafflestudio.snutt.friend.repository
 
-import com.wafflestudio.snu4t.common.extension.desc
-import com.wafflestudio.snu4t.friend.data.Friend
-import com.wafflestudio.snu4t.friend.dto.FriendState
+import com.wafflestudio.snutt.common.extension.desc
+import com.wafflestudio.snutt.friend.data.Friend
+import com.wafflestudio.snutt.friend.dto.FriendState
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.config
+package com.wafflestudio.snutt.config
 
 import jakarta.annotation.PostConstruct
 import org.springframework.core.env.Environment

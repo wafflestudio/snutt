@@ -1,6 +1,6 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.evaluation.dto.SnuttEvLectureSummaryDto
+import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

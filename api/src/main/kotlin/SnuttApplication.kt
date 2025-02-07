@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t
+package com.wafflestudio.snutt
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class Snu4tApplication
+class SnuttApplication
 
 fun main(args: Array<String>) {
-    runApplication<Snu4tApplication>(*args)
+    runApplication<SnuttApplication>(*args)
 }

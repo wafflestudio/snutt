@@ -1,14 +1,14 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.friend.dto.FriendRequest
-import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
-import com.wafflestudio.snu4t.friend.dto.FriendResponse
-import com.wafflestudio.snu4t.friend.dto.FriendState
-import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
-import com.wafflestudio.snu4t.friend.service.FriendService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.users.service.UserNicknameService
+import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.friend.dto.FriendRequest
+import com.wafflestudio.snutt.friend.dto.FriendRequestLinkResponse
+import com.wafflestudio.snutt.friend.dto.FriendResponse
+import com.wafflestudio.snutt.friend.dto.FriendState
+import com.wafflestudio.snutt.friend.dto.UpdateFriendDisplayNameRequest
+import com.wafflestudio.snutt.friend.service.FriendService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.users.service.UserNicknameService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.awaitBody

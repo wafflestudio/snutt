@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.timetables.data
+package com.wafflestudio.snutt.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.wafflestudio.snu4t.lectures.data.ClassPlaceAndTime
-import com.wafflestudio.snu4t.lectures.data.Lecture
-import com.wafflestudio.snu4t.theme.data.ColorSet
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.theme.data.ColorSet
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed

@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.mail.data
+package com.wafflestudio.snutt.mail.data
 
 enum class UserMailType(val index: Int) {
     VERIFICATION(0),

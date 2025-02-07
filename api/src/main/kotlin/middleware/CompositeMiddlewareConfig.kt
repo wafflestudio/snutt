@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.middleware
+package com.wafflestudio.snutt.middleware
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

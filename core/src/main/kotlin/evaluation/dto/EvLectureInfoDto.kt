@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.evaluation.dto
+package com.wafflestudio.snutt.evaluation.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 
 data class EvLectureInfoDto(
     val year: Int,

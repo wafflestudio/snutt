@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.tag.data
+package com.wafflestudio.snutt.tag.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.router.docs
+package com.wafflestudio.snutt.router.docs
 
-import com.wafflestudio.snu4t.common.dto.ListResponse
-import com.wafflestudio.snu4t.coursebook.data.CoursebookDto
-import com.wafflestudio.snu4t.friend.dto.FriendRequest
-import com.wafflestudio.snu4t.friend.dto.FriendRequestLinkResponse
-import com.wafflestudio.snu4t.friend.dto.FriendResponse
-import com.wafflestudio.snu4t.friend.dto.UpdateFriendDisplayNameRequest
-import com.wafflestudio.snu4t.timetables.dto.TimetableDto
+import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.coursebook.data.CoursebookDto
+import com.wafflestudio.snutt.friend.dto.FriendRequest
+import com.wafflestudio.snutt.friend.dto.FriendRequestLinkResponse
+import com.wafflestudio.snutt.friend.dto.FriendResponse
+import com.wafflestudio.snutt.friend.dto.UpdateFriendDisplayNameRequest
+import com.wafflestudio.snutt.timetables.dto.TimetableDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn

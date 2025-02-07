@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.feedback.service
+package com.wafflestudio.snutt.feedback.service
 
-import com.wafflestudio.snu4t.common.client.AppVersion
-import com.wafflestudio.snu4t.common.client.OsType
-import com.wafflestudio.snu4t.common.github.client.GithubRestApiClient
-import com.wafflestudio.snu4t.common.github.dto.GithubIssue
-import com.wafflestudio.snu4t.config.PhaseUtils
-import com.wafflestudio.snu4t.feedback.dto.FeedbackDto
+import com.wafflestudio.snutt.common.client.AppVersion
+import com.wafflestudio.snutt.common.client.OsType
+import com.wafflestudio.snutt.common.github.client.GithubRestApiClient
+import com.wafflestudio.snutt.common.github.dto.GithubIssue
+import com.wafflestudio.snutt.config.PhaseUtils
+import com.wafflestudio.snutt.feedback.dto.FeedbackDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant

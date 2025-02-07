@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.users.dto
+package com.wafflestudio.snutt.users.dto
 
 data class UserPatchRequest(
     val nickname: String?,

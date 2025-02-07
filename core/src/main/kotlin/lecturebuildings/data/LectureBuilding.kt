@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.lecturebuildings.data
+package com.wafflestudio.snutt.lecturebuildings.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex

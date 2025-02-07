@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.notification.data
+package com.wafflestudio.snutt.notification.data
 
 import com.fasterxml.jackson.annotation.JsonValue
 import org.springframework.core.convert.converter.Converter

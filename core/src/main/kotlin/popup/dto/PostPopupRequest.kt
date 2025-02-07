@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.popup.dto
+package com.wafflestudio.snutt.popup.dto
 
 data class PostPopupRequest(
     val key: String,

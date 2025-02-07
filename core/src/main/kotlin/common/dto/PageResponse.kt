@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.dto
+package com.wafflestudio.snutt.common.dto
 
 open class PageResponse<T>(
     val content: List<T>,

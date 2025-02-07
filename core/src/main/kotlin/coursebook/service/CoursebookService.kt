@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.coursebook.service
+package com.wafflestudio.snutt.coursebook.service
 
-import com.wafflestudio.snu4t.coursebook.data.Coursebook
-import com.wafflestudio.snu4t.coursebook.repository.CoursebookRepository
+import com.wafflestudio.snutt.coursebook.data.Coursebook
+import com.wafflestudio.snutt.coursebook.repository.CoursebookRepository
 import org.springframework.stereotype.Service
 
 interface CoursebookService {

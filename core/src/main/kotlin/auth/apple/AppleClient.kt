@@ -1,10 +1,10 @@
-package com.wafflestudio.snu4t.auth.apple
+package com.wafflestudio.snutt.auth.apple
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.wafflestudio.snu4t.auth.OAuth2Client
-import com.wafflestudio.snu4t.auth.OAuth2UserResponse
-import com.wafflestudio.snu4t.common.exception.InvalidAppleLoginTokenException
-import com.wafflestudio.snu4t.common.extension.get
+import com.wafflestudio.snutt.auth.OAuth2Client
+import com.wafflestudio.snutt.auth.OAuth2UserResponse
+import com.wafflestudio.snutt.common.exception.InvalidAppleLoginTokenException
+import com.wafflestudio.snutt.common.extension.get
 import io.jsonwebtoken.Jwts
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component

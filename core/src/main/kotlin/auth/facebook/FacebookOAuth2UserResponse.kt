@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.auth.facebook
+package com.wafflestudio.snutt.auth.facebook
 
 data class FacebookOAuth2UserResponse(
     val id: String,

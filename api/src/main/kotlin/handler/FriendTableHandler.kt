@@ -1,11 +1,11 @@
-package com.wafflestudio.snu4t.handler
+package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snu4t.common.enum.Semester
-import com.wafflestudio.snu4t.common.exception.FriendNotFoundException
-import com.wafflestudio.snu4t.friend.service.FriendService
-import com.wafflestudio.snu4t.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snu4t.timetables.dto.TimetableDto
-import com.wafflestudio.snu4t.timetables.service.TimetableService
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.FriendNotFoundException
+import com.wafflestudio.snutt.friend.service.FriendService
+import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
+import com.wafflestudio.snutt.timetables.dto.TimetableDto
+import com.wafflestudio.snutt.timetables.service.TimetableService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

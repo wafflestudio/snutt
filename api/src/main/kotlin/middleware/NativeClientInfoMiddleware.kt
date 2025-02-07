@@ -1,12 +1,12 @@
-package com.wafflestudio.snu4t.middleware
+package com.wafflestudio.snutt.middleware
 
-import com.wafflestudio.snu4t.common.client.AppType
-import com.wafflestudio.snu4t.common.client.AppVersion
-import com.wafflestudio.snu4t.common.client.ClientInfo
-import com.wafflestudio.snu4t.common.client.OsType
-import com.wafflestudio.snu4t.common.exception.InvalidAppTypeException
-import com.wafflestudio.snu4t.common.exception.InvalidOsTypeException
-import com.wafflestudio.snu4t.handler.RequestContext
+import com.wafflestudio.snutt.common.client.AppType
+import com.wafflestudio.snutt.common.client.AppVersion
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.client.OsType
+import com.wafflestudio.snutt.common.exception.InvalidAppTypeException
+import com.wafflestudio.snutt.common.exception.InvalidOsTypeException
+import com.wafflestudio.snutt.handler.RequestContext
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

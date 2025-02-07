@@ -1,9 +1,9 @@
-package com.wafflestudio.snu4t.middleware
+package com.wafflestudio.snutt.middleware
 
-import com.wafflestudio.snu4t.common.exception.NoUserTokenException
-import com.wafflestudio.snu4t.common.exception.UserNotAdminException
-import com.wafflestudio.snu4t.handler.RequestContext
-import com.wafflestudio.snu4t.users.service.UserService
+import com.wafflestudio.snutt.common.exception.NoUserTokenException
+import com.wafflestudio.snutt.common.exception.UserNotAdminException
+import com.wafflestudio.snutt.handler.RequestContext
+import com.wafflestudio.snutt.users.service.UserService
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 

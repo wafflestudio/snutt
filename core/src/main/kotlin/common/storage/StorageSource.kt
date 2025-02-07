@@ -1,4 +1,4 @@
-package com.wafflestudio.snu4t.common.storage
+package com.wafflestudio.snutt.common.storage
 
 enum class StorageSource(val value: String, val storageType: StorageType, val path: String? = null) {
     POPUP("popup", StorageType.ASSETS, "popup-images"),

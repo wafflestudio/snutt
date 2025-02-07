@@ -1,7 +1,7 @@
-package com.wafflestudio.snu4t.coursebook.data
+package com.wafflestudio.snutt.coursebook.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snu4t.common.enum.Semester
+import com.wafflestudio.snutt.common.enum.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.mapping.Document

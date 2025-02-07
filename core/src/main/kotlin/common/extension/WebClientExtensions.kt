@@ -1,8 +1,8 @@
-package com.wafflestudio.snu4t.common.extension
+package com.wafflestudio.snutt.common.extension
 
-import com.wafflestudio.snu4t.common.util.WebClientUtils.logWebClientError
-import com.wafflestudio.snu4t.common.util.addHeaders
-import com.wafflestudio.snu4t.common.util.uriWithParams
+import com.wafflestudio.snutt.common.util.WebClientUtils.logWebClientError
+import com.wafflestudio.snutt.common.util.addHeaders
+import com.wafflestudio.snutt.common.util.uriWithParams
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.web.reactive.function.client.WebClient
