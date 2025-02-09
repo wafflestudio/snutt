@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 
 @Document(collection = "push_opt_out")
-@CompoundIndex(def = "{ 'user_id': 1, 'push_category': 1 }")
+@CompoundIndex(def = "{ 'user_id': 1, 'push_category': 1 }", unique = true)
 data class PushOptOut(
     @Id
     val id: String? = null,
