@@ -86,7 +86,7 @@ class PushServiceImpl internal constructor(
         userId: String,
         pushCategory: PushCategory,
     ) {
-        if (!pushOptOutRepository.existsByUserIdAndPushCategory(userId, pushCategory)) {
+        if (pushCategory == PushCategory.NORMAL || !pushOptOutRepository.existsByUserIdAndPushCategory(userId, pushCategory)) {
             sendPush(pushMessage, userId)
         }
     }
@@ -96,6 +96,10 @@ class PushServiceImpl internal constructor(
         userIds: List<String>,
         pushCategory: PushCategory,
     ) {
+        if (pushCategory == PushCategory.NORMAL) {
+            sendPushes(pushMessage, userIds)
+        }
+
         val filteredUserIds =
             pushOptOutRepository
                 .findByUserIdInAndPushCategory(userIds, pushCategory)
@@ -112,6 +116,10 @@ class PushServiceImpl internal constructor(
         userToPushMessage: Map<String, PushMessage>,
         pushCategory: PushCategory,
     ) {
+        if (pushCategory == PushCategory.NORMAL) {
+            sendTargetPushes(userToPushMessage)
+        }
+
         val userIds = userToPushMessage.keys.toList()
 
         val filteredUserToPushMessage =

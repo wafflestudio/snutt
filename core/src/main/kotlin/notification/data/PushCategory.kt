@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 enum class PushCategory(
     @JsonValue val value: Int,
 ) {
+    NORMAL(0),
     LECTURE_UPDATE(1),
     VACANCY_NOTIFICATION(2),
     ;
@@ -31,3 +32,10 @@ class PushCategoryReadConverter : Converter<Int, PushCategory> {
 class PushCategoryWriteConverter : Converter<PushCategory, Int> {
     override fun convert(source: PushCategory): Int = source.value
 }
+
+fun PushCategory(notificationType: NotificationType) =
+    when (notificationType) {
+        NotificationType.LECTURE_UPDATE -> PushCategory.LECTURE_UPDATE
+        NotificationType.LECTURE_VACANCY -> PushCategory.VACANCY_NOTIFICATION
+        else -> PushCategory.NORMAL
+    }
