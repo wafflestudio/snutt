@@ -14,4 +14,9 @@ interface PushOptOutRepository : CoroutineCrudRepository<PushOptOut, String> {
         userId: String,
         pushCategory: PushCategory,
     ): Long
+
+    suspend fun findByUserIdInAndPushCategory(
+        userIds: List<String>,
+        pushCategory: PushCategory,
+    ): List<PushOptOut>
 }
