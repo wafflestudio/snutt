@@ -1,0 +1,33 @@
+package com.wafflestudio.snutt.notification.data
+
+import com.fasterxml.jackson.annotation.JsonValue
+import org.springframework.core.convert.converter.Converter
+import org.springframework.data.convert.ReadingConverter
+import org.springframework.data.convert.WritingConverter
+import org.springframework.stereotype.Component
+
+enum class PushCategory(
+    @JsonValue val value: Int,
+) {
+    LECTURE_UPDATE(1),
+    VACANCY_NOTIFICATION(2),
+    ;
+
+    companion object {
+        private val valueMap = PushCategory.entries.associateBy { e -> e.value }
+
+        fun getOfValue(value: Int): PushCategory? = valueMap[value]
+    }
+}
+
+@ReadingConverter
+@Component
+class PushCategoryReadConverter : Converter<Int, PushCategory> {
+    override fun convert(source: Int): PushCategory = PushCategory.getOfValue(source)!!
+}
+
+@WritingConverter
+@Component
+class PushCategoryWriteConverter : Converter<PushCategory, Int> {
+    override fun convert(source: PushCategory): Int = source.value
+}
