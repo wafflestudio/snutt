@@ -41,6 +41,7 @@ class EvService(
         val result: MutableMap<String, Any?>? =
             snuttEvWebClient.method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
+                .contentType(MediaType.APPLICATION_JSON)
                 .header("Snutt-User-Id", userId)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
