@@ -27,13 +27,4 @@ data class ClassPlaceAndTimeLegacyRequestDto(
             endMinute = endMinute,
         )
     }
-
-    private fun timeStringToMinute(time: String): Int {
-        val (hour, minute) = time.split(":")
-        return hour.toInt() * 60 + minute.toInt()
-    }
-
-    private fun periodToMinute(period: Double): Int {
-        return (period * 60 + 8 * 60).toInt()
-    }
 }
