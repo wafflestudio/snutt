@@ -5,17 +5,17 @@ import com.google.api.core.ApiFutureCallback
 import com.google.api.core.ApiFutures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 suspend fun <F : Any> ApiFuture<F>.await(): F {
     return this.await { it }
 }
 
 suspend fun <F : Any, R : Any?> ApiFuture<F>.await(successHandler: (F) -> R): R {
-    return suspendCoroutine { cont ->
+    return suspendCancellableCoroutine { cont ->
         ApiFutures.addCallback(
             this,
             object : ApiFutureCallback<F> {
@@ -29,5 +29,8 @@ suspend fun <F : Any, R : Any?> ApiFuture<F>.await(successHandler: (F) -> R): R 
             },
             Dispatchers.IO.asExecutor(),
         )
+        cont.invokeOnCancellation {
+            this.cancel(true)
+        }
     }
 }
