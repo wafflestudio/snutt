@@ -133,11 +133,8 @@ class DuplicateEmailException(authProviders: List<AuthProvider>) : SnuttExceptio
         run {
             val socialProviders = authProviders.filter { it != AuthProvider.LOCAL }
             when {
-                authProviders.contains(AuthProvider.LOCAL) && socialProviders.isEmpty() -> "이미 가입된 이메일입니다. 아이디 찾기를 이용해주세요."
-                authProviders.contains(AuthProvider.LOCAL) && socialProviders.isNotEmpty() ->
-                    "이미 가입된 이메일입니다. (${socialProviders.joinToString(", ") { it.value }}) 중 하나의 계정으로 로그인하거나 '아이디 찾기'를 이용해주세요."
-
-                socialProviders.isNotEmpty() -> "이미 가입된 이메일입니다. 이전에 가입한 ${socialProviders.joinToString(", ") { it.value }} 계정으로 로그인해주세요."
+                socialProviders.isNotEmpty() -> "이미 ${socialProviders.joinToString(", ") { it.korName }}과(와) 연동된 계정이 있습니다."
+                authProviders.contains(AuthProvider.LOCAL) -> "이미 가입된 이메일입니다. 아이디 찾기를 이용해주세요."
                 else -> throw IllegalStateException("로그인 방법이 없는 계정")
             }
         },
