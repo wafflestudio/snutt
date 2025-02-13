@@ -109,5 +109,6 @@ api:
   server:
     snuttev:
       base-url: http://snutt-ev.snutt-prod.svc.cluster.local
+      read-timeout: 5000
 
 secret-names: prod/snutt-timetable

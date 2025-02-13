@@ -3,9 +3,8 @@ package com.wafflestudio.snutt.common.extension
 import com.wafflestudio.snutt.common.util.WebClientUtils.logWebClientError
 import com.wafflestudio.snutt.common.util.addHeaders
 import com.wafflestudio.snutt.common.util.uriWithParams
-import kotlinx.coroutines.reactor.awaitSingleOrNull
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBodyOrNull
 
 suspend inline fun <reified T : Any> WebClient.get(
     uri: String,
@@ -19,8 +18,7 @@ suspend inline fun <reified T : Any> WebClient.get(
                 uriWithParams(uri, params)
             }
             .retrieve()
-            .bodyToMono(object : ParameterizedTypeReference<T>() {})
-            .awaitSingleOrNull()
+            .awaitBodyOrNull<T>()
     }.onFailure {
         logWebClientError(uri, it)
     }
@@ -39,8 +37,7 @@ suspend inline fun <reified ResponseT : Any> WebClient.post(
                 body?.let { bodyValue(it) }
             }
             .retrieve()
-            .bodyToMono(object : ParameterizedTypeReference<ResponseT>() {})
-            .awaitSingleOrNull()
+            .awaitBodyOrNull<ResponseT>()
     }.onFailure {
         logWebClientError(uri, it)
     }

@@ -50,7 +50,7 @@ subprojects {
 
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.1.3")
+        implementation("com.wafflestudio.truffle.sdk:truffle-spring-boot-starter:1.1.5")
         implementation("com.wafflestudio.truffle.sdk:truffle-logback:1.1.3")
 
         implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")

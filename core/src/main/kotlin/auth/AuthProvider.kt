@@ -1,11 +1,11 @@
 package com.wafflestudio.snutt.auth
 
-enum class AuthProvider(val value: String) {
-    LOCAL("local"),
-    FACEBOOK("facebook"),
-    APPLE("apple"),
-    GOOGLE("google"),
-    KAKAO("kakao"),
+enum class AuthProvider(val value: String, val korName: String) {
+    LOCAL("local", "아이디/비밀번호"),
+    FACEBOOK("facebook", "페이스북"),
+    APPLE("apple", "애플"),
+    GOOGLE("google", "구글"),
+    KAKAO("kakao", "카카오"),
     ;
 
     companion object {

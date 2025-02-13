@@ -9,9 +9,8 @@ import com.wafflestudio.snutt.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snutt.evaluation.dto.EvUserDto
 import com.wafflestudio.snutt.timetables.service.TimetableService
 import com.wafflestudio.snutt.users.service.UserService
+import io.netty.util.ReferenceCounted
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
@@ -19,6 +18,8 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.awaitBody
+import org.springframework.web.reactive.function.client.awaitBodyOrNull
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 
@@ -40,6 +41,7 @@ class EvService(
         val result: MutableMap<String, Any?>? =
             snuttEvWebClient.method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
+                .contentType(MediaType.APPLICATION_JSON)
                 .header("Snutt-User-Id", userId)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -47,12 +49,12 @@ class EvService(
                 .retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
                     response.bodyToMono<Map<String, Any?>>()
+                        .doOnDiscard(ReferenceCounted::class.java) { it.release() }
                         .flatMap { errorBody ->
                             Mono.error(EvServiceProxyException(response.statusCode(), errorBody))
                         }
                 }
-                .bodyToMono<MutableMap<String, Any?>>()
-                .awaitFirstOrNull()
+                .awaitBodyOrNull<MutableMap<String, Any?>>()
         return updateUserInfo(result)
     }
 
@@ -90,12 +92,12 @@ class EvService(
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
                 response.bodyToMono<Map<String, Any?>>()
+                    .doOnDiscard(ReferenceCounted::class.java) { it.release() }
                     .flatMap { errorBody ->
                         Mono.error(EvServiceProxyException(response.statusCode(), errorBody))
                     }
             }
-            .bodyToMono<MutableMap<String, Any?>>()
-            .awaitSingle()
+            .awaitBody<MutableMap<String, Any?>>()
     }
 
     @Suppress("UNCHECKED_CAST")

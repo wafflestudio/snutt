@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
-import reactor.netty.resources.ConnectionProvider
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 @Configuration
@@ -31,23 +29,13 @@ class ApiWebClientConfig(
     private fun create(apiConfig: ApiConfig): WebClient {
         val connector =
             ReactorClientHttpConnector(
-                HttpClient.create(
-                    ConnectionProvider.builder("snuttev-provider")
-                        .maxConnections(100)
-                        .pendingAcquireTimeout(Duration.ofMillis(300))
-                        .maxLifeTime(Duration.ofSeconds(3600))
-                        .maxIdleTime(Duration.ofSeconds(240))
-                        .lifo()
-                        .build(),
-                )
+                HttpClient.create()
                     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiConfig.connectTimeout)
                     .doOnConnected { conn: Connection ->
-                        conn
-                            .addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
-                            .addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
+                        conn.addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
+                        conn.addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
                     },
             )
-
         return WebClient.builder().clientConnector(connector).baseUrl(apiConfig.baseUrl).build()
     }
 }
