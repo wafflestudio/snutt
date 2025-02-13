@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.Lecture
-import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 
 data class LectureDto(
     @JsonProperty("_id")

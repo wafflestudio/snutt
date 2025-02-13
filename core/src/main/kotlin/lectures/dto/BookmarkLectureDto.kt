@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture
-import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 
 data class BookmarkLectureDto(
     @JsonProperty("_id")

@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.handler
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snutt.notification.service.DeviceService
-import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.service.UserNicknameService
 import com.wafflestudio.snutt.users.service.UserService
 import org.springframework.stereotype.Component

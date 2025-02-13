@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeLegacyDto
-import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snutt.theme.data.ColorSet
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 

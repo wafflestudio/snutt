@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.timetables.dto.request
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.enum.DayOfWeek
 import com.wafflestudio.snutt.common.exception.InvalidTimeException
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
