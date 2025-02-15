@@ -2,8 +2,6 @@ package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.enum.DayOfWeek
-import com.wafflestudio.snutt.lecturebuildings.data.LectureBuilding
-import com.wafflestudio.snutt.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.utils.endPeriod
 import com.wafflestudio.snutt.lectures.utils.minuteToString
@@ -37,7 +35,6 @@ data class ClassPlaceAndTimeLegacyDto(
     val periodLength: Double,
     @JsonProperty("start")
     val startPeriod: Double,
-    var lectureBuildings: List<LectureBuilding>? = null,
 )
 
 fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlaceAndTimeLegacyDto =
@@ -51,6 +48,3 @@ fun ClassPlaceAndTimeLegacyDto(classPlaceAndTime: ClassPlaceAndTime): ClassPlace
         startPeriod = classPlaceAndTime.startPeriod,
         periodLength = classPlaceAndTime.endPeriod - classPlaceAndTime.startPeriod,
     )
-
-val ClassPlaceAndTimeLegacyDto.placeInfos: List<PlaceInfo>
-    get() = place?.let { PlaceInfo.getValuesOf(it) } ?: emptyList()

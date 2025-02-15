@@ -4,13 +4,10 @@ import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.EvDataNotFoundException
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.dto.LectureDto
 import com.wafflestudio.snutt.lectures.dto.SearchDto
-import com.wafflestudio.snutt.lectures.dto.placeInfos
 import com.wafflestudio.snutt.lectures.repository.LectureRepository
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import org.springframework.stereotype.Service
@@ -40,7 +37,6 @@ interface LectureService {
 class LectureServiceImpl(
     private val lectureRepository: LectureRepository,
     private val snuttEvRepository: SnuttEvRepository,
-    private val lectureBuildingService: LectureBuildingService,
 ) : LectureService {
     override fun findAll(): Flow<Lecture> = lectureRepository.findAll()
 
@@ -63,25 +59,10 @@ class LectureServiceImpl(
         return lectures.map { lecture ->
             val snuttEvLecture = snuttIdToEvLectureMap[lecture.id]
             LectureDto(lecture, snuttEvLecture)
-        }.addLectureBuildings()
+        }
     }
 
     override suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto {
         return snuttEvRepository.getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
     }
-
-    private suspend fun List<LectureDto>.addLectureBuildings(): List<LectureDto> =
-        coroutineScope {
-            val placeInfosAll =
-                flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }.distinct()
-            val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
-            forEach {
-                it.classPlaceAndTimes.forEach { classPlaceAndTime ->
-                    classPlaceAndTime.apply {
-                        lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
-                    }
-                }
-            }
-            this@addLectureBuildings
-        }
 }

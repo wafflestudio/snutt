@@ -9,7 +9,6 @@ import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
@@ -47,7 +46,6 @@ interface SugangSnuSyncService {
 @Service
 class SugangSnuSyncServiceImpl(
     private val sugangSnuFetchService: SugangSnuFetchService,
-    private val categoryPre2025FetchService: CategoryPre2025FetchService,
     private val lectureService: LectureService,
     private val timeTableRepository: TimetableRepository,
     private val sugangSnuRepository: SugangSnuRepository,
@@ -59,14 +57,8 @@ class SugangSnuSyncServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
 
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
-        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val newLectures =
             sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
-                .map { lecture ->
-                    lecture.apply {
-                        categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
-                    }
-                }
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
@@ -81,14 +73,8 @@ class SugangSnuSyncServiceImpl(
     }
 
     override suspend fun addCoursebook(coursebook: Coursebook) {
-        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val newLectures =
             sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
-                .map { lecture ->
-                    lecture.apply {
-                        categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
-                    }
-                }
         lectureService.upsertLectures(newLectures)
         syncTagList(coursebook, newLectures)
 

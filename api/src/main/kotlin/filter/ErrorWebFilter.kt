@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.common.exception.ErrorType
 import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
+import kotlinx.coroutines.CancellationException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -46,9 +47,9 @@ class ErrorWebFilter(
                                 SnuttException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
                             )
                     }
-                    is AbortedException -> {
-                        httpStatusCode = HttpStatus.GATEWAY_TIMEOUT
-                        errorBody = makeErrorBody(SnuttException())
+                    is AbortedException, is CancellationException -> {
+                        httpStatusCode = HttpStatus.NO_CONTENT
+                        errorBody = emptyMap<String, Any>()
                     }
                     else -> {
                         log.error(throwable.message, throwable)

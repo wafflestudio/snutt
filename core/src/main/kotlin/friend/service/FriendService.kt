@@ -133,7 +133,7 @@ class FriendServiceImpl(
         fromUser: User,
         toUserId: String,
     ) {
-        val fromUserNickname = userNicknameService.getNicknameDto(fromUser.nickname!!).nickname
+        val fromUserNickname = userNicknameService.getNicknameDto(fromUser.nickname).nickname
         val pushMessage =
             PushMessage(
                 title = "친구 요청",
@@ -164,7 +164,7 @@ class FriendServiceImpl(
         fromUserId: String,
         toUser: User,
     ) {
-        val toUserNickname = userNicknameService.getNicknameDto(toUser.nickname!!).nickname
+        val toUserNickname = userNicknameService.getNicknameDto(toUser.nickname).nickname
         val pushMessage =
             PushMessage(
                 title = "친구 요청 수락",

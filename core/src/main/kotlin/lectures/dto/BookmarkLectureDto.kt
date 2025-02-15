@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.lectures.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture
-import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 
 data class BookmarkLectureDto(
     @JsonProperty("_id")
@@ -27,9 +26,6 @@ data class BookmarkLectureDto(
     @JsonProperty("course_title")
     var courseTitle: String,
     val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
-    // FIXME: 안드로이드 구버전 대응용 필드 1년 후 2024년에 삭제 (2023/06/26)
-    @JsonProperty("class_time_mask")
-    val classTimeMask: List<Int> = emptyList(),
 )
 
 fun BookmarkLectureDto(
@@ -52,5 +48,4 @@ fun BookmarkLectureDto(
         courseNumber = lecture.courseNumber,
         courseTitle = lecture.courseTitle,
         snuttEvLecture = snuttEvLecture,
-        classTimeMask = ClassTimeUtils.classTimeToBitmask(lecture.classPlaceAndTimes),
     )
