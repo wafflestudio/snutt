@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.sugangsnu.common.service
 
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
+import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -19,6 +20,7 @@ interface SugangSnuFetchService {
 @Service
 class SugangSnuFetchServiceImpl(
     private val sugangSnuRepository: SugangSnuRepository,
+    private val categoryPre2025FetchService: CategoryPre2025FetchService,
 ) : SugangSnuFetchService {
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
@@ -27,6 +29,7 @@ class SugangSnuFetchServiceImpl(
         year: Int,
         semester: Semester,
     ): List<Lecture> {
+        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "ko")
         val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "en")
         val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
@@ -69,6 +72,7 @@ class SugangSnuFetchServiceImpl(
                 department = extraDepartment ?: department
                 quota = extraLectureInfo.subInfo.quota ?: quota
                 remark = extraLectureInfo.subInfo.remark ?: remark
+                categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
             }
         }
     }
