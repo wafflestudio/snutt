@@ -32,7 +32,7 @@ class FriendHandler(
                         id = friend.id!!,
                         userId = partner.id!!,
                         displayName = partnerDisplayName,
-                        nickname = userNicknameService.getNicknameDto(partner.nickname!!),
+                        nickname = userNicknameService.getNicknameDto(partner.nickname),
                         createdAt = friend.createdAt,
                     )
                 }
@@ -104,7 +104,7 @@ class FriendHandler(
                         id = friend.id!!,
                         userId = partner.id!!,
                         displayName = friend.getPartnerDisplayName(userId),
-                        nickname = userNicknameService.getNicknameDto(partner.nickname!!),
+                        nickname = userNicknameService.getNicknameDto(partner.nickname),
                         createdAt = friend.createdAt,
                     )
                 }

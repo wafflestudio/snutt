@@ -13,8 +13,6 @@ import com.wafflestudio.snutt.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snutt.coursebook.data.CoursebookDto
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
-import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
-import com.wafflestudio.snutt.lectures.dto.placeInfos
 import com.wafflestudio.snutt.theme.service.TimetableThemeService
 import com.wafflestudio.snutt.theme.service.toBasicThemeType
 import com.wafflestudio.snutt.theme.service.toIdForTimetable
@@ -25,7 +23,6 @@ import com.wafflestudio.snutt.timetables.dto.TimetableLectureLegacyDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
@@ -115,7 +112,6 @@ class TimetableServiceImpl(
     private val coursebookService: CoursebookService,
     private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
-    private val lectureBuildingService: LectureBuildingService,
     private val evRepository: SnuttEvRepository,
     private val dynamicLinkClient: DynamicLinkClient,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
@@ -335,7 +331,7 @@ class TimetableServiceImpl(
         val evLectureIdMap =
             evRepository.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
         val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.lectureId]) }
-        return TimetableLegacyDto(timetable, timetableLectures).addLectureBuildings()
+        return TimetableLegacyDto(timetable, timetableLectures)
     }
 
     override suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto {
@@ -344,20 +340,4 @@ class TimetableServiceImpl(
         val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.lectureId]) }
         return TimetableDto(timetable, timetableLectures)
     }
-
-    private suspend fun TimetableLegacyDto.addLectureBuildings(): TimetableLegacyDto =
-        coroutineScope {
-            val placeInfosAll =
-                lectures.flatMap { it.classPlaceAndTimes.flatMap { classPlaceAndTime -> classPlaceAndTime.placeInfos } }
-                    .distinct()
-            val buildings = lectureBuildingService.getLectureBuildings(placeInfosAll).associateBy { it.buildingNumber }
-            lectures.forEach {
-                it.classPlaceAndTimes.forEach { classPlaceAndTime ->
-                    classPlaceAndTime.apply {
-                        lectureBuildings = placeInfos.mapNotNull { placeInfo -> buildings[placeInfo.buildingNumber] }
-                    }
-                }
-            }
-            this@addLectureBuildings
-        }
 }

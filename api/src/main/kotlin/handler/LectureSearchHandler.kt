@@ -1,7 +1,6 @@
 package com.wafflestudio.snutt.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.DayOfWeek
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.lectures.dto.SearchDto
 import com.wafflestudio.snutt.lectures.dto.SearchTimeDto
@@ -39,8 +38,6 @@ data class SearchQueryLegacy(
     val academicYear: List<String>? = null,
     val department: List<String>? = null,
     val category: List<String>? = null,
-    @JsonProperty("time_mask")
-    val timeMask: List<Int>? = null,
     val times: List<SearchTimeDto>? = null,
     val timesToExclude: List<SearchTimeDto>? = null,
     val etc: List<String>? = null,
@@ -62,7 +59,7 @@ data class SearchQueryLegacy(
             department = department,
             category = category,
             etcTags = etc,
-            times = times?.takeIf { it.isNotEmpty() } ?: bitmaskToClassTime(timeMask),
+            times = times,
             timesToExclude = timesToExclude,
             page = page,
             offset = offset,
@@ -71,35 +68,4 @@ data class SearchQueryLegacy(
             categoryPre2025 = categoryPre2025,
         )
     }
-
-    /*
-    기존 timeMask 스펙을 대응하기 위한 코드
-    8시부터 23시까지 30분 단위로 강의가 존재하는 경우 1, 존재하지 않는 경우 0인 2진수가 전달된다.
-    이를 searchTimeDto로 변환
-    ex) 111000... -> 8:00~9:30 수업 -> startMinute = 480, endMinute: 570
-     */
-    private fun bitmaskToClassTime(timeMask: List<Int>?): List<SearchTimeDto>? =
-        timeMask?.flatMapIndexed { dayValue, mask ->
-            mask.toTimeMask().zip((mask shr 1).toTimeMask())
-                .foldIndexed(emptyList()) { index, acc, (bit, bitBefore) ->
-                    if (bit && !bitBefore) {
-                        acc +
-                            SearchTimeDto(
-                                day = DayOfWeek.getOfValue(dayValue)!!,
-                                startMinute = index * 30 + 8 * 60,
-                                endMinute = index * 30 + 8 * 60 + 30,
-                            )
-                    } else if (bit && bitBefore) {
-                        val updated = acc.last().copy(endMinute = index * 30 + 8 * 60 + 30)
-                        acc.dropLast(1) + updated
-                    } else {
-                        acc
-                    }
-                }
-        }
-
-    /*
-    ex) 258048 -> 2진수 00000000000000111111000000000000 -> [..., true, true, true, true, true, true, false, false, ...]
-     */
-    private fun Int.toTimeMask(): List<Boolean> = this.toString(2).padStart(30, '0').map { it == '1' }
 }
