@@ -263,6 +263,7 @@ class TimetableServiceImpl(
                 themeId = defaultTheme.toIdForTimetable(),
             )
         timetableRepository.save(timetable)
+        setPrimary(userId, timetable.id!!)
     }
 
     private suspend fun getLatestCopiedTimetableNumber(
