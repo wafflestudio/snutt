@@ -27,6 +27,7 @@ class PopupServiceImpl(
                 key = request.key,
                 imageOriginUri = request.imageOriginUri,
                 hiddenDays = request.hiddenDays,
+                linkUrl = request.linkUrl,
             )
         return try {
             popupRepository.save(popup)
