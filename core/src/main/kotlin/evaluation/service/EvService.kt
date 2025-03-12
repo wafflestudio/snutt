@@ -12,7 +12,7 @@ import com.wafflestudio.snutt.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snutt.evaluation.dto.EvUserDto
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
-import com.wafflestudio.snutt.timetables.service.TimetableService
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import com.wafflestudio.snutt.users.service.UserService
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpHeaders
@@ -29,7 +29,7 @@ import org.springframework.web.reactive.function.client.createExceptionAndAwait
 @Service
 class EvService(
     private val snuttEvWebClient: SnuttEvWebClient,
-    private val timetableService: TimetableService,
+    private val timetableRepository: TimetableRepository,
     private val coursebookService: CoursebookService,
     private val userService: UserService,
     private val objectMapper: ObjectMapper,
@@ -70,7 +70,7 @@ class EvService(
     ): Map<String, Any?> {
         val recentLectures: List<EvLectureInfoDto> =
             coursebookService.getLastTwoCourseBooksBeforeCurrent().flatMap { coursebook ->
-                timetableService.getTimetablesBySemester(userId, coursebook.year, coursebook.semester).toList()
+                timetableRepository.findAllByUserIdAndYearAndSemester(userId, coursebook.year, coursebook.semester).toList()
                     .flatMap { timetable ->
                         timetable.lectures.map { lecture ->
                             EvLectureInfoDto(
