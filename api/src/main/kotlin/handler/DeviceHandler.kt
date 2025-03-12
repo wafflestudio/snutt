@@ -18,6 +18,7 @@ class DeviceHandler(
             val clientInfo = req.clientInfo!!
 
             val registrationId = req.pathVariable("id")
+            if (registrationId.isBlank()) throw InvalidPathParameterException("id")
             deviceService.addRegistrationId(userId, registrationId, clientInfo)
 
             OkResponse()
