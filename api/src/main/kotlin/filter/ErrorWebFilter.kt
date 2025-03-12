@@ -58,15 +58,19 @@ class ErrorWebFilter(
                     }
                 }
 
-                exchange.response.statusCode = httpStatusCode
-                exchange.response.headers.contentType = MediaType.APPLICATION_JSON
-                exchange.response.writeWith(
-                    Mono.just(
-                        exchange.response
-                            .bufferFactory()
-                            .wrap(objectMapper.writeValueAsBytes(errorBody)),
-                    ),
-                )
+                if (!exchange.response.isCommitted) {
+                    exchange.response.statusCode = httpStatusCode
+                    exchange.response.headers.contentType = MediaType.APPLICATION_JSON
+                    exchange.response.writeWith(
+                        Mono.just(
+                            exchange.response
+                                .bufferFactory()
+                                .wrap(objectMapper.writeValueAsBytes(errorBody)),
+                        ),
+                    )
+                } else {
+                    Mono.empty()
+                }
             }
     }
 
