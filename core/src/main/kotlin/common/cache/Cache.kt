@@ -73,22 +73,20 @@ class RedisCache(
         builtKey: BuiltCacheKey,
         value: T?,
     ) {
-        runCatching {
+        try {
             val redisValue = objectMapper.writeValueAsString(value)
 
             log.debug("[CACHE SET] {}", builtKey.key)
             redisTemplate.opsForValue().setAndAwait(builtKey.key, redisValue, builtKey.ttl)
-        }.getOrElse {
-            log.error(it.message, it)
+        } catch (_: Exception) {
         }
     }
 
     override suspend fun delete(builtKey: BuiltCacheKey) {
-        runCatching {
+        try {
             log.debug("[CACHE DEL] {}", builtKey.key)
             redisTemplate.deleteAndAwait(builtKey.key)
-        }.getOrElse {
-            log.error(it.message, it)
+        } catch (_: Exception) {
         }
     }
 
