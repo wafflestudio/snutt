@@ -4,7 +4,7 @@ import com.wafflestudio.snutt.bookmark.data.Bookmark
 import com.wafflestudio.snutt.bookmark.repository.BookmarkRepository
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
-import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture
 import com.wafflestudio.snutt.lectures.dto.BookmarkLectureDto
 import com.wafflestudio.snutt.lectures.service.LectureService
@@ -39,7 +39,7 @@ interface BookmarkService {
 class BookmarkServiceImpl(
     private val bookmarkRepository: BookmarkRepository,
     private val lectureService: LectureService,
-    private val snuttEvRepository: SnuttEvRepository,
+    private val snuttEvService: EvService,
 ) : BookmarkService {
     override suspend fun getBookmark(
         userId: String,
@@ -86,7 +86,7 @@ class BookmarkServiceImpl(
 
     override suspend fun convertBookmarkLecturesToBookmarkLectureDtos(bookmarkLectures: List<BookmarkLecture>): List<BookmarkLectureDto> {
         val snuttIdtoLectureMap =
-            snuttEvRepository.getSummariesByIds(bookmarkLectures.map { it.id!! }).associateBy { it.snuttId }
+            snuttEvService.getSummariesByIds(bookmarkLectures.map { it.id!! }).associateBy { it.snuttId }
         return bookmarkLectures.map { bookmarkLecture ->
             val snuttEvLecture = snuttIdtoLectureMap[bookmarkLecture.id]
             BookmarkLectureDto(bookmarkLecture, snuttEvLecture)

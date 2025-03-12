@@ -1,9 +1,7 @@
 package com.wafflestudio.snutt.lectures.service
 
 import com.wafflestudio.snutt.common.enum.Semester
-import com.wafflestudio.snutt.common.exception.EvDataNotFoundException
-import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
-import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.dto.LectureDto
 import com.wafflestudio.snutt.lectures.dto.SearchDto
@@ -29,14 +27,12 @@ interface LectureService {
     fun search(query: SearchDto): Flow<Lecture>
 
     suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto>
-
-    suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto
 }
 
 @Service
 class LectureServiceImpl(
     private val lectureRepository: LectureRepository,
-    private val snuttEvRepository: SnuttEvRepository,
+    private val snuttEvService: EvService,
 ) : LectureService {
     override fun findAll(): Flow<Lecture> = lectureRepository.findAll()
 
@@ -55,14 +51,10 @@ class LectureServiceImpl(
 
     override suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto> {
         val snuttIdToEvLectureMap =
-            snuttEvRepository.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
+            snuttEvService.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
         return lectures.map { lecture ->
             val snuttEvLecture = snuttIdToEvLectureMap[lecture.id]
             LectureDto(lecture, snuttEvLecture)
         }
-    }
-
-    override suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto {
-        return snuttEvRepository.getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
     }
 }

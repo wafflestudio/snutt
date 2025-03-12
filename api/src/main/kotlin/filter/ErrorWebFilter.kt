@@ -29,12 +29,19 @@ class ErrorWebFilter(
     ): Mono<Void> {
         return chain.filter(exchange)
             .onErrorResume { throwable ->
-                val errorBody: Any
+                val errorBody: ErrorBody
                 val httpStatusCode: HttpStatusCode
                 when (throwable) {
                     is EvServiceProxyException -> {
                         httpStatusCode = throwable.statusCode
-                        errorBody = throwable.errorBody
+                        errorBody =
+                            throwable.errorResponse.let {
+                                ErrorBody(
+                                    it.error.code,
+                                    it.error.message,
+                                    it.error.message,
+                                )
+                            }
                     }
                     is SnuttException -> {
                         httpStatusCode = throwable.error.httpStatus
@@ -49,7 +56,7 @@ class ErrorWebFilter(
                     }
                     is AbortedException, is CancellationException -> {
                         httpStatusCode = HttpStatus.NO_CONTENT
-                        errorBody = emptyMap<String, Any>()
+                        errorBody = makeErrorBody(SnuttException())
                     }
                     else -> {
                         log.error(throwable.message, throwable)
