@@ -12,7 +12,7 @@ import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snutt.coursebook.data.CoursebookDto
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
-import com.wafflestudio.snutt.evaluation.repository.SnuttEvRepository
+import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.theme.service.TimetableThemeService
 import com.wafflestudio.snutt.theme.service.toBasicThemeType
 import com.wafflestudio.snutt.theme.service.toIdForTimetable
@@ -112,7 +112,7 @@ class TimetableServiceImpl(
     private val coursebookService: CoursebookService,
     private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
-    private val evRepository: SnuttEvRepository,
+    private val evService: EvService,
     private val dynamicLinkClient: DynamicLinkClient,
     @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
@@ -329,14 +329,14 @@ class TimetableServiceImpl(
 
     override suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto {
         val evLectureIdMap =
-            evRepository.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
+            evService.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
         val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.lectureId]) }
         return TimetableLegacyDto(timetable, timetableLectures)
     }
 
     override suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto {
         val evLectureIdMap =
-            evRepository.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
+            evService.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
         val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.lectureId]) }
         return TimetableDto(timetable, timetableLectures)
     }
