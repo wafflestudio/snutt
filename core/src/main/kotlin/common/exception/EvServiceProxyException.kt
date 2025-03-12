@@ -1,8 +1,9 @@
 package com.wafflestudio.snutt.common.exception
 
+import com.wafflestudio.snutt.evaluation.dto.EvErrorResponse
 import org.springframework.http.HttpStatusCode
 
 class EvServiceProxyException(
     val statusCode: HttpStatusCode,
-    val errorBody: Map<String, Any?>,
+    val errorResponse: EvErrorResponse,
 ) : RuntimeException()
