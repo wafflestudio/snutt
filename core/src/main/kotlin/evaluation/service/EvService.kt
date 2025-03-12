@@ -99,6 +99,32 @@ class EvService(
             .awaitBody<MutableMap<String, Any?>>()
     }
 
+    suspend fun getSummariesByIds(ids: List<String>): List<SnuttEvLectureSummaryDto> =
+        runCatching {
+            snuttEvWebClient.get().uri { builder ->
+                builder.path("/v1/lectures/snutt-summary")
+                    .queryParam("semesterLectureSnuttIds", ids.joinToString(","))
+                    .build()
+            }
+                .retrieve()
+                .awaitBody<ListResponse<SnuttEvLectureSummaryDto>>().content
+        }.getOrDefault(emptyList())
+
+    suspend fun getEvIdsBySnuttIds(snuttIds: List<String>): List<SnuttEvLectureIdDto> =
+        runCatching {
+            snuttEvWebClient.get().uri { builder ->
+                builder.path("/v1/lectures/ids")
+                    .queryParam("semesterLectureSnuttIds", snuttIds.joinToString(","))
+                    .build()
+            }
+                .retrieve()
+                .awaitBody<ListResponse<SnuttEvLectureIdDto>>().content
+        }.getOrDefault(emptyList())
+
+    suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto {
+        return getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
+    }
+
     @Suppress("UNCHECKED_CAST")
     private suspend fun updateUserInfo(data: MutableMap<String, Any?>?): MutableMap<String, Any?>? {
         if (data == null) return null
