@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation =
             Operation(
                 operationId = "existsVacancyNotification",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "lectureId", required = true)],
                 responses = [
                     ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = ExistenceResponse::class))]),
                 ],

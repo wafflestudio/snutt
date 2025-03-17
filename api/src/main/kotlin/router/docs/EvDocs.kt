@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation =
             Operation(
                 operationId = "getLectureEvaluationSummary",
-                parameters = [Parameter(`in` = ParameterIn.QUERY, name = "lectureId", required = true, description = "snutt lecture id")],
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "lectureId", required = true, description = "snutt lecture id")],
                 responses = [
                     ApiResponse(
                         responseCode = "200",
