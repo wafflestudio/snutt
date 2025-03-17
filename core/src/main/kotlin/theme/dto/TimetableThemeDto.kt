@@ -10,6 +10,7 @@ import com.wafflestudio.snutt.theme.service.toIdForTimetable
 
 data class TimetableThemeDto(
     val id: String?,
+    val userId: String,
     val theme: BasicThemeType,
     val name: String,
     val colors: List<ColorSet>?,
@@ -30,6 +31,7 @@ fun TimetableThemeDto(timetableTheme: TimetableTheme) =
     with(timetableTheme) {
         TimetableThemeDto(
             id = toIdForTimetable(),
+            userId = userId,
             theme = toBasicThemeType(),
             name = name,
             colors = colors,
@@ -48,6 +50,7 @@ fun TimetableThemeDto(
     with(timetableTheme) {
         TimetableThemeDto(
             id = toIdForTimetable(),
+            userId = userId,
             theme = toBasicThemeType(),
             name = name,
             colors = colors,
