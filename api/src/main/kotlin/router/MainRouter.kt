@@ -35,6 +35,7 @@ import com.wafflestudio.snutt.router.docs.FriendDocs
 import com.wafflestudio.snutt.router.docs.LectureSearchDocs
 import com.wafflestudio.snutt.router.docs.NotificationDocs
 import com.wafflestudio.snutt.router.docs.PopupDocs
+import com.wafflestudio.snutt.router.docs.PushDocs
 import com.wafflestudio.snutt.router.docs.TagDocs
 import com.wafflestudio.snutt.router.docs.ThemeDocs
 import com.wafflestudio.snutt.router.docs.TimetableDocs
@@ -347,6 +348,7 @@ class MainRouter(
         }
 
     @Bean
+    @PushDocs
     fun pushPreferenceRouter() =
         v1CoRouter {
             "/push/preferences".nest {
