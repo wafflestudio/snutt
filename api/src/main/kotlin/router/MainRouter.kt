@@ -351,10 +351,7 @@ class MainRouter(
         v1CoRouter {
             "/push/preferences".nest {
                 GET("", pushPreferenceHandler::getPushPreferences)
-                POST("lecture-update", pushPreferenceHandler::enableLectureUpdate)
-                DELETE("lecture-update", pushPreferenceHandler::disableLectureUpdate)
-                POST("vacancy-notification", pushPreferenceHandler::enableVacancyNotification)
-                DELETE("vacancy-notification", pushPreferenceHandler::disableVacancyNotification)
+                POST("", pushPreferenceHandler::savePushPreferences)
             }
         }
 }
