@@ -169,6 +169,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         operation =
             Operation(
                 operationId = "acceptFriendByLink",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "requestToken", required = true)],
                 responses = [
                     ApiResponse(
                         responseCode = "200",
