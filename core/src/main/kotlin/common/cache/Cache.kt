@@ -50,55 +50,40 @@ class RedisCache(
         typeRef: TypeReference<T>,
         supplier: (suspend () -> T?)?,
     ): T? {
-        try {
-            log.debug("[CACHE GET] {}", builtKey.key)
-            val redisValue = redisTemplate.opsForValue().getAndAwait(builtKey.key)
-            redisValue?.let {
-                return objectMapper.readValue(it, typeRef)
+        val redisValue = runCatching { redisTemplate.opsForValue().getAndAwait(builtKey.key) }.getOrNull()
+        return if (redisValue != null) {
+            objectMapper.readValue(redisValue, typeRef)
+        } else {
+            if (supplier == null) return null
+            supplier().also { value ->
+                coroutineScope.launch {
+                    set(builtKey, value)
+                }
             }
-        } catch (e: Exception) {
-            log.error(e.message, e)
         }
-
-        if (supplier == null) return null
-
-        val value = supplier()
-
-        coroutineScope.launch { set(builtKey, value) }
-
-        return value
     }
 
     override suspend fun <T : Any> set(
         builtKey: BuiltCacheKey,
         value: T?,
     ) {
-        try {
-            val redisValue = objectMapper.writeValueAsString(value)
-
-            log.debug("[CACHE SET] {}", builtKey.key)
-            redisTemplate.opsForValue().setAndAwait(builtKey.key, redisValue, builtKey.ttl)
-        } catch (_: Exception) {
-        }
+        val redisValue = objectMapper.writeValueAsString(value)
+        runCatching { redisTemplate.opsForValue().setAndAwait(builtKey.key, redisValue, builtKey.ttl) }
     }
 
     override suspend fun delete(builtKey: BuiltCacheKey) {
-        try {
-            log.debug("[CACHE DEL] {}", builtKey.key)
-            redisTemplate.deleteAndAwait(builtKey.key)
-        } catch (_: Exception) {
-        }
+        runCatching { redisTemplate.deleteAndAwait(builtKey.key) }
     }
 
-    override suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean {
-        log.debug("[CACHE SETNX] {}", builtKey.key)
-        return redisTemplate.opsForValue().setIfAbsentAndAwait(builtKey.key, "true", builtKey.ttl)
-    }
+    override suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean =
+        runCatching {
+            redisTemplate.opsForValue().setIfAbsentAndAwait(builtKey.key, "true", builtKey.ttl)
+        }.getOrDefault(false)
 
-    override suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean {
-        log.debug("[CACHE DEL] {}", builtKey.key)
-        return redisTemplate.deleteAndAwait(builtKey.key) > 0
-    }
+    override suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean =
+        runCatching {
+            redisTemplate.deleteAndAwait(builtKey.key) > 0
+        }.getOrDefault(false)
 }
 
 suspend inline fun <reified T : Any> Cache.get(
