@@ -57,6 +57,7 @@ class RedisCache(
                 return objectMapper.readValue(it, typeRef)
             }
         } catch (e: Exception) {
+            log.error("cache get error")
             log.error(e.message, e)
         }
 
@@ -64,7 +65,9 @@ class RedisCache(
 
         val value = supplier()
 
-        coroutineScope.launch { set(builtKey, value) }
+        coroutineScope.launch {
+            set(builtKey, value)
+        }
 
         return value
     }
@@ -78,7 +81,9 @@ class RedisCache(
 
             log.debug("[CACHE SET] {}", builtKey.key)
             redisTemplate.opsForValue().setAndAwait(builtKey.key, redisValue, builtKey.ttl)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.error("cache set error")
+            log.error(e.message, e)
         }
     }
 
@@ -86,18 +91,32 @@ class RedisCache(
         try {
             log.debug("[CACHE DEL] {}", builtKey.key)
             redisTemplate.deleteAndAwait(builtKey.key)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.error("cache delete error", e)
+            log.error(e.message, e)
         }
     }
 
     override suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean {
         log.debug("[CACHE SETNX] {}", builtKey.key)
-        return redisTemplate.opsForValue().setIfAbsentAndAwait(builtKey.key, "true", builtKey.ttl)
+        return try {
+            redisTemplate.opsForValue().setIfAbsentAndAwait(builtKey.key, "true", builtKey.ttl)
+        } catch (e: Exception) {
+            log.error("acquireLock error")
+            log.error(e.message, e)
+            false
+        }
     }
 
     override suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean {
         log.debug("[CACHE DEL] {}", builtKey.key)
-        return redisTemplate.deleteAndAwait(builtKey.key) > 0
+        return try {
+            redisTemplate.deleteAndAwait(builtKey.key) > 0
+        } catch (e: Exception) {
+            log.error("releaseLock error")
+            log.error(e.message, e)
+            false
+        }
     }
 }
 
