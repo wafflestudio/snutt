@@ -7,16 +7,19 @@ import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.util.buildMultiValueMap
 import com.wafflestudio.snutt.config.SnuttEvWebClient
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.evaluation.dto.EvErrorInfo
 import com.wafflestudio.snutt.evaluation.dto.EvErrorResponse
 import com.wafflestudio.snutt.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snutt.evaluation.dto.EvUserDto
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.service.UserService
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
@@ -35,16 +38,19 @@ class EvService(
     private val objectMapper: ObjectMapper,
 ) {
     suspend fun handleRouting(
-        userId: String,
+        user: User,
         requestPath: String,
         requestQueryParams: MultiValueMap<String, String> = buildMultiValueMap(mapOf()),
         originalBody: String,
         method: HttpMethod,
     ): Map<String, Any?>? {
+        if (user.isEmailVerified == false) {
+            throw EvServiceProxyException(HttpStatus.FORBIDDEN, EvErrorResponse(EvErrorInfo(23000, "User email is not verified")))
+        }
         val result: MutableMap<String, Any?>? =
             snuttEvWebClient.method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
-                .header("Snutt-User-Id", userId)
+                .header("Snutt-User-Id", user.id)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(originalBody)
