@@ -20,6 +20,9 @@ fun ServerRequest.setContext(value: RequestContext) {
     this.attributes()[CONTEXT_ATTRIBUTE_KEY] = value
 }
 
+val ServerRequest.user: User
+    get() = this.getContext().user ?: throw WrongUserTokenException
+
 val ServerRequest.userId: String
     get() = this.getContext().user?.id ?: throw WrongUserTokenException
 
