@@ -15,25 +15,25 @@ class EvServiceHandler(
     suspend fun handleGet(req: ServerRequest) =
         handle(req) {
             val body = req.awaitBodyOrNull<String>() ?: ""
-            evService.handleRouting(req.userId, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.GET)
+            evService.handleRouting(req.user, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.GET)
         }
 
     suspend fun handlePost(req: ServerRequest) =
         handle(req) {
             val body = req.awaitBodyOrNull<String>() ?: ""
-            evService.handleRouting(req.userId, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.POST)
+            evService.handleRouting(req.user, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.POST)
         }
 
     suspend fun handleDelete(req: ServerRequest) =
         handle(req) {
             val body = req.awaitBodyOrNull<String>() ?: ""
-            evService.handleRouting(req.userId, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.DELETE)
+            evService.handleRouting(req.user, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.DELETE)
         }
 
     suspend fun handlePatch(req: ServerRequest) =
         handle(req) {
             val body = req.awaitBodyOrNull<String>() ?: ""
-            evService.handleRouting(req.userId, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.PATCH)
+            evService.handleRouting(req.user, req.pathVariable("requestPath"), req.queryParams(), body, HttpMethod.PATCH)
         }
 
     suspend fun getMyLatestLectures(req: ServerRequest) =

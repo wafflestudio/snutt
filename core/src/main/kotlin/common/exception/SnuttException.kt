@@ -34,6 +34,8 @@ object DuplicateLocalIdException : SnuttException(ErrorType.DUPLICATE_LOCAL_ID)
 
 object InvalidEmailException : SnuttException(ErrorType.INVALID_EMAIL)
 
+object UserEmailIsNotVerifiedException : SnuttException(ErrorType.USER_EMAIL_IS_NOT_VERIFIED)
+
 object LectureNotFoundException : SnuttException(ErrorType.LECTURE_NOT_FOUND)
 
 object UserNotFoundException : SnuttException(ErrorType.USER_NOT_FOUND)

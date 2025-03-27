@@ -29,6 +29,7 @@ enum class ErrorType(
     LECTURE_TIME_OVERLAP(HttpStatus.FORBIDDEN, 0x300C, "강의 시간이 겹칩니다."),
     CANNOT_RESET_CUSTOM_LECTURE(HttpStatus.FORBIDDEN, 0x300D, "cannot reset custom lectures"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, 0x300F, "email이 유효하지 않습니다.", "이메일 형식이 올바르지 않습니다."),
+    USER_EMAIL_IS_NOT_VERIFIED(HttpStatus.FORBIDDEN, 0x3011, "User email is not verified", "이메일 인증이 필요합니다."),
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다.", "해당 강의는 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다.", "해당 유저는 존재하지 않습니다."),
