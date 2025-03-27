@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.common.exception.EvDataNotFoundException
 import com.wafflestudio.snutt.common.exception.EvServiceProxyException
+import com.wafflestudio.snutt.common.exception.UserEmailIsNotVerifiedException
 import com.wafflestudio.snutt.common.util.buildMultiValueMap
 import com.wafflestudio.snutt.config.SnuttEvWebClient
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
-import com.wafflestudio.snutt.evaluation.dto.EvErrorInfo
 import com.wafflestudio.snutt.evaluation.dto.EvErrorResponse
 import com.wafflestudio.snutt.evaluation.dto.EvLectureInfoDto
 import com.wafflestudio.snutt.evaluation.dto.EvUserDto
@@ -19,7 +19,6 @@ import com.wafflestudio.snutt.users.service.UserService
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.MultiValueMap
@@ -45,7 +44,7 @@ class EvService(
         method: HttpMethod,
     ): Map<String, Any?>? {
         if (user.isEmailVerified == false) {
-            throw EvServiceProxyException(HttpStatus.FORBIDDEN, EvErrorResponse(EvErrorInfo(23000, "User email is not verified")))
+            throw UserEmailIsNotVerifiedException
         }
         val result: MutableMap<String, Any?>? =
             snuttEvWebClient.method(method)
