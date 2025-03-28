@@ -74,7 +74,7 @@ interface UserService {
     suspend fun loginApple(socialLoginRequest: SocialLoginRequest): LoginResponse
 
     suspend fun logout(
-        userId: String,
+        user: User,
         logoutRequest: LogoutRequest,
     )
 
@@ -369,10 +369,10 @@ class UserServiceImpl(
     }
 
     override suspend fun logout(
-        userId: String,
+        user: User,
         logoutRequest: LogoutRequest,
     ) {
-        val user = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+        if (logoutRequest.registrationId.isBlank()) return
         deviceService.removeRegistrationId(user.id!!, logoutRequest.registrationId)
     }
 
