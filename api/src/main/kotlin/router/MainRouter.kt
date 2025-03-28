@@ -15,6 +15,7 @@ import com.wafflestudio.snutt.handler.FriendTableHandler
 import com.wafflestudio.snutt.handler.LectureSearchHandler
 import com.wafflestudio.snutt.handler.NotificationHandler
 import com.wafflestudio.snutt.handler.PopupHandler
+import com.wafflestudio.snutt.handler.PushPreferenceHandler
 import com.wafflestudio.snutt.handler.StaticPageHandler
 import com.wafflestudio.snutt.handler.TagHandler
 import com.wafflestudio.snutt.handler.TimetableHandler
@@ -34,6 +35,7 @@ import com.wafflestudio.snutt.router.docs.FriendDocs
 import com.wafflestudio.snutt.router.docs.LectureSearchDocs
 import com.wafflestudio.snutt.router.docs.NotificationDocs
 import com.wafflestudio.snutt.router.docs.PopupDocs
+import com.wafflestudio.snutt.router.docs.PushDocs
 import com.wafflestudio.snutt.router.docs.TagDocs
 import com.wafflestudio.snutt.router.docs.ThemeDocs
 import com.wafflestudio.snutt.router.docs.TimetableDocs
@@ -70,6 +72,7 @@ class MainRouter(
     private val feedbackHandler: FeedbackHandler,
     private val staticPageHandler: StaticPageHandler,
     private val evServiceHandler: EvServiceHandler,
+    private val pushPreferenceHandler: PushPreferenceHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -342,5 +345,15 @@ class MainRouter(
             GET("/member").invoke { staticPageHandler.member() }
             GET("/privacy_policy").invoke { staticPageHandler.privacyPolicy() }
             GET("/terms_of_service").invoke { staticPageHandler.termsOfService() }
+        }
+
+    @Bean
+    @PushDocs
+    fun pushPreferenceRouter() =
+        v1CoRouter {
+            "/push/preferences".nest {
+                GET("", pushPreferenceHandler::getPushPreferences)
+                POST("", pushPreferenceHandler::savePushPreferences)
+            }
         }
 }
