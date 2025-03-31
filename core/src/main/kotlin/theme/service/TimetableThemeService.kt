@@ -210,7 +210,7 @@ class TimetableThemeServiceImpl(
     ): TimetableTheme {
         val theme = timetableThemeRepository.findById(themeId) ?: throw ThemeNotFoundException
         if (theme.status != ThemeStatus.PUBLISHED) throw ThemeNotFoundException
-        if (timetableThemeRepository.existsByOriginId(themeId)) throw AlreadyDownloadedThemeException
+        if (timetableThemeRepository.existsByOriginIdAndUserId(themeId, downloadedUserId)) throw AlreadyDownloadedThemeException
         val downloadedTheme =
             theme.copy(
                 id = null,
