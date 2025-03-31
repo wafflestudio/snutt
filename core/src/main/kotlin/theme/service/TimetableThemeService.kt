@@ -53,7 +53,7 @@ interface TimetableThemeService {
     suspend fun downloadTheme(
         downloadedUserId: String,
         themeId: String,
-        name: String,
+        newName: String,
     ): TimetableTheme
 
     suspend fun deleteTheme(
@@ -206,7 +206,7 @@ class TimetableThemeServiceImpl(
     override suspend fun downloadTheme(
         downloadedUserId: String,
         themeId: String,
-        name: String,
+        newName: String,
     ): TimetableTheme {
         val theme = timetableThemeRepository.findById(themeId) ?: throw ThemeNotFoundException
         if (theme.status != ThemeStatus.PUBLISHED) throw ThemeNotFoundException
@@ -214,7 +214,7 @@ class TimetableThemeServiceImpl(
         val downloadedTheme =
             theme.copy(
                 id = null,
-                name = name,
+                name = newName,
                 userId = downloadedUserId,
                 origin =
                     ThemeOrigin(
