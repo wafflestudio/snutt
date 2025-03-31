@@ -214,7 +214,7 @@ class TimetableThemeServiceImpl(
         val downloadedTheme =
             theme.copy(
                 id = null,
-                name = name,
+                name = theme.publishInfo!!.publishName,
                 userId = downloadedUserId,
                 origin =
                     ThemeOrigin(
