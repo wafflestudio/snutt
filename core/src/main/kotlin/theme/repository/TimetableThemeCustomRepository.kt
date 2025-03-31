@@ -30,7 +30,10 @@ interface TimetableThemeCustomRepository {
 
     suspend fun findPublishedTimetablesOrderByDownloadsDesc(page: Int): List<TimetableTheme>
 
-    suspend fun existsByOriginId(originId: String): Boolean
+    suspend fun existsByOriginIdAndUserId(
+        originId: String,
+        userId: String,
+    ): Boolean
 
     suspend fun addDownloadCount(id: String)
 }
@@ -68,7 +71,10 @@ class TimetableThemeCustomRepositoryImpl(
         ).skip((page - 1) * 10L).take(10).collectList().awaitSingle()
     }
 
-    override suspend fun existsByOriginId(originId: String): Boolean =
+    override suspend fun existsByOriginIdAndUserId(
+        originId: String,
+        userId: String,
+    ): Boolean =
         reactiveMongoTemplate.exists<TimetableTheme>(
             Query.query((TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId),
         ).awaitSingle()
