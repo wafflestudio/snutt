@@ -44,7 +44,7 @@ data class PushMessage(
             title = title,
             message = body,
             type = notificationType,
-            deeplink = urlScheme?.build()?.value,
+            deeplink = urlScheme?.build()?.value ?: data.payload["url_scheme"],
         )
     }
 }
