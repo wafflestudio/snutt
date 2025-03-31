@@ -76,7 +76,10 @@ class TimetableThemeCustomRepositoryImpl(
         userId: String,
     ): Boolean =
         reactiveMongoTemplate.exists<TimetableTheme>(
-            Query.query((TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId),
+            Query.query(
+                (TimetableTheme::origin / ThemeOrigin::originId) isEqualTo originId and
+                    TimetableTheme::userId isEqualTo userId,
+            ),
         ).awaitSingle()
 
     override suspend fun addDownloadCount(id: String) {
