@@ -50,8 +50,6 @@ subprojects {
 
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-        implementation("com.wafflestudio.spring:spring-boot-starter-waffle:1.0.0")
-
         implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
