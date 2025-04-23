@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.notification.service
 import com.wafflestudio.snutt.common.push.PushClient
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import org.springframework.stereotype.Service
 
 /**
@@ -22,12 +23,30 @@ interface PushService {
     suspend fun sendGlobalPush(pushMessage: PushMessage)
 
     suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>)
+
+    suspend fun sendPush(
+        pushMessage: PushMessage,
+        userId: String,
+        pushPreferenceType: PushPreferenceType,
+    )
+
+    suspend fun sendPushes(
+        pushMessage: PushMessage,
+        userIds: List<String>,
+        pushPreferenceType: PushPreferenceType,
+    )
+
+    suspend fun sendTargetPushes(
+        userToPushMessage: Map<String, PushMessage>,
+        pushPreferenceType: PushPreferenceType,
+    )
 }
 
 @Service
 class PushServiceImpl internal constructor(
     private val deviceService: DeviceService,
     private val pushClient: PushClient,
+    private val pushPreferenceService: PushPreferenceService,
 ) : PushService {
     override suspend fun sendPush(
         pushMessage: PushMessage,
@@ -60,4 +79,41 @@ class PushServiceImpl internal constructor(
             deviceService.getUserDevices(userId).map { it.fcmRegistrationId to pushMessage }
         }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
             .let { pushClient.sendMessages(it) }
+
+    override suspend fun sendPush(
+        pushMessage: PushMessage,
+        userId: String,
+        pushPreferenceType: PushPreferenceType,
+    ) {
+        if (pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)) {
+            sendPush(pushMessage, userId)
+        }
+    }
+
+    override suspend fun sendPushes(
+        pushMessage: PushMessage,
+        userIds: List<String>,
+        pushPreferenceType: PushPreferenceType,
+    ) {
+        val filteredUserIds = pushPreferenceService.filterUsersByPushPreference(userIds, pushPreferenceType)
+
+        if (filteredUserIds.isNotEmpty()) {
+            sendPushes(pushMessage, filteredUserIds)
+        }
+    }
+
+    override suspend fun sendTargetPushes(
+        userToPushMessage: Map<String, PushMessage>,
+        pushPreferenceType: PushPreferenceType,
+    ) {
+        val filteredUserToPushMessage =
+            userToPushMessage.filterKeys {
+                    userId ->
+                pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)
+            }
+
+        if (filteredUserToPushMessage.isNotEmpty()) {
+            sendTargetPushes(filteredUserToPushMessage)
+        }
+    }
 }
