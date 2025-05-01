@@ -67,7 +67,7 @@ class SugangSnuFetchServiceImpl(
                 academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
                     ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
                 courseTitle = extraCourseTitle ?: courseTitle
-                instructor = extraLectureInfo.subInfo.professorName ?: instructor
+                instructor = (extraLectureInfo.subInfo.professorName ?: instructor)?.substringBeforeLast(" (")
                 category = extraLectureInfo.subInfo.category ?: category
                 department = extraDepartment ?: department
                 quota = extraLectureInfo.subInfo.quota ?: quota
