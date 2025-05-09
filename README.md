@@ -28,10 +28,10 @@ SNU Timetable API 서버
 
 서울대학교 수강편람 검색 및 시간표 관리를 위한 애플리케이션입니다.
 
-#### 사용해보기
-[웹](https://snutt.wafflestudio.com/)
-[안드로이드 앱](https://play.google.com/store/apps/details?id=com.wafflestudio.snutt2.live)
-[iOS 앱](https://apps.apple.com/us/app/snutt-%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90-%EC%8B%9C%EA%B0%84%ED%91%9C-%EC%95%B1/id1215668309)
+### 사용해보기
+- [웹](https://snutt.wafflestudio.com/)
+- [안드로이드 앱](https://play.google.com/store/apps/details?id=com.wafflestudio.snutt2.live)
+- [iOS 앱](https://apps.apple.com/us/app/snutt-%EC%84%9C%EC%9A%B8%EB%8C%80%ED%95%99%EA%B5%90-%EC%8B%9C%EA%B0%84%ED%91%9C-%EC%95%B1/id1215668309)
 
 ## Related Repositories
 ### 서버 프로젝트
