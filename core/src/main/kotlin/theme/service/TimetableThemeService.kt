@@ -136,7 +136,7 @@ class TimetableThemeServiceImpl(
 
     override suspend fun getFriendsThemes(userId: String): List<TimetableTheme> {
         val friendIds = friendService.getMyFriends(userId, state = FriendState.ACTIVE).map { it.second.id!! }
-        return timetableThemeRepository.findByUserIdInAndStatus(friendIds, ThemeStatus.PUBLISHED)
+        return timetableThemeRepository.findOriginalThemesByUserIds(friendIds)
     }
 
     override suspend fun addTheme(

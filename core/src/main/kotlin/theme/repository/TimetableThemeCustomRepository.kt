@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.and
+import org.springframework.data.mongodb.core.query.inValues
 import org.springframework.data.mongodb.core.query.regex
 import org.springframework.data.mongodb.core.updateFirst
 
@@ -36,6 +37,8 @@ interface TimetableThemeCustomRepository {
     ): Boolean
 
     suspend fun addDownloadCount(id: String)
+
+    suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme>
 }
 
 class TimetableThemeCustomRepositoryImpl(
@@ -87,5 +90,29 @@ class TimetableThemeCustomRepositoryImpl(
             Query.query(TimetableTheme::id isEqualTo id),
             Update().inc((TimetableTheme::publishInfo / ThemeMarketInfo::downloads).toDotPath(), 1),
         ).awaitSingle()
+    }
+
+    override suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme> {
+        val publishedThemeIds =
+            reactiveMongoTemplate.find<TimetableTheme>(
+                Query.query(
+                    TimetableTheme::userId.inValues(userIds) and TimetableTheme::status isEqualTo ThemeStatus.PUBLISHED,
+                ),
+            ).collectList().awaitSingle().map { theme -> theme.id }
+
+        val sourceIds =
+            reactiveMongoTemplate.find<TimetableTheme>(
+                Query.query(
+                    TimetableTheme::userId.inValues(userIds) and TimetableTheme::status isEqualTo ThemeStatus.DOWNLOADED,
+                ),
+            ).collectList().awaitSingle().mapNotNull { theme -> theme.origin?.originId }
+
+        val ids = (publishedThemeIds + sourceIds).toSet()
+
+        return reactiveMongoTemplate.find<TimetableTheme>(
+            Query.query(
+                TimetableTheme::id.inValues(ids),
+            ).with((TimetableTheme::publishInfo / ThemeMarketInfo::downloads).desc()),
+        ).collectList().awaitSingle()
     }
 }
