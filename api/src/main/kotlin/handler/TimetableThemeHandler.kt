@@ -107,6 +107,14 @@ class TimetableThemeHandler(
             timetableThemeService.deleteTheme(userId, themeId)
         }
 
+    suspend fun deletePublishedTheme(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val themeId = req.pathVariable("themeId")
+
+            timetableThemeService.deletePublishedTheme(userId, themeId)
+        }
+
     suspend fun copyTheme(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
