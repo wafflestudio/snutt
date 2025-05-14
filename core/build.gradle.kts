@@ -6,7 +6,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto")
     implementation("software.amazon.awssdk:s3:2.25.15")
     implementation("software.amazon.awssdk:ses:2.25.15")
-    implementation("com.wafflestudio.spring:spring-boot-starter-waffle:1.0.2")
+    implementation("com.wafflestudio.spring:spring-boot-starter-waffle:1.0.4")
     implementation("com.google.firebase:firebase-admin:9.3.0")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
 
