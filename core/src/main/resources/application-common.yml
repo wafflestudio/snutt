@@ -46,6 +46,15 @@ secret-names: dev/snutt-timetable
 spring:
   config:
     activate:
+      on-profile: local
+logging:
+  config: classpath:logback/local.xml
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: dev
   data:
     mongodb:
