@@ -9,15 +9,19 @@ import com.wafflestudio.snutt.theme.data.ThemeStatus
 import com.wafflestudio.snutt.theme.data.TimetableTheme
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.div
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.ConvertOperators
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation
 import org.springframework.data.mongodb.core.exists
 import org.springframework.data.mongodb.core.find
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.and
-import org.springframework.data.mongodb.core.query.inValues
 import org.springframework.data.mongodb.core.query.regex
 import org.springframework.data.mongodb.core.updateFirst
 
@@ -93,26 +97,55 @@ class TimetableThemeCustomRepositoryImpl(
     }
 
     override suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme> {
-        val publishedThemeIds =
-            reactiveMongoTemplate.find<TimetableTheme>(
-                Query.query(
-                    TimetableTheme::userId.inValues(userIds) and TimetableTheme::status isEqualTo ThemeStatus.PUBLISHED,
+        val downloadedOriginThemeStages =
+            listOf(
+                Aggregation.match(
+                    Criteria.where("userId").`in`(userIds)
+                        .and("status").`is`(ThemeStatus.DOWNLOADED),
                 ),
-            ).collectList().awaitSingle().map { theme -> theme.id }
+                Aggregation.project()
+                    .and(ConvertOperators.ToObjectId.toObjectId("\$origin.originId")).`as`("effectiveThemeId"),
+                Aggregation.lookup()
+                    .from("timetableTheme")
+                    .localField("effectiveThemeId")
+                    .foreignField("_id")
+                    .`as`("themeDetails"),
+                Aggregation.unwind("themeDetails"),
+                Aggregation.replaceRoot("themeDetails"),
+            )
 
-        val sourceIds =
-            reactiveMongoTemplate.find<TimetableTheme>(
-                Query.query(
-                    TimetableTheme::userId.inValues(userIds) and TimetableTheme::status isEqualTo ThemeStatus.DOWNLOADED,
+        val publishedThemeStages =
+            listOf(
+                Aggregation.match(
+                    Criteria.where("userId").`in`(userIds)
+                        .and("status").`is`(ThemeStatus.PUBLISHED),
                 ),
-            ).collectList().awaitSingle().mapNotNull { theme -> theme.origin?.originId }
+                Aggregation.replaceRoot("$\$ROOT"),
+            )
 
-        val ids = (publishedThemeIds + sourceIds).toSet()
+        val facetOperation =
+            Aggregation.facet()
+                .and(*downloadedOriginThemeStages.toTypedArray()).`as`("downloadedThemes")
+                .and(*publishedThemeStages.toTypedArray()).`as`("publishedThemes")
 
-        return reactiveMongoTemplate.find<TimetableTheme>(
-            Query.query(
-                TimetableTheme::id.inValues(ids),
-            ).with((TimetableTheme::publishInfo / ThemeMarketInfo::downloads).desc()),
+        val combinedAggregation =
+            TypedAggregation.newAggregation(
+                TimetableTheme::class.java,
+                facetOperation,
+                Aggregation.project()
+                    .andExpression("concatArrays('\$downloadedThemes', '\$publishedThemes')").`as`("combinedThemes"),
+                Aggregation.unwind("\$combinedThemes"),
+                Aggregation.replaceRoot("\$combinedThemes"),
+                Aggregation.group("_id")
+                    .first("$\$ROOT").`as`("doc"),
+                Aggregation.replaceRoot("\$doc"),
+                Aggregation.sort(Sort.Direction.DESC, "publishInfo.downloads"),
+            )
+
+        return reactiveMongoTemplate.aggregate(
+            combinedAggregation,
+            "timetableTheme",
+            TimetableTheme::class.java,
         ).collectList().awaitSingle()
     }
 }
