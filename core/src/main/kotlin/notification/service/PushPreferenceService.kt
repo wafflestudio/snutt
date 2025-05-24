@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.notification.service
 
 import com.wafflestudio.snutt.notification.data.PushPreference
+import com.wafflestudio.snutt.notification.data.PushPreferenceItem
 import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.dto.PushPreferenceDto
 import com.wafflestudio.snutt.notification.repository.PushPreferenceRepository
@@ -48,7 +49,17 @@ class PushPreferenceServiceImpl(
         pushPreferenceRepository.findByUserId(user.id!!)
             ?.let { PushPreferenceDto(it) }
             ?: PushPreferenceDto(
-                pushPreferences = emptyList(),
+                pushPreferences =
+                    listOf(
+                        PushPreferenceItem(
+                            type = PushPreferenceType.LECTURE_UPDATE,
+                            isEnabled = true,
+                        ),
+                        PushPreferenceItem(
+                            type = PushPreferenceType.VACANCY_NOTIFICATION,
+                            isEnabled = true,
+                        ),
+                    ),
             )
 
     override suspend fun isPushPreferenceEnabled(
@@ -63,7 +74,7 @@ class PushPreferenceServiceImpl(
             .findByUserId(userId)
             ?.pushPreferences
             ?.any { it.type == pushPreferenceType && it.isEnabled }
-            ?: false
+            ?: true
     }
 
     override suspend fun filterUsersByPushPreference(
@@ -74,12 +85,16 @@ class PushPreferenceServiceImpl(
             return userIds
         }
 
-        return pushPreferenceRepository
-            .findByUserIdIn(userIds)
-            .filter { pushPreference ->
-                pushPreference.pushPreferences
-                    .any { it.type == pushPreferenceType && it.isEnabled }
-            }
-            .map { it.userId }
+        val disabledUserIds =
+            pushPreferenceRepository
+                .findByUserIdIn(userIds)
+                .filter { pushPreference ->
+                    pushPreference.pushPreferences
+                        .any { it.type == pushPreferenceType && !it.isEnabled }
+                }
+                .map { it.userId }
+                .toSet()
+
+        return userIds - disabledUserIds
     }
 }
