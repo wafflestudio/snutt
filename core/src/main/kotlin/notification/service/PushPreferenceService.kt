@@ -50,16 +50,11 @@ class PushPreferenceServiceImpl(
             ?.let { PushPreferenceDto(it) }
             ?: PushPreferenceDto(
                 pushPreferences =
-                    listOf(
-                        PushPreferenceItem(
-                            type = PushPreferenceType.LECTURE_UPDATE,
-                            isEnabled = true,
-                        ),
-                        PushPreferenceItem(
-                            type = PushPreferenceType.VACANCY_NOTIFICATION,
-                            isEnabled = true,
-                        ),
-                    ),
+                    PushPreferenceType.entries
+                        .filterNot { it == PushPreferenceType.NORMAL }
+                        .map {
+                            PushPreferenceItem(type = it, isEnabled = true)
+                        },
             )
 
     override suspend fun isPushPreferenceEnabled(
