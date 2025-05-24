@@ -35,12 +35,22 @@ class PushPreferenceServiceImpl(
         user: User,
         pushPreferenceDto: PushPreferenceDto,
     ) {
+        val pushPreferenceDtoMap = pushPreferenceDto.pushPreferences.associate { it.type to it.isEnabled }
+
+        val pushPreferenceItemsWithDefault =
+            PushPreferenceType.entries.map {
+                PushPreferenceItem(
+                    type = it,
+                    isEnabled = pushPreferenceDtoMap[it] ?: it.isEnabledByDefault,
+                )
+            }
+
         pushPreferenceRepository.save(
             pushPreferenceRepository.findByUserId(user.id!!)
-                ?.copy(pushPreferences = pushPreferenceDto.pushPreferences)
+                ?.copy(pushPreferences = pushPreferenceItemsWithDefault)
                 ?: PushPreference(
                     userId = user.id,
-                    pushPreferences = pushPreferenceDto.pushPreferences,
+                    pushPreferences = pushPreferenceItemsWithDefault,
                 ),
         )
     }
