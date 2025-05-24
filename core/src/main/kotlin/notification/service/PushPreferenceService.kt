@@ -53,7 +53,7 @@ class PushPreferenceServiceImpl(
                     PushPreferenceType.entries
                         .filterNot { it == PushPreferenceType.NORMAL }
                         .map {
-                            PushPreferenceItem(type = it, isEnabled = true)
+                            PushPreferenceItem(type = it, isEnabled = it.isEnabledByDefault)
                         },
             )
 
@@ -68,8 +68,9 @@ class PushPreferenceServiceImpl(
         return pushPreferenceRepository
             .findByUserId(userId)
             ?.pushPreferences
-            ?.any { it.type == pushPreferenceType && it.isEnabled }
-            ?: true
+            ?.find { it.type == pushPreferenceType }
+            ?.isEnabled
+            ?: pushPreferenceType.isEnabledByDefault
     }
 
     override suspend fun filterUsersByPushPreference(
@@ -80,16 +81,20 @@ class PushPreferenceServiceImpl(
             return userIds
         }
 
-        val disabledUserIds =
+        val userIdsToCustomPushPreferences =
             pushPreferenceRepository
                 .findByUserIdIn(userIds)
-                .filter { pushPreference ->
-                    pushPreference.pushPreferences
-                        .any { it.type == pushPreferenceType && !it.isEnabled }
-                }
-                .map { it.userId }
-                .toSet()
+                .associateBy { it.userId }
 
-        return userIds - disabledUserIds
+        return userIds.filter {
+                userId ->
+            val customEnabled =
+                userIdsToCustomPushPreferences[userId]
+                    ?.pushPreferences
+                    ?.find { it.type == pushPreferenceType }
+                    ?.isEnabled
+
+            customEnabled ?: pushPreferenceType.isEnabledByDefault
+        }
     }
 }
