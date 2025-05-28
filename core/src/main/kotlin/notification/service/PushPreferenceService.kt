@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.notification.service
 
 import com.wafflestudio.snutt.notification.data.PushPreference
+import com.wafflestudio.snutt.notification.data.PushPreferenceItem
 import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.dto.PushPreferenceDto
 import com.wafflestudio.snutt.notification.repository.PushPreferenceRepository
@@ -34,12 +35,22 @@ class PushPreferenceServiceImpl(
         user: User,
         pushPreferenceDto: PushPreferenceDto,
     ) {
+        val pushPreferenceDtoMap = pushPreferenceDto.pushPreferences.associate { it.type to it.isEnabled }
+
+        val pushPreferenceItemsWithDefault =
+            PushPreferenceType.entries.map {
+                PushPreferenceItem(
+                    type = it,
+                    isEnabled = pushPreferenceDtoMap[it] ?: it.isEnabledByDefault,
+                )
+            }
+
         pushPreferenceRepository.save(
             pushPreferenceRepository.findByUserId(user.id!!)
-                ?.copy(pushPreferences = pushPreferenceDto.pushPreferences)
+                ?.copy(pushPreferences = pushPreferenceItemsWithDefault)
                 ?: PushPreference(
                     userId = user.id,
-                    pushPreferences = pushPreferenceDto.pushPreferences,
+                    pushPreferences = pushPreferenceItemsWithDefault,
                 ),
         )
     }
@@ -48,7 +59,12 @@ class PushPreferenceServiceImpl(
         pushPreferenceRepository.findByUserId(user.id!!)
             ?.let { PushPreferenceDto(it) }
             ?: PushPreferenceDto(
-                pushPreferences = emptyList(),
+                pushPreferences =
+                    PushPreferenceType.entries
+                        .filterNot { it == PushPreferenceType.NORMAL }
+                        .map {
+                            PushPreferenceItem(type = it, isEnabled = it.isEnabledByDefault)
+                        },
             )
 
     override suspend fun isPushPreferenceEnabled(
@@ -62,8 +78,9 @@ class PushPreferenceServiceImpl(
         return pushPreferenceRepository
             .findByUserId(userId)
             ?.pushPreferences
-            ?.any { it.type == pushPreferenceType && it.isEnabled }
-            ?: false
+            ?.find { it.type == pushPreferenceType }
+            ?.isEnabled
+            ?: pushPreferenceType.isEnabledByDefault
     }
 
     override suspend fun filterUsersByPushPreference(
@@ -74,12 +91,20 @@ class PushPreferenceServiceImpl(
             return userIds
         }
 
-        return pushPreferenceRepository
-            .findByUserIdIn(userIds)
-            .filter { pushPreference ->
-                pushPreference.pushPreferences
-                    .any { it.type == pushPreferenceType && it.isEnabled }
-            }
-            .map { it.userId }
+        val userIdsToCustomPushPreferences =
+            pushPreferenceRepository
+                .findByUserIdIn(userIds)
+                .associateBy { it.userId }
+
+        return userIds.filter {
+                userId ->
+            val customEnabled =
+                userIdsToCustomPushPreferences[userId]
+                    ?.pushPreferences
+                    ?.find { it.type == pushPreferenceType }
+                    ?.isEnabled
+
+            customEnabled ?: pushPreferenceType.isEnabledByDefault
+        }
     }
 }
