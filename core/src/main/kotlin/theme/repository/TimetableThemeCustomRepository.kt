@@ -120,7 +120,6 @@ class TimetableThemeCustomRepositoryImpl(
                     Criteria.where("userId").`in`(userIds)
                         .and("status").`is`(ThemeStatus.PUBLISHED),
                 ),
-                Aggregation.replaceRoot("$\$ROOT"),
             )
 
         val facetOperation =
