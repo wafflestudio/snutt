@@ -55,7 +55,7 @@ enum class ErrorType(
     ALREADY_SOCIAL_ACCOUNT(HttpStatus.BAD_REQUEST, 40020, "이미 소셜 계정이 존재합니다.", "이미 소셜 계정이 존재합니다."),
     UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요.", "앱 버전을 업데이트해주세요."),
     NOT_PUBLISHED_THEME(HttpStatus.BAD_REQUEST, 40022, "공유한 테마가 아닙니다", "공유한 테마가 아닙니다"),
-    PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "공유한 테마는 삭제할 수 없습니다", "공유한 테마는 삭제할 수 없습니다"),
+    PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "테마를 삭제할 수 없습니다. 공유한 테마를 먼저 삭제해주세요.", "테마를 삭제할 수 없습니다. 공유한 테마를 먼저 삭제해주세요."),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다.", "소셜 로그인에 실패했습니다."),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다.", "소셜 로그인에 실패했습니다."),
