@@ -14,6 +14,7 @@ import org.springframework.data.mapping.div
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators
 import org.springframework.data.mongodb.core.aggregation.ConvertOperators
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation
 import org.springframework.data.mongodb.core.exists
@@ -97,7 +98,7 @@ class TimetableThemeCustomRepositoryImpl(
     }
 
     override suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme> {
-        val downloadedOriginThemeStages =
+        val downloadedOriginStages =
             listOf(
                 Aggregation.match(
                     Criteria.where("userId").`in`(userIds)
@@ -113,8 +114,7 @@ class TimetableThemeCustomRepositoryImpl(
                 Aggregation.unwind("themeDetails"),
                 Aggregation.replaceRoot("themeDetails"),
             )
-
-        val publishedThemeStages =
+        val publishedStages =
             listOf(
                 Aggregation.match(
                     Criteria.where("userId").`in`(userIds)
@@ -124,15 +124,16 @@ class TimetableThemeCustomRepositoryImpl(
 
         val facetOperation =
             Aggregation.facet()
-                .and(*downloadedOriginThemeStages.toTypedArray()).`as`("downloadedThemes")
-                .and(*publishedThemeStages.toTypedArray()).`as`("publishedThemes")
+                .and(*downloadedOriginStages.toTypedArray()).`as`("downloadedThemes")
+                .and(*publishedStages.toTypedArray()).`as`("publishedThemes")
 
         val combinedAggregation =
             TypedAggregation.newAggregation(
                 TimetableTheme::class.java,
                 facetOperation,
                 Aggregation.project()
-                    .andExpression("concatArrays('\$downloadedThemes', '\$publishedThemes')").`as`("combinedThemes"),
+                    .and(ArrayOperators.ConcatArrays.arrayOf("\$downloadedThemes").concat("\$publishedThemes"))
+                    .`as`("combinedThemes"),
                 Aggregation.unwind("\$combinedThemes"),
                 Aggregation.replaceRoot("\$combinedThemes"),
                 Aggregation.group("_id")
