@@ -335,6 +335,12 @@ class MainRouter(
             }
         }
 
+    @Bean
+    fun diaryRouter() =
+        v1CoRouter {
+            "/diary".nest {}
+        }
+
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) =
         coRouter {
             path("/v1").or("").nest(r)
