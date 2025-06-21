@@ -39,8 +39,9 @@ class TimetableThemeHandler(
     suspend fun getFriendsThemes(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
+            val page = req.parseRequiredQueryParam<Int>("page")
 
-            val themes = timetableThemeService.getFriendsThemes(userId)
+            val themes = timetableThemeService.getFriendsThemes(userId, page)
             val result = timetableThemeService.convertThemesToTimetableDtos(themes)
             ListResponse(result)
         }
@@ -105,6 +106,14 @@ class TimetableThemeHandler(
             val themeId = req.pathVariable("themeId")
 
             timetableThemeService.deleteTheme(userId, themeId)
+        }
+
+    suspend fun deletePublishedTheme(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val themeId = req.pathVariable("themeId")
+
+            timetableThemeService.deletePublishedTheme(userId, themeId)
         }
 
     suspend fun copyTheme(req: ServerRequest) =

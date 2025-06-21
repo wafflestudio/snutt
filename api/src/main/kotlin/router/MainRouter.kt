@@ -279,6 +279,7 @@ class MainRouter(
                 POST("/{themeId}/copy", timetableThemeHandler::copyTheme)
                 POST("/{themeId}/default", timetableThemeHandler::setDefault)
                 POST("/{themeId}/publish", timetableThemeHandler::publishTheme)
+                DELETE("/{themeId}/publish", timetableThemeHandler::deletePublishedTheme)
                 POST("/{themeId}/download", timetableThemeHandler::downloadTheme)
                 POST("/search", timetableThemeHandler::searchThemes)
                 POST("/basic/{basicThemeTypeValue}/default", timetableThemeHandler::setBasicThemeTypeDefault)
