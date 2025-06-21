@@ -44,7 +44,10 @@ interface TimetableThemeCustomRepository {
 
     suspend fun addDownloadCount(id: String)
 
-    suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme>
+    suspend fun findOriginalThemesByUserIds(
+        userIds: List<String>,
+        page: Int,
+    ): List<TimetableTheme>
 }
 
 class TimetableThemeCustomRepositoryImpl(
@@ -108,7 +111,10 @@ class TimetableThemeCustomRepositoryImpl(
         ).awaitSingle()
     }
 
-    override suspend fun findOriginalThemesByUserIds(userIds: List<String>): List<TimetableTheme> {
+    override suspend fun findOriginalThemesByUserIds(
+        userIds: List<String>,
+        page: Int,
+    ): List<TimetableTheme> {
         val downloadedOriginStages =
             arrayOf(
                 Aggregation.match(
@@ -157,6 +163,6 @@ class TimetableThemeCustomRepositoryImpl(
         return reactiveMongoTemplate.aggregate(
             combinedAggregation,
             TimetableTheme::class.java,
-        ).collectList().awaitSingle()
+        ).skip((page - 1) * 10L).take(10).collectList().awaitSingle()
     }
 }

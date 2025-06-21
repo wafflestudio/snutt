@@ -30,7 +30,10 @@ interface TimetableThemeService {
 
     suspend fun getBestThemes(page: Int): List<TimetableTheme>
 
-    suspend fun getFriendsThemes(userId: String): List<TimetableTheme>
+    suspend fun getFriendsThemes(
+        userId: String,
+        page: Int,
+    ): List<TimetableTheme>
 
     suspend fun addTheme(
         userId: String,
@@ -134,9 +137,12 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.findPublishedTimetablesOrderByDownloadsDesc(page)
     }
 
-    override suspend fun getFriendsThemes(userId: String): List<TimetableTheme> {
+    override suspend fun getFriendsThemes(
+        userId: String,
+        page: Int,
+    ): List<TimetableTheme> {
         val friendIds = friendService.getMyFriends(userId, state = FriendState.ACTIVE).map { it.second.id!! }
-        return timetableThemeRepository.findOriginalThemesByUserIds(friendIds)
+        return timetableThemeRepository.findOriginalThemesByUserIds(friendIds, page)
     }
 
     override suspend fun addTheme(
