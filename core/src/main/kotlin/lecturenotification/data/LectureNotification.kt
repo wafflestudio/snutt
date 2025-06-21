@@ -33,5 +33,5 @@ data class LectureNotification(
 
 data class LectureNotificationSchedule(
     val minuteOfWeek: Int,
-    val notifiedAt: Instant? = null
+    val notifiedAt: Instant? = null,
 )

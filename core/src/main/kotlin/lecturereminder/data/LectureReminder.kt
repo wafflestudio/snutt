@@ -21,5 +21,5 @@ enum class LectureReminderOffset(
 ) {
     ZERO(0),
     TEN_MINUTES_BEFORE(-10),
-    TEM_MINUTES_AFTER(10);
+    TEM_MINUTES_AFTER(10),
 }
