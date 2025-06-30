@@ -82,6 +82,10 @@ object AlreadySocialAccountException : SnuttException(ErrorType.ALREADY_SOCIAL_A
 
 object UpdateAppVersionException : SnuttException(ErrorType.UPDATE_APP_VERSION)
 
+object NotPublishedThemeException : SnuttException(ErrorType.NOT_PUBLISHED_THEME)
+
+object PublishedThemeDeleteErrorException : SnuttException(ErrorType.PUBLISHED_THEME_DELETE_ERROR)
+
 object SocialConnectFailException : SnuttException(ErrorType.SOCIAL_CONNECT_FAIL)
 
 object InvalidAppleLoginTokenException : SnuttException(ErrorType.INVALID_APPLE_LOGIN_TOKEN)

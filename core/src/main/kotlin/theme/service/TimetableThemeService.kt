@@ -6,6 +6,8 @@ import com.wafflestudio.snutt.common.exception.DuplicateThemeNameException
 import com.wafflestudio.snutt.common.exception.InvalidThemeColorCountException
 import com.wafflestudio.snutt.common.exception.InvalidThemeTypeException
 import com.wafflestudio.snutt.common.exception.NotDefaultThemeErrorException
+import com.wafflestudio.snutt.common.exception.NotPublishedThemeException
+import com.wafflestudio.snutt.common.exception.PublishedThemeDeleteErrorException
 import com.wafflestudio.snutt.common.exception.ThemeNotFoundException
 import com.wafflestudio.snutt.friend.dto.FriendState
 import com.wafflestudio.snutt.friend.service.FriendService
@@ -28,7 +30,10 @@ interface TimetableThemeService {
 
     suspend fun getBestThemes(page: Int): List<TimetableTheme>
 
-    suspend fun getFriendsThemes(userId: String): List<TimetableTheme>
+    suspend fun getFriendsThemes(
+        userId: String,
+        page: Int,
+    ): List<TimetableTheme>
 
     suspend fun addTheme(
         userId: String,
@@ -57,6 +62,11 @@ interface TimetableThemeService {
     ): TimetableTheme
 
     suspend fun deleteTheme(
+        userId: String,
+        themeId: String,
+    )
+
+    suspend fun deletePublishedTheme(
         userId: String,
         themeId: String,
     )
@@ -127,9 +137,12 @@ class TimetableThemeServiceImpl(
         return timetableThemeRepository.findPublishedTimetablesOrderByDownloadsDesc(page)
     }
 
-    override suspend fun getFriendsThemes(userId: String): List<TimetableTheme> {
+    override suspend fun getFriendsThemes(
+        userId: String,
+        page: Int,
+    ): List<TimetableTheme> {
         val friendIds = friendService.getMyFriends(userId, state = FriendState.ACTIVE).map { it.second.id!! }
-        return timetableThemeRepository.findByUserIdInAndStatus(friendIds, ThemeStatus.PUBLISHED)
+        return timetableThemeRepository.findOriginalThemesByUserIds(friendIds, page)
     }
 
     override suspend fun addTheme(
@@ -244,7 +257,24 @@ class TimetableThemeServiceImpl(
         }
         timetableRepository.saveAll(timetables).collect()
 
+        if (theme.status == ThemeStatus.PUBLISHED) throw PublishedThemeDeleteErrorException
+
         timetableThemeRepository.delete(theme)
+    }
+
+    override suspend fun deletePublishedTheme(
+        userId: String,
+        themeId: String,
+    ) {
+        val theme = getCustomTheme(userId, themeId)
+
+        if (theme.status == ThemeStatus.PUBLISHED) {
+            theme.status = ThemeStatus.PRIVATE
+        } else {
+            throw NotPublishedThemeException
+        }
+
+        timetableThemeRepository.save(theme)
     }
 
     override suspend fun copyTheme(

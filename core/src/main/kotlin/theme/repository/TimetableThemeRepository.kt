@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.theme.repository
 
-import com.wafflestudio.snutt.theme.data.ThemeStatus
 import com.wafflestudio.snutt.theme.data.TimetableTheme
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
@@ -16,9 +15,4 @@ interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, Str
         userId: String,
         name: String,
     ): Boolean
-
-    suspend fun findByUserIdInAndStatus(
-        userIds: List<String>,
-        status: ThemeStatus,
-    ): List<TimetableTheme>
 }
