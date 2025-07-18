@@ -7,6 +7,8 @@ import com.wafflestudio.snutt.clientconfig.service.ClientConfigService
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.storage.StorageService
 import com.wafflestudio.snutt.common.storage.StorageSource
+import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
+import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.middleware.SnuttRestAdminApiMiddleware
 import com.wafflestudio.snutt.notification.service.NotificationAdminService
 import com.wafflestudio.snutt.popup.dto.PopupResponse
@@ -24,6 +26,7 @@ class AdminHandler(
     private val configService: ClientConfigService,
     private val storageService: StorageService,
     private val popupService: PopupService,
+    private val diaryService: DiaryService,
     snuttRestAdminApiMiddleware: SnuttRestAdminApiMiddleware,
 ) : ServiceHandler(snuttRestAdminApiMiddleware) {
     suspend fun insertNotification(req: ServerRequest) =
@@ -89,5 +92,43 @@ class AdminHandler(
             val popupId = req.pathVariable("id")
 
             popupService.deletePopup(popupId)
+        }
+
+    suspend fun getDiaryQuestions(req: ServerRequest) =
+        handle(req) {
+            diaryService.getActiveQuestions()
+        }
+
+    suspend fun insertDiaryQuestion(req: ServerRequest) =
+        handle(req) {
+            val body = req.awaitBody<DiaryAddQuestionRequestDto>()
+
+            diaryService.addQuestion(body)
+        }
+
+    suspend fun removeDiaryQuestion(req: ServerRequest) =
+        handle(req) {
+            val questionId = req.pathVariable("id")
+
+            diaryService.removeQuestion(questionId)
+        }
+
+    suspend fun getAllDiaryActivityTypes(req: ServerRequest) =
+        handle(req) {
+            diaryService.getAllActivityTypes()
+        }
+
+    suspend fun insertDiaryActivityType(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
+
+            diaryService.addOrEnableActivityType(name)
+        }
+
+    suspend fun removeDiaryActivityType(req: ServerRequest) =
+        handle(req) {
+            val name = req.pathVariable("name")
+
+            diaryService.disableActivityType(name)
         }
 }

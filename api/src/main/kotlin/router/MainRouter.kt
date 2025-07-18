@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.handler.BuildingHandler
 import com.wafflestudio.snutt.handler.ConfigHandler
 import com.wafflestudio.snutt.handler.CoursebookHandler
 import com.wafflestudio.snutt.handler.DeviceHandler
+import com.wafflestudio.snutt.handler.DiaryHandler
 import com.wafflestudio.snutt.handler.EvHandler
 import com.wafflestudio.snutt.handler.EvServiceHandler
 import com.wafflestudio.snutt.handler.FeedbackHandler
@@ -70,6 +71,7 @@ class MainRouter(
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
     private val feedbackHandler: FeedbackHandler,
+    private val diaryHandler: DiaryHandler,
     private val staticPageHandler: StaticPageHandler,
     private val evServiceHandler: EvServiceHandler,
     private val pushPreferenceHandler: PushPreferenceHandler,
@@ -212,6 +214,13 @@ class MainRouter(
 
                 POST("/popups", adminHandler::postPopup)
                 DELETE("/popups/{id}", adminHandler::deletePopup)
+
+                GET("/diary/activityTypes", adminHandler::getAllDiaryActivityTypes)
+                GET("/diary/questions", adminHandler::getDiaryQuestions)
+                POST("/diary/activityTypes/{name}", adminHandler::insertDiaryActivityType)
+                DELETE("/diary/activityTypes/{name}", adminHandler::removeDiaryActivityType)
+                POST("/diary/questions", adminHandler::insertDiaryQuestion)
+                DELETE("/diary/questions/{id}", adminHandler::removeDiaryQuestion)
             }
         }
 
@@ -338,7 +347,12 @@ class MainRouter(
     @Bean
     fun diaryRouter() =
         v1CoRouter {
-            "/diary".nest {}
+            "/diary".nest {
+                GET("/my", diaryHandler::getMySubmissions)
+                GET("/questions", diaryHandler::getQuestionnaireFromActivityTypes)
+                GET("/activityTypes", diaryHandler::getActivityTypes)
+                POST("/submit", diaryHandler::submitDiary)
+            }
         }
 
     private fun v1CoRouter(r: CoRouterFunctionDsl.() -> Unit) =

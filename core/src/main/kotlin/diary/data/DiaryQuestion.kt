@@ -10,7 +10,7 @@ data class DiaryQuestion(
     val question: String,
     val shortenedQuestion: String,
     val answers: List<String>,
-    val answersShortened: List<String>,
-    val forTopics: List<DiaryActivityType>,
-    val isActive: Boolean = true,
+    val shortenedAnswers: List<String>,
+    val targetTopics: List<DiaryActivityType>,
+    var active: Boolean = true,
 )
