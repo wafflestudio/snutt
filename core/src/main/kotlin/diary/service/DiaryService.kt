@@ -84,7 +84,7 @@ class DiaryService(
                     questions[questionId]?.let { question ->
                         DiaryShortQuestionReply(
                             question = question.shortQuestion,
-                            answer = question.answers[submission.answerIndexes[index]],
+                            answer = question.shortAnswers[submission.answerIndexes[index]],
                         )
                     }
                 }
