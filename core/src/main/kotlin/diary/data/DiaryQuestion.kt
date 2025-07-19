@@ -8,9 +8,9 @@ data class DiaryQuestion(
     @Id
     val id: String? = null,
     val question: String,
-    val shortenedQuestion: String,
+    val shortQuestion: String,
     val answers: List<String>,
-    val shortenedAnswers: List<String>,
+    val shortAnswers: List<String>,
     val targetTopics: List<DiaryActivityType>,
     var active: Boolean = true,
 )

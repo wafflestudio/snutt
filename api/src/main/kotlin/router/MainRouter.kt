@@ -30,6 +30,7 @@ import com.wafflestudio.snutt.router.docs.BookmarkDocs
 import com.wafflestudio.snutt.router.docs.BuildingsDocs
 import com.wafflestudio.snutt.router.docs.ConfigDocs
 import com.wafflestudio.snutt.router.docs.CoursebookDocs
+import com.wafflestudio.snutt.router.docs.DiaryDocs
 import com.wafflestudio.snutt.router.docs.EvDocs
 import com.wafflestudio.snutt.router.docs.FeedbackDocs
 import com.wafflestudio.snutt.router.docs.FriendDocs
@@ -345,13 +346,14 @@ class MainRouter(
         }
 
     @Bean
+    @DiaryDocs
     fun diaryRouter() =
         v1CoRouter {
             "/diary".nest {
                 GET("/my", diaryHandler::getMySubmissions)
-                POST("/questions", diaryHandler::getQuestionnaireFromActivityTypes)
+                POST("/questionnaire", diaryHandler::getQuestionnaireFromActivityTypes)
                 GET("/activityTypes", diaryHandler::getActivityTypes)
-                POST("/submit", diaryHandler::submitDiary)
+                POST("", diaryHandler::submitDiary)
             }
         }
 

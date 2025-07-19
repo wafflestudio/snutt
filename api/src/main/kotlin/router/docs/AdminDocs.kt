@@ -5,6 +5,9 @@ import com.wafflestudio.snutt.clientconfig.dto.PatchConfigRequest
 import com.wafflestudio.snutt.clientconfig.dto.PostConfigRequest
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
+import com.wafflestudio.snutt.diary.dto.DiaryActivityTypeDto
+import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
+import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.dto.PostPopupRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -188,6 +191,95 @@ import org.springframework.web.bind.annotation.RequestMethod
                     Parameter(`in` = ParameterIn.PATH, name = "id", required = true),
                 ],
                 responses = [ApiResponse(responseCode = "200")],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/activityTypes",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getAllDiaryActivityTypes",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryActivityTypeDto::class)))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/questions",
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "getDiaryQuestions",
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryQuestionDto::class)))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/activityTypes",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "insertDiaryActivityType",
+                parameters = [
+                    Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
+                ],
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/activityTypes",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "removeDiaryActivityType",
+                parameters = [
+                    Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
+                ],
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/questions",
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "insertDiaryQuestion",
+                requestBody =
+                    RequestBody(
+                        content = [
+                            Content(
+                                schema = Schema(implementation = DiaryAddQuestionRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            ),
+                        ],
+                        required = true,
+                    ),
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/admin/diary/questions/{id}",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "removeDiaryQuestion",
+                parameters = [
+                    Parameter(`in` = ParameterIn.PATH, name = "id", required = true),
+                ],
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
             ),
     ),
 )

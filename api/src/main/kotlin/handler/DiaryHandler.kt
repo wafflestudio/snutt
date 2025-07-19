@@ -1,5 +1,9 @@
 package com.wafflestudio.snutt.handler
 
+import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.diary.dto.DiaryActivityTypeDto
+import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
+import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryService
@@ -20,18 +24,28 @@ class DiaryHandler(
             val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            diaryService.generateQuestionnaire(userId, body.lectureId, body.activityTypes)
+            diaryService.generateQuestionnaire(userId, body.lectureId, body.activityTypes).map {
+                DiaryQuestionDto(it)
+            }
         }
 
     suspend fun getMySubmissions(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
-            diaryService.getMySubmissions(userId)
+            val submissions = diaryService.getMySubmissions(userId)
+            val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
+
+            submissions.map {
+                    submission ->
+                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
+            }
         }
 
     suspend fun getActivityTypes(req: ServerRequest) =
         handle(req) {
-            diaryService.getActiveActivityTypes()
+            diaryService.getActiveActivityTypes().map {
+                DiaryActivityTypeDto(it)
+            }
         }
 
     suspend fun submitDiary(req: ServerRequest) =
@@ -40,5 +54,6 @@ class DiaryHandler(
             val body = req.awaitBody<DiarySubmissionRequestDto>()
 
             diaryService.submitDiary(userId, body)
+            OkResponse()
         }
 }

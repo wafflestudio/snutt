@@ -1,16 +1,18 @@
 package com.wafflestudio.snutt.diary.service
 
+import com.wafflestudio.snutt.common.exception.DiaryActivityTypeNotFoundException
+import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.diary.data.DiaryActivityType
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import com.wafflestudio.snutt.diary.dto.DiaryShortQuestionReply
-import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.repository.DiaryActivityTypeRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 
@@ -34,6 +36,7 @@ class DiaryService(
                 .flatMap { it.questionIds }
                 .toSet()
 
+        println(answeredQuestionIds)
         return questions.filterNot { question -> question.id in answeredQuestionIds }
             .shuffled()
             .take(3)
@@ -50,6 +53,14 @@ class DiaryService(
         request: DiarySubmissionRequestDto,
     ) {
         val lecture = lectureService.getByIdOrNull(request.lectureId)!!
+        val activityTypes = diaryActivityTypeRepository.findByNameIn(request.activityTypes).toList()
+        if (!diaryQuestionRepository.existsAllById(request.questionIds)) {
+            throw DiaryQuestionNotFoundException
+        }
+        if (activityTypes.size < request.activityTypes.size) {
+            throw DiaryActivityTypeNotFoundException
+        }
+
         val submission =
             DiarySubmission(
                 userId = userId,
@@ -58,27 +69,28 @@ class DiaryService(
                 courseTitle = lecture.courseTitle,
                 answerIndexes = request.answerIndexes,
                 questionIds = request.questionIds,
+                activityTypeIds = activityTypes.map { it.id!! },
             )
         diarySubmissionRepository.save(submission)
     }
 
-    suspend fun getMySubmissions(userId: String): List<DiarySubmissionSummaryDto> =
-        diarySubmissionRepository.findAllByUserIdOrderByCreatedAt(userId).map { submission ->
+    suspend fun getMySubmissions(userId: String): List<DiarySubmission> = diarySubmissionRepository.findAllByUserIdOrderByCreatedAt(userId)
+
+    suspend fun getSubmissionIdShortQuestionRepliesMap(submissions: List<DiarySubmission>): Map<String, List<DiaryShortQuestionReply>> {
+        val questions = diaryQuestionRepository.findAllByIdIn(submissions.flatMap { it.questionIds }).associateBy { it.id }
+        return submissions.associate { submission ->
             val shortQuestionReplies =
-                submission.questionIds.mapIndexed { index, questionId ->
-                    val question = diaryQuestionRepository.findById(questionId)!!
-                    DiaryShortQuestionReply(
-                        question = question.shortenedQuestion,
-                        answer = question.shortenedAnswers[index],
-                    )
+                submission.questionIds.mapIndexedNotNull { index, questionId ->
+                    questions[questionId]?.let { question ->
+                        DiaryShortQuestionReply(
+                            question = question.shortQuestion,
+                            answer = question.answers[submission.answerIndexes[index]],
+                        )
+                    }
                 }
-            DiarySubmissionSummaryDto(
-                date = submission.createdAt,
-                lectureTitle = submission.courseTitle,
-                shortQuestionReplies = shortQuestionReplies,
-                comment = submission.comment,
-            )
+            submission.id!! to shortQuestionReplies
         }
+    }
 
     suspend fun addOrEnableActivityType(name: String) {
         val activityType = diaryActivityTypeRepository.findByName(name) ?: DiaryActivityType(name = name, active = true)
@@ -96,10 +108,10 @@ class DiaryService(
         val question =
             DiaryQuestion(
                 answers = request.answers,
-                shortenedAnswers = request.shortenedAnswers,
+                shortAnswers = request.shortAnswers,
                 question = request.question,
-                shortenedQuestion = request.shortenedQuestion,
-                targetTopics = diaryActivityTypeRepository.findByNameIn(request.targetTopics),
+                shortQuestion = request.shortQuestion,
+                targetTopics = diaryActivityTypeRepository.findByNameIn(request.targetActivityTypes),
             )
         diaryQuestionRepository.save(question)
     }

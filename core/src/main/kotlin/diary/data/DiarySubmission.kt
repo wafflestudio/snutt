@@ -12,6 +12,7 @@ data class DiarySubmission(
     val id: String? = null,
     @Field(targetType = FieldType.OBJECT_ID)
     val userId: String,
+    val activityTypeIds: List<String>,
     val questionIds: List<String>,
     val answerIndexes: List<Int>,
     @Field(targetType = FieldType.OBJECT_ID)

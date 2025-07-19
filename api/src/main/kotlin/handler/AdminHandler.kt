@@ -104,6 +104,7 @@ class AdminHandler(
             val body = req.awaitBody<DiaryAddQuestionRequestDto>()
 
             diaryService.addQuestion(body)
+            OkResponse()
         }
 
     suspend fun removeDiaryQuestion(req: ServerRequest) =
@@ -111,6 +112,7 @@ class AdminHandler(
             val questionId = req.pathVariable("id")
 
             diaryService.removeQuestion(questionId)
+            OkResponse()
         }
 
     suspend fun getAllDiaryActivityTypes(req: ServerRequest) =
@@ -123,6 +125,7 @@ class AdminHandler(
             val name = req.parseRequiredQueryParam<String>("name")
 
             diaryService.addOrEnableActivityType(name)
+            OkResponse()
         }
 
     suspend fun removeDiaryActivityType(req: ServerRequest) =
@@ -130,5 +133,6 @@ class AdminHandler(
             val name = req.parseRequiredQueryParam<String>("name")
 
             diaryService.disableActivityType(name)
+            OkResponse()
         }
 }

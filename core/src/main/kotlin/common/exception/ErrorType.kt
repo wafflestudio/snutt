@@ -76,6 +76,8 @@ enum class ErrorType(
     TAG_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, 40408, "태그 리스트를 찾을 수 없습니다", "태그 리스트를 찾을 수 없습니다"),
     FRIEND_LINK_NOT_FOUND(HttpStatus.NOT_FOUND, 40409, "친구 링크가 유효하지 않습니다", "친구 링크가 유효하지 않습니다"),
     SOCIAL_PROVIDER_NOT_ATTACHED(HttpStatus.NOT_FOUND, 40410, "소셜 계정이 연동되지 않았습니다", "소셜 계정이 연동되지 않았습니다"),
+    DIARY_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, 40411, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
+    DIARY_ACTIVITY_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, 40412, "강의 일기장 오늘 한 일이 유효하지 않습니다", "강의 일기장 오늘 한 일이 유효하지 않습니다"),
 
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.CONFLICT, 40900, "빈자리 알림 중복", "이미 빈자리 알림을 받고 있는 강좌입니다"),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다", "이미 사용 중인 이메일입니다"),

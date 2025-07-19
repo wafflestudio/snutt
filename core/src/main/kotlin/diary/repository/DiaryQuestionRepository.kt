@@ -8,4 +8,8 @@ interface DiaryQuestionRepository : CoroutineCrudRepository<DiaryQuestion, Strin
     suspend fun findByTargetTopicsContainsAndActiveTrue(activityTypes: List<DiaryActivityType>): List<DiaryQuestion>
 
     suspend fun findAllByActiveTrue(): List<DiaryQuestion>
+
+    suspend fun findAllByIdIn(ids: List<String>): List<DiaryQuestion>
+
+    suspend fun existsAllById(ids: List<String>): Boolean
 }
