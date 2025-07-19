@@ -120,14 +120,14 @@ class AdminHandler(
 
     suspend fun insertDiaryActivityType(req: ServerRequest) =
         handle(req) {
-            val name = req.pathVariable("name")
+            val name = req.parseRequiredQueryParam<String>("name")
 
             diaryService.addOrEnableActivityType(name)
         }
 
     suspend fun removeDiaryActivityType(req: ServerRequest) =
         handle(req) {
-            val name = req.pathVariable("name")
+            val name = req.parseRequiredQueryParam<String>("name")
 
             diaryService.disableActivityType(name)
         }

@@ -217,8 +217,8 @@ class MainRouter(
 
                 GET("/diary/activityTypes", adminHandler::getAllDiaryActivityTypes)
                 GET("/diary/questions", adminHandler::getDiaryQuestions)
-                POST("/diary/activityTypes/{name}", adminHandler::insertDiaryActivityType)
-                DELETE("/diary/activityTypes/{name}", adminHandler::removeDiaryActivityType)
+                POST("/diary/activityTypes", adminHandler::insertDiaryActivityType)
+                DELETE("/diary/activityTypes", adminHandler::removeDiaryActivityType)
                 POST("/diary/questions", adminHandler::insertDiaryQuestion)
                 DELETE("/diary/questions/{id}", adminHandler::removeDiaryQuestion)
             }
@@ -349,7 +349,7 @@ class MainRouter(
         v1CoRouter {
             "/diary".nest {
                 GET("/my", diaryHandler::getMySubmissions)
-                GET("/questions", diaryHandler::getQuestionnaireFromActivityTypes)
+                POST("/questions", diaryHandler::getQuestionnaireFromActivityTypes)
                 GET("/activityTypes", diaryHandler::getActivityTypes)
                 POST("/submit", diaryHandler::submitDiary)
             }
