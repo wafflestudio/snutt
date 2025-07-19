@@ -17,9 +17,10 @@ class DiaryHandler(
     ) {
     suspend fun getQuestionnaireFromActivityTypes(req: ServerRequest) =
         handle(req) {
+            val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            diaryService.generateQuestionnaire(body.activityTypes)
+            diaryService.generateQuestionnaire(userId, body.lectureId, body.activityTypes)
         }
 
     suspend fun getMySubmissions(req: ServerRequest) =

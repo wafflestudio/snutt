@@ -21,9 +21,22 @@ class DiaryService(
     private val diarySubmissionRepository: DiarySubmissionRepository,
     private val lectureService: LectureService,
 ) {
-    suspend fun generateQuestionnaire(activityTypeNames: List<String>): List<DiaryQuestion> {
+    suspend fun generateQuestionnaire(
+        userId: String,
+        lectureId: String,
+        activityTypeNames: List<String>,
+    ): List<DiaryQuestion> {
         val activityTypes = diaryActivityTypeRepository.findByNameIn(activityTypeNames)
-        return diaryQuestionRepository.findByTargetTopicsContainsAndActiveTrue(activityTypes)
+        val questions = diaryQuestionRepository.findByTargetTopicsContainsAndActiveTrue(activityTypes)
+        val answeredQuestionIds =
+            diarySubmissionRepository.findAllByUserIdOrderByCreatedAt(userId)
+                .filter { it.lectureId == lectureId }
+                .flatMap { it.questionIds }
+                .toSet()
+
+        return questions.filterNot { question -> question.id in answeredQuestionIds }
+            .shuffled()
+            .take(3)
     }
 
     suspend fun getActiveActivityTypes(): List<DiaryActivityType> = diaryActivityTypeRepository.findAllByActiveTrue()
