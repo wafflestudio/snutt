@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.findModifyAndAwait
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.and
+import org.springframework.data.mongodb.core.query.elemMatch
 import org.springframework.data.mongodb.core.query.inValues
 import org.springframework.data.mongodb.core.update
 
@@ -67,6 +68,8 @@ interface TimetableCustomRepository {
         semester: Semester,
         title: String,
     ): Timetable?
+
+    suspend fun findTimetableLectureById(timetableLectureId: String): TimetableLecture?
 }
 
 class TimetableCustomRepositoryImpl(
@@ -170,4 +173,14 @@ class TimetableCustomRepositoryImpl(
             ).with(Timetable::title.desc()),
             Timetable::class.java,
         ).awaitSingleOrNull()
+
+    override suspend fun findTimetableLectureById(timetableLectureId: String): TimetableLecture? {
+        val timetable =
+            reactiveMongoTemplate.findOne(
+                Query.query(Timetable::lectures elemMatch (TimetableLecture::id isEqualTo timetableLectureId)),
+                Timetable::class.java,
+            ).awaitSingleOrNull()
+
+        return timetable?.lectures?.find { it.id == timetableLectureId }
+    }
 }

@@ -33,6 +33,7 @@ enum class ErrorType(
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다", "수강편람에서 찾을 수 없는 강좌입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다", "해당 정보로 가입된 사용자가 없습니다"),
+    TIMETABLE_LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4005, "timetableLecture가 없습니다", "시간표에 존재하지 않는 강좌입니다"),
 
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
@@ -89,4 +90,6 @@ enum class ErrorType(
     CANNOT_REMOVE_LAST_AUTH_PROVIDER(HttpStatus.CONFLICT, 40909, "최소 한 개의 로그인 수단은 유지해야 합니다", "최소 한 개의 로그인 수단은 유지해야 합니다"),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요"),
+
+    NO_CURRENT_SEMESTER_EXCEPTION(HttpStatus.BAD_REQUEST, 50100, "방학 중에는 불가능합니다", "방학 중에는 불가능합니다"),
 }

@@ -1,0 +1,82 @@
+package com.wafflestudio.snutt.timetablelecturereminder.service
+
+import com.wafflestudio.snutt.common.exception.NoCurrentSemesterException
+import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
+import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
+import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
+import com.wafflestudio.snutt.common.exception.WrongSemesterException
+import com.wafflestudio.snutt.common.util.SemesterUtils
+import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
+import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureRemindersWithTimetable
+import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import org.springframework.stereotype.Service
+
+interface TimetableLectureReminderService {
+    suspend fun getReminder(timetableLectureId: String): TimetableLectureReminder?
+
+    suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable
+
+    suspend fun modifyReminder(
+        timetableId: String,
+        timetableLectureId: String,
+        offsetMinutes: Int,
+    ): TimetableLectureReminder
+
+    suspend fun deleteReminder(timetableLectureId: String)
+}
+
+@Service
+class TimetableLectureReminderServiceImpl(
+    private val timetableLectureReminderRepository: TimetableLectureReminderRepository,
+    private val timetableRepository: TimetableRepository,
+) : TimetableLectureReminderService {
+    override suspend fun getReminder(timetableLectureId: String): TimetableLectureReminder? {
+        val reminder = timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)
+        return reminder
+    }
+
+    override suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
+        val (currentYear, currentSemester) =
+            SemesterUtils.getCurrentYearAndSemester()
+                ?: throw NoCurrentSemesterException
+        val primaryTimetable =
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, currentYear, currentSemester)
+                ?: throw PrimaryTimetableNotFoundException
+        val reminders =
+            timetableLectureReminderRepository.findByTimetableLectureIdIn(primaryTimetable.lectures.map { it.id })
+        return TimetableLectureRemindersWithTimetable(primaryTimetable, reminders)
+    }
+
+    override suspend fun modifyReminder(
+        timetableId: String,
+        timetableLectureId: String,
+        offsetMinutes: Int,
+    ): TimetableLectureReminder {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        val (currentYear, currentSemester) =
+            SemesterUtils.getCurrentYearAndSemester()
+                ?: throw NoCurrentSemesterException
+        if (timetable.year != currentYear || timetable.semester != currentSemester) throw WrongSemesterException
+        val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
+
+        val schedules =
+            timetableLecture.classPlaceAndTimes.map { TimetableLectureReminder.Schedule(it.day, it.startMinute) }
+        val reminder =
+            timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)?.copy(
+                offsetMinutes = offsetMinutes,
+                schedules = schedules,
+            ) ?: TimetableLectureReminder(
+                timetableLectureId = timetableLectureId,
+                offsetMinutes = offsetMinutes,
+                schedules = schedules,
+            )
+        return timetableLectureReminderRepository.save(reminder)
+    }
+
+    override suspend fun deleteReminder(timetableLectureId: String) {
+        val reminder =
+            timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId) ?: return
+        timetableLectureReminderRepository.delete(reminder)
+    }
+}
