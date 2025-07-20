@@ -10,6 +10,7 @@ import com.wafflestudio.snutt.common.exception.WrongSemesterException
 import com.wafflestudio.snutt.lectures.repository.LectureRepository
 import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snutt.theme.service.TimetableThemeService
+import com.wafflestudio.snutt.timetablelecturereminder.service.TimetableLectureReminderService
 import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
@@ -57,6 +58,7 @@ interface TimetableLectureService {
 @Service
 class TimetableLectureServiceImpl(
     private val timetableThemeService: TimetableThemeService,
+    private val timetableLectureReminderService: TimetableLectureReminderService,
     private val timetableRepository: TimetableRepository,
     private val lectureRepository: LectureRepository,
 ) : TimetableLectureService {
@@ -114,6 +116,7 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = originalLecture.categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
+        timetableLectureReminderService.updateScheduleIfNeeded(timetableLecture)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 
@@ -144,6 +147,7 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
+        timetableLectureReminderService.updateScheduleIfNeeded(timetableLecture)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
     }
 

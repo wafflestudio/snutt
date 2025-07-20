@@ -9,6 +9,7 @@ import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureRemindersWithTimetable
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.stereotype.Service
 
@@ -24,6 +25,8 @@ interface TimetableLectureReminderService {
     ): TimetableLectureReminder
 
     suspend fun deleteReminder(timetableLectureId: String)
+
+    suspend fun updateScheduleIfNeeded(modifiedTimetableLecture: TimetableLecture)
 }
 
 @Service
