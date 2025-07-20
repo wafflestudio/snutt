@@ -58,10 +58,13 @@ class TimetableLectureReminderServiceImpl(
             SemesterUtils.getCurrentYearAndSemester()
                 ?: throw NoCurrentSemesterException
         if (timetable.year != currentYear || timetable.semester != currentSemester) throw WrongSemesterException
-        val timetableLecture = timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
+        val timetableLecture =
+            timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
         val schedules =
-            timetableLecture.classPlaceAndTimes.map { TimetableLectureReminder.Schedule(it.day, it.startMinute) }
+            timetableLecture.classPlaceAndTimes.map {
+                TimetableLectureReminder.Schedule(it.day, it.startMinute) + offsetMinutes
+            }
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)?.copy(
                 offsetMinutes = offsetMinutes,
@@ -78,5 +81,27 @@ class TimetableLectureReminderServiceImpl(
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId) ?: return
         timetableLectureReminderRepository.delete(reminder)
+    }
+
+    override suspend fun updateScheduleIfNeeded(modifiedTimetableLecture: TimetableLecture) {
+        val reminder =
+            timetableLectureReminderRepository.findByTimetableLectureId(modifiedTimetableLecture.id)
+                ?: return
+        val existingSchedulesMap =
+            reminder.schedules.associateBy(
+                keySelector = { it.day to it.minute },
+                valueTransform = { it.notifiedAt },
+            )
+        val newSchedules =
+            modifiedTimetableLecture.classPlaceAndTimes.map { classPlaceAndTime ->
+                val newSchedule =
+                    TimetableLectureReminder.Schedule(
+                        classPlaceAndTime.day,
+                        classPlaceAndTime.startMinute,
+                    ) + reminder.offsetMinutes
+
+                newSchedule.copy(notifiedAt = existingSchedulesMap[newSchedule.day to newSchedule.minute])
+            }
+        timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
     }
 }

@@ -21,8 +21,24 @@ data class TimetableLectureReminder(
     var schedules: List<Schedule>,
 ) {
     data class Schedule(
-        var day: DayOfWeek,
-        var minute: Int,
-        var notifiedAt: Instant? = null,
-    )
+        val day: DayOfWeek,
+        val minute: Int,
+        val notifiedAt: Instant? = null,
+    ) {
+        operator fun plus(minutesToAdd: Int): Schedule {
+            val totalMinutes = this.minute + minutesToAdd
+            val daysToAdd = totalMinutes / 1440
+            val newMinute = totalMinutes % 1440
+
+            val currentDayIndex = this.day.value
+            val newDayIndex = (currentDayIndex + daysToAdd) % 7
+            val newDay = DayOfWeek.getOfValue(((newDayIndex % 7) + 7) % 7)!!
+
+            return this.copy(day = newDay, minute = newMinute)
+        }
+
+        operator fun minus(minutesToSubtract: Int): Schedule {
+            return this.plus(-minutesToSubtract)
+        }
+    }
 }
