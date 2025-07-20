@@ -12,7 +12,6 @@ import com.wafflestudio.snutt.diary.repository.DiaryActivityTypeRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 
@@ -29,7 +28,7 @@ class DiaryService(
         activityTypeNames: List<String>,
     ): List<DiaryQuestion> {
         val activityTypes = diaryActivityTypeRepository.findByNameIn(activityTypeNames)
-        val questions = diaryQuestionRepository.findByTargetTopicsContainsAndActiveTrue(activityTypes)
+        val questions = diaryQuestionRepository.findByTargetActivityTypesContainsAndActiveTrue(activityTypes)
         val answeredQuestionIds =
             diarySubmissionRepository.findAllByUserIdOrderByCreatedAt(userId)
                 .filter { it.lectureId == lectureId }
@@ -111,7 +110,7 @@ class DiaryService(
                 shortAnswers = request.shortAnswers,
                 question = request.question,
                 shortQuestion = request.shortQuestion,
-                targetTopics = diaryActivityTypeRepository.findByNameIn(request.targetActivityTypes),
+                targetActivityTypes = diaryActivityTypeRepository.findByNameIn(request.targetActivityTypes),
             )
         diaryQuestionRepository.save(question)
     }
