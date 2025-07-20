@@ -37,7 +37,12 @@ enum class ErrorType(
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
     INVALID_BODY_FIELD_VALUE(HttpStatus.BAD_REQUEST, 40002, "요청 바디 값 오류"),
-    INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(HttpStatus.BAD_REQUEST, 40005, "이전 학기에는 빈자리 알림을 등록할 수 없습니다"),
+    INVALID_REGISTRATION_FOR_PREVIOUS_SEMESTER_COURSE(
+        HttpStatus.BAD_REQUEST,
+        40005,
+        "이전 학기에는 빈자리 알림을 등록할 수 없습니다",
+        "이전 학기에는 빈자리 알림을 등록할 수 없습니다",
+    ),
     INVALID_OS_TYPE(HttpStatus.BAD_REQUEST, 40006, "잘못된 OS 타입입니다"),
     INVALID_APP_TYPE(HttpStatus.BAD_REQUEST, 40007, "잘못된 APP 타입입니다"),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, 40008, "nickname이 유효하지 않습니다", "사용할 수 없는 닉네임입니다"),
