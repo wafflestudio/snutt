@@ -20,6 +20,7 @@ import com.wafflestudio.snutt.handler.StaticPageHandler
 import com.wafflestudio.snutt.handler.TagHandler
 import com.wafflestudio.snutt.handler.TimetableHandler
 import com.wafflestudio.snutt.handler.TimetableLectureHandler
+import com.wafflestudio.snutt.handler.TimetableLectureReminderHandler
 import com.wafflestudio.snutt.handler.TimetableThemeHandler
 import com.wafflestudio.snutt.handler.UserHandler
 import com.wafflestudio.snutt.handler.VacancyNotifcationHandler
@@ -73,6 +74,7 @@ class MainRouter(
     private val staticPageHandler: StaticPageHandler,
     private val evServiceHandler: EvServiceHandler,
     private val pushPreferenceHandler: PushPreferenceHandler,
+    private val timetableLectureReminderHandler: TimetableLectureReminderHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -150,12 +152,19 @@ class MainRouter(
                 PUT("/{timetableId}/theme", timeTableHandler::modifyTimetableTheme)
                 POST("/{timetableId}/primary", timeTableHandler::setPrimary)
                 DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
+                GET(
+                    "/current-semester/primary/lecture/reminders",
+                    timetableLectureReminderHandler::getRemindersInCurrentSemesterPrimaryTimetable,
+                )
                 "{timetableId}/lecture".nest {
                     POST("", timeTableLectureHandler::addCustomLecture)
                     POST("/{lectureId}", timeTableLectureHandler::addLecture)
                     PUT("/{timetableLectureId}/reset", timeTableLectureHandler::resetTimetableLecture)
                     PUT("/{timetableLectureId}", timeTableLectureHandler::modifyTimetableLecture)
                     DELETE("/{timetableLectureId}", timeTableLectureHandler::deleteTimetableLecture)
+                    GET("/{timetableLectureId}/reminder", timetableLectureReminderHandler::getReminder)
+                    PUT("/{timetableLectureId}/reminder", timetableLectureReminderHandler::modifyReminder)
+                    DELETE("/{timetableLectureId}/reminder", timetableLectureReminderHandler::deleteReminder)
                 }
             }
         }
