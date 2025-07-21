@@ -27,12 +27,14 @@ data class TimetableLectureReminder(
     ) {
         operator fun plus(minutesToAdd: Int): Schedule {
             val totalMinutes = this.minute + minutesToAdd
-            val daysToAdd = totalMinutes / 1440
-            val newMinute = totalMinutes % 1440
+
+            val minutesPerDay = 1440
+            val daysToAdd = Math.floorDiv(totalMinutes, minutesPerDay)
+            val newMinute = Math.floorMod(totalMinutes, minutesPerDay)
 
             val currentDayIndex = this.day.value
-            val newDayIndex = (currentDayIndex + daysToAdd) % 7
-            val newDay = DayOfWeek.getOfValue(((newDayIndex % 7) + 7) % 7)!!
+            val newDayIndex = Math.floorMod(currentDayIndex + daysToAdd, 7)
+            val newDay = DayOfWeek.getOfValue(newDayIndex)!!
 
             return this.copy(day = newDay, minute = newMinute)
         }
