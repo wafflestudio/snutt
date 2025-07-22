@@ -103,6 +103,7 @@ class TimetableLectureReminderServiceImpl(
                         classPlaceAndTime.startMinute,
                     ) + reminder.offsetMinutes
 
+                // 이미 알림을 보낸 시간은 유지하고, 새로 추가된 시간에 대해서는 null로 설정
                 newSchedule.copy(notifiedAt = existingSchedulesMap[newSchedule.day to newSchedule.minute])
             }
         timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
