@@ -91,5 +91,5 @@ enum class ErrorType(
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요"),
 
-    NO_CURRENT_SEMESTER_EXCEPTION(HttpStatus.BAD_REQUEST, 50100, "방학 중에는 불가능합니다", "방학 중에는 불가능합니다"),
+    PAST_SEMESTER(HttpStatus.BAD_REQUEST, 50100, "이미 종료된 학기입니다", "이미 종료된 학기입니다"),
 }

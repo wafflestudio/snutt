@@ -17,8 +17,9 @@ class TimetableLectureReminderHandler(
 ) : ServiceHandler(snuttRestApiDefaultMiddleware) {
     suspend fun getReminder(req: ServerRequest): ServerResponse =
         handle(req) {
+            val timetableId = req.pathVariable("timetableId")
             val timetableLectureId = req.pathVariable("timetableLectureId")
-            timetableLectureReminderService.getReminder(timetableLectureId)?.let(::TimetableLectureReminderDto) ?: Unit
+            timetableLectureReminderService.getReminder(timetableId, timetableLectureId)?.let(::TimetableLectureReminderDto) ?: Unit
         }
 
     suspend fun getRemindersInCurrentSemesterPrimaryTimetable(req: ServerRequest): ServerResponse =

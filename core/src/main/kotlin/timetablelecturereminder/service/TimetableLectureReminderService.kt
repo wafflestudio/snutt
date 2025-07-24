@@ -1,20 +1,23 @@
 package com.wafflestudio.snutt.timetablelecturereminder.service
 
-import com.wafflestudio.snutt.common.exception.NoCurrentSemesterException
+import com.wafflestudio.snutt.common.exception.PastSemesterException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
-import com.wafflestudio.snutt.common.exception.WrongSemesterException
 import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureRemindersWithTimetable
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
+import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.stereotype.Service
 
 interface TimetableLectureReminderService {
-    suspend fun getReminder(timetableLectureId: String): TimetableLectureReminder?
+    suspend fun getReminder(
+        timetableId: String,
+        timetableLectureId: String,
+    ): TimetableLectureReminder?
 
     suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable
 
@@ -34,15 +37,18 @@ class TimetableLectureReminderServiceImpl(
     private val timetableLectureReminderRepository: TimetableLectureReminderRepository,
     private val timetableRepository: TimetableRepository,
 ) : TimetableLectureReminderService {
-    override suspend fun getReminder(timetableLectureId: String): TimetableLectureReminder? {
+    override suspend fun getReminder(
+        timetableId: String,
+        timetableLectureId: String,
+    ): TimetableLectureReminder? {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        validateTimetableSemester(timetable)
         val reminder = timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)
         return reminder
     }
 
     override suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
-        val (currentYear, currentSemester) =
-            SemesterUtils.getCurrentYearAndSemester()
-                ?: throw NoCurrentSemesterException
+        val (currentYear, currentSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
         val primaryTimetable =
             timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, currentYear, currentSemester)
                 ?: throw PrimaryTimetableNotFoundException
@@ -57,10 +63,7 @@ class TimetableLectureReminderServiceImpl(
         offsetMinutes: Int,
     ): TimetableLectureReminder {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        val (currentYear, currentSemester) =
-            SemesterUtils.getCurrentYearAndSemester()
-                ?: throw NoCurrentSemesterException
-        if (timetable.year != currentYear || timetable.semester != currentSemester) throw WrongSemesterException
+        validateTimetableSemester(timetable)
         val timetableLecture =
             timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
@@ -107,5 +110,12 @@ class TimetableLectureReminderServiceImpl(
                 newSchedule.copy(notifiedAt = existingSchedulesMap[newSchedule.day to newSchedule.minute])
             }
         timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
+    }
+
+    private fun validateTimetableSemester(timetable: Timetable) {
+        val (currentYear, currentSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
+        if (timetable.year < currentYear || (timetable.year == currentYear && timetable.semester < currentSemester)) {
+            throw PastSemesterException
+        }
     }
 }

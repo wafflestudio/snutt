@@ -166,4 +166,4 @@ object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_R
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
 
-object NoCurrentSemesterException : SnuttException(ErrorType.NO_CURRENT_SEMESTER_EXCEPTION)
+object PastSemesterException : SnuttException(ErrorType.PAST_SEMESTER)
