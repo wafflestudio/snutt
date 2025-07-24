@@ -153,8 +153,8 @@ class MainRouter(
                 POST("/{timetableId}/primary", timeTableHandler::setPrimary)
                 DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
                 GET(
-                    "/current-semester/primary/lecture/reminders",
-                    timetableLectureReminderHandler::getRemindersInCurrentSemesterPrimaryTimetable,
+                    "/active-semester/primary/lecture/reminders",
+                    timetableLectureReminderHandler::getRemindersInActiveSemesterPrimaryTimetable,
                 )
                 "{timetableId}/lecture".nest {
                     POST("", timeTableLectureHandler::addCustomLecture)

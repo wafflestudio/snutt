@@ -19,7 +19,7 @@ interface TimetableLectureReminderService {
         timetableLectureId: String,
     ): TimetableLectureReminder?
 
-    suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable
+    suspend fun getRemindersInActiveSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable
 
     suspend fun modifyReminder(
         timetableId: String,
@@ -47,10 +47,10 @@ class TimetableLectureReminderServiceImpl(
         return reminder
     }
 
-    override suspend fun getRemindersInCurrentSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
-        val (currentYear, currentSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
+    override suspend fun getRemindersInActiveSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
+        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
         val primaryTimetable =
-            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, currentYear, currentSemester)
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, activeYear, activeSemester)
                 ?: throw PrimaryTimetableNotFoundException
         val reminders =
             timetableLectureReminderRepository.findByTimetableLectureIdIn(primaryTimetable.lectures.map { it.id })
@@ -113,8 +113,8 @@ class TimetableLectureReminderServiceImpl(
     }
 
     private fun validateTimetableSemester(timetable: Timetable) {
-        val (currentYear, currentSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
-        if (timetable.year < currentYear || (timetable.year == currentYear && timetable.semester < currentSemester)) {
+        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
+        if (timetable.year < activeYear || (timetable.year == activeYear && timetable.semester < activeSemester)) {
             throw PastSemesterException
         }
     }

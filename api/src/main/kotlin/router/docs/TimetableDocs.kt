@@ -54,12 +54,12 @@ import timetables.dto.TimetableBriefDto
             ),
     ),
     RouterOperation(
-        path = "/v1/tables/current-semester/primary/lecture/reminders",
+        path = "/v1/tables/active-semester/primary/lecture/reminders",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getRemindersInCurrentSemesterPrimaryTimetable",
+                operationId = "getRemindersInActiveSemesterPrimaryTimetable",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
