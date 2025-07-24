@@ -27,17 +27,16 @@ object SemesterUtils {
             semesterPeriods.firstOrNull { currentMonthDay in it.dateRange }
                 ?: return null
 
-        val academicYear = now.year + currentPeriod.academicYearOffset
-        return academicYear to currentPeriod.semester
+        return now.year + currentPeriod.academicYearOffset to currentPeriod.semester
     }
 
     fun getCurrentOrNextYearAndSemester(): Pair<Int, Semester> {
-        val now = LocalDate.now()
-        val currentMonthDay = MonthDay.from(now)
-
-        return getCurrentYearAndSemester()
-            ?: semesterPeriods.first { currentMonthDay < it.dateRange.start }.let { nextPeriod ->
+        return getCurrentYearAndSemester() ?: run {
+            val now = LocalDate.now()
+            val currentMonthDay = MonthDay.from(now)
+            semesterPeriods.first { currentMonthDay < it.dateRange.start }.let { nextPeriod ->
                 (now.year + nextPeriod.academicYearOffset) to nextPeriod.semester
             }
+        }
     }
 }
