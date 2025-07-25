@@ -12,6 +12,7 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 interface TimetableLectureReminderService {
     suspend fun getReminder(
@@ -48,7 +49,7 @@ class TimetableLectureReminderServiceImpl(
     }
 
     override suspend fun getRemindersInActiveSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
-        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
+        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
         val primaryTimetable =
             timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, activeYear, activeSemester)
                 ?: throw PrimaryTimetableNotFoundException
@@ -113,7 +114,7 @@ class TimetableLectureReminderServiceImpl(
     }
 
     private fun validateTimetableSemester(timetable: Timetable) {
-        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester()
+        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
         if (timetable.year < activeYear || (timetable.year == activeYear && timetable.semester < activeSemester)) {
             throw PastSemesterException
         }

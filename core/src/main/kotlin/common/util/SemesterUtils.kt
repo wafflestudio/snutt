@@ -1,8 +1,9 @@
 package com.wafflestudio.snutt.common.util
 
 import com.wafflestudio.snutt.common.enum.Semester
-import java.time.LocalDate
+import java.time.Instant
 import java.time.MonthDay
+import java.time.ZoneId
 
 object SemesterUtils {
     private data class SemesterInfo(
@@ -20,22 +21,22 @@ object SemesterUtils {
             SemesterInfo(Semester.WINTER, 0, MonthDay.of(12, 20)..MonthDay.of(12, 31)),
         )
 
-    fun getCurrentYearAndSemester(): Pair<Int, Semester>? {
-        val now = LocalDate.now()
-        val currentMonthDay = MonthDay.from(now)
+    fun getCurrentYearAndSemester(now: Instant): Pair<Int, Semester>? {
+        val localDate = now.atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
+        val currentMonthDay = MonthDay.from(localDate)
         val currentPeriod =
             semesterPeriods.firstOrNull { currentMonthDay in it.dateRange }
                 ?: return null
 
-        return now.year + currentPeriod.academicYearOffset to currentPeriod.semester
+        return localDate.year + currentPeriod.academicYearOffset to currentPeriod.semester
     }
 
-    fun getCurrentOrNextYearAndSemester(): Pair<Int, Semester> {
-        return getCurrentYearAndSemester() ?: run {
-            val now = LocalDate.now()
-            val currentMonthDay = MonthDay.from(now)
+    fun getCurrentOrNextYearAndSemester(now: Instant): Pair<Int, Semester> {
+        return getCurrentYearAndSemester(now) ?: run {
+            val localDate = now.atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
+            val currentMonthDay = MonthDay.from(localDate)
             semesterPeriods.first { currentMonthDay < it.dateRange.start }.let { nextPeriod ->
-                (now.year + nextPeriod.academicYearOffset) to nextPeriod.semester
+                (localDate.year + nextPeriod.academicYearOffset) to nextPeriod.semester
             }
         }
     }
