@@ -35,7 +35,6 @@ class DiaryService(
                 .flatMap { it.questionIds }
                 .toSet()
 
-        println(answeredQuestionIds)
         return questions.filterNot { question -> question.id in answeredQuestionIds }
             .shuffled()
             .take(3)
