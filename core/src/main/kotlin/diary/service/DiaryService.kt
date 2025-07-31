@@ -30,8 +30,7 @@ class DiaryService(
         val activityTypes = diaryActivityTypeRepository.findByNameIn(activityTypeNames)
         val questions = diaryQuestionRepository.findByTargetActivityTypesContainsAndActiveTrue(activityTypes)
         val answeredQuestionIds =
-            diarySubmissionRepository.findAllByUserIdOrderByCreatedAt(userId)
-                .filter { it.lectureId == lectureId }
+            diarySubmissionRepository.findAllByUserIdAndLectureIdOrderByCreatedAt(userId, lectureId)
                 .flatMap { it.questionIds }
                 .toSet()
 
