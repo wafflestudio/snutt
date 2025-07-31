@@ -2,7 +2,7 @@ package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.exception.DiaryActivityTypeNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
-import com.wafflestudio.snutt.diary.data.DiaryActivityType
+import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import com.wafflestudio.snutt.diary.dto.DiaryShortQuestionReply
@@ -39,9 +39,9 @@ class DiaryService(
             .take(3)
     }
 
-    suspend fun getActiveActivityTypes(): List<DiaryActivityType> = diaryActivityTypeRepository.findAllByActiveTrue()
+    suspend fun getActiveActivityTypes(): List<DiaryActivity> = diaryActivityTypeRepository.findAllByActiveTrue()
 
-    suspend fun getAllActivityTypes(): List<DiaryActivityType> = diaryActivityTypeRepository.findAll().toList()
+    suspend fun getAllActivityTypes(): List<DiaryActivity> = diaryActivityTypeRepository.findAll().toList()
 
     suspend fun getActiveQuestions(): List<DiaryQuestion> = diaryQuestionRepository.findAllByActiveTrue()
 
@@ -90,7 +90,7 @@ class DiaryService(
     }
 
     suspend fun addOrEnableActivityType(name: String) {
-        val activityType = diaryActivityTypeRepository.findByName(name) ?: DiaryActivityType(name = name, active = true)
+        val activityType = diaryActivityTypeRepository.findByName(name) ?: DiaryActivity(name = name, active = true)
         activityType.active = true
         diaryActivityTypeRepository.save(activityType)
     }

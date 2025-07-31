@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-data class DiaryActivityType(
+data class DiaryActivity(
     @Id
     val id: String? = null,
     @Indexed(unique = true)
