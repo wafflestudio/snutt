@@ -25,12 +25,11 @@ class TimetableLectureReminderHandler(
     suspend fun getRemindersInActiveSemesterPrimaryTimetable(req: ServerRequest): ServerResponse =
         handle(req) {
             val userId = req.userId
-            timetableLectureReminderService.getRemindersInActiveSemesterPrimaryTimetable(userId).let {
-                TimetableLectureRemindersWithTimetableIdResponse(
-                    timetableId = it.timetable.id,
-                    reminders = it.reminders.map(::TimetableLectureReminderDto),
-                )
-            }
+            val reminders = timetableLectureReminderService.getRemindersInActiveSemesterPrimaryTimetable(userId)
+            TimetableLectureRemindersWithTimetableIdResponse(
+                timetableId = reminders.timetable.id,
+                reminders = reminders.reminders.map(::TimetableLectureReminderDto),
+            )
         }
 
     suspend fun modifyReminder(req: ServerRequest): ServerResponse =
