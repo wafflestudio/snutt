@@ -70,7 +70,7 @@ class TimetableLectureReminderServiceImpl(
 
         val schedules =
             timetableLecture.classPlaceAndTimes.map {
-                TimetableLectureReminder.Schedule(it.day, it.startMinute) + offsetMinutes
+                TimetableLectureReminder.Schedule(it.day, it.startMinute).plusMinutes(offsetMinutes)
             }
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)?.copy(
@@ -106,7 +106,7 @@ class TimetableLectureReminderServiceImpl(
                     TimetableLectureReminder.Schedule(
                         classPlaceAndTime.day,
                         classPlaceAndTime.startMinute,
-                    ) + reminder.offsetMinutes
+                    ).plusMinutes(reminder.offsetMinutes)
 
                 // 이미 알림을 보낸 시간은 유지하고, 새로 추가된 시간에 대해서는 null로 설정
                 newSchedule.copy(recentNotifiedAt = existingSchedulesMap[newSchedule.day to newSchedule.minute])

@@ -28,7 +28,7 @@ data class TimetableLectureReminder(
         val minute: Int,
         val recentNotifiedAt: Instant? = null,
     ) {
-        operator fun plus(minutesToAdd: Int): Schedule {
+        fun plusMinutes(minutesToAdd: Int): Schedule {
             val totalMinutes = this.minute + minutesToAdd
 
             val minutesPerDay = 1440
@@ -40,10 +40,6 @@ data class TimetableLectureReminder(
             val newDay = DayOfWeek.getOfValue(newDayIndex)!!
 
             return this.copy(day = newDay, minute = newMinute)
-        }
-
-        operator fun minus(minutesToSubtract: Int): Schedule {
-            return this.plus(-minutesToSubtract)
         }
     }
 }
