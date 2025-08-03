@@ -7,8 +7,9 @@ import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
 import com.wafflestudio.snutt.timetables.data.Timetable
-import com.wafflestudio.snutt.timetables.data.TimetableLecture
+import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -27,8 +28,6 @@ interface TimetableLectureReminderService {
     ): TimetableLectureReminder
 
     suspend fun deleteReminder(timetableLectureId: String)
-
-    suspend fun updateScheduleIfNeeded(modifiedTimetableLecture: TimetableLecture)
 }
 
 @Service
@@ -86,7 +85,16 @@ class TimetableLectureReminderServiceImpl(
         timetableLectureReminderRepository.delete(reminder)
     }
 
-    override suspend fun updateScheduleIfNeeded(modifiedTimetableLecture: TimetableLecture) {
+    private fun validateTimetableSemester(timetable: Timetable) {
+        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
+        if (timetable.year < activeYear || (timetable.year == activeYear && timetable.semester < activeSemester)) {
+            throw PastSemesterException
+        }
+    }
+
+    @EventListener
+    suspend fun handleTimetableLectureModifiedEvent(event: TimetableLectureModifiedEvent) {
+        val modifiedTimetableLecture = event.timetableLecture
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(modifiedTimetableLecture.id)
                 ?: return
@@ -103,12 +111,5 @@ class TimetableLectureReminderServiceImpl(
                 existingSchedule ?: newSchedule // 이미 알림을 보낸 schedule의 recentNotifiedAt은 유지하고, 새로 추가된 schedule에 대해서는 null로 설정
             }
         timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
-    }
-
-    private fun validateTimetableSemester(timetable: Timetable) {
-        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
-        if (timetable.year < activeYear || (timetable.year == activeYear && timetable.semester < activeSemester)) {
-            throw PastSemesterException
-        }
     }
 }

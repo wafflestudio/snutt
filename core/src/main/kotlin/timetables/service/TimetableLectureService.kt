@@ -10,12 +10,13 @@ import com.wafflestudio.snutt.common.exception.WrongSemesterException
 import com.wafflestudio.snutt.lectures.repository.LectureRepository
 import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snutt.theme.service.TimetableThemeService
-import com.wafflestudio.snutt.timetablelecturereminder.service.TimetableLectureReminderService
 import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {
@@ -58,9 +59,9 @@ interface TimetableLectureService {
 @Service
 class TimetableLectureServiceImpl(
     private val timetableThemeService: TimetableThemeService,
-    private val timetableLectureReminderService: TimetableLectureReminderService,
     private val timetableRepository: TimetableRepository,
     private val lectureRepository: LectureRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : TimetableLectureService {
     override suspend fun addLecture(
         userId: String,
@@ -116,8 +117,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = originalLecture.categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        timetableLectureReminderService.updateScheduleIfNeeded(timetableLecture)
-        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        return updatedTimetable
     }
 
     override suspend fun modifyTimetableLecture(
@@ -147,8 +149,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        timetableLectureReminderService.updateScheduleIfNeeded(timetableLecture)
-        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        return updatedTimetable
     }
 
     override suspend fun deleteTimetableLecture(
