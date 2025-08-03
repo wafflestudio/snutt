@@ -26,7 +26,7 @@ data class TimetableLectureReminder(
     data class Schedule(
         val day: DayOfWeek,
         val minute: Int,
-        val notifiedAt: Instant? = null,
+        val recentNotifiedAt: Instant? = null,
     ) {
         operator fun plus(minutesToAdd: Int): Schedule {
             val totalMinutes = this.minute + minutesToAdd
