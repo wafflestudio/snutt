@@ -19,7 +19,7 @@ class TimetableLectureReminderHandler(
         handle(req) {
             val timetableId = req.pathVariable("timetableId")
             val timetableLectureId = req.pathVariable("timetableLectureId")
-            timetableLectureReminderService.getReminder(timetableId, timetableLectureId)?.let(::TimetableLectureReminderDto) ?: Unit
+            timetableLectureReminderService.getReminder(timetableId, timetableLectureId)?.let(::TimetableLectureReminderDto)
         }
 
     suspend fun getRemindersInActiveSemesterPrimaryTimetable(req: ServerRequest): ServerResponse =
