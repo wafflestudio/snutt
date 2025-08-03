@@ -77,6 +77,7 @@ class TimetableLectureReminderServiceImpl(
                 offsetMinutes = offsetMinutes,
                 schedules = schedules,
             ) ?: TimetableLectureReminder(
+                timetableId = timetable.id!!,
                 timetableLectureId = timetableLectureId,
                 offsetMinutes = offsetMinutes,
                 schedules = schedules,

@@ -14,6 +14,9 @@ import java.time.Instant
 data class TimetableLectureReminder(
     @Id
     var id: String? = null,
+    @Indexed
+    @Field(targetType = FieldType.OBJECT_ID)
+    var timetableId: String,
     @Indexed(unique = true)
     @Field(targetType = FieldType.OBJECT_ID)
     var timetableLectureId: String,
