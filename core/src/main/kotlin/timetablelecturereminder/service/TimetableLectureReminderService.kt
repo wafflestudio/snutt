@@ -1,12 +1,10 @@
 package com.wafflestudio.snutt.timetablelecturereminder.service
 
 import com.wafflestudio.snutt.common.exception.PastSemesterException
-import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
 import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
-import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureRemindersWithTimetable
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
 import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
@@ -20,7 +18,7 @@ interface TimetableLectureReminderService {
         timetableLectureId: String,
     ): TimetableLectureReminder?
 
-    suspend fun getRemindersInActiveSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable
+    suspend fun getReminders(timetableId: String): List<TimetableLectureReminder>
 
     suspend fun modifyReminder(
         timetableId: String,
@@ -48,14 +46,11 @@ class TimetableLectureReminderServiceImpl(
         return reminder
     }
 
-    override suspend fun getRemindersInActiveSemesterPrimaryTimetable(userId: String): TimetableLectureRemindersWithTimetable {
-        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
-        val primaryTimetable =
-            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, activeYear, activeSemester)
-                ?: throw PrimaryTimetableNotFoundException
-        val reminders =
-            timetableLectureReminderRepository.findByTimetableLectureIdIn(primaryTimetable.lectures.map { it.id })
-        return TimetableLectureRemindersWithTimetable(primaryTimetable, reminders)
+    override suspend fun getReminders(timetableId: String): List<TimetableLectureReminder> {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        validateTimetableSemester(timetable)
+        val reminders = timetableLectureReminderRepository.findByTimetableLectureIdIn(timetable.lectures.map { it.id })
+        return reminders
     }
 
     override suspend fun modifyReminder(
