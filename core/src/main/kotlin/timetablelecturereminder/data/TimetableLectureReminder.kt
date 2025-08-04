@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.Instant
 
 @Document
-@CompoundIndex(def = "{'schedules.day': 1, 'schedules.minute': 1, 'schedules.notifiedAt': 1}")
+@CompoundIndex(def = "{'schedules.day': 1, 'schedules.minute': 1, 'schedules.recentNotifiedAt': 1}")
 data class TimetableLectureReminder(
     @Id
     var id: String? = null,
