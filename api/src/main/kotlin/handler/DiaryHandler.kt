@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.handler
 
 import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.diary.dto.DiaryActivityTypeDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
@@ -19,12 +21,12 @@ class DiaryHandler(
 ) : ServiceHandler(
         handlerMiddleware = snuttRestApiDefaultMiddleware,
     ) {
-    suspend fun getQuestionnaireFromActivityTypes(req: ServerRequest) =
+    suspend fun getQuestionnaireFromActivities(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            diaryService.generateQuestionnaire(userId, body.lectureId, body.activityTypes).map {
+            diaryService.generateQuestionnaire(userId, body.lectureId, body.activities).map {
                 DiaryQuestionDto(it)
             }
         }
@@ -32,7 +34,10 @@ class DiaryHandler(
     suspend fun getMySubmissions(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
-            val submissions = diaryService.getMySubmissions(userId)
+            val year = req.pathVariable("year").toInt()
+            val semester =
+                Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
+            val submissions = diaryService.getMySubmissions(userId, year, semester)
             val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
 
             submissions.map {
@@ -41,9 +46,9 @@ class DiaryHandler(
             }
         }
 
-    suspend fun getActivityTypes(req: ServerRequest) =
+    suspend fun getActivities(req: ServerRequest) =
         handle(req) {
-            diaryService.getActiveActivityTypes().map {
+            diaryService.getActiveActivities().map {
                 DiaryActivityTypeDto(it)
             }
         }

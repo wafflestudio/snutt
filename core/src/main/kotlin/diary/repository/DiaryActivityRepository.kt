@@ -3,7 +3,7 @@ package com.wafflestudio.snutt.diary.repository
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface DiaryActivityTypeRepository : CoroutineCrudRepository<DiaryActivity, String> {
+interface DiaryActivityRepository : CoroutineCrudRepository<DiaryActivity, String> {
     suspend fun findAllByActiveTrue(): List<DiaryActivity>
 
     suspend fun findByName(name: String): DiaryActivity?

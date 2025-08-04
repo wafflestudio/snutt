@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getQuestionnaireFromActivityTypes",
+                operationId = "getQuestionnaireFromActivities",
                 requestBody =
                     RequestBody(
                         content = [
@@ -59,12 +59,12 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/diary/activityTypes",
+        path = "/v1/diary/activities",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getActivityTypes",
+                operationId = "getActivities",
                 responses = [
                     ApiResponse(
                         responseCode = "200",

@@ -115,24 +115,24 @@ class AdminHandler(
             OkResponse()
         }
 
-    suspend fun getAllDiaryActivityTypes(req: ServerRequest) =
+    suspend fun getAllDiaryActivities(req: ServerRequest) =
         handle(req) {
-            diaryService.getAllActivityTypes()
+            diaryService.getAllActivities()
         }
 
-    suspend fun insertDiaryActivityType(req: ServerRequest) =
+    suspend fun insertDiaryActivity(req: ServerRequest) =
         handle(req) {
             val name = req.parseRequiredQueryParam<String>("name")
 
-            diaryService.addOrEnableActivityType(name)
+            diaryService.addOrEnableActivity(name)
             OkResponse()
         }
 
-    suspend fun removeDiaryActivityType(req: ServerRequest) =
+    suspend fun removeDiaryActivity(req: ServerRequest) =
         handle(req) {
             val name = req.parseRequiredQueryParam<String>("name")
 
-            diaryService.disableActivityType(name)
+            diaryService.disableActivity(name)
             OkResponse()
         }
 }

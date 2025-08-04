@@ -11,6 +11,6 @@ data class DiaryQuestion(
     val shortQuestion: String,
     val answers: List<String>,
     val shortAnswers: List<String>,
-    val targetActivityTypes: List<DiaryActivity>,
+    val targetActivities: List<DiaryActivity>,
     var active: Boolean = true,
 )

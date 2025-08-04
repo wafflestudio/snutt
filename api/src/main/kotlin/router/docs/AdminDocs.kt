@@ -194,12 +194,12 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activityTypes",
+        path = "/v1/admin/diary/activities",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getAllDiaryActivityTypes",
+                operationId = "getAllDiaryActivities",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
@@ -224,12 +224,12 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activityTypes",
+        path = "/v1/admin/diary/activities",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "insertDiaryActivityType",
+                operationId = "insertDiaryActivity",
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
@@ -237,12 +237,12 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activityTypes",
+        path = "/v1/admin/diary/activities",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "removeDiaryActivityType",
+                operationId = "removeDiaryActivity",
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
