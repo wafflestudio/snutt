@@ -33,7 +33,8 @@ internal class FcmPushClient(
 
     init {
         val options =
-            FirebaseOptions.builder()
+            FirebaseOptions
+                .builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
                 .setDatabaseUrl("https://$projectId.firebaseio.com/")
                 .build()
@@ -68,8 +69,7 @@ internal class FcmPushClient(
                                 null
                             }
                         }
-                    }
-                    .awaitAll()
+                    }.awaitAll()
                     .filterNotNull()
                     .flatMap { it.responses }
 
@@ -100,7 +100,8 @@ internal class FcmPushClient(
 
     private fun TargetedPushMessage.toFcmMessage(): Message {
         val notification =
-            Notification.builder()
+            Notification
+                .builder()
                 .setTitle(message.title)
                 .setBody(message.body)
                 .build()

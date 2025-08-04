@@ -36,45 +36,47 @@ class SugangSnuFetchServiceImpl(
         val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
         val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
         val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
-        return fullSheet.drop(3).map { row ->
-            convertSugangSnuRowToLecture(row, columnNameIndex, year, semester)
-        }.also {
-            koreanLectureXlsx.release()
-            englishLectureXlsx.release()
-        }.map { lecture ->
-            val extraLectureInfo =
-                sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
+        return fullSheet
+            .drop(3)
+            .map { row ->
+                convertSugangSnuRowToLecture(row, columnNameIndex, year, semester)
+            }.also {
+                koreanLectureXlsx.release()
+                englishLectureXlsx.release()
+            }.map { lecture ->
+                val extraLectureInfo =
+                    sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
 
-            val extraCourseTitle =
-                if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) {
-                    extraLectureInfo.subInfo.courseName
-                } else {
-                    "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
-                }
-            val extraDepartment =
-                if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
-                    "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
-                } else {
-                    null
-                }
+                val extraCourseTitle =
+                    if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) {
+                        extraLectureInfo.subInfo.courseName
+                    } else {
+                        "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
+                    }
+                val extraDepartment =
+                    if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
+                        "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
+                    } else {
+                        null
+                    }
 
-            lecture.apply {
-                classPlaceAndTimes =
-                    SugangSnuClassTimeUtils.convertTextToClassTimeObject(
-                        extraLectureInfo.ltTime,
-                        extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") },
-                    )
-                academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
-                    ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
-                courseTitle = extraCourseTitle ?: courseTitle
-                instructor = (extraLectureInfo.subInfo.professorName ?: instructor)?.substringBeforeLast(" (")
-                category = extraLectureInfo.subInfo.category ?: category
-                department = extraDepartment ?: department
-                quota = extraLectureInfo.subInfo.quota ?: quota
-                remark = extraLectureInfo.subInfo.remark ?: remark
-                categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
+                lecture.apply {
+                    classPlaceAndTimes =
+                        SugangSnuClassTimeUtils.convertTextToClassTimeObject(
+                            extraLectureInfo.ltTime,
+                            extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") },
+                        )
+                    academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
+                        ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
+                    courseTitle = extraCourseTitle ?: courseTitle
+                    instructor = (extraLectureInfo.subInfo.professorName ?: instructor)?.substringBeforeLast(" (")
+                    category = extraLectureInfo.subInfo.category ?: category
+                    department = extraDepartment ?: department
+                    quota = extraLectureInfo.subInfo.quota ?: quota
+                    remark = extraLectureInfo.subInfo.remark ?: remark
+                    categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
+                }
             }
-        }
     }
 
     /*
@@ -110,7 +112,8 @@ class SugangSnuFetchServiceImpl(
         val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
         val instructor = row.getCellByColumnName("주담당교수")
         val (quota, quotaForCurrentStudent) =
-            row.getCellByColumnName("정원")
+            row
+                .getCellByColumnName("정원")
                 .takeIf { quotaRegex.matches(it) }
                 ?.let { quotaRegex.find(it)!!.groups }
                 ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)

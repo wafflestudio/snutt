@@ -26,10 +26,11 @@ class GoogleClient(
 
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val googleUserResponse =
-            webClient.get<GoogleOAuth2UserResponse>(
-                uri = USER_INFO_URI,
-                headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
-            ).getOrNull()
+            webClient
+                .get<GoogleOAuth2UserResponse>(
+                    uri = USER_INFO_URI,
+                    headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
+                ).getOrNull()
 
         log.info("token=$token, googleUserResponse=$googleUserResponse")
 

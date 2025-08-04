@@ -54,8 +54,10 @@ class BookmarkServiceImpl(
         lectureId: String,
     ): Boolean {
         val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
-        return bookmarkRepository.findFirstByUserIdAndYearAndSemester(userId, lecture.year, lecture.semester)
-            ?.lectures?.any { it.id == lectureId } ?: false
+        return bookmarkRepository
+            .findFirstByUserIdAndYearAndSemester(userId, lecture.year, lecture.semester)
+            ?.lectures
+            ?.any { it.id == lectureId } ?: false
     }
 
     override suspend fun addLecture(

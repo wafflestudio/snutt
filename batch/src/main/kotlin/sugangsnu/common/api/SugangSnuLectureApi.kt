@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class SugangSnuApiConfig() {
+class SugangSnuApiConfig {
     companion object {
         const val SUGANG_SNU_BASEURL = "https://sugang.snu.ac.kr"
     }
@@ -14,11 +14,14 @@ class SugangSnuApiConfig() {
     @Bean
     fun sugangSnuApi(): SugangSnuApi {
         val exchangeStrategies: ExchangeStrategies =
-            ExchangeStrategies.builder()
+            ExchangeStrategies
+                .builder()
                 .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
                 .build()
 
-        return WebClient.builder().baseUrl(SUGANG_SNU_BASEURL)
+        return WebClient
+            .builder()
+            .baseUrl(SUGANG_SNU_BASEURL)
             .exchangeStrategies(exchangeStrategies) // set exchange strategies
             .defaultHeaders {
                 it.setAll(
@@ -33,9 +36,11 @@ class SugangSnuApiConfig() {
                         "Referer" to "https://sugang.snu.ac.kr/sugang/cc/cc100InterfaceExcel.action",
                     ),
                 )
-            }
-            .build().let(::SugangSnuApi)
+            }.build()
+            .let(::SugangSnuApi)
     }
 }
 
-class SugangSnuApi(webClient: WebClient) : WebClient by webClient
+class SugangSnuApi(
+    webClient: WebClient,
+) : WebClient by webClient

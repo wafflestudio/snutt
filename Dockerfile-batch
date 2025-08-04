@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-alpine
 WORKDIR /app
 ARG CODEARTIFACT_AUTH_TOKEN
 COPY . /app

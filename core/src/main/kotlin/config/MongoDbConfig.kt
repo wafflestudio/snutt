@@ -12,19 +12,16 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext
 @Configuration
 class MongoDbConfig {
     @Bean
-    fun customConversions(converters: List<Converter<*, *>>): MongoCustomConversions {
-        return MongoCustomConversions(converters)
-    }
+    fun customConversions(converters: List<Converter<*, *>>): MongoCustomConversions = MongoCustomConversions(converters)
 
     @Bean
     fun mappingMongoConverter(
         context: MongoMappingContext,
         conversions: MongoCustomConversions,
-    ): MappingMongoConverter {
-        return MappingMongoConverter(NoOpDbRefResolver.INSTANCE, context).apply {
+    ): MappingMongoConverter =
+        MappingMongoConverter(NoOpDbRefResolver.INSTANCE, context).apply {
             customConversions = conversions
             // _class 필드 삭제하기 위해 적용
             setTypeMapper(DefaultMongoTypeMapper(null))
         }
-    }
 }

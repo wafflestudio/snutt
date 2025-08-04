@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Import
 
 @SpringBootTest
 @Import(MockMongoDB::class)
-abstract class BaseIntegTest(body: BaseIntegTest.() -> Unit = {}) : WordSpec() {
+abstract class BaseIntegTest(
+    body: BaseIntegTest.() -> Unit = {},
+) : WordSpec() {
     init {
         body()
     }

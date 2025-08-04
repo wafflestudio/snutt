@@ -40,7 +40,5 @@ class PopupServiceImpl(
         popupRepository.deleteById(popupId)
     }
 
-    override suspend fun getPopups(clientInfo: ClientInfo): List<Popup> {
-        return popupRepository.findAll().toList().sortedBy { it.createdAt }
-    }
+    override suspend fun getPopups(clientInfo: ClientInfo): List<Popup> = popupRepository.findAll().toList().sortedBy { it.createdAt }
 }

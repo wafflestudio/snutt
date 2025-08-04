@@ -13,7 +13,7 @@ class ApiKeyMiddleware(
     @Value("\${snutt.secret-key}") private val secretKey: String,
 ) : Middleware {
     private val keySpec = SecretKeySpec(secretKey.toByteArray(), "HmacSHA256")
-    private val jwtParser = Jwts.parser().setSigningKey(keySpec)
+    private val jwtParser = Jwts.parser().verifyWith(keySpec).build()
     private val stringToKeyVersionMap =
         mapOf(
             "ios" to "0",
@@ -28,7 +28,7 @@ class ApiKeyMiddleware(
     ): RequestContext =
         runCatching {
             val apiKey = requireNotNull(req.headers().firstHeader("x-access-apikey"))
-            val claims = jwtParser.parseClaimsJws(apiKey).body
+            val claims = jwtParser.parseSignedClaims(apiKey).payload
 
             val string = claims["string"]!!.toString()
             val keyVersion = claims["key_version"]!!.toString()

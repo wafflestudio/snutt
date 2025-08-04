@@ -6,7 +6,9 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import org.springframework.stereotype.Component
 
 @Component
-class TimetableFixture(val userFixture: UserFixture) {
+class TimetableFixture(
+    val userFixture: UserFixture,
+) {
     fun getTimetable(title: String): Timetable {
         val userId = userFixture.testUser.id!!
         return Timetable(

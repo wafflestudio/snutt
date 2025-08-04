@@ -47,11 +47,10 @@ class AutoPrimaryJobConfig(
     fun primaryTimetableAutoSetJob(
         jobRepository: JobRepository,
         primaryTimetableAutoSetStep: Step,
-    ): Job {
-        return JobBuilder(JOB_NAME, jobRepository)
+    ): Job =
+        JobBuilder(JOB_NAME, jobRepository)
             .start(primaryTimetableAutoSetStep)
             .build()
-    }
 
     @Bean
     @JobScope
@@ -60,26 +59,40 @@ class AutoPrimaryJobConfig(
         transactionManager: PlatformTransactionManager,
         @Value("#{jobParameters[year]}") year: Int,
     ): Step =
-        StepBuilder(STEP_NAME, jobRepository).tasklet(
-            { _, _ ->
-                autoSetPrimaryTimetable(year)
-                RepeatStatus.FINISHED
-            },
-            transactionManager,
-        ).build()
+        StepBuilder(STEP_NAME, jobRepository)
+            .tasklet(
+                { _, _ ->
+                    autoSetPrimaryTimetable(year)
+                    RepeatStatus.FINISHED
+                },
+                transactionManager,
+            ).build()
 
-    data class AggResult(val id: Key)
+    data class AggResult(
+        val id: Key,
+    )
 
-    data class Key(val user_id: String, val semester: Semester, val year: Int)
+    data class Key(
+        val user_id: String,
+        val semester: Semester,
+        val year: Int,
+    )
 
     private fun autoSetPrimaryTimetable(year: Int) =
         runBlocking {
             val counter = AtomicInteger()
             val timetablesCount =
-                reactiveMongoTemplate.count(
-                    Query.query(Criteria.where("_id").ne(null).and("year").`is`(year)),
-                    Timetable::class.java,
-                ).block() ?: 0L
+                reactiveMongoTemplate
+                    .count(
+                        Query.query(
+                            Criteria
+                                .where("_id")
+                                .ne(null)
+                                .and("year")
+                                .`is`(year),
+                        ),
+                        Timetable::class.java,
+                    ).block() ?: 0L
 
             val rateLimiter =
                 RateLimiter.of(
@@ -98,7 +111,8 @@ class AutoPrimaryJobConfig(
                     Aggregation.group("user_id", "semester", "year"),
                 )
             val buffer = ConcurrentHashMap.newKeySet<String>()
-            reactiveMongoTemplate.aggregate(agg, "timetables", AggResult::class.java)
+            reactiveMongoTemplate
+                .aggregate(agg, "timetables", AggResult::class.java)
                 .asFlow()
                 .collect {
                     val primaryTable =
@@ -113,25 +127,29 @@ class AutoPrimaryJobConfig(
 
                     val ids = HashSet(buffer).also { buffer.clear() }
                     launch {
-                        reactiveMongoTemplate.bulkOps(
-                            BulkOperations.BulkMode.ORDERED,
-                            "timetables",
-                        ).updateMulti(
-                            Query.query(Criteria.where("_id").`in`(ids)),
-                            Update.update("is_primary", true),
-                        ).execute().block()
+                        reactiveMongoTemplate
+                            .bulkOps(
+                                BulkOperations.BulkMode.ORDERED,
+                                "timetables",
+                            ).updateMulti(
+                                Query.query(Criteria.where("_id").`in`(ids)),
+                                Update.update("is_primary", true),
+                            ).execute()
+                            .block()
                     }.join()
                     log.info("updated ${ids.size} docs")
                 }
 
             if (buffer.isNotEmpty()) {
-                reactiveMongoTemplate.bulkOps(
-                    BulkOperations.BulkMode.ORDERED,
-                    "timetables",
-                ).updateMulti(
-                    Query.query(Criteria.where("_id").`in`(buffer)),
-                    Update.update("is_primary", true),
-                ).execute().block()
+                reactiveMongoTemplate
+                    .bulkOps(
+                        BulkOperations.BulkMode.ORDERED,
+                        "timetables",
+                    ).updateMulti(
+                        Query.query(Criteria.where("_id").`in`(buffer)),
+                        Update.update("is_primary", true),
+                    ).execute()
+                    .block()
             }
         }
 

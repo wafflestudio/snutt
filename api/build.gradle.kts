@@ -1,6 +1,6 @@
 plugins {
     id("org.springframework.boot")
-    id("org.unbroken-dome.test-sets") version "4.0.0"
+    id("org.unbroken-dome.test-sets") version "4.1.0"
 }
 
 dependencies {
@@ -8,13 +8,15 @@ dependencies {
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("io.jsonwebtoken:jjwt:0.9.1")
-    runtimeOnly("javax.xml.bind:jaxb-api:2.1")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+    runtimeOnly("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 
     testImplementation(testFixtures(project(":core")))
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:mongodb:1.19.0")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+    testImplementation("org.testcontainers:mongodb:1.21.3")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
 }
 
 tasks.bootJar {

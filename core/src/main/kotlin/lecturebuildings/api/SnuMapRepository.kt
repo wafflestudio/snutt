@@ -17,12 +17,15 @@ class SnuMapRepository(
     }
 
     suspend fun getLectureBuildingSearchResult(buildingNum: String): SnuMapSearchResult =
-        snuMapApi.get().uri { builder ->
-            builder.path(SNU_MAP_SEARCH_PATH)
-                .query(DEFAULT_SEARCH_PARAMS)
-                .queryParam("search_word", buildingNum)
-                .build()
-        }
-            .retrieve().awaitBody<String>()
+        snuMapApi
+            .get()
+            .uri { builder ->
+                builder
+                    .path(SNU_MAP_SEARCH_PATH)
+                    .query(DEFAULT_SEARCH_PARAMS)
+                    .queryParam("search_word", buildingNum)
+                    .build()
+            }.retrieve()
+            .awaitBody<String>()
             .let { objectMapper.readValue<SnuMapSearchResult>(it) }
 }

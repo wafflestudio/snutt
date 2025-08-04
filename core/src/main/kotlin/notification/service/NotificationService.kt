@@ -42,12 +42,13 @@ class NotificationServiceImpl(
     override suspend fun getNotifications(query: NotificationQuery): List<Notification> {
         val user = query.user
         val notifications =
-            notificationRepository.findNotifications(
-                userId = user.id!!,
-                createdAt = user.regDate,
-                offset = query.offset,
-                limit = query.limit,
-            ).toList()
+            notificationRepository
+                .findNotifications(
+                    userId = user.id!!,
+                    createdAt = user.regDate,
+                    offset = query.offset,
+                    limit = query.limit,
+                ).toList()
 
         if (query.explicit) {
             userService.update(user.apply { notificationCheckedAt = LocalDateTime.now() })
@@ -56,9 +57,8 @@ class NotificationServiceImpl(
         return notifications
     }
 
-    override suspend fun getUnreadCount(user: User): Long {
-        return notificationRepository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
-    }
+    override suspend fun getUnreadCount(user: User): Long =
+        notificationRepository.countUnreadNotifications(user.id!!, user.notificationCheckedAt)
 
     override suspend fun sendNotification(notification: Notification) {
         notificationRepository.save(notification)

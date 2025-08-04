@@ -50,8 +50,13 @@ fun WebClient.UriSpec<*>.uriWithParams(
     params?.let {
         uri { builder ->
             URI(uri).let {
-                builder.host(it.host).scheme(it.scheme).port(it.port).path(it.path)
-                    .queryParams(buildMultiValueMap(params)).build()
+                builder
+                    .host(it.host)
+                    .scheme(it.scheme)
+                    .port(it.port)
+                    .path(it.path)
+                    .queryParams(buildMultiValueMap(params))
+                    .build()
             }
         }
     } ?: uri(uri)

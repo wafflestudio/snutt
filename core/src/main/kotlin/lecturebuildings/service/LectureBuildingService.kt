@@ -32,21 +32,26 @@ class LectureBuildingServiceImpl(
 
     override suspend fun updateLectureBuildings(placeInfos: List<PlaceInfo>) {
         coroutineScope {
-            placeInfos.filter { it.campus == Campus.GWANAK }.map {
-                async {
-                    snuMapRepository.getLectureBuildingSearchResult(it.buildingNumber)
-                        .getMostProbableSearchItem(it.buildingNumber)
+            placeInfos
+                .filter { it.campus == Campus.GWANAK }
+                .map {
+                    async {
+                        snuMapRepository
+                            .getLectureBuildingSearchResult(it.buildingNumber)
+                            .getMostProbableSearchItem(it.buildingNumber)
+                    }
+                }.awaitAll()
+                .filterNotNull()
+                .map {
+                    LectureBuilding(
+                        buildingNumber = it.buildingNumber ?: "",
+                        buildingNameKor = it.name,
+                        buildingNameEng = it.englishName ?: "",
+                        locationInDMS = GeoCoordinate(it.latitudeInDMS, it.longitudeInDMS),
+                        locationInDecimal = GeoCoordinate(it.latitudeInDecimal, it.longitudeInDecimal),
+                        campus = Campus.GWANAK,
+                    )
                 }
-            }.awaitAll().filterNotNull().map {
-                LectureBuilding(
-                    buildingNumber = it.buildingNumber ?: "",
-                    buildingNameKor = it.name,
-                    buildingNameEng = it.englishName ?: "",
-                    locationInDMS = GeoCoordinate(it.latitudeInDMS, it.longitudeInDMS),
-                    locationInDecimal = GeoCoordinate(it.latitudeInDecimal, it.longitudeInDecimal),
-                    campus = Campus.GWANAK,
-                )
-            }
         }.let { lectureBuildingRepository.saveAll(it) }
     }
 

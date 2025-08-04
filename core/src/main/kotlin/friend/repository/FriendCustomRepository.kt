@@ -27,50 +27,52 @@ class FriendCustomRepositoryImpl(
     override suspend fun findAllFriends(
         userId: String,
         state: FriendState,
-    ): List<Friend> {
-        return reactiveMongoTemplate.find<Friend>(
-            Query.query(
-                when (state) {
-                    FriendState.ACTIVE -> {
-                        Criteria().andOperator(
-                            Criteria().orOperator(
-                                Friend::fromUserId isEqualTo userId,
-                                Friend::toUserId isEqualTo userId,
-                            ),
-                            Friend::isAccepted isEqualTo true,
-                        )
-                    }
-                    FriendState.REQUESTING -> {
-                        Criteria().andOperator(
-                            Friend::fromUserId isEqualTo userId,
-                            Friend::isAccepted isEqualTo false,
-                        )
-                    }
-                    FriendState.REQUESTED -> {
-                        Criteria().andOperator(
-                            Friend::toUserId isEqualTo userId,
-                            Friend::isAccepted isEqualTo false,
-                        )
-                    }
-                },
-            ).with(Friend::createdAt.desc()),
-        ).asFlow().toList()
-    }
+    ): List<Friend> =
+        reactiveMongoTemplate
+            .find<Friend>(
+                Query
+                    .query(
+                        when (state) {
+                            FriendState.ACTIVE -> {
+                                Criteria().andOperator(
+                                    Criteria().orOperator(
+                                        Friend::fromUserId isEqualTo userId,
+                                        Friend::toUserId isEqualTo userId,
+                                    ),
+                                    Friend::isAccepted isEqualTo true,
+                                )
+                            }
+                            FriendState.REQUESTING -> {
+                                Criteria().andOperator(
+                                    Friend::fromUserId isEqualTo userId,
+                                    Friend::isAccepted isEqualTo false,
+                                )
+                            }
+                            FriendState.REQUESTED -> {
+                                Criteria().andOperator(
+                                    Friend::toUserId isEqualTo userId,
+                                    Friend::isAccepted isEqualTo false,
+                                )
+                            }
+                        },
+                    ).with(Friend::createdAt.desc()),
+            ).asFlow()
+            .toList()
 
-    override suspend fun findByUserPair(userIds: Pair<String, String>): Friend? {
-        return reactiveMongoTemplate.find<Friend>(
-            Query.query(
-                Criteria().orOperator(
-                    Criteria().andOperator(
-                        Friend::fromUserId isEqualTo userIds.first,
-                        Friend::toUserId isEqualTo userIds.second,
-                    ),
-                    Criteria().andOperator(
-                        Friend::fromUserId isEqualTo userIds.second,
-                        Friend::toUserId isEqualTo userIds.first,
+    override suspend fun findByUserPair(userIds: Pair<String, String>): Friend? =
+        reactiveMongoTemplate
+            .find<Friend>(
+                Query.query(
+                    Criteria().orOperator(
+                        Criteria().andOperator(
+                            Friend::fromUserId isEqualTo userIds.first,
+                            Friend::toUserId isEqualTo userIds.second,
+                        ),
+                        Criteria().andOperator(
+                            Friend::fromUserId isEqualTo userIds.second,
+                            Friend::toUserId isEqualTo userIds.first,
+                        ),
                     ),
                 ),
-            ),
-        ).awaitFirstOrNull()
-    }
+            ).awaitFirstOrNull()
 }

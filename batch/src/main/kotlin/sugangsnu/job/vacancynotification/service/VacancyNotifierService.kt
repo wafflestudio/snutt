@@ -146,28 +146,37 @@ class VacancyNotifierServiceImpl(
 
     private suspend fun getRegistrationStatus(pages: List<Int>): List<RegistrationStatus> =
         supervisorScope {
-            pages.map { page ->
-                async {
-                    getSugangSnuSearchContent(page).extractRegistrationStatus()
-                }
-            }.awaitAll().flatten()
+            pages
+                .map { page ->
+                    async {
+                        getSugangSnuSearchContent(page).extractRegistrationStatus()
+                    }
+                }.awaitAll()
+                .flatten()
         }
 
     private fun Element.extractRegistrationStatus() =
-        this.select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
+        this
+            .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
             .map { course ->
-                course.select("div.course-info-item ul.course-info").first()!!
+                course
+                    .select("div.course-info-item ul.course-info")
+                    .first()!!
                     .let { info ->
                         val (courseNumber, lectureNumber) =
                             info
-                                .select("li:nth-of-type(1) > span:nth-of-type(3)").text()
+                                .select("li:nth-of-type(1) > span:nth-of-type(3)")
+                                .text()
                                 .takeIf { courseNumberRegex.matches(it) }!!
                                 .let { courseNumberRegex.find(it)!!.groups }
                                 .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
                         val registrationCount =
-                            info.select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
+                            info
+                                .select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
                                 .text()
-                                .split("/").first().toInt()
+                                .split("/")
+                                .first()
+                                .toInt()
                         RegistrationStatus(
                             courseNumber = courseNumber,
                             lectureNumber = lectureNumber,
@@ -179,7 +188,8 @@ class VacancyNotifierServiceImpl(
     private suspend fun getSugangSnuSearchContent(pageNo: Int): Element {
         val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(pageNo)
         return try {
-            Jsoup.parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
+            Jsoup
+                .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
                 .select("html > body > form#CC100 > div#wrapper > div#skip-con > div.content")
                 .first()!!
         } finally {

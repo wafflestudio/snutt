@@ -17,7 +17,8 @@ object SugangSnuClassTimeUtils {
         runCatching {
             val sugangSnuClassTimes =
                 classTimesTexts
-                    .filter { it.isNotBlank() }.map(SugangSnuClassTimeUtils::parseSugangSnuClassTime)
+                    .filter { it.isNotBlank() }
+                    .map(SugangSnuClassTimeUtils::parseSugangSnuClassTime)
             val locationTexts =
                 locationsTexts.let { locationText ->
                     when (locationText.size) {
@@ -27,7 +28,8 @@ object SugangSnuClassTimeUtils {
                         else -> throw RuntimeException("locations does not match with times $classTimesTexts $locationsTexts")
                     }
                 }
-            sugangSnuClassTimes.zip(locationTexts)
+            sugangSnuClassTimes
+                .zip(locationTexts)
                 .groupBy({ it.first }, { it.second })
                 .map { (sugangSnuClassTime, locationTexts) ->
                     ClassPlaceAndTime(
@@ -36,15 +38,14 @@ object SugangSnuClassTimeUtils {
                         startMinute = sugangSnuClassTime.startHour.toInt() * 60 + sugangSnuClassTime.startMinute.toInt(),
                         endMinute = sugangSnuClassTime.endHour.toInt() * 60 + sugangSnuClassTime.endMinute.toInt(),
                     )
-                }
-                .sortedWith(compareBy({ it.day.value }, { it.startMinute }))
+                }.sortedWith(compareBy({ it.day.value }, { it.startMinute }))
         }.getOrElse {
             log.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesTexts, locationsTexts)
             emptyList()
         }
 
-    private fun parseSugangSnuClassTime(classTime: String): SugangSnuClassTime {
-        return classTimeRegEx.find(classTime)!!.groups.let { matchResult ->
+    private fun parseSugangSnuClassTime(classTime: String): SugangSnuClassTime =
+        classTimeRegEx.find(classTime)!!.groups.let { matchResult ->
             SugangSnuClassTime(
                 dayOfWeek = matchResult["day"]!!.value,
                 startHour = matchResult["startHour"]!!.value,
@@ -53,5 +54,4 @@ object SugangSnuClassTimeUtils {
                 endMinute = matchResult["endMinute"]!!.value,
             )
         }
-    }
 }

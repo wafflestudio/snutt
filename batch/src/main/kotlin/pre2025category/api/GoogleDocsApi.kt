@@ -16,16 +16,19 @@ class GoogleDocsApiConfig {
     @Bean
     fun googleDocsApi(): GoogleDocsApi {
         val exchangeStrategies: ExchangeStrategies =
-            ExchangeStrategies.builder()
+            ExchangeStrategies
+                .builder()
                 .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
                 .build()
 
         val httpClient =
-            HttpClient.create()
+            HttpClient
+                .create()
                 .followRedirect(true)
                 .compress(true)
 
-        return WebClient.builder()
+        return WebClient
+            .builder()
             .baseUrl(GOOGLE_DOCS_BASE_URL)
             .clientConnector(ReactorClientHttpConnector(httpClient))
             .exchangeStrategies(exchangeStrategies)
@@ -34,4 +37,6 @@ class GoogleDocsApiConfig {
     }
 }
 
-class GoogleDocsApi(webClient: WebClient) : WebClient by webClient
+class GoogleDocsApi(
+    webClient: WebClient,
+) : WebClient by webClient
