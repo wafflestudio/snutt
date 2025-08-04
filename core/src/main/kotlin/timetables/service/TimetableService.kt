@@ -163,9 +163,7 @@ class TimetableServiceImpl(
     override suspend fun getTimetable(
         userId: String,
         timetableId: String,
-    ): Timetable {
-        return timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
-    }
+    ): Timetable = timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
 
     override suspend fun modifyTimetableTitle(
         userId: String,
@@ -195,13 +193,14 @@ class TimetableServiceImpl(
         val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
         val latestCopiedTimetableNumber =
             getLatestCopiedTimetableNumber(userId, timetable.year, timetable.semester, title ?: timetable.title)
-        return timetable.copy(
-            id = null,
-            userId = userId,
-            updatedAt = Instant.now(),
-            title = baseTitle + " (${latestCopiedTimetableNumber + 1})",
-            isPrimary = false,
-        ).let { timetableRepository.save(it) }
+        return timetable
+            .copy(
+                id = null,
+                userId = userId,
+                updatedAt = Instant.now(),
+                title = baseTitle + " (${latestCopiedTimetableNumber + 1})",
+                isPrimary = false,
+            ).let { timetableRepository.save(it) }
     }
 
     override suspend fun modifyTimetableTheme(
@@ -235,19 +234,19 @@ class TimetableServiceImpl(
         userId: String,
         year: Int,
         semester: Semester,
-    ): Timetable {
-        return timetableRepository.findByUserIdAndYearAndSemester(userId, year, semester)
+    ): Timetable =
+        timetableRepository
+            .findByUserIdAndYearAndSemester(userId, year, semester)
             .toList()
             .ifEmpty { throw TimetableNotFoundException }
             .find { it.isPrimary == true } ?: throw PrimaryTimetableNotFoundException
-    }
 
-    override suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto> {
-        return timetableRepository.findAllByUserIdAndIsPrimaryTrue(userId)
+    override suspend fun getCoursebooksWithPrimaryTable(userId: String): List<CoursebookDto> =
+        timetableRepository
+            .findAllByUserIdAndIsPrimaryTrue(userId)
             .map { CoursebookDto(it.year, it.semester) }
             .toSet()
             .sortedByDescending { it.order }
-    }
 
     override suspend fun createDefaultTable(userId: String): Timetable {
         val coursebook = coursebookService.getLatestCoursebook()
@@ -272,8 +271,12 @@ class TimetableServiceImpl(
         title: String,
     ): Int {
         val baseTitle = title.replace(Regex("""\s\(\d+\)$"""), "")
-        return timetableRepository.findLatestChildTimetable(userId, year, semester, baseTitle)?.title
-            ?.replace(baseTitle, "")?.filter { it.isDigit() }?.toIntOrNull() ?: 0
+        return timetableRepository
+            .findLatestChildTimetable(userId, year, semester, baseTitle)
+            ?.title
+            ?.replace(baseTitle, "")
+            ?.filter { it.isDigit() }
+            ?.toIntOrNull() ?: 0
     }
 
     private suspend fun validateTimetableTitle(

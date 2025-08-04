@@ -1,6 +1,10 @@
 package com.wafflestudio.snutt.sugangsnu.common.enum
 
-enum class LectureCategory(val parentCategory: String, val queryValue: Long, val koreanName: String) {
+enum class LectureCategory(
+    val parentCategory: String,
+    val queryValue: Long,
+    val koreanName: String,
+) {
     // 학문의 기초
     FOUNDATION_WRITING("04", 40, "사고와 표현"),
     FOUNDATION_LANGUAGE("04", 41, "외국어"),

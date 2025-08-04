@@ -36,19 +36,20 @@ class VacancyNotificationJobConfig {
         coursebookService: CoursebookService,
         sugangSnuNotificationService: SugangSnuNotificationService,
     ): Step =
-        StepBuilder("vacancyNotificationStep", jobRepository).tasklet(
-            { _, _ ->
-                runBlocking {
-                    val latestCoursebook = coursebookService.getLatestCoursebook()
-                    val updateResult = vacancyNotifierService.noti(latestCoursebook)
-                    if (Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
-                    when (updateResult) {
-                        VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
-                        VacancyNotificationJobResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
-                        VacancyNotificationJobResult.SUCCESS -> RepeatStatus.CONTINUABLE
+        StepBuilder("vacancyNotificationStep", jobRepository)
+            .tasklet(
+                { _, _ ->
+                    runBlocking {
+                        val latestCoursebook = coursebookService.getLatestCoursebook()
+                        val updateResult = vacancyNotifierService.noti(latestCoursebook)
+                        if (Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
+                        when (updateResult) {
+                            VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
+                            VacancyNotificationJobResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
+                            VacancyNotificationJobResult.SUCCESS -> RepeatStatus.CONTINUABLE
+                        }
                     }
-                }
-            },
-            transactionManager,
-        ).build()
+                },
+                transactionManager,
+            ).build()
 }

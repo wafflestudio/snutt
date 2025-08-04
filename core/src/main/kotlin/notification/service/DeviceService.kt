@@ -103,15 +103,17 @@ class DeviceService internal constructor(
         }
     }
 
-    suspend fun getUserDevices(userId: String): List<UserDevice> {
-        return userDeviceRepository.findByUserIdAndIsDeletedFalse(userId).distinctBy { it.fcmRegistrationId }
-            .ifEmpty { // UserDevice 로 migration 되지 않은 경우를 고려
+    suspend fun getUserDevices(userId: String): List<UserDevice> =
+        userDeviceRepository
+            .findByUserIdAndIsDeletedFalse(userId)
+            .distinctBy { it.fcmRegistrationId }
+            .ifEmpty {
+                // UserDevice 로 migration 되지 않은 경우를 고려
                 userRepository.findByIdAndActiveTrue(userId)?.fcmKey?.let { fcmKey ->
                     // FCM API 의 한계로 기기 그룹 내의 registrationId 들을 알아낼 수는 없음
                     listOf(UserDevice.of(userId, fcmKey))
                 } ?: emptyList()
             }
-    }
 
     suspend fun getUsersDevices(userIds: List<String>): Map<String, List<UserDevice>> {
         val userDevices = userDeviceRepository.findByUserIdInAndIsDeletedFalse(userIds).distinctBy { it.fcmRegistrationId }

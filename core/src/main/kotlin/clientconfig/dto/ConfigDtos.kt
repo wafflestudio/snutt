@@ -51,8 +51,8 @@ data class ConfigVersionDto(
         fun of(
             iosAppVersion: AppVersion?,
             androidAppVersion: AppVersion?,
-        ): ConfigVersionDto? {
-            return if (iosAppVersion != null && androidAppVersion != null) {
+        ): ConfigVersionDto? =
+            if (iosAppVersion != null && androidAppVersion != null) {
                 ConfigVersionDto(
                     ios = iosAppVersion.appVersion,
                     android = androidAppVersion.appVersion,
@@ -60,6 +60,5 @@ data class ConfigVersionDto(
             } else {
                 null
             }
-        }
     }
 }

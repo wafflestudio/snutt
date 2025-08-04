@@ -10,7 +10,9 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.queryParamOrNull
 
-abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoOp) {
+abstract class ServiceHandler(
+    val handlerMiddleware: Middleware = Middleware.NoOp,
+) {
     protected suspend fun <T : Any> handle(
         req: ServerRequest,
         additionalMiddleware: Middleware = Middleware.NoOp,
@@ -20,9 +22,7 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
         return function()?.toResponse() ?: ServerResponse.ok().buildAndAwait()
     }
 
-    private suspend fun <T : Any> T.toResponse(): ServerResponse {
-        return ServerResponse.ok().bodyValue(this).awaitSingle()
-    }
+    private suspend fun <T : Any> T.toResponse(): ServerResponse = ServerResponse.ok().bodyValue(this).awaitSingle()
 
     fun <T> ServerRequest.parseRequiredQueryParam(
         name: String,
@@ -35,15 +35,17 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
         name: String,
         convert: (String) -> T?,
     ): T? =
-        this.queryParamOrNull(name)?.runCatching { convert(this)!! }
+        this
+            .queryParamOrNull(name)
+            ?.runCatching { convert(this)!! }
             ?.getOrElse { throw InvalidQueryParameterException(name) }
 
     inline fun <reified T> ServerRequest.parseRequiredQueryParam(name: String): T =
         parseQueryParam<T>(name)
             ?: throw MissingRequiredParameterException(name)
 
-    inline fun <reified T> ServerRequest.parseQueryParam(name: String): T? {
-        return when (T::class) {
+    inline fun <reified T> ServerRequest.parseQueryParam(name: String): T? =
+        when (T::class) {
             String::class -> this.parseQueryParam(name) { it } as T?
             Int::class -> this.parseQueryParam(name) { it.toIntOrNull() } as T?
             Long::class -> this.parseQueryParam(name) { it.toLongOrNull() } as T?
@@ -52,5 +54,4 @@ abstract class ServiceHandler(val handlerMiddleware: Middleware = Middleware.NoO
             Boolean::class -> this.parseQueryParam(name) { it.toBooleanStrictOrNull() } as T?
             else -> throw IllegalArgumentException("파싱을 지원하지 않는 쿼리 파라미터 타입입니다. type: ${T::class}")
         }
-    }
 }

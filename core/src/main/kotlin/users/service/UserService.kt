@@ -145,13 +145,9 @@ class UserServiceImpl(
 ) : UserService {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    override suspend fun getUser(userId: String): User {
-        return userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
-    }
+    override suspend fun getUser(userId: String): User = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
 
-    override suspend fun getUsers(userIds: List<String>): List<User> {
-        return userRepository.findAllByIdInAndActiveTrue(userIds)
-    }
+    override suspend fun getUsers(userIds: List<String>): List<User> = userRepository.findAllByIdInAndActiveTrue(userIds)
 
     override suspend fun patchUserInfo(
         userId: String,
@@ -376,9 +372,7 @@ class UserServiceImpl(
         deviceService.removeRegistrationId(user.id!!, logoutRequest.registrationId)
     }
 
-    override suspend fun update(user: User): User {
-        return userRepository.save(user)
-    }
+    override suspend fun update(user: User): User = userRepository.save(user)
 
     override suspend fun sendVerificationCode(
         user: User,
@@ -614,7 +608,8 @@ class UserServiceImpl(
         val existing = readVerificationValue(key)
         if (existing != null && existing.count > 4) throw TooManyVerificationCodeRequestException
         val value = RedisVerificationValue(email, code, (existing?.count ?: 0) + 1)
-        redisTemplate.opsForValue()
+        redisTemplate
+            .opsForValue()
             .set(key, mapper.writeValueAsString(value), Duration.ofMinutes(3))
             .subscribe()
         return value
@@ -629,11 +624,10 @@ class UserServiceImpl(
         return value
     }
 
-    private suspend fun readVerificationValue(key: String): RedisVerificationValue? {
-        return redisTemplate.opsForValue().getAndAwait(key)?.let {
+    private suspend fun readVerificationValue(key: String): RedisVerificationValue? =
+        redisTemplate.opsForValue().getAndAwait(key)?.let {
             mapper.readValue<RedisVerificationValue>(it)
         }
-    }
 
     companion object {
         private val emailMaskRegex = Regex("(?<=.{3}).(?=.*@)")

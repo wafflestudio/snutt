@@ -2,7 +2,10 @@ package com.wafflestudio.snutt.common.storage
 
 import com.wafflestudio.snutt.config.PhaseUtils
 
-enum class StorageType(bucketName: String, val acl: Acl = Acl.PRIVATE) {
+enum class StorageType(
+    bucketName: String,
+    val acl: Acl = Acl.PRIVATE,
+) {
     ASSETS("snutt-asset", Acl.PUBLIC_READ),
     ;
 
@@ -15,8 +18,6 @@ enum class StorageType(bucketName: String, val acl: Acl = Acl.PRIVATE) {
     companion object {
         private const val BUCKET_NAME_DEV_SUFFIX = "-dev"
 
-        fun from(bucketName: String): StorageType {
-            return entries.first { it.bucketName == bucketName }
-        }
+        fun from(bucketName: String): StorageType = entries.first { it.bucketName == bucketName }
     }
 }

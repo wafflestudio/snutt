@@ -43,15 +43,16 @@ class VacancyNotificationServiceImpl(
     private val coursebookService: CoursebookService,
 ) : VacancyNotificationService {
     override suspend fun getVacancyNotificationLectures(userId: String): List<Lecture> =
-        vacancyNotificationRepository.findAllByUserId(userId).map { it.lectureId }
-            .let { lectureRepository.findAllById(it) }.toList()
+        vacancyNotificationRepository
+            .findAllByUserId(userId)
+            .map { it.lectureId }
+            .let { lectureRepository.findAllById(it) }
+            .toList()
 
     override suspend fun existsVacancyNotification(
         userId: String,
         lectureId: String,
-    ): Boolean {
-        return vacancyNotificationRepository.existsByUserIdAndLectureId(userId, lectureId)
-    }
+    ): Boolean = vacancyNotificationRepository.existsByUserIdAndLectureId(userId, lectureId)
 
     override suspend fun addVacancyNotification(
         userId: String,

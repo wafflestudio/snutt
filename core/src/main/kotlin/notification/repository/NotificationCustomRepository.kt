@@ -21,22 +21,26 @@ interface NotificationCustomRepository {
     ): Flow<Notification>
 }
 
-class NotificationRepositoryImpl(private val reactiveMongoTemplate: ReactiveMongoTemplate) : NotificationCustomRepository {
+class NotificationRepositoryImpl(
+    private val reactiveMongoTemplate: ReactiveMongoTemplate,
+) : NotificationCustomRepository {
     override fun findNotifications(
         userId: String,
         createdAt: LocalDateTime,
         offset: Long,
         limit: Int,
-    ) = reactiveMongoTemplate.find<Notification>(
-        Query.query(
-            Criteria().andOperator(
-                Notification::createdAt gt createdAt,
-                Notification::userId inValues listOf(userId, null),
-            ),
-        ).apply {
-            with(Notification::createdAt.desc())
-            skip(offset)
-            limit(limit)
-        },
-    ).asFlow()
+    ) = reactiveMongoTemplate
+        .find<Notification>(
+            Query
+                .query(
+                    Criteria().andOperator(
+                        Notification::createdAt gt createdAt,
+                        Notification::userId inValues listOf(userId, null),
+                    ),
+                ).apply {
+                    with(Notification::createdAt.desc())
+                    skip(offset)
+                    limit(limit)
+                },
+        ).asFlow()
 }

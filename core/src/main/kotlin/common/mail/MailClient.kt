@@ -22,12 +22,14 @@ class MailClient {
     ) {
         val dest = Destination.builder().toAddresses(to).build()
         val message =
-            Message.builder()
+            Message
+                .builder()
                 .subject(Content.builder().data(subject).build())
                 .body(Body.builder().html(Content.builder().data(body).build()).build())
                 .build()
         val request =
-            SendEmailRequest.builder()
+            SendEmailRequest
+                .builder()
                 .destination(dest)
                 .message(message)
                 .source(sourceEmail)

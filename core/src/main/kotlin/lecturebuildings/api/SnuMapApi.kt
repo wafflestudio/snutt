@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class SnuMapApiConfig() {
+class SnuMapApiConfig {
     companion object {
         const val SNU_MAP_BASE_URL = "https://map.snu.ac.kr"
     }
@@ -14,11 +14,14 @@ class SnuMapApiConfig() {
     @Bean
     fun snuMapSnuApi(): SnuMapApi {
         val exchangeStrategies: ExchangeStrategies =
-            ExchangeStrategies.builder()
+            ExchangeStrategies
+                .builder()
                 .codecs { it.defaultCodecs().maxInMemorySize(-1) } // to unlimited memory size
                 .build()
 
-        return WebClient.builder().baseUrl(SNU_MAP_BASE_URL)
+        return WebClient
+            .builder()
+            .baseUrl(SNU_MAP_BASE_URL)
             .exchangeStrategies(exchangeStrategies)
             .defaultHeaders {
                 it.setAll(
@@ -33,9 +36,11 @@ class SnuMapApiConfig() {
                         "Referer" to "https://map.snu.ac.kr/web/main.action",
                     ),
                 )
-            }
-            .build().let(::SnuMapApi)
+            }.build()
+            .let(::SnuMapApi)
     }
 }
 
-class SnuMapApi(webClient: WebClient) : WebClient by webClient
+class SnuMapApi(
+    webClient: WebClient,
+) : WebClient by webClient

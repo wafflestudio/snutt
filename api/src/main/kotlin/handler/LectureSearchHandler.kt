@@ -47,8 +47,8 @@ data class SearchQueryLegacy(
     val sortCriteria: String? = null,
     val categoryPre2025: List<String>? = null,
 ) {
-    fun toSearchDto(): SearchDto {
-        return SearchDto(
+    fun toSearchDto(): SearchDto =
+        SearchDto(
             year = year,
             semester = semester,
             query = title,
@@ -67,5 +67,4 @@ data class SearchQueryLegacy(
             sortBy = sortCriteria,
             categoryPre2025 = categoryPre2025,
         )
-    }
 }

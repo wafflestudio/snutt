@@ -33,20 +33,21 @@ data class PushMessage(
     val urlScheme: DeeplinkType? = null,
     val data: Data = Data(emptyMap()),
 ) {
-    data class Data(val payload: Map<String, String>)
+    data class Data(
+        val payload: Map<String, String>,
+    )
 
     fun toNotification(
         notificationType: NotificationType,
         userId: String?,
-    ): Notification {
-        return Notification(
+    ): Notification =
+        Notification(
             userId = userId,
             title = title,
             message = body,
             type = notificationType,
             deeplink = urlScheme?.build()?.value,
         )
-    }
 }
 
 fun PushMessage(

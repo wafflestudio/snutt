@@ -14,9 +14,13 @@ class CategoryPre2025FetchService(
 
         try {
             val workbook = WorkbookFactory.create(oldCategoriesXlsx.asInputStream())
-            return workbook.sheetIterator().asSequence()
+            return workbook
+                .sheetIterator()
+                .asSequence()
                 .flatMap { sheet ->
-                    sheet.rowIterator().asSequence()
+                    sheet
+                        .rowIterator()
+                        .asSequence()
                         .drop(4)
                         .mapNotNull { row ->
                             runCatching {
@@ -26,8 +30,7 @@ class CategoryPre2025FetchService(
                                 currentCourseNumber to oldCategory
                             }.getOrNull()
                         }
-                }
-                .toMap()
+                }.toMap()
         } finally {
             oldCategoriesXlsx.release()
         }

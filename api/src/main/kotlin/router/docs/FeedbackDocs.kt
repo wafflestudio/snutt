@@ -38,4 +38,4 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
 )
-annotation class FeedbackDocs()
+annotation class FeedbackDocs

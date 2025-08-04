@@ -47,7 +47,8 @@ class EvService(
             throw UserEmailIsNotVerifiedException
         }
         val result: MutableMap<String, Any?>? =
-            snuttEvWebClient.method(method)
+            snuttEvWebClient
+                .method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
                 .header("Snutt-User-Id", user.id)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
@@ -75,7 +76,9 @@ class EvService(
     ): Map<String, Any?> {
         val recentLectures: List<EvLectureInfoDto> =
             coursebookService.getLastTwoCourseBooksBeforeCurrent().flatMap { coursebook ->
-                timetableRepository.findAllByUserIdAndYearAndSemester(userId, coursebook.year, coursebook.semester).toList()
+                timetableRepository
+                    .findAllByUserIdAndYearAndSemester(userId, coursebook.year, coursebook.semester)
+                    .toList()
                     .flatMap { timetable ->
                         timetable.lectures.map { lecture ->
                             EvLectureInfoDto(
@@ -88,15 +91,15 @@ class EvService(
             }
 
         val lectureInfoParam = objectMapper.writeValueAsString(recentLectures)
-        return snuttEvWebClient.get()
+        return snuttEvWebClient
+            .get()
             .uri { builder ->
                 builder
                     .path("/v1/users/me/lectures/latest")
                     .queryParam("snutt_lecture_info", "{lectureInfoParam}")
                     .queryParams(requestQueryParams)
                     .build(lectureInfoParam)
-            }
-            .header("Snutt-User-Id", userId)
+            }.header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
             .awaitExchange { response ->
                 if (response.statusCode().is2xxSuccessful) {
@@ -115,29 +118,34 @@ class EvService(
 
     suspend fun getSummariesByIds(ids: List<String>): List<SnuttEvLectureSummaryDto> =
         runCatching {
-            snuttEvWebClient.get().uri { builder ->
-                builder.path("/v1/lectures/snutt-summary")
-                    .queryParam("semesterLectureSnuttIds", ids.joinToString(","))
-                    .build()
-            }
-                .retrieve()
-                .awaitBody<ListResponse<SnuttEvLectureSummaryDto>>().content
+            snuttEvWebClient
+                .get()
+                .uri { builder ->
+                    builder
+                        .path("/v1/lectures/snutt-summary")
+                        .queryParam("semesterLectureSnuttIds", ids.joinToString(","))
+                        .build()
+                }.retrieve()
+                .awaitBody<ListResponse<SnuttEvLectureSummaryDto>>()
+                .content
         }.getOrDefault(emptyList())
 
     suspend fun getEvIdsBySnuttIds(snuttIds: List<String>): List<SnuttEvLectureIdDto> =
         runCatching {
-            snuttEvWebClient.get().uri { builder ->
-                builder.path("/v1/lectures/ids")
-                    .queryParam("semesterLectureSnuttIds", snuttIds.joinToString(","))
-                    .build()
-            }
-                .retrieve()
-                .awaitBody<ListResponse<SnuttEvLectureIdDto>>().content
+            snuttEvWebClient
+                .get()
+                .uri { builder ->
+                    builder
+                        .path("/v1/lectures/ids")
+                        .queryParam("semesterLectureSnuttIds", snuttIds.joinToString(","))
+                        .build()
+                }.retrieve()
+                .awaitBody<ListResponse<SnuttEvLectureIdDto>>()
+                .content
         }.getOrDefault(emptyList())
 
-    suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto {
-        return getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
-    }
+    suspend fun getEvSummary(lectureId: String): SnuttEvLectureSummaryDto =
+        getSummariesByIds(listOf(lectureId)).firstOrNull() ?: throw EvDataNotFoundException
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun updateUserInfo(data: MutableMap<String, Any?>?): MutableMap<String, Any?>? {

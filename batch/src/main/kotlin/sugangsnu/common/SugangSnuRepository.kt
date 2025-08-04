@@ -46,14 +46,15 @@ class SugangSnuRepository(
     }
 
     suspend fun getSearchPageHtml(pageNo: Int = 1): PooledDataBuffer =
-        sugangSnuApi.get()
+        sugangSnuApi
+            .get()
             .uri { builder ->
-                builder.path(SUGANG_SNU_SEARCH_PATH)
+                builder
+                    .path(SUGANG_SNU_SEARCH_PATH)
                     .query(DEFAULT_SEARCH_PAGE_PARAMS)
                     .queryParam("pageNo", pageNo)
                     .build()
-            }
-            .accept(MediaType.TEXT_HTML)
+            }.accept(MediaType.TEXT_HTML)
             .retrieve()
             .awaitBody<PooledDataBuffer>()
 
@@ -63,51 +64,62 @@ class SugangSnuRepository(
         courseNumber: String,
         lectureNumber: String,
     ): SugangSnuLectureInfo =
-        sugangSnuApi.get().uri { builder ->
-            val semesterSearchString = convertSemesterToSugangSnuSearchString(semester)
-            builder.path(SUGANG_SNU_SEARCH_POPUP_PATH)
-                .query(DEFAULT_SEARCH_POPUP_PARAMS)
-                .queryParam("openSchyy", year)
-                .queryParam("openShtmFg", semesterSearchString.substring(0..9))
-                .queryParam("openDetaShtmFg", semesterSearchString.substring(10))
-                .queryParam("sbjtCd", courseNumber)
-                .queryParam("ltNo", lectureNumber)
-                .build()
-        }.accept(MediaType.APPLICATION_JSON).retrieve().awaitBody<String>()
+        sugangSnuApi
+            .get()
+            .uri { builder ->
+                val semesterSearchString = convertSemesterToSugangSnuSearchString(semester)
+                builder
+                    .path(SUGANG_SNU_SEARCH_POPUP_PATH)
+                    .query(DEFAULT_SEARCH_POPUP_PARAMS)
+                    .queryParam("openSchyy", year)
+                    .queryParam("openShtmFg", semesterSearchString.substring(0..9))
+                    .queryParam("openDetaShtmFg", semesterSearchString.substring(10))
+                    .queryParam("sbjtCd", courseNumber)
+                    .queryParam("ltNo", lectureNumber)
+                    .build()
+            }.accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .awaitBody<String>()
             .let { objectMapper.readValue<SugangSnuLectureInfo>(it) }
 
     suspend fun getCoursebookCondition(): SugangSnuCoursebookCondition =
-        sugangSnuApi.get().uri { builder ->
-            builder.path(SUGANG_SNU_COURSEBOOK_PATH)
-                .query(DEFAULT_COURSEBOOK_PARAMS)
-                .build()
-        }.awaitExchange {
-            if (it.statusCode().is2xxSuccessful) {
-                it.awaitBody()
-            } else {
-                throw it.createExceptionAndAwait()
+        sugangSnuApi
+            .get()
+            .uri { builder ->
+                builder
+                    .path(SUGANG_SNU_COURSEBOOK_PATH)
+                    .query(DEFAULT_COURSEBOOK_PARAMS)
+                    .build()
+            }.awaitExchange {
+                if (it.statusCode().is2xxSuccessful) {
+                    it.awaitBody()
+                } else {
+                    throw it.createExceptionAndAwait()
+                }
             }
-        }
 
     suspend fun getSugangSnuLectures(
         year: Int,
         semester: Semester,
         language: String = "ko",
     ): PooledDataBuffer =
-        sugangSnuApi.get().uri { builder ->
-            builder.run {
-                path(SUGANG_SNU_LECTURE_EXCEL_DOWNLOAD_PATH)
-                query(DEFAULT_LECTURE_EXCEL_DOWNLOAD_PARAMS)
-                queryParam("srchLanguage", language)
-                queryParam("srchOpenSchyy", year)
-                queryParam("srchOpenShtm", convertSemesterToSugangSnuSearchString(semester))
-                build()
+        sugangSnuApi
+            .get()
+            .uri { builder ->
+                builder.run {
+                    path(SUGANG_SNU_LECTURE_EXCEL_DOWNLOAD_PATH)
+                    query(DEFAULT_LECTURE_EXCEL_DOWNLOAD_PARAMS)
+                    queryParam("srchLanguage", language)
+                    queryParam("srchOpenSchyy", year)
+                    queryParam("srchOpenShtm", convertSemesterToSugangSnuSearchString(semester))
+                    build()
+                }
+            }.accept(MediaType.TEXT_HTML)
+            .awaitExchange {
+                if (it.statusCode().is2xxSuccessful) {
+                    it.awaitBody()
+                } else {
+                    throw it.createExceptionAndAwait()
+                }
             }
-        }.accept(MediaType.TEXT_HTML).awaitExchange {
-            if (it.statusCode().is2xxSuccessful) {
-                it.awaitBody()
-            } else {
-                throw it.createExceptionAndAwait()
-            }
-        }
 }

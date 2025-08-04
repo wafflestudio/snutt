@@ -75,9 +75,10 @@ class PushServiceImpl internal constructor(
     override suspend fun sendGlobalPush(pushMessage: PushMessage) = pushClient.sendGlobalMessage(pushMessage)
 
     override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>) =
-        userToPushMessage.entries.flatMap { (userId, pushMessage) ->
-            deviceService.getUserDevices(userId).map { it.fcmRegistrationId to pushMessage }
-        }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
+        userToPushMessage.entries
+            .flatMap { (userId, pushMessage) ->
+                deviceService.getUserDevices(userId).map { it.fcmRegistrationId to pushMessage }
+            }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
             .let { pushClient.sendMessages(it) }
 
     override suspend fun sendPush(
@@ -107,8 +108,7 @@ class PushServiceImpl internal constructor(
         pushPreferenceType: PushPreferenceType,
     ) {
         val filteredUserToPushMessage =
-            userToPushMessage.filterKeys {
-                    userId ->
+            userToPushMessage.filterKeys { userId ->
                 pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)
             }
 

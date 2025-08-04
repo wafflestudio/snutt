@@ -21,7 +21,8 @@ class VacancyNotifcationHandler(
         handle(req) {
             val userId = req.userId
 
-            vacancyNotificationService.getVacancyNotificationLectures(userId)
+            vacancyNotificationService
+                .getVacancyNotificationLectures(userId)
                 .let { lectureService.convertLecturesToLectureDtos(it) }
                 .let { VacancyNotificationLecturesResponse(it) }
         }

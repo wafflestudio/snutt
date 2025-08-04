@@ -67,4 +67,4 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
 )
-annotation class CoursebookDocs()
+annotation class CoursebookDocs

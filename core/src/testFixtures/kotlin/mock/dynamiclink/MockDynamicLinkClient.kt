@@ -9,20 +9,18 @@ import org.springframework.stereotype.Service
 @Service
 @Primary
 class MockDynamicLinkClient : DynamicLinkClient {
-    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse {
-        return DynamicLinkResponse(
+    override suspend fun generateLink(dynamicLinkRequest: DynamicLinkRequest): DynamicLinkResponse =
+        DynamicLinkResponse(
             "https://snuttdev.page.link/oySD",
             "https://snuttdev.page.link/oySD?d=1",
         )
-    }
 
     override suspend fun generateLink(
         link: String,
         mobileCtaLink: String,
-    ): DynamicLinkResponse {
-        return DynamicLinkResponse(
+    ): DynamicLinkResponse =
+        DynamicLinkResponse(
             "https://snuttdev.page.link/oySD",
             "https://snuttdev.page.link/oySD?d=1",
         )
-    }
 }

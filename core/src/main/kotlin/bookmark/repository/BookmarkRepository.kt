@@ -6,7 +6,9 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BookmarkRepository : CoroutineCrudRepository<Bookmark, String>, BookmarkCustomRepository {
+interface BookmarkRepository :
+    CoroutineCrudRepository<Bookmark, String>,
+    BookmarkCustomRepository {
     suspend fun findFirstByUserIdAndYearAndSemester(
         userId: String,
         year: Int,

@@ -97,9 +97,9 @@ class FriendHandler(
             val userId = req.userId
             val requestToken = req.pathVariable("requestToken")
 
-            friendService.acceptFriendByLink(userId, requestToken)
-                .let {
-                        (friend, partner) ->
+            friendService
+                .acceptFriendByLink(userId, requestToken)
+                .let { (friend, partner) ->
                     FriendResponse(
                         id = friend.id!!,
                         userId = partner.id!!,

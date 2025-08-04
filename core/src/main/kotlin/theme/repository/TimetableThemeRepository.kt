@@ -3,7 +3,9 @@ package com.wafflestudio.snutt.theme.repository
 import com.wafflestudio.snutt.theme.data.TimetableTheme
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface TimetableThemeRepository : CoroutineCrudRepository<TimetableTheme, String>, TimetableThemeCustomRepository {
+interface TimetableThemeRepository :
+    CoroutineCrudRepository<TimetableTheme, String>,
+    TimetableThemeCustomRepository {
     suspend fun findByIdAndUserId(
         id: String,
         userId: String,

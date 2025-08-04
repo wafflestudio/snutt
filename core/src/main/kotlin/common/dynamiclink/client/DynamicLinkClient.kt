@@ -46,8 +46,7 @@ class FirebaseDynamicLinkClient(
                         .path(SHORT_LINK_PATH)
                         .queryParam("key", apiKey)
                         .build()
-                }
-                .bodyValue(dynamicLinkRequest)
+                }.bodyValue(dynamicLinkRequest)
                 .retrieve()
                 .awaitBody<DynamicLinkResponse>()
         }.getOrElse {

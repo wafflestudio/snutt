@@ -4,7 +4,10 @@ import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
-sealed class UserLectureSyncResult(open val userId: String, open val lectureId: String)
+sealed class UserLectureSyncResult(
+    open val userId: String,
+    open val lectureId: String,
+)
 
 sealed class BookmarkLectureSyncResult(
     override val userId: String,

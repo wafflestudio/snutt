@@ -14,7 +14,8 @@ class StaticPageHandler {
         private val privacyPolicyHtml = ClassPathResource("$RESOURCE_PATH/privacy_policy.html")
         private val termsOfServiceHtml = ClassPathResource("$RESOURCE_PATH/terms_of_service.html")
         private val staticResponse =
-            ServerResponse.ok()
+            ServerResponse
+                .ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofDays(1)))
                 .header("Content-Type", "text/html; charset=utf-8")
     }

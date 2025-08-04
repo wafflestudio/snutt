@@ -92,4 +92,4 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
 )
-annotation class PushDocs()
+annotation class PushDocs

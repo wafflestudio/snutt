@@ -5,7 +5,9 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface TimetableRepository : CoroutineCrudRepository<Timetable, String>, TimetableCustomRepository {
+interface TimetableRepository :
+    CoroutineCrudRepository<Timetable, String>,
+    TimetableCustomRepository {
     fun findAllByUserId(userId: String): Flow<Timetable>
 
     fun findAllByUserIdAndIsPrimaryTrue(userId: String): Flow<Timetable>
