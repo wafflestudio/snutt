@@ -40,8 +40,7 @@ class DiaryHandler(
             val submissions = diaryService.getMySubmissions(userId, year, semester)
             val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
 
-            submissions.map {
-                    submission ->
+            submissions.map { submission ->
                 DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
             }
         }

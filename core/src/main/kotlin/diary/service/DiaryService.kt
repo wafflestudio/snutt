@@ -66,11 +66,13 @@ class DiaryServiceImpl(
         val activities = diaryActivityRepository.findByNameIn(activityNames)
         val questions = diaryQuestionRepository.findByTargetActivitiesContainsAndActiveTrue(activities)
         val answeredQuestionIds =
-            diarySubmissionRepository.findAllByUserIdAndLectureIdOrderByCreatedAt(userId, lectureId)
+            diarySubmissionRepository
+                .findAllByUserIdAndLectureIdOrderByCreatedAt(userId, lectureId)
                 .flatMap { it.questionIds }
                 .toSet()
 
-        return questions.filterNot { question -> question.id in answeredQuestionIds }
+        return questions
+            .filterNot { question -> question.id in answeredQuestionIds }
             .shuffled()
             .take(3)
     }
