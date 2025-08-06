@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.router.docs
 
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.diary.dto.DiaryActivityTypeDto
+import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
@@ -68,7 +68,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryActivityTypeDto::class)))],
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryActivityDto::class)))],
                     ),
                 ],
             ),

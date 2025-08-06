@@ -18,10 +18,8 @@ data class DiarySubmission(
     @Field(targetType = FieldType.OBJECT_ID)
     val userId: String,
     @Field(targetType = FieldType.OBJECT_ID)
-    val activityTypeIds: List<String>,
-    @Field(targetType = FieldType.OBJECT_ID)
-    val questionIds: List<String>,
-    val answerIndexes: List<Int>,
+    val activityIds: List<String>,
+    val questionAnswers: List<QuestionAnswer>,
     @Field(targetType = FieldType.OBJECT_ID)
     val lectureId: String,
     val courseTitle: String,
@@ -29,4 +27,9 @@ data class DiarySubmission(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val year: Int,
     val semester: Semester,
+)
+
+data class QuestionAnswer(
+    val questionId: String,
+    val answerIndex: Int,
 )

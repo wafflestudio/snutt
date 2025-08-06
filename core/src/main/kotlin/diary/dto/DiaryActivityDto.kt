@@ -2,13 +2,13 @@ package com.wafflestudio.snutt.diary.dto
 
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 
-data class DiaryActivityTypeDto(
+data class DiaryActivityDto(
     val id: String,
     val name: String,
 )
 
-fun DiaryActivityTypeDto(diaryActivity: DiaryActivity) =
-    DiaryActivityTypeDto(
+fun DiaryActivityDto(diaryActivity: DiaryActivity) =
+    DiaryActivityDto(
         id = diaryActivity.id!!,
         name = diaryActivity.name,
     )

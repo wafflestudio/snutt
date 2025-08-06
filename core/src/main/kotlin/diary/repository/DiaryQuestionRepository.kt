@@ -5,7 +5,7 @@ import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface DiaryQuestionRepository : CoroutineCrudRepository<DiaryQuestion, String> {
-    suspend fun findByTargetActivitiesContainsAndActiveTrue(activityTypes: List<DiaryActivity>): List<DiaryQuestion>
+    suspend fun findByTargetActivitiesContainsAndActiveTrue(activities: List<DiaryActivity>): List<DiaryQuestion>
 
     suspend fun findAllByActiveTrue(): List<DiaryQuestion>
 

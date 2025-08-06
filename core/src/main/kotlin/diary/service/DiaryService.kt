@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.enum.Semester
-import com.wafflestudio.snutt.common.exception.DiaryActivityTypeNotFoundException
+import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
@@ -68,8 +68,7 @@ class DiaryServiceImpl(
         val answeredQuestionIds =
             diarySubmissionRepository
                 .findAllByUserIdAndLectureIdOrderByCreatedAt(userId, lectureId)
-                .flatMap { it.questionIds }
-                .toSet()
+                .flatMap { submission -> submission.questionAnswers.map { it.questionId } }
 
         return questions
             .filterNot { question -> question.id in answeredQuestionIds }
@@ -89,22 +88,21 @@ class DiaryServiceImpl(
     ) {
         val lecture = lectureService.getByIdOrNull(request.lectureId)!!
         val activities = diaryActivityRepository.findByNameIn(request.activities).toList()
-        if (diaryQuestionRepository.countByIdIn(request.questionIds) != request.questionIds.size) {
+        val questionIds = request.questionAnswers.map { it.questionId }
+        if (diaryQuestionRepository.countByIdIn(questionIds) != questionIds.size) {
             throw DiaryQuestionNotFoundException
         }
-        if (activities.size < request.activities.size) {
-            throw DiaryActivityTypeNotFoundException
+        if (activities.size != request.activities.size) {
+            throw DiaryActivityNotFoundException
         }
-
         val submission =
             DiarySubmission(
                 userId = userId,
                 comment = request.comment,
                 lectureId = request.lectureId,
                 courseTitle = lecture.courseTitle,
-                answerIndexes = request.answerIndexes,
-                questionIds = request.questionIds,
-                activityTypeIds = activities.map { it.id!! },
+                questionAnswers = request.questionAnswers,
+                activityIds = activities.map { it.id!! },
                 year = lecture.year,
                 semester = lecture.semester,
             )
@@ -125,31 +123,31 @@ class DiaryServiceImpl(
     override suspend fun getSubmissionIdShortQuestionRepliesMap(
         submissions: List<DiarySubmission>,
     ): Map<String, List<DiaryShortQuestionReply>> {
-        val questions = diaryQuestionRepository.findAllByIdIn(submissions.flatMap { it.questionIds }).associateBy { it.id }
+        val questionIds = submissions.flatMap { submission -> submission.questionAnswers.map { it.questionId } }
+        val questionsIdMap = diaryQuestionRepository.findAllByIdIn(questionIds).associateBy { it.id }
         return submissions.associate { submission ->
             val shortQuestionReplies =
-                submission.questionIds.mapIndexedNotNull { index, questionId ->
-                    questions[questionId]?.let { question ->
-                        DiaryShortQuestionReply(
-                            question = question.shortQuestion,
-                            answer = question.shortAnswers[submission.answerIndexes[index]],
-                        )
-                    }
+                submission.questionAnswers.map { (questionId, answerIndex) ->
+                    val question = questionsIdMap[questionId]!!
+                    DiaryShortQuestionReply(
+                        question = question.shortQuestion,
+                        answer = question.shortAnswers[answerIndex],
+                    )
                 }
             submission.id!! to shortQuestionReplies
         }
     }
 
     override suspend fun addOrEnableActivity(name: String) {
-        val activityType = diaryActivityRepository.findByName(name) ?: DiaryActivity(name = name, active = true)
-        activityType.active = true
-        diaryActivityRepository.save(activityType)
+        val activity = diaryActivityRepository.findByName(name) ?: DiaryActivity(name = name, active = true)
+        activity.active = true
+        diaryActivityRepository.save(activity)
     }
 
     override suspend fun disableActivity(name: String) {
-        val activityType = diaryActivityRepository.findByName(name) ?: return
-        activityType.active = false
-        diaryActivityRepository.save(activityType)
+        val activity = diaryActivityRepository.findByName(name) ?: return
+        activity.active = false
+        diaryActivityRepository.save(activity)
     }
 
     override suspend fun addQuestion(request: DiaryAddQuestionRequestDto) {

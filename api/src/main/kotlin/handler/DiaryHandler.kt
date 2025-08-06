@@ -3,7 +3,7 @@ package com.wafflestudio.snutt.handler
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
-import com.wafflestudio.snutt.diary.dto.DiaryActivityTypeDto
+import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
@@ -48,7 +48,7 @@ class DiaryHandler(
     suspend fun getActivities(req: ServerRequest) =
         handle(req) {
             diaryService.getActiveActivities().map {
-                DiaryActivityTypeDto(it)
+                DiaryActivityDto(it)
             }
         }
 
