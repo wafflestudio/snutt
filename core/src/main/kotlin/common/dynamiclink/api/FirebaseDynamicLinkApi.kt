@@ -19,11 +19,15 @@ class FirebaseDynamicLinkApiConfig(
     @Bean
     fun firebaseDynamicLinkApi(): FirebaseDynamicLinkApi {
         val httpClient = HttpClient.create().responseTimeout(responseTimeout)
-        return WebClient.builder()
+        return WebClient
+            .builder()
             .clientConnector(ReactorClientHttpConnector(httpClient))
             .baseUrl(FIREBASE_DYNAMIC_LINK_BASE_URL)
-            .build().let(::FirebaseDynamicLinkApi)
+            .build()
+            .let(::FirebaseDynamicLinkApi)
     }
 }
 
-class FirebaseDynamicLinkApi(webClient: WebClient) : WebClient by webClient
+class FirebaseDynamicLinkApi(
+    webClient: WebClient,
+) : WebClient by webClient

@@ -14,7 +14,9 @@ class GithubRestApiConfig {
 
     @Bean
     fun githubRestApi(): GithubRestApi =
-        WebClient.builder().baseUrl(GITHUB_API_BASE_URI)
+        WebClient
+            .builder()
+            .baseUrl(GITHUB_API_BASE_URI)
             .defaultHeaders {
                 it.setAll(
                     mapOf(
@@ -22,8 +24,10 @@ class GithubRestApiConfig {
                         USER_AGENT to "snutt-timetable",
                     ),
                 )
-            }
-            .build().let(::GithubRestApi)
+            }.build()
+            .let(::GithubRestApi)
 }
 
-class GithubRestApi(webClient: WebClient) : WebClient by webClient
+class GithubRestApi(
+    webClient: WebClient,
+) : WebClient by webClient

@@ -25,12 +25,11 @@ class UserNicknameService(
         private val nicknameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
     }
 
-    private fun readAndSplitByComma(resource: ClassPathResource): List<String> {
-        return resource.inputStream
+    private fun readAndSplitByComma(resource: ClassPathResource): List<String> =
+        resource.inputStream
             .readBytes()
             .decodeToString()
             .split("\n")
-    }
 
     suspend fun generateUniqueRandomNickname(): String {
         val nickname = createRandomNickname()
@@ -52,7 +51,8 @@ class UserNicknameService(
         if (!isValidNickname(nickname)) throw InvalidNicknameException
 
         val tagsWithSameNickname =
-            userRepository.findAllByNicknameStartingWith(nickname)
+            userRepository
+                .findAllByNicknameStartingWith(nickname)
                 .mapNotNull { it.nicknameTag }
                 .toSet()
         val newTag = createTag(tagsWithSameNickname)
@@ -60,18 +60,15 @@ class UserNicknameService(
         return "$nickname$TAG_DELIMITER$newTag"
     }
 
-    private fun isValidNickname(nickname: String): Boolean {
-        return nickname.isNotBlank() && nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
-    }
+    private fun isValidNickname(nickname: String): Boolean =
+        nickname.isNotBlank() && nickname.length <= NICKNAME_MAX_LENGTH && nickname.matches(nicknameRegex)
 
     private val nicknames =
         adjectives
             .flatMap { adj -> nouns.map { "$adj $it" } }
             .filter { it.length <= NICKNAME_MAX_LENGTH }
 
-    private fun createRandomNickname(): String {
-        return nicknames.random()
-    }
+    private fun createRandomNickname(): String = nicknames.random()
 
     private fun createTag(existingTags: Set<Int>): String =
         generateSequence { (0..9999).random() }

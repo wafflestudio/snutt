@@ -18,7 +18,8 @@ class FriendTableHandler(
     suspend fun getPrimaryTable(req: ServerRequest) =
         handle(req) {
             val friend =
-                friendService.get(req.pathVariable("friendId"))
+                friendService
+                    .get(req.pathVariable("friendId"))
                     ?.takeIf { it.isAccepted && it.includes(req.userId) }
                     ?: throw FriendNotFoundException
 
@@ -30,7 +31,8 @@ class FriendTableHandler(
     suspend fun getCoursebooks(req: ServerRequest) =
         handle(req) {
             val friend =
-                friendService.get(req.pathVariable("friendId"))
+                friendService
+                    .get(req.pathVariable("friendId"))
                     ?.takeIf { it.isAccepted && it.includes(req.userId) }
                     ?: throw FriendNotFoundException
 

@@ -33,8 +33,8 @@ data class ClientConfig(
     fun isAdaptable(
         osType: OsType,
         appVersion: AppVersion,
-    ): Boolean {
-        return (
+    ): Boolean =
+        (
             osType == OsType.IOS &&
                 (
                     (minIosVersion == null || appVersion >= minIosVersion) &&
@@ -48,5 +48,4 @@ data class ClientConfig(
                             (maxAndroidVersion == null || appVersion <= maxAndroidVersion)
                     )
             )
-    }
 }

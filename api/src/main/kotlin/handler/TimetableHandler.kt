@@ -32,7 +32,8 @@ class TimetableHandler(
         handle(req) {
             val userId = req.userId
 
-            timetableService.getMostRecentlyUpdatedTimetable(userId)
+            timetableService
+                .getMostRecentlyUpdatedTimetable(userId)
                 .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
         }
 
@@ -43,7 +44,9 @@ class TimetableHandler(
             val semester =
                 Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
 
-            timetableService.getTimetablesBySemester(userId, year, semester).toList()
+            timetableService
+                .getTimetablesBySemester(userId, year, semester)
+                .toList()
                 .map { timetableService.convertTimetableToTimetableLegacyDto(it) }
         }
 
@@ -66,7 +69,8 @@ class TimetableHandler(
             val userId = req.userId
             val timetableId = req.pathVariable("timetableId")
 
-            timetableService.getTimetable(userId, timetableId)
+            timetableService
+                .getTimetable(userId, timetableId)
                 .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
         }
 
@@ -111,7 +115,8 @@ class TimetableHandler(
             val timetableId = req.pathVariable("timetableId")
             val body = req.awaitBody<TimetableModifyThemeRequestDto>()
 
-            timetableService.modifyTimetableTheme(userId, timetableId, body.theme, body.themeId)
+            timetableService
+                .modifyTimetableTheme(userId, timetableId, body.theme, body.themeId)
                 .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
         }
 

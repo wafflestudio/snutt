@@ -1,6 +1,9 @@
 package com.wafflestudio.snutt.auth
 
-enum class AuthProvider(val value: String, val korName: String) {
+enum class AuthProvider(
+    val value: String,
+    val korName: String,
+) {
     LOCAL("local", "아이디/비밀번호"),
     FACEBOOK("facebook", "페이스북"),
     APPLE("apple", "애플"),

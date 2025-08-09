@@ -30,9 +30,7 @@ enum class BasicThemeType(
 @ReadingConverter
 @Component
 class BasicThemeTypeReadConverter : Converter<Int, BasicThemeType> {
-    override fun convert(source: Int): BasicThemeType {
-        return requireNotNull(BasicThemeType.from(source))
-    }
+    override fun convert(source: Int): BasicThemeType = requireNotNull(BasicThemeType.from(source))
 }
 
 @Component

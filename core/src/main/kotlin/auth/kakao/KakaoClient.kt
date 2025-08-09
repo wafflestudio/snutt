@@ -26,10 +26,11 @@ class KakaoClient(
 
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val kakaoUserResponse =
-            webClient.get<KakaoOAuth2UserResponse>(
-                uri = USER_INFO_URI,
-                headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
-            ).getOrNull()
+            webClient
+                .get<KakaoOAuth2UserResponse>(
+                    uri = USER_INFO_URI,
+                    headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
+                ).getOrNull()
 
         log.info("token=$token, kakaoUserResponse=$kakaoUserResponse")
 

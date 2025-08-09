@@ -24,7 +24,8 @@ class SugangSnuSyncJobConfig {
         syncSugangSnuStep: Step,
     ): Job =
         JobBuilder("sugangSnuMigrationJob", jobRepository)
-            .start(syncSugangSnuStep).build()
+            .start(syncSugangSnuStep)
+            .build()
 
     @Bean
     fun syncSugangSnuStep(
@@ -35,22 +36,23 @@ class SugangSnuSyncJobConfig {
         sugangSnuNotificationService: SugangSnuNotificationService,
         vacancyNotificationService: VacancyNotificationService,
     ): Step =
-        StepBuilder("fetchSugangSnuStep", jobRepository).tasklet(
-            { _, _ ->
-                runBlocking {
-                    val existingCoursebook = coursebookService.getLatestCoursebook()
-                    if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
-                        val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
-                        sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
-                    } else {
-                        val newCoursebook = existingCoursebook.nextCoursebook()
-                        vacancyNotificationService.deleteAll()
-                        sugangSnuSyncService.addCoursebook(newCoursebook)
-                        sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
+        StepBuilder("fetchSugangSnuStep", jobRepository)
+            .tasklet(
+                { _, _ ->
+                    runBlocking {
+                        val existingCoursebook = coursebookService.getLatestCoursebook()
+                        if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
+                            val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
+                            sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
+                        } else {
+                            val newCoursebook = existingCoursebook.nextCoursebook()
+                            vacancyNotificationService.deleteAll()
+                            sugangSnuSyncService.addCoursebook(newCoursebook)
+                            sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
+                        }
                     }
-                }
-                RepeatStatus.FINISHED
-            },
-            transactionManager,
-        ).build()
+                    RepeatStatus.FINISHED
+                },
+                transactionManager,
+            ).build()
 }

@@ -44,7 +44,8 @@ class SugangSnuNotificationServiceImpl(
             val userUpdatedLectureCountMap =
                 userLectureSyncResults.filterIsInstance<TimetableLectureUpdateResult>().toCountMap()
             val userDeletedLectureCountMap =
-                userLectureSyncResults.filter { it is TimetableLectureDeleteResult || it is TimetableLectureDeleteByOverlapResult }
+                userLectureSyncResults
+                    .filter { it is TimetableLectureDeleteResult || it is TimetableLectureDeleteByOverlapResult }
                     .toCountMap()
 
             val allUserIds = userUpdatedLectureCountMap.keys + userDeletedLectureCountMap.keys
@@ -88,7 +89,11 @@ class SugangSnuNotificationServiceImpl(
     }
 
     private fun List<UserLectureSyncResult>.toCountMap() =
-        this.map { result -> result.userId to result.lectureId }.distinct().groupingBy { it.first }.eachCount()
+        this
+            .map { result -> result.userId to result.lectureId }
+            .distinct()
+            .groupingBy { it.first }
+            .eachCount()
 
     private fun UserLectureSyncResult.toNotification(): Notification {
         val (message, notificationType, deeplink) =

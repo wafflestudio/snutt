@@ -2,7 +2,9 @@ package com.wafflestudio.snutt.common.push
 
 import com.wafflestudio.snutt.config.PhaseUtils
 
-enum class DeeplinkType(private val url: String) {
+enum class DeeplinkType(
+    private val url: String,
+) {
     NOTIFICATIONS("notifications"),
     VACANCY("vacancy"),
     FRIENDS("friends?openDrawer=true"),
@@ -27,5 +29,7 @@ enum class DeeplinkType(private val url: String) {
     }
 
     @JvmInline
-    value class Deeplink(val value: String)
+    value class Deeplink(
+        val value: String,
+    )
 }

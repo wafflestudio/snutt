@@ -120,30 +120,56 @@ class SugangSnuSyncServiceImpl(
         lectures: Iterable<Lecture>,
     ) {
         val tagCollection =
-            lectures.fold(ParsedTags()) { acc, lecture ->
-                ParsedTags(
-                    academicYear = acc.academicYear + lecture.academicYear,
-                    classification = acc.classification + lecture.classification,
-                    department = acc.department + lecture.department,
-                    credit = acc.credit + lecture.credit,
-                    instructor = acc.instructor + lecture.instructor,
-                    category = acc.category + lecture.category,
-                    categoryPre2025 = acc.categoryPre2025 + lecture.categoryPre2025,
-                )
-            }.let { parsedTag ->
-                TagCollection(
-                    // 엑셀 academicYear 필드 '학년' 안 붙어 나오는 경우 제외
-                    academicYear = parsedTag.academicYear.filterNotNull().filter { it.length > 1 }.sorted(),
-                    classification = parsedTag.classification.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                    department = parsedTag.department.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                    credit = parsedTag.credit.sorted().map { "${it}학점" },
-                    instructor = parsedTag.instructor.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                    category = parsedTag.category.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                    categoryPre2025 = parsedTag.categoryPre2025.filterNotNull().filter { it.isNotBlank() }.sorted(),
-                )
-            }
+            lectures
+                .fold(ParsedTags()) { acc, lecture ->
+                    ParsedTags(
+                        academicYear = acc.academicYear + lecture.academicYear,
+                        classification = acc.classification + lecture.classification,
+                        department = acc.department + lecture.department,
+                        credit = acc.credit + lecture.credit,
+                        instructor = acc.instructor + lecture.instructor,
+                        category = acc.category + lecture.category,
+                        categoryPre2025 = acc.categoryPre2025 + lecture.categoryPre2025,
+                    )
+                }.let { parsedTag ->
+                    TagCollection(
+                        // 엑셀 academicYear 필드 '학년' 안 붙어 나오는 경우 제외
+                        academicYear =
+                            parsedTag.academicYear
+                                .filterNotNull()
+                                .filter { it.length > 1 }
+                                .sorted(),
+                        classification =
+                            parsedTag.classification
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        department =
+                            parsedTag.department
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        credit = parsedTag.credit.sorted().map { "${it}학점" },
+                        instructor =
+                            parsedTag.instructor
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        category =
+                            parsedTag.category
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        categoryPre2025 =
+                            parsedTag.categoryPre2025
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                    )
+                }
         val tagList =
-            tagListRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
+            tagListRepository
+                .findByYearAndSemester(coursebook.year, coursebook.semester)
                 ?.copy(tagCollection = tagCollection, updatedAt = Instant.now()) ?: TagList(
                 year = coursebook.year,
                 semester = coursebook.semester,
@@ -182,93 +208,96 @@ class SugangSnuSyncServiceImpl(
         )
 
     private fun updateBookmarkLectures(updatedLecture: UpdatedLecture) =
-        bookmarkRepository.findAllContainsLectureId(
-            updatedLecture.oldData.year,
-            updatedLecture.oldData.semester,
-            updatedLecture.oldData.id!!,
-        ).map { bookmark ->
-            val updatedBookmarkLecture =
-                bookmark.lectures.find { it.id == updatedLecture.oldData.id }?.apply {
-                    academicYear = updatedLecture.newData.academicYear
-                    category = updatedLecture.newData.category
-                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
-                    classification = updatedLecture.newData.classification
-                    credit = updatedLecture.newData.credit
-                    department = updatedLecture.newData.department
-                    instructor = updatedLecture.newData.instructor
-                    quota = updatedLecture.newData.quota
-                    freshmanQuota = updatedLecture.newData.freshmanQuota
-                    remark = updatedLecture.newData.remark
-                    lectureNumber = updatedLecture.newData.lectureNumber
-                    courseNumber = updatedLecture.newData.courseNumber
-                    courseTitle = updatedLecture.newData.courseTitle
-                    categoryPre2025 = updatedLecture.newData.categoryPre2025
-                }!!
-            bookmarkRepository.updateLecture(bookmark.id!!, updatedBookmarkLecture)
-        }.map { bookmark ->
-            BookmarkLectureUpdateResult(
-                bookmark.year,
-                bookmark.semester,
-                updatedLecture.oldData.courseTitle,
-                bookmark.userId,
+        bookmarkRepository
+            .findAllContainsLectureId(
+                updatedLecture.oldData.year,
+                updatedLecture.oldData.semester,
                 updatedLecture.oldData.id!!,
-                updatedLecture.updatedField,
-            )
-        }
+            ).map { bookmark ->
+                val updatedBookmarkLecture =
+                    bookmark.lectures.find { it.id == updatedLecture.oldData.id }?.apply {
+                        academicYear = updatedLecture.newData.academicYear
+                        category = updatedLecture.newData.category
+                        classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
+                        classification = updatedLecture.newData.classification
+                        credit = updatedLecture.newData.credit
+                        department = updatedLecture.newData.department
+                        instructor = updatedLecture.newData.instructor
+                        quota = updatedLecture.newData.quota
+                        freshmanQuota = updatedLecture.newData.freshmanQuota
+                        remark = updatedLecture.newData.remark
+                        lectureNumber = updatedLecture.newData.lectureNumber
+                        courseNumber = updatedLecture.newData.courseNumber
+                        courseTitle = updatedLecture.newData.courseTitle
+                        categoryPre2025 = updatedLecture.newData.categoryPre2025
+                    }!!
+                bookmarkRepository.updateLecture(bookmark.id!!, updatedBookmarkLecture)
+            }.map { bookmark ->
+                BookmarkLectureUpdateResult(
+                    bookmark.year,
+                    bookmark.semester,
+                    updatedLecture.oldData.courseTitle,
+                    bookmark.userId,
+                    updatedLecture.oldData.id!!,
+                    updatedLecture.updatedField,
+                )
+            }
 
     private fun checkOverlapAndUpdateTimetableLectures(updatedLecture: UpdatedLecture): Flow<UserLectureSyncResult> =
-        timeTableRepository.findAllContainsLectureId(
-            updatedLecture.oldData.year,
-            updatedLecture.oldData.semester,
-            updatedLecture.oldData.id!!,
-        ).let { timetables ->
-            merge(
-                updateTimetableLectures(
-                    timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
-                    updatedLecture,
-                ),
-                dropOverlappingLectures(
-                    timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
-                    updatedLecture,
-                ),
-            )
-        }
+        timeTableRepository
+            .findAllContainsLectureId(
+                updatedLecture.oldData.year,
+                updatedLecture.oldData.semester,
+                updatedLecture.oldData.id!!,
+            ).let { timetables ->
+                merge(
+                    updateTimetableLectures(
+                        timetables.filter { !isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                        updatedLecture,
+                    ),
+                    dropOverlappingLectures(
+                        timetables.filter { isUpdatedTimetableLectureOverlapped(it, updatedLecture) },
+                        updatedLecture,
+                    ),
+                )
+            }
 
     private fun updateTimetableLectures(
         timetables: Flow<Timetable>,
         updatedLecture: UpdatedLecture,
     ): Flow<TimetableLectureUpdateResult> =
-        timetables.map { timetable ->
-            val updatedTimetableLecture =
-                timetable.lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
-                    academicYear = updatedLecture.newData.academicYear
-                    category = updatedLecture.newData.category
-                    classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
-                    classification = updatedLecture.newData.classification
-                    credit = updatedLecture.newData.credit
-                    department = updatedLecture.newData.department
-                    instructor = updatedLecture.newData.instructor
-                    lectureNumber = updatedLecture.newData.lectureNumber
-                    quota = updatedLecture.newData.quota
-                    freshmanQuota = updatedLecture.newData.freshmanQuota
-                    remark = updatedLecture.newData.remark
-                    courseNumber = updatedLecture.newData.courseNumber
-                    courseTitle = updatedLecture.newData.courseTitle
-                    categoryPre2025 = updatedLecture.newData.categoryPre2025
-                }
-            timeTableRepository.updateTimetableLecture(timetable.id!!, updatedTimetableLecture!!)
-        }.map { timetable ->
-            TimetableLectureUpdateResult(
-                year = timetable.year,
-                semester = timetable.semester,
-                lectureId = updatedLecture.oldData.id!!,
-                userId = timetable.userId,
-                timetableTitle = timetable.title,
-                timetableId = timetable.id!!,
-                courseTitle = updatedLecture.oldData.courseTitle,
-                updatedFields = updatedLecture.updatedField,
-            )
-        }
+        timetables
+            .map { timetable ->
+                val updatedTimetableLecture =
+                    timetable.lectures.find { it.lectureId == updatedLecture.oldData.id }?.apply {
+                        academicYear = updatedLecture.newData.academicYear
+                        category = updatedLecture.newData.category
+                        classPlaceAndTimes = updatedLecture.newData.classPlaceAndTimes
+                        classification = updatedLecture.newData.classification
+                        credit = updatedLecture.newData.credit
+                        department = updatedLecture.newData.department
+                        instructor = updatedLecture.newData.instructor
+                        lectureNumber = updatedLecture.newData.lectureNumber
+                        quota = updatedLecture.newData.quota
+                        freshmanQuota = updatedLecture.newData.freshmanQuota
+                        remark = updatedLecture.newData.remark
+                        courseNumber = updatedLecture.newData.courseNumber
+                        courseTitle = updatedLecture.newData.courseTitle
+                        categoryPre2025 = updatedLecture.newData.categoryPre2025
+                    }
+                timeTableRepository.updateTimetableLecture(timetable.id!!, updatedTimetableLecture!!)
+            }.map { timetable ->
+                TimetableLectureUpdateResult(
+                    year = timetable.year,
+                    semester = timetable.semester,
+                    lectureId = updatedLecture.oldData.id!!,
+                    userId = timetable.userId,
+                    timetableTitle = timetable.title,
+                    timetableId = timetable.id!!,
+                    courseTitle = updatedLecture.oldData.courseTitle,
+                    updatedFields = updatedLecture.updatedField,
+                )
+            }
 
     fun dropOverlappingLectures(
         timetables: Flow<Timetable>,
@@ -295,37 +324,39 @@ class SugangSnuSyncServiceImpl(
         }
 
     private fun deleteBookmarkLectures(deletedLecture: Lecture): Flow<BookmarkLectureDeleteResult> =
-        bookmarkRepository.findAllContainsLectureId(
-            deletedLecture.year,
-            deletedLecture.semester,
-            deletedLecture.id!!,
-        ).map { bookmark ->
-            bookmarkRepository.pullLecture(bookmark.id!!, deletedLecture.id!!)
-            BookmarkLectureDeleteResult(
-                year = bookmark.year,
-                semester = bookmark.semester,
-                courseTitle = deletedLecture.courseTitle,
-                userId = bookmark.userId,
-                lectureId = deletedLecture.id!!,
-            )
-        }
+        bookmarkRepository
+            .findAllContainsLectureId(
+                deletedLecture.year,
+                deletedLecture.semester,
+                deletedLecture.id!!,
+            ).map { bookmark ->
+                bookmarkRepository.pullLecture(bookmark.id!!, deletedLecture.id!!)
+                BookmarkLectureDeleteResult(
+                    year = bookmark.year,
+                    semester = bookmark.semester,
+                    courseTitle = deletedLecture.courseTitle,
+                    userId = bookmark.userId,
+                    lectureId = deletedLecture.id!!,
+                )
+            }
 
     private fun deleteTimetableLectures(deletedLecture: Lecture): Flow<TimetableLectureDeleteResult> =
-        timeTableRepository.findAllContainsLectureId(
-            deletedLecture.year,
-            deletedLecture.semester,
-            deletedLecture.id!!,
-        ).map { timetable ->
-            timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, deletedLecture.id!!)
-            TimetableLectureDeleteResult(
-                timetable.year,
-                timetable.semester,
-                timetable.title,
-                deletedLecture.courseTitle,
-                timetable.userId,
+        timeTableRepository
+            .findAllContainsLectureId(
+                deletedLecture.year,
+                deletedLecture.semester,
                 deletedLecture.id!!,
-            )
-        }
+            ).map { timetable ->
+                timeTableRepository.pullTimetableLectureByLectureId(timetable.id!!, deletedLecture.id!!)
+                TimetableLectureDeleteResult(
+                    timetable.year,
+                    timetable.semester,
+                    timetable.title,
+                    deletedLecture.courseTitle,
+                    timetable.userId,
+                    deletedLecture.id!!,
+                )
+            }
 
     private suspend fun updateLectureBuildings(compareResult: SugangSnuLectureCompareResult) {
         val updatedPlaceInfos =

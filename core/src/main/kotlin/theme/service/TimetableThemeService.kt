@@ -133,9 +133,8 @@ class TimetableThemeServiceImpl(
         return basicThemes + customThemes
     }
 
-    override suspend fun getBestThemes(page: Int): List<TimetableTheme> {
-        return timetableThemeRepository.findPublishedTimetablesOrderByDownloadsDesc(page)
-    }
+    override suspend fun getBestThemes(page: Int): List<TimetableTheme> =
+        timetableThemeRepository.findPublishedTimetablesOrderByDownloadsDesc(page)
 
     override suspend fun getFriendsThemes(
         userId: String,
@@ -301,8 +300,12 @@ class TimetableThemeServiceImpl(
         name: String,
     ): Int {
         val baseName = name.replace(copyNumberRegex, "")
-        return timetableThemeRepository.findLastChild(userId, baseName)?.name
-            ?.replace(baseName, "")?.filter { it.isDigit() }?.toIntOrNull() ?: 0
+        return timetableThemeRepository
+            .findLastChild(userId, baseName)
+            ?.name
+            ?.replace(baseName, "")
+            ?.filter { it.isDigit() }
+            ?.toIntOrNull() ?: 0
     }
 
     // iOS, Android 3.5.0 버전에서만 사용
@@ -370,18 +373,16 @@ class TimetableThemeServiceImpl(
         )
     }
 
-    override suspend fun searchThemes(keyword: String): List<TimetableTheme> {
-        return timetableThemeRepository.findPublishedTimetablesByPublishNameContaining(keyword)
-    }
+    override suspend fun searchThemes(keyword: String): List<TimetableTheme> =
+        timetableThemeRepository.findPublishedTimetablesByPublishNameContaining(keyword)
 
     private suspend fun getCustomTheme(
         userId: String,
         themeId: String,
-    ): TimetableTheme {
-        return timetableThemeRepository.findByIdAndUserId(themeId, userId)?.also {
+    ): TimetableTheme =
+        timetableThemeRepository.findByIdAndUserId(themeId, userId)?.also {
             if (!it.isCustom) throw InvalidThemeTypeException
         } ?: throw ThemeNotFoundException
-    }
 
     private fun buildTimetableTheme(
         userId: String,
@@ -394,13 +395,16 @@ class TimetableThemeServiceImpl(
         isCustom = false,
     ).also { it.isDefault = isDefault }
 
-    override suspend fun getNewColorIndexAndColor(timetable: Timetable): Pair<Int, ColorSet?> {
-        return if (timetable.themeId == null) {
+    override suspend fun getNewColorIndexAndColor(timetable: Timetable): Pair<Int, ColorSet?> =
+        if (timetable.themeId == null) {
             val alreadyUsedIndexes = timetable.lectures.map { it.colorIndex }
             val indexToCount = (1..MAX_COLOR_COUNT).associateWith { colorIndex -> alreadyUsedIndexes.count { it == colorIndex } }
 
             val minCount = indexToCount.minOf { it.value }
-            indexToCount.entries.filter { (_, count) -> count == minCount }.map { it.key }.random() to null
+            indexToCount.entries
+                .filter { (_, count) -> count == minCount }
+                .map { it.key }
+                .random() to null
         } else {
             val theme = getTheme(timetable.userId, timetable.themeId)
 
@@ -408,9 +412,12 @@ class TimetableThemeServiceImpl(
             val colorToCount = requireNotNull(theme.colors).associateWith { color -> alreadyUsedColors.count { it == color } }
 
             val minCount = colorToCount.minOf { it.value }
-            0 to colorToCount.entries.filter { (_, count) -> count == minCount }.map { it.key }.random()
+            0 to
+                colorToCount.entries
+                    .filter { (_, count) -> count == minCount }
+                    .map { it.key }
+                    .random()
         }
-    }
 
     override suspend fun convertThemesToTimetableDtos(themes: List<TimetableTheme>): List<TimetableThemeDto> {
         val nicknameMap = userService.getUsers(themes.map { it.userId }).associate { it.id to it.nicknameWithoutTag }

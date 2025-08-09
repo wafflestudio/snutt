@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 
 @Component
-class UserAuthorizeMiddleware(private val userService: UserService) : Middleware {
+class UserAuthorizeMiddleware(
+    private val userService: UserService,
+) : Middleware {
     override suspend fun invoke(
         req: ServerRequest,
         context: RequestContext,

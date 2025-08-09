@@ -22,21 +22,24 @@ class ApiWebClientConfig(
 ) {
     @Bean
     @Profile("!test")
-    fun snuttevServer(): SnuttEvWebClient {
-        return create(apiConfigs.server["snuttev"]!!).let(::SnuttEvWebClient)
-    }
+    fun snuttevServer(): SnuttEvWebClient = create(apiConfigs.server["snuttev"]!!).let(::SnuttEvWebClient)
 
     private fun create(apiConfig: ApiConfig): WebClient {
         val connector =
             ReactorClientHttpConnector(
-                HttpClient.create()
+                HttpClient
+                    .create()
                     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiConfig.connectTimeout)
                     .doOnConnected { conn: Connection ->
                         conn.addHandlerLast(ReadTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
                         conn.addHandlerLast(WriteTimeoutHandler(apiConfig.readTimeout, TimeUnit.MILLISECONDS))
                     },
             )
-        return WebClient.builder().clientConnector(connector).baseUrl(apiConfig.baseUrl).build()
+        return WebClient
+            .builder()
+            .clientConnector(connector)
+            .baseUrl(apiConfig.baseUrl)
+            .build()
     }
 }
 
@@ -52,4 +55,6 @@ class ApiConfig {
     lateinit var baseUrl: String
 }
 
-class SnuttEvWebClient(webClient: WebClient) : WebClient by webClient
+class SnuttEvWebClient(
+    webClient: WebClient,
+) : WebClient by webClient

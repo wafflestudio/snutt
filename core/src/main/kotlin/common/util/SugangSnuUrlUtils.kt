@@ -20,7 +20,8 @@ object SugangSnuUrlUtils {
         courseNumber: String,
         lectureNumber: String,
     ): String =
-        DefaultUriBuilderFactory().builder()
+        DefaultUriBuilderFactory()
+            .builder()
             .scheme("https")
             .host("sugang.snu.ac.kr")
             .path("/sugang/cc/cc103.action")

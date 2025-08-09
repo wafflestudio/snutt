@@ -172,7 +172,8 @@ class TimetableLectureServiceImpl(
             timetable.lectures.filter {
                 timetableLecture.id != it.id &&
                     ClassTimeUtils.timesOverlap(
-                        timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes,
+                        timetableLecture.classPlaceAndTimes,
+                        it.classPlaceAndTimes,
                     )
             }
         when {

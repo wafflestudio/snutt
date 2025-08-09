@@ -28,10 +28,11 @@ class FacebookClient(
 
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val facebookUserResponse =
-            webClient.get<FacebookOAuth2UserResponse>(
-                uri = USER_INFO_URI,
-                params = mapOf("access_token" to token),
-            ).getOrNull()
+            webClient
+                .get<FacebookOAuth2UserResponse>(
+                    uri = USER_INFO_URI,
+                    params = mapOf("access_token" to token),
+                ).getOrNull()
 
         log.info("token=$token, facebookUserResponse=$facebookUserResponse")
 

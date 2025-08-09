@@ -34,70 +34,77 @@ class LectureCustomRepositoryImpl(
     }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> =
-        reactiveMongoTemplate.find<Lecture>(
-            Query.query(
-                Criteria().andOperator(
-                    listOfNotNull(
-                        Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                        searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
-                        searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
-                        searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
-                        searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
-                        searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
-                        listOfNotNull(
-                            searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
-                            searchCondition.categoryPre2025?.takeIf { it.isNotEmpty() }?.let { Lecture::categoryPre2025 inValues it },
-                        ).takeIf { it.isNotEmpty() }?.let {
-                            Criteria().orOperator(it)
-                        },
-                        searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
-                        searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
-                            Criteria().andOperator(
-                                Lecture::classPlaceAndTimes ne listOf(),
-                                // 수업시간 하나라도 제시한 시간대들에 포함이 되지 않는 경우가 존재하면 안됨
-                                Lecture::classPlaceAndTimes.not().elemMatch(
+        reactiveMongoTemplate
+            .find<Lecture>(
+                Query
+                    .query(
+                        Criteria().andOperator(
+                            listOfNotNull(
+                                Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
+                                searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
+                                searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
+                                searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
+                                searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
+                                searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
+                                listOfNotNull(
+                                    searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
+                                    searchCondition.categoryPre2025
+                                        ?.takeIf {
+                                            it.isNotEmpty()
+                                        }?.let { Lecture::categoryPre2025 inValues it },
+                                ).takeIf { it.isNotEmpty() }?.let {
+                                    Criteria().orOperator(it)
+                                },
+                                searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
+                                searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
                                     Criteria().andOperator(
-                                        searchTimes.map { searchTime ->
-                                            Criteria().orOperator(
-                                                ClassPlaceAndTime::day.ne(searchTime.day),
-                                                ClassPlaceAndTime::startMinute.lt(searchTime.startMinute),
-                                                ClassPlaceAndTime::endMinute.gt(searchTime.endMinute),
-                                            )
-                                        },
-                                    ),
-                                ),
-                            )
-                        },
-                        searchCondition.timesToExclude?.takeIf { it.isNotEmpty() }?.let { excludeTimes ->
-                            // 수업시간들과 제시한 시간대들 중 하나라도 겹치는 경우가 존재하면 안됨
-                            Criteria().andOperator(
-                                Lecture::classPlaceAndTimes ne listOf(),
-                                Lecture::classPlaceAndTimes.not().elemMatch(
-                                    Criteria().orOperator(
-                                        excludeTimes.map { time ->
+                                        Lecture::classPlaceAndTimes ne listOf(),
+                                        // 수업시간 하나라도 제시한 시간대들에 포함이 되지 않는 경우가 존재하면 안됨
+                                        Lecture::classPlaceAndTimes.not().elemMatch(
                                             Criteria().andOperator(
-                                                ClassPlaceAndTime::day.isEqualTo(time.day),
-                                                ClassPlaceAndTime::startMinute.lt(time.endMinute),
-                                                ClassPlaceAndTime::endMinute.gt(time.startMinute),
-                                            )
-                                        },
-                                    ),
-                                ),
-                            )
-                        },
-                        *searchCondition.etcTags.orEmpty().map { etcTag ->
-                            when (etcTag) {
-                                "E" -> Lecture::remark regex ".*ⓔ.*"
-                                "MO" -> Lecture::remark regex ".*ⓜⓞ.*"
-                                else -> null
-                            }
-                        }.toTypedArray(),
-                    ),
-                ),
-            )
-                .with(SortCriteria.getSort(SortCriteria.getOfName(searchCondition.sortBy)))
-                .skip(searchCondition.offset).limit(searchCondition.limit),
-        ).asFlow()
+                                                searchTimes.map { searchTime ->
+                                                    Criteria().orOperator(
+                                                        ClassPlaceAndTime::day.ne(searchTime.day),
+                                                        ClassPlaceAndTime::startMinute.lt(searchTime.startMinute),
+                                                        ClassPlaceAndTime::endMinute.gt(searchTime.endMinute),
+                                                    )
+                                                },
+                                            ),
+                                        ),
+                                    )
+                                },
+                                searchCondition.timesToExclude?.takeIf { it.isNotEmpty() }?.let { excludeTimes ->
+                                    // 수업시간들과 제시한 시간대들 중 하나라도 겹치는 경우가 존재하면 안됨
+                                    Criteria().andOperator(
+                                        Lecture::classPlaceAndTimes ne listOf(),
+                                        Lecture::classPlaceAndTimes.not().elemMatch(
+                                            Criteria().orOperator(
+                                                excludeTimes.map { time ->
+                                                    Criteria().andOperator(
+                                                        ClassPlaceAndTime::day.isEqualTo(time.day),
+                                                        ClassPlaceAndTime::startMinute.lt(time.endMinute),
+                                                        ClassPlaceAndTime::endMinute.gt(time.startMinute),
+                                                    )
+                                                },
+                                            ),
+                                        ),
+                                    )
+                                },
+                                *searchCondition.etcTags
+                                    .orEmpty()
+                                    .map { etcTag ->
+                                        when (etcTag) {
+                                            "E" -> Lecture::remark regex ".*ⓔ.*"
+                                            "MO" -> Lecture::remark regex ".*ⓜⓞ.*"
+                                            else -> null
+                                        }
+                                    }.toTypedArray(),
+                            ),
+                        ),
+                    ).with(SortCriteria.getSort(SortCriteria.getOfName(searchCondition.sortBy)))
+                    .skip(searchCondition.offset)
+                    .limit(searchCondition.limit),
+            ).asFlow()
 
     private fun makeSearchCriteriaFromQuery(query: String): Criteria =
         Criteria().andOperator(
@@ -134,7 +141,9 @@ class LectureCustomRepositoryImpl(
                                  */
                                     '과', '부' -> {
                                         val fuzzyWithoutLastChar =
-                                            keyword.dropLast(1).toCharArray()
+                                            keyword
+                                                .dropLast(1)
+                                                .toCharArray()
                                                 .joinToString(".*") { Regex.escape(it.toString()) }
                                         Lecture::department.regex("^$fuzzyWithoutLastChar", "i")
                                     }
@@ -156,11 +165,7 @@ class LectureCustomRepositoryImpl(
             },
         )
 
-    private fun Char.isKoreanLetter(): Boolean {
-        return this in '가'..'힣'
-    }
+    private fun Char.isKoreanLetter(): Boolean = this in '가'..'힣'
 
-    private fun String.hasKorean(): Boolean {
-        return this.isNotEmpty() && this.map { it.isKoreanLetter() }.reduce { acc, c -> acc || c }
-    }
+    private fun String.hasKorean(): Boolean = this.isNotEmpty() && this.map { it.isKoreanLetter() }.reduce { acc, c -> acc || c }
 }

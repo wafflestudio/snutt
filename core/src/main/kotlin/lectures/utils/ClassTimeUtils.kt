@@ -25,7 +25,8 @@ object ClassTimeUtils {
         time1: ClassPlaceAndTime,
         time2: ClassPlaceAndTime,
     ) = time1.day == time2.day &&
-        time1.startMinute < time2.endMinute && time1.endMinute > time2.startMinute
+        time1.startMinute < time2.endMinute &&
+        time1.endMinute > time2.startMinute
 }
 
 fun minuteToString(minute: Int) = "${String.format("%02d", minute / 60)}:${String.format("%02d", minute % 60)}"
