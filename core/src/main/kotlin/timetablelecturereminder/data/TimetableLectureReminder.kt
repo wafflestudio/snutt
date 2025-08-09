@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.Instant
+import java.time.ZoneId
 
 @Document
 @CompoundIndex(def = "{'schedules.day': 1, 'schedules.minute': 1, 'schedules.recentNotifiedAt': 1}")
@@ -27,7 +28,19 @@ data class TimetableLectureReminder(
         val day: DayOfWeek,
         val minute: Int,
         val recentNotifiedAt: Instant? = null,
-    ) {
+    ) : Comparable<Schedule> {
+        companion object {
+            fun fromInstant(
+                instant: Instant,
+                zoneId: ZoneId = ZoneId.of("Asia/Seoul"),
+            ): Schedule {
+                val localDateTime = instant.atZone(zoneId).toLocalDateTime()
+                val day = DayOfWeek.getOfValue(localDateTime.dayOfWeek.value - 1)!!
+                val minute = localDateTime.hour * 60 + localDateTime.minute
+                return Schedule(day, minute)
+            }
+        }
+
         fun plusMinutes(minutesToAdd: Int): Schedule {
             val totalMinutes = this.minute + minutesToAdd
 
@@ -40,6 +53,26 @@ data class TimetableLectureReminder(
             val newDay = DayOfWeek.getOfValue(newDayIndex)!!
 
             return this.copy(day = newDay, minute = newMinute)
+        }
+
+        fun minusMinutes(minutesToSubtract: Int): Schedule = this.plusMinutes(-minutesToSubtract)
+
+        fun isWithin(
+            start: Schedule,
+            end: Schedule,
+        ): Boolean =
+            if (start <= end) {
+                this >= start && this <= end
+            } else {
+                this >= start || this <= end
+            }
+
+        override fun compareTo(other: Schedule): Int {
+            val dayCompare = this.day.compareTo(other.day)
+            if (dayCompare != 0) {
+                return dayCompare
+            }
+            return this.minute.compareTo(other.minute)
         }
     }
 }
