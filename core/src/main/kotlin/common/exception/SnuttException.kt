@@ -40,6 +40,8 @@ object LectureNotFoundException : SnuttException(ErrorType.LECTURE_NOT_FOUND)
 
 object UserNotFoundException : SnuttException(ErrorType.USER_NOT_FOUND)
 
+object TimetableLectureNotFoundException : SnuttException(ErrorType.TIMETABLE_LECTURE_NOT_FOUND)
+
 class MissingRequiredParameterException(
     fieldName: String,
 ) : SnuttException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
@@ -117,7 +119,7 @@ object CustomLectureResetException : SnuttException(ErrorType.CANNOT_RESET_CUSTO
 
 object TimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND)
 
-object PrimaryTimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND)
+object PrimaryTimetableNotFoundException : SnuttException(ErrorType.PRIMARY_TIMETABLE_NOT_FOUND)
 
 object TimetableNotPrimaryException : SnuttException(ErrorType.DEFAULT_ERROR)
 
@@ -171,3 +173,5 @@ object DuplicateSocialAccountException : SnuttException(ErrorType.DUPLICATE_SOCI
 object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_REMOVE_LAST_AUTH_PROVIDER)
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
+
+object PastSemesterException : SnuttException(ErrorType.PAST_SEMESTER)

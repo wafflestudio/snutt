@@ -33,6 +33,7 @@ enum class ErrorType(
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다", "수강편람에서 찾을 수 없는 강좌입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다", "해당 정보로 가입된 사용자가 없습니다"),
+    TIMETABLE_LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4005, "timetableLecture가 없습니다", "시간표에 존재하지 않는 강좌입니다"),
 
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, 40000, "파라미터 누락"),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 40001, "파라미터 값 오류"),
@@ -61,6 +62,7 @@ enum class ErrorType(
     UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요", "앱 버전을 업데이트해주세요"),
     NOT_PUBLISHED_THEME(HttpStatus.BAD_REQUEST, 40022, "공유한 테마가 아닙니다", "공유한 테마가 아닙니다"),
     PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "테마마켓에서 테마를 내린 뒤 다시 시도해주세요", "테마마켓에서 테마를 내린 뒤 다시 시도해주세요"),
+    PAST_SEMESTER(HttpStatus.BAD_REQUEST, 40024, "이미 종료된 학기입니다", "이미 종료된 학기입니다"),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다", "소셜 로그인에 실패했습니다"),
