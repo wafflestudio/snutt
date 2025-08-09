@@ -130,6 +130,7 @@ class TimetableLectureReminderNotifierServiceImpl(
             }
 
             if (pastSemesterItems.isNotEmpty()) {
+                // 지난 학기의 리마인더가 남아 있다면 삭제한다.
                 deletePastSemesterReminders(pastSemesterItems.map { it.second })
                 logger.info("${pastSemesterItems.size}개의 지난 학기 리마인더를 삭제했습니다.")
             }
@@ -185,7 +186,10 @@ class TimetableLectureReminderNotifierServiceImpl(
             reminders.map { reminder ->
                 val newSchedules =
                     reminder.schedules.map { schedule ->
-                        if (schedule.shouldBeMarkAsNotified(scheduleFrom, scheduleTo, now)) {
+                        // 강의 하나의 schedule이 10분 윈도우 안에 여러 개라면
+                        // 알림을 1분마다 하나씩 보낼 필요 없이 한 번만 보내고
+                        // schedule은 전부 recentNotifiedAt을 기록하여 리소스를 아낀다.
+                        if (schedule.shouldBeMarkedAsNotified(scheduleFrom, scheduleTo, now)) {
                             schedule.copy(recentNotifiedAt = now)
                         } else {
                             schedule
@@ -198,12 +202,12 @@ class TimetableLectureReminderNotifierServiceImpl(
         timetableLectureReminderRepository.saveAll(updatedReminders).collect()
     }
 
-    private fun TimetableLectureReminder.Schedule.shouldBeMarkAsNotified(
-        startSchedule: TimetableLectureReminder.Schedule,
-        endSchedule: TimetableLectureReminder.Schedule,
+    private fun TimetableLectureReminder.Schedule.shouldBeMarkedAsNotified(
+        scheduleFrom: TimetableLectureReminder.Schedule,
+        scheduleTo: TimetableLectureReminder.Schedule,
         now: Instant,
     ): Boolean {
-        val isInTimeWindow = this.isWithin(startSchedule, endSchedule)
+        val isInTimeWindow = this.isWithin(scheduleFrom, scheduleTo)
         val hasNotBeenNotifiedRecently =
             this.recentNotifiedAt == null ||
                 this.recentNotifiedAt < now.minusSeconds(REMINDER_TIME_WINDOW_MINUTES * 60L)
