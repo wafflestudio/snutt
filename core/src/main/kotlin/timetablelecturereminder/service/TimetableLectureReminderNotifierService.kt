@@ -130,7 +130,7 @@ class TimetableLectureReminderNotifierServiceImpl(
             }
 
             if (pastSemesterItems.isNotEmpty()) {
-                // 지난 학기의 리마인더가 남아 있다면 삭제한다.
+                // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
                 deletePastSemesterReminders(pastSemesterItems.map { it.second })
                 logger.info("${pastSemesterItems.size}개의 지난 학기 리마인더를 삭제했습니다.")
             }
