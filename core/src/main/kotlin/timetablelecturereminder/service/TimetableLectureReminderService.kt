@@ -103,10 +103,11 @@ class TimetableLectureReminderServiceImpl(
         val newSchedules =
             modifiedTimetableLecture.classPlaceAndTimes.map { classPlaceAndTime ->
                 val newSchedule =
-                    TimetableLectureReminder.Schedule(
-                        classPlaceAndTime.day,
-                        classPlaceAndTime.startMinute,
-                    ).plusMinutes(reminder.offsetMinutes)
+                    TimetableLectureReminder
+                        .Schedule(
+                            classPlaceAndTime.day,
+                            classPlaceAndTime.startMinute,
+                        ).plusMinutes(reminder.offsetMinutes)
                 val existingSchedule = existingSchedulesMap[newSchedule.day to newSchedule.minute]
                 existingSchedule ?: newSchedule // 이미 알림을 보낸 schedule의 recentNotifiedAt은 유지하고, 새로 추가된 schedule에 대해서는 null로 설정
             }

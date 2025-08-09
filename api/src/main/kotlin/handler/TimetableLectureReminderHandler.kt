@@ -43,11 +43,12 @@ class TimetableLectureReminderHandler(
             val timetableId = req.pathVariable("timetableId")
             val timetableLectureId = req.pathVariable("timetableLectureId")
             val body = req.awaitBody<TimetableLectureReminderModifyRequestDto>()
-            timetableLectureReminderService.modifyReminder(
-                timetableId,
-                timetableLectureId,
-                body.offsetMinutes,
-            ).let(::TimetableLectureReminderDto)
+            timetableLectureReminderService
+                .modifyReminder(
+                    timetableId,
+                    timetableLectureId,
+                    body.offsetMinutes,
+                ).let(::TimetableLectureReminderDto)
         }
 
     suspend fun deleteReminder(req: ServerRequest): ServerResponse =

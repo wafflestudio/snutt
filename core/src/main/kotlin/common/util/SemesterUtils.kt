@@ -31,13 +31,12 @@ object SemesterUtils {
         return localDate.year + currentPeriod.academicYearOffset to currentPeriod.semester
     }
 
-    fun getCurrentOrNextYearAndSemester(now: Instant): Pair<Int, Semester> {
-        return getCurrentYearAndSemester(now) ?: run {
+    fun getCurrentOrNextYearAndSemester(now: Instant): Pair<Int, Semester> =
+        getCurrentYearAndSemester(now) ?: run {
             val localDate = now.atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
             val currentMonthDay = MonthDay.from(localDate)
             semesterPeriods.first { currentMonthDay < it.dateRange.start }.let { nextPeriod ->
                 (localDate.year + nextPeriod.academicYearOffset) to nextPeriod.semester
             }
         }
-    }
 }
