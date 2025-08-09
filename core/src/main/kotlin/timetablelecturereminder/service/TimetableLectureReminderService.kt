@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
 import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.event.data.TimetableLectureDeletedEvent
 import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.context.event.EventListener
@@ -112,5 +113,10 @@ class TimetableLectureReminderServiceImpl(
                 existingSchedule ?: newSchedule // 이미 알림을 보낸 schedule의 recentNotifiedAt은 유지하고, 새로 추가된 schedule에 대해서는 null로 설정
             }
         timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
+    }
+
+    @EventListener
+    suspend fun handleTimetableLectureDeletedEvent(event: TimetableLectureDeletedEvent) {
+        deleteReminder(event.timetableLectureId)
     }
 }

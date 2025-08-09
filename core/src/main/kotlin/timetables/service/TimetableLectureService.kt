@@ -14,6 +14,7 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.event.data.TimetableLectureDeletedEvent
 import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.context.ApplicationEventPublisher
@@ -160,7 +161,9 @@ class TimetableLectureServiceImpl(
         timetableLectureId: String,
     ): Timetable {
         timetableRepository.findByUserIdAndId(userId, timetableId) ?: throw TimetableNotFoundException
-        return timetableRepository.pullTimetableLecture(timetableId, timetableLectureId)
+        val updatedTimetable = timetableRepository.pullTimetableLecture(timetableId, timetableLectureId)
+        eventPublisher.publishEvent(TimetableLectureDeletedEvent(timetableLectureId))
+        return updatedTimetable
     }
 
     private suspend fun resolveTimeConflict(
