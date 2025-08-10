@@ -2,6 +2,8 @@ package com.wafflestudio.snutt.diary.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
+import org.springframework.data.mongodb.core.mapping.FieldType
 
 @Document
 data class DiaryQuestion(
@@ -11,6 +13,7 @@ data class DiaryQuestion(
     val shortQuestion: String,
     val answers: List<String>,
     val shortAnswers: List<String>,
-    val targetActivities: List<DiaryActivity>,
+    @Field(targetType = FieldType.OBJECT_ID)
+    val targetActivityIds: List<String>,
     var active: Boolean = true,
 )

@@ -64,8 +64,8 @@ class DiaryServiceImpl(
         lectureId: String,
         activityNames: List<String>,
     ): List<DiaryQuestion> {
-        val activities = diaryActivityRepository.findByNameIn(activityNames)
-        val questions = diaryQuestionRepository.findByTargetActivitiesContainsAndActiveTrue(activities)
+        val activityIds = diaryActivityRepository.findByNameIn(activityNames).map { it.id!! }
+        val questions = diaryQuestionRepository.findByTargetActivityIdsContainsAndActiveTrue(activityIds)
         val answeredQuestionIds =
             diarySubmissionRepository
                 .findAllByUserIdAndLectureIdOrderByCreatedAtDesc(userId, lectureId)
@@ -152,13 +152,17 @@ class DiaryServiceImpl(
     }
 
     override suspend fun addQuestion(request: DiaryAddQuestionRequestDto) {
+        val targetActivityIds = diaryActivityRepository.findByNameIn(request.targetActivities).mapNotNull { it.id }
+        if (targetActivityIds.size != request.targetActivities.size) {
+            throw DiaryActivityNotFoundException
+        }
         val question =
             DiaryQuestion(
                 answers = request.answers,
                 shortAnswers = request.shortAnswers,
                 question = request.question,
                 shortQuestion = request.shortQuestion,
-                targetActivities = diaryActivityRepository.findByNameIn(request.targetActivities),
+                targetActivityIds = targetActivityIds,
             )
         diaryQuestionRepository.save(question)
     }
