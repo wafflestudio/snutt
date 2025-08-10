@@ -5,13 +5,13 @@ import com.wafflestudio.snutt.diary.data.DiarySubmission
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, String> {
-    suspend fun findAllByUserIdAndYearAndSemesterOrderByCreatedAt(
+    suspend fun findAllByUserIdAndYearAndSemesterOrderByCreatedAtDesc(
         userId: String,
         year: Int,
         semester: Semester,
     ): List<DiarySubmission>
 
-    suspend fun findAllByUserIdAndLectureIdOrderByCreatedAt(
+    suspend fun findAllByUserIdAndLectureIdOrderByCreatedAtDesc(
         userId: String,
         lectureId: String,
     ): List<DiarySubmission>

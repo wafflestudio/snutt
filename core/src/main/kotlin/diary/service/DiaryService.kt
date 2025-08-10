@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.diary.service
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
+import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiarySubmission
@@ -67,7 +68,7 @@ class DiaryServiceImpl(
         val questions = diaryQuestionRepository.findByTargetActivitiesContainsAndActiveTrue(activities)
         val answeredQuestionIds =
             diarySubmissionRepository
-                .findAllByUserIdAndLectureIdOrderByCreatedAt(userId, lectureId)
+                .findAllByUserIdAndLectureIdOrderByCreatedAtDesc(userId, lectureId)
                 .flatMap { submission -> submission.questionAnswers.map { it.questionId } }
 
         return questions
@@ -86,8 +87,8 @@ class DiaryServiceImpl(
         userId: String,
         request: DiarySubmissionRequestDto,
     ) {
-        val lecture = lectureService.getByIdOrNull(request.lectureId)!!
-        val activities = diaryActivityRepository.findByNameIn(request.activities).toList()
+        val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
+        val activities = diaryActivityRepository.findByNameIn(request.activities)
         val questionIds = request.questionAnswers.map { it.questionId }
         if (diaryQuestionRepository.countByIdIn(questionIds) != questionIds.size) {
             throw DiaryQuestionNotFoundException
@@ -114,7 +115,7 @@ class DiaryServiceImpl(
         year: Int,
         semester: Semester,
     ): List<DiarySubmission> =
-        diarySubmissionRepository.findAllByUserIdAndYearAndSemesterOrderByCreatedAt(
+        diarySubmissionRepository.findAllByUserIdAndYearAndSemesterOrderByCreatedAtDesc(
             userId,
             year,
             semester,
