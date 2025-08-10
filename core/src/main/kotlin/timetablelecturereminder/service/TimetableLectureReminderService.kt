@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.timetablelecturereminder.service
 
+import com.wafflestudio.snutt.common.exception.InvalidTimeException
 import com.wafflestudio.snutt.common.exception.PastSemesterException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
@@ -62,6 +63,8 @@ class TimetableLectureReminderServiceImpl(
         val timetableLecture =
             timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
+        if (timetableLecture.classPlaceAndTimes.isEmpty()) throw InvalidTimeException
+
         val schedules =
             timetableLecture.classPlaceAndTimes.map {
                 TimetableLectureReminder.Schedule(it.day, it.startMinute).plusMinutes(offsetMinutes)
@@ -98,6 +101,12 @@ class TimetableLectureReminderServiceImpl(
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(modifiedTimetableLecture.id)
                 ?: return
+
+        if (modifiedTimetableLecture.classPlaceAndTimes.isEmpty()) { // 강의의 시간을 없애면 리마인더도 없앤다.
+            timetableLectureReminderRepository.delete(reminder)
+            return
+        }
+
         val existingSchedulesMap =
             reminder.schedules.associateBy { it.day to it.minute }
         val newSchedules =
