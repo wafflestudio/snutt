@@ -9,6 +9,7 @@ import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
 import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
@@ -162,8 +163,8 @@ class TimetableLectureReminderNotifierServiceImpl(
                         timetable.lectures.find { it.id == reminder.timetableLectureId } ?: return@mapNotNull null
                     val pushMessage =
                         PushMessage(
-                            getPushTitle(),
-                            getPushBody(timetableLecture.courseTitle, reminder.offsetMinutes),
+                            getPushTitle(timetableLecture),
+                            getPushBody(timetableLecture, reminder.offsetMinutes),
                         )
                     timetable.userId to pushMessage
                 }.toMap()
@@ -220,17 +221,24 @@ class TimetableLectureReminderNotifierServiceImpl(
         timetableLectureReminderRepository.deleteAll(reminders)
     }
 
-    private fun getPushTitle(): String = "\uD83D\uDCDA 전자 출결을 잊지 마세요!"
+    private fun getPushTitle(timetableLecture: TimetableLecture): String =
+        if (timetableLecture.lectureId == null) {
+            "\uD83D\uDCDA 일정 리마인더"
+        } else {
+            "\uD83D\uDCDA 강의 리마인더"
+        }
 
     private fun getPushBody(
-        timetableLectureTitle: String,
+        timetableLecture: TimetableLecture,
         offsetMinutes: Int,
-    ): String =
-        if (offsetMinutes == 0) {
-            "$timetableLectureTitle 수업 시간이에요."
+    ): String {
+        val typeString = if (timetableLecture.lectureId == null) "일정" else "수업"
+        return if (offsetMinutes == 0) {
+            "${timetableLecture.courseTitle} $typeString 시간이에요."
         } else if (offsetMinutes > 0) {
-            "$timetableLectureTitle 수업 시작 ${offsetMinutes}분 후에요."
+            "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 후예요."
         } else {
-            "$timetableLectureTitle 수업 시작 ${offsetMinutes}분 전이에요."
+            "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 전이에요."
         }
+    }
 }
