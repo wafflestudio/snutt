@@ -7,6 +7,7 @@ enum class ErrorType(
     val errorCode: Long,
     val errorMessage: String,
     val displayMessage: String = "현재 서비스 이용이 원활하지 않습니다. 이용에 불편을 드려 죄송합니다",
+    val title: String = "오류",
 ) {
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 0x0000, "API 호출에 실패하였습니다", "서버에 문제가 있으니, 잠시 후 다시 시도해주세요"),
 
