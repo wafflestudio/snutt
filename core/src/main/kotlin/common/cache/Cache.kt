@@ -32,6 +32,11 @@ interface Cache {
     suspend fun acquireLock(builtKey: BuiltCacheKey): Boolean
 
     suspend fun releaseLock(builtKey: BuiltCacheKey): Boolean
+
+    suspend fun withLock(
+        builtKey: BuiltCacheKey,
+        block: suspend () -> Unit,
+    )
 }
 
 @Component
@@ -84,6 +89,19 @@ class RedisCache(
         runCatching {
             redisTemplate.deleteAndAwait(builtKey.key) > 0
         }.getOrDefault(false)
+
+    override suspend fun withLock(
+        builtKey: BuiltCacheKey,
+        block: suspend () -> Unit,
+    ) {
+        if (acquireLock(builtKey)) {
+            try {
+                block()
+            } finally {
+                releaseLock(builtKey)
+            }
+        }
+    }
 }
 
 suspend inline fun <reified T : Any> Cache.get(

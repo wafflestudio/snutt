@@ -39,32 +39,27 @@ class TimetableLectureReminderNotifierServiceImpl(
     @Scheduled(cron = "0 * * * * *", scheduler = "timetableLectureReminderTaskScheduler")
     override suspend fun send() {
         val lockKey = CacheKey.LOCK_SEND_TIMETABLE_LECTURE_REMINDER_NOTIFICATION.build()
-        try {
-            if (!cache.acquireLock(lockKey)) {
-                return
-            }
+        cache.withLock(lockKey) {
+            try {
+                logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
+                val now = Instant.now()
+                val (currentYear, currentSemester) =
+                    SemesterUtils.getCurrentYearAndSemester(now) ?: run {
+                        logger.debug("현재 진행 중인 학기가 없습니다.")
+                        return@withLock
+                    }
+                val reminders = getTargetReminders(now)
 
-            logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
-            val now = Instant.now()
-            val (currentYear, currentSemester) =
-                SemesterUtils.getCurrentYearAndSemester(now) ?: run {
-                    logger.debug("현재 진행 중인 학기가 없습니다.")
-                    return
+                if (reminders.isEmpty()) {
+                    logger.debug("현재 시간대에 전송할 강의 리마인더가 없습니다.")
+                    return@withLock
                 }
-            val reminders = getTargetReminders(now)
 
-            if (reminders.isEmpty()) {
-                logger.debug("현재 시간대에 전송할 강의 리마인더가 없습니다.")
-                return
+                logger.info("총 ${reminders.size}개의 강의 리마인더를 찾았습니다.")
+                processReminders(reminders, currentYear, currentSemester, now)
+            } catch (e: Exception) {
+                logger.error("강의 리마인더 알림 전송 중 오류 발생", e)
             }
-
-            logger.info("총 ${reminders.size}개의 강의 리마인더를 찾았습니다.")
-            processReminders(reminders, currentYear, currentSemester, now)
-        } catch (e: Exception) {
-            logger.error("강의 리마인더 알림 전송 중 오류 발생", e)
-        } finally {
-            cache.releaseLock(lockKey)
-            logger.debug("강의 리마인더 알림 전송 작업을 완료했습니다.")
         }
     }
 
