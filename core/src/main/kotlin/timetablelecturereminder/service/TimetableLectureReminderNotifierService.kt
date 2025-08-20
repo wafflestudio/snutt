@@ -81,58 +81,53 @@ class TimetableLectureReminderNotifierServiceImpl(
         currentSemester: Semester,
         now: Instant,
     ) {
-        try {
-            val timetables = timetableRepository.findAllById(chunkedReminders.map { it.timetableId }).toList()
-            val timetableToReminderMap = mapTimetablesToReminders(timetables, chunkedReminders)
+        val timetables = timetableRepository.findAllById(chunkedReminders.map { it.timetableId }).toList()
+        val timetableToReminderMap = mapTimetablesToReminders(timetables, chunkedReminders)
 
-            val nextSemesterItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
-            val pastSemesterItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
-            val currentSemesterPrimaryTableItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
-            val currentSemesterNonPrimaryTableItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
+        val nextSemesterItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
+        val pastSemesterItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
+        val currentSemesterPrimaryTableItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
+        val currentSemesterNonPrimaryTableItems = mutableListOf<Pair<Timetable, TimetableLectureReminder>>()
 
-            timetableToReminderMap.forEach { pair ->
-                val (timetable, _) = pair
-                when {
-                    timetable.year > currentYear ||
-                        (timetable.year == currentYear && timetable.semester > currentSemester) -> {
-                        nextSemesterItems.add(pair)
-                    }
-                    timetable.year < currentYear ||
-                        (timetable.year == currentYear && timetable.semester < currentSemester) -> {
-                        pastSemesterItems.add(pair)
-                    }
-                    else -> {
-                        if (timetable.isPrimary == true) {
-                            currentSemesterPrimaryTableItems.add(pair)
-                        } else {
-                            currentSemesterNonPrimaryTableItems.add(pair)
-                        }
+        timetableToReminderMap.forEach { pair ->
+            val (timetable, _) = pair
+            when {
+                timetable.year > currentYear ||
+                    (timetable.year == currentYear && timetable.semester > currentSemester) -> {
+                    nextSemesterItems.add(pair)
+                }
+                timetable.year < currentYear ||
+                    (timetable.year == currentYear && timetable.semester < currentSemester) -> {
+                    pastSemesterItems.add(pair)
+                }
+                else -> {
+                    if (timetable.isPrimary == true) {
+                        currentSemesterPrimaryTableItems.add(pair)
+                    } else {
+                        currentSemesterNonPrimaryTableItems.add(pair)
                     }
                 }
             }
+        }
 
-            if (currentSemesterPrimaryTableItems.isNotEmpty()) {
-                sendPushes(currentSemesterPrimaryTableItems)
-                markRemindersAsNotified(currentSemesterPrimaryTableItems.map { it.second }, now)
-                logger.info("${currentSemesterPrimaryTableItems.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
-            }
+        if (currentSemesterPrimaryTableItems.isNotEmpty()) {
+            sendPushes(currentSemesterPrimaryTableItems)
+            markRemindersAsNotified(currentSemesterPrimaryTableItems.map { it.second }, now)
+            logger.info("${currentSemesterPrimaryTableItems.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
+        }
 
-            if (currentSemesterNonPrimaryTableItems.isNotEmpty()) {
-                logger.debug("${currentSemesterNonPrimaryTableItems.size}개의 대표시간표의 강의가 아닌 현재 학기 리마인더를 건너뛰었습니다.")
-            }
+        if (currentSemesterNonPrimaryTableItems.isNotEmpty()) {
+            logger.debug("${currentSemesterNonPrimaryTableItems.size}개의 대표시간표의 강의가 아닌 현재 학기 리마인더를 건너뛰었습니다.")
+        }
 
-            if (nextSemesterItems.isNotEmpty()) {
-                logger.debug("${nextSemesterItems.size}개의 다음 학기 리마인더를 건너뛰었습니다.")
-            }
+        if (nextSemesterItems.isNotEmpty()) {
+            logger.debug("${nextSemesterItems.size}개의 다음 학기 리마인더를 건너뛰었습니다.")
+        }
 
-            if (pastSemesterItems.isNotEmpty()) {
-                // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
-                deletePastSemesterReminders(pastSemesterItems.map { it.second })
-                logger.info("${pastSemesterItems.size}개의 지난 학기 리마인더를 삭제했습니다.")
-            }
-        } catch (e: Exception) {
-            logger.error("강의 리마인더 배치 처리 중 오류 발생", e)
-            throw e
+        if (pastSemesterItems.isNotEmpty()) {
+            // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
+            deletePastSemesterReminders(pastSemesterItems.map { it.second })
+            logger.info("${pastSemesterItems.size}개의 지난 학기 리마인더를 삭제했습니다.")
         }
     }
 
