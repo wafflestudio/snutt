@@ -131,6 +131,10 @@ object FriendLinkNotFoundException : SnuttException(ErrorType.FRIEND_LINK_NOT_FO
 
 object SocialProviderNotAttachedException : SnuttException(ErrorType.SOCIAL_PROVIDER_NOT_ATTACHED)
 
+object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_NOT_FOUND)
+
+object DiaryActivityNotFoundException : SnuttException(ErrorType.DIARY_ACTIVITY_NOT_FOUND)
+
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : SnuttException(ErrorType.THEME_NOT_FOUND)

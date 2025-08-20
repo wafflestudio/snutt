@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.handler.BuildingHandler
 import com.wafflestudio.snutt.handler.ConfigHandler
 import com.wafflestudio.snutt.handler.CoursebookHandler
 import com.wafflestudio.snutt.handler.DeviceHandler
+import com.wafflestudio.snutt.handler.DiaryHandler
 import com.wafflestudio.snutt.handler.EvHandler
 import com.wafflestudio.snutt.handler.EvServiceHandler
 import com.wafflestudio.snutt.handler.FeedbackHandler
@@ -30,6 +31,7 @@ import com.wafflestudio.snutt.router.docs.BookmarkDocs
 import com.wafflestudio.snutt.router.docs.BuildingsDocs
 import com.wafflestudio.snutt.router.docs.ConfigDocs
 import com.wafflestudio.snutt.router.docs.CoursebookDocs
+import com.wafflestudio.snutt.router.docs.DiaryDocs
 import com.wafflestudio.snutt.router.docs.EvDocs
 import com.wafflestudio.snutt.router.docs.FeedbackDocs
 import com.wafflestudio.snutt.router.docs.FriendDocs
@@ -71,6 +73,7 @@ class MainRouter(
     private val coursebookHandler: CoursebookHandler,
     private val tagHandler: TagHandler,
     private val feedbackHandler: FeedbackHandler,
+    private val diaryHandler: DiaryHandler,
     private val staticPageHandler: StaticPageHandler,
     private val evServiceHandler: EvServiceHandler,
     private val pushPreferenceHandler: PushPreferenceHandler,
@@ -221,6 +224,13 @@ class MainRouter(
 
                 POST("/popups", adminHandler::postPopup)
                 DELETE("/popups/{id}", adminHandler::deletePopup)
+
+                GET("/diary/activities", adminHandler::getAllDiaryActivities)
+                GET("/diary/questions", adminHandler::getDiaryQuestions)
+                POST("/diary/activities", adminHandler::insertDiaryActivity)
+                DELETE("/diary/activities", adminHandler::removeDiaryActivity)
+                POST("/diary/questions", adminHandler::insertDiaryQuestion)
+                DELETE("/diary/questions/{id}", adminHandler::removeDiaryQuestion)
             }
         }
 
@@ -341,6 +351,18 @@ class MainRouter(
         v1CoRouter {
             "/feedback".nest {
                 POST("", feedbackHandler::postFeedback)
+            }
+        }
+
+    @Bean
+    @DiaryDocs
+    fun diaryRouter() =
+        v1CoRouter {
+            "/diary".nest {
+                GET("/{year}/{semester}", diaryHandler::getMySubmissions)
+                POST("/questionnaire", diaryHandler::getQuestionnaireFromActivities)
+                GET("/activities", diaryHandler::getActivities)
+                POST("", diaryHandler::submitDiary)
             }
         }
 
