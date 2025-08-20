@@ -82,6 +82,7 @@ api:
   server:
     snuttev:
       base-url: http://snutt-ev.snutt-dev.svc.cluster.local
+      read-timeout: 5000
 
 logging:
   level:
