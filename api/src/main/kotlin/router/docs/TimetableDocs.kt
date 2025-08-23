@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.router.docs
 
 import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snutt.timetablelecturereminder.dto.TimetableLectureReminderDto
+import com.wafflestudio.snutt.timetablelecturereminder.dto.request.TimetableLectureReminderModifyRequestDto
 import com.wafflestudio.snutt.timetablelecturereminder.dto.response.TimetableLectureRemindersWithTimetableIdResponse
 import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
@@ -458,13 +459,17 @@ import timetables.dto.TimetableBriefDto
                         name = "timetableLectureId",
                         required = true,
                     ),
-                    Parameter(
-                        `in` = ParameterIn.QUERY,
-                        name = "offsetMinutes",
+                ],
+                requestBody =
+                    RequestBody(
                         required = true,
                         description = "강의 시작 시각으로부터 알림을 받을 시간의 오프셋(분)",
+                        content = [
+                            Content(
+                                schema = Schema(implementation = TimetableLectureReminderModifyRequestDto::class),
+                            ),
+                        ],
                     ),
-                ],
                 responses = [
                     ApiResponse(
                         responseCode = "200",
