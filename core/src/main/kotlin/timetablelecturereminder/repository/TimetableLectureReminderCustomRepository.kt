@@ -7,6 +7,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.elemMatch
+import org.springframework.data.mongodb.core.query.gte
+import org.springframework.data.mongodb.core.query.isEqualTo
+import org.springframework.data.mongodb.core.query.lt
+import org.springframework.data.mongodb.core.query.lte
 import java.time.Instant
 
 interface TimetableLectureReminderCustomRepository {
@@ -28,20 +33,18 @@ class TimetableLectureReminderCustomRepositoryImpl(
         lastNotifiedBefore: Instant,
     ): List<TimetableLectureReminder> {
         val criteria =
-            Criteria.where("schedules").elemMatch(
-                Criteria
-                    .where("day")
-                    .`is`(dayOfWeek)
-                    .and("minute")
-                    .gte(startMinute)
-                    .lte(endMinute)
-                    .andOperator(
-                        Criteria().orOperator(
-                            Criteria.where("recentNotifiedAt").`is`(null),
-                            Criteria.where("recentNotifiedAt").lt(lastNotifiedBefore),
-                        ),
+            TimetableLectureReminder::schedules elemMatch
+                Criteria().andOperator(
+                    TimetableLectureReminder.Schedule::day isEqualTo dayOfWeek,
+                    Criteria().andOperator(
+                        TimetableLectureReminder.Schedule::minute gte startMinute,
+                        TimetableLectureReminder.Schedule::minute lte endMinute,
                     ),
-            )
+                    Criteria().orOperator(
+                        TimetableLectureReminder.Schedule::recentNotifiedAt isEqualTo null,
+                        TimetableLectureReminder.Schedule::recentNotifiedAt lt lastNotifiedBefore,
+                    ),
+                )
 
         return reactiveMongoTemplate
             .find<TimetableLectureReminder>(
