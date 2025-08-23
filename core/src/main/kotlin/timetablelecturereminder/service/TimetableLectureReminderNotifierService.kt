@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 interface TimetableLectureReminderNotifierService {
     suspend fun send()
@@ -126,8 +127,38 @@ class TimetableLectureReminderNotifierServiceImpl(
         }
     }
 
-    private suspend fun getTargetReminders(now: Instant): List<TimetableLectureReminder> =
-        timetableLectureReminderRepository.findRemindersToSendNotifications(now, REMINDER_TIME_WINDOW_MINUTES)
+    private suspend fun getTargetReminders(now: Instant): List<TimetableLectureReminder> {
+        val scheduleTo = TimetableLectureReminder.Schedule.fromInstant(now)
+        val scheduleFrom = scheduleTo.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
+        val lastNotifiedBefore = now.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
+
+        val reminders =
+            if (scheduleFrom.day == scheduleTo.day) {
+                // 같은 날짜 내에서의 스케줄
+                timetableLectureReminderRepository.findDueRemindersInTimeRange(
+                    dayOfWeek = scheduleTo.day.value,
+                    startMinute = scheduleFrom.minute,
+                    endMinute = scheduleTo.minute,
+                    lastNotifiedBefore = lastNotifiedBefore,
+                )
+            } else {
+                // 다른 날짜(자정 즈음)
+                timetableLectureReminderRepository.findDueRemindersInTimeRange( // 어제 스케줄
+                    dayOfWeek = scheduleFrom.day.value,
+                    startMinute = scheduleFrom.minute,
+                    endMinute = 1439, // 23:59
+                    lastNotifiedBefore = lastNotifiedBefore,
+                ) +
+                    timetableLectureReminderRepository.findDueRemindersInTimeRange( // 오늘 스케줄
+                        dayOfWeek = scheduleTo.day.value,
+                        startMinute = 0,
+                        endMinute = scheduleTo.minute,
+                        lastNotifiedBefore = lastNotifiedBefore,
+                    )
+            }
+
+        return reminders
+    }
 
     private suspend fun sendPushes(targets: List<TimetableAndReminder>) {
         val userIdToPushMessage =
