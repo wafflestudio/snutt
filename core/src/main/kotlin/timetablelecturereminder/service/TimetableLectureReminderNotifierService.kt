@@ -38,7 +38,7 @@ class TimetableLectureReminderNotifierServiceImpl(
         private const val BATCH_SIZE = 500
     }
 
-    @Scheduled(cron = "0 * * * * *", scheduler = "timetableLectureReminderTaskScheduler")
+    @Scheduled(cron = "0 * * * * *")
     override suspend fun send() {
         val lockKey = CacheKey.LOCK_SEND_TIMETABLE_LECTURE_REMINDER_NOTIFICATION.build()
         cache.withLock(lockKey) {
