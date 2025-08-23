@@ -44,13 +44,13 @@ class TimetableLectureReminderNotifierServiceImpl(
         cache.withLock(lockKey) {
             try {
                 logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
-                val now = Instant.now()
+                val currentTime = Instant.now()
                 val (currentYear, currentSemester) =
-                    SemesterUtils.getCurrentYearAndSemester(now) ?: run {
+                    SemesterUtils.getCurrentYearAndSemester(currentTime) ?: run {
                         logger.debug("현재 진행 중인 학기가 없습니다.")
                         return@withLock
                     }
-                val reminders = getTargetReminders(now)
+                val reminders = getTargetReminders(currentTime)
 
                 if (reminders.isEmpty()) {
                     logger.debug("현재 시간대에 전송할 강의 리마인더가 없습니다.")
@@ -58,22 +58,55 @@ class TimetableLectureReminderNotifierServiceImpl(
                 }
 
                 logger.info("총 ${reminders.size}개의 강의 리마인더를 찾았습니다.")
-                processReminders(reminders, currentYear, currentSemester, now)
+                processReminders(reminders, currentYear, currentSemester, currentTime)
             } catch (e: Exception) {
                 logger.error("강의 리마인더 알림 전송 중 오류 발생", e)
             }
         }
     }
 
+    private suspend fun getTargetReminders(currentTime: Instant): List<TimetableLectureReminder> {
+        val endSchedule = TimetableLectureReminder.Schedule.fromInstant(currentTime)
+        val startSchedule = endSchedule.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
+        val lastNotifiedBefore = currentTime.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
+
+        val reminders =
+            if (startSchedule.day == endSchedule.day) {
+                // 같은 날짜 내에서의 스케줄
+                timetableLectureReminderRepository.findDueRemindersInTimeRange(
+                    dayOfWeek = endSchedule.day.value,
+                    startMinute = startSchedule.minute,
+                    endMinute = endSchedule.minute,
+                    lastNotifiedBefore = lastNotifiedBefore,
+                )
+            } else {
+                // 다른 날짜(자정 즈음)
+                timetableLectureReminderRepository.findDueRemindersInTimeRange( // 어제 스케줄
+                    dayOfWeek = startSchedule.day.value,
+                    startMinute = startSchedule.minute,
+                    endMinute = 1439, // 23:59
+                    lastNotifiedBefore = lastNotifiedBefore,
+                ) +
+                    timetableLectureReminderRepository.findDueRemindersInTimeRange( // 오늘 스케줄
+                        dayOfWeek = endSchedule.day.value,
+                        startMinute = 0,
+                        endMinute = endSchedule.minute,
+                        lastNotifiedBefore = lastNotifiedBefore,
+                    )
+            }
+
+        return reminders
+    }
+
     private suspend fun processReminders(
         reminders: List<TimetableLectureReminder>,
         currentYear: Int,
         currentSemester: Semester,
-        now: Instant,
+        currentTime: Instant,
     ) {
         reminders.chunked(BATCH_SIZE).forEachIndexed { index, chunkedReminders ->
             logger.debug("배치 ${index + 1} 처리 중: ${chunkedReminders.size}개의 리마인더")
-            processChunkedReminders(chunkedReminders, currentYear, currentSemester, now)
+            processChunkedReminders(chunkedReminders, currentYear, currentSemester, currentTime)
         }
     }
 
@@ -81,7 +114,7 @@ class TimetableLectureReminderNotifierServiceImpl(
         chunkedReminders: List<TimetableLectureReminder>,
         currentYear: Int,
         currentSemester: Semester,
-        now: Instant,
+        currentTime: Instant,
     ) {
         val timetablesById =
             timetableRepository.findAllById(chunkedReminders.map { it.timetableId }).toList().associateBy { it.id }
@@ -92,72 +125,62 @@ class TimetableLectureReminderNotifierServiceImpl(
                 }
             }
 
-        val nextSemesterItems =
-            timetableAndReminders.filter {
-                it.timetable.isAfterSemester(currentYear, currentSemester)
-            }
-        val pastSemesterItems =
-            timetableAndReminders.filter {
-                it.timetable.isBeforeSemester(currentYear, currentSemester)
-            }
-        val (currentSemesterPrimaryTableItems, currentSemesterNonPrimaryTableItems) =
+        processCurrentSemesterReminders(timetableAndReminders, currentYear, currentSemester, currentTime)
+        processPastSemesterReminders(timetableAndReminders, currentYear, currentSemester)
+        processNextSemesterReminders(timetableAndReminders, currentYear, currentSemester)
+    }
+
+    private suspend fun processCurrentSemesterReminders(
+        timetableAndReminders: List<TimetableAndReminder>,
+        currentYear: Int,
+        currentSemester: Semester,
+        currentTime: Instant,
+    ) {
+        val (currentSemesterPrimaryTimetableAndReminders, currentSemesterNonPrimaryTimetableAndReminders) =
             timetableAndReminders
                 .filter {
                     it.timetable.isInSemester(currentYear, currentSemester)
                 }.partition { it.timetable.isPrimary == true }
 
-        if (currentSemesterPrimaryTableItems.isNotEmpty()) {
-            sendPushes(currentSemesterPrimaryTableItems)
-            markRemindersAsNotified(currentSemesterPrimaryTableItems.map { it.reminder }, now)
-            logger.info("${currentSemesterPrimaryTableItems.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
+        if (currentSemesterPrimaryTimetableAndReminders.isNotEmpty()) {
+            sendPushes(currentSemesterPrimaryTimetableAndReminders)
+            markRemindersAsNotified(currentSemesterPrimaryTimetableAndReminders.map { it.reminder }, currentTime)
+            logger.info("${currentSemesterPrimaryTimetableAndReminders.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
         }
 
-        if (currentSemesterNonPrimaryTableItems.isNotEmpty()) {
-            logger.debug("${currentSemesterNonPrimaryTableItems.size}개의 대표시간표의 강의가 아닌 현재 학기 리마인더를 건너뛰었습니다.")
-        }
-
-        if (nextSemesterItems.isNotEmpty()) {
-            logger.debug("${nextSemesterItems.size}개의 다음 학기 리마인더를 건너뛰었습니다.")
-        }
-
-        if (pastSemesterItems.isNotEmpty()) {
-            // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
-            deletePastSemesterReminders(pastSemesterItems.map { it.reminder })
-            logger.info("${pastSemesterItems.size}개의 지난 학기 리마인더를 삭제했습니다.")
+        if (currentSemesterNonPrimaryTimetableAndReminders.isNotEmpty()) {
+            logger.debug("${currentSemesterNonPrimaryTimetableAndReminders.size}개의 대표시간표의 강의가 아닌 현재 학기 리마인더를 건너뛰었습니다.")
         }
     }
 
-    private suspend fun getTargetReminders(now: Instant): List<TimetableLectureReminder> {
-        val scheduleTo = TimetableLectureReminder.Schedule.fromInstant(now)
-        val scheduleFrom = scheduleTo.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
-        val lastNotifiedBefore = now.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
-
-        val reminders =
-            if (scheduleFrom.day == scheduleTo.day) {
-                // 같은 날짜 내에서의 스케줄
-                timetableLectureReminderRepository.findDueRemindersInTimeRange(
-                    dayOfWeek = scheduleTo.day.value,
-                    startMinute = scheduleFrom.minute,
-                    endMinute = scheduleTo.minute,
-                    lastNotifiedBefore = lastNotifiedBefore,
-                )
-            } else {
-                // 다른 날짜(자정 즈음)
-                timetableLectureReminderRepository.findDueRemindersInTimeRange( // 어제 스케줄
-                    dayOfWeek = scheduleFrom.day.value,
-                    startMinute = scheduleFrom.minute,
-                    endMinute = 1439, // 23:59
-                    lastNotifiedBefore = lastNotifiedBefore,
-                ) +
-                    timetableLectureReminderRepository.findDueRemindersInTimeRange( // 오늘 스케줄
-                        dayOfWeek = scheduleTo.day.value,
-                        startMinute = 0,
-                        endMinute = scheduleTo.minute,
-                        lastNotifiedBefore = lastNotifiedBefore,
-                    )
+    private suspend fun processPastSemesterReminders(
+        timetableAndReminders: List<TimetableAndReminder>,
+        currentYear: Int,
+        currentSemester: Semester,
+    ) {
+        val pastSemesterTimetableAndReminders =
+            timetableAndReminders.filter {
+                it.timetable.isBeforeSemester(currentYear, currentSemester)
             }
+        if (pastSemesterTimetableAndReminders.isNotEmpty()) {
+            // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
+            deletePastSemesterReminders(pastSemesterTimetableAndReminders.map { it.reminder })
+            logger.info("${pastSemesterTimetableAndReminders.size}개의 지난 학기 리마인더를 삭제했습니다.")
+        }
+    }
 
-        return reminders
+    private fun processNextSemesterReminders(
+        timetableAndReminders: List<TimetableAndReminder>,
+        currentYear: Int,
+        currentSemester: Semester,
+    ) {
+        val nextSemesterTimetableAndReminders =
+            timetableAndReminders.filter {
+                it.timetable.isAfterSemester(currentYear, currentSemester)
+            }
+        if (nextSemesterTimetableAndReminders.isNotEmpty()) {
+            logger.debug("${nextSemesterTimetableAndReminders.size}개의 다음 학기 리마인더를 건너뛰었습니다.")
+        }
     }
 
     private suspend fun sendPushes(targets: List<TimetableAndReminder>) {
@@ -175,12 +198,12 @@ class TimetableLectureReminderNotifierServiceImpl(
 
     private suspend fun markRemindersAsNotified(
         reminders: List<TimetableLectureReminder>,
-        now: Instant,
+        currentTime: Instant,
     ) {
         if (reminders.isEmpty()) return
 
-        val scheduleTo = TimetableLectureReminder.Schedule.fromInstant(now)
-        val scheduleFrom = scheduleTo.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
+        val scheduleEndTime = TimetableLectureReminder.Schedule.fromInstant(currentTime)
+        val scheduleStartTime = scheduleEndTime.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
 
         val updatedReminders =
             reminders.map { reminder ->
@@ -189,8 +212,8 @@ class TimetableLectureReminderNotifierServiceImpl(
                         // 강의 하나의 schedule이 10분 윈도우 안에 여러 개라면
                         // 알림을 1분마다 하나씩 보낼 필요 없이 한 번만 보내고
                         // schedule은 전부 recentNotifiedAt을 기록하여 리소스를 아낀다.
-                        if (schedule.shouldBeMarkedAsNotified(scheduleFrom, scheduleTo, now)) {
-                            schedule.copy(recentNotifiedAt = now)
+                        if (schedule.shouldBeMarkedAsNotified(scheduleStartTime, scheduleEndTime, currentTime)) {
+                            schedule.copy(recentNotifiedAt = currentTime)
                         } else {
                             schedule
                         }
@@ -208,14 +231,14 @@ class TimetableLectureReminderNotifierServiceImpl(
     }
 
     private fun TimetableLectureReminder.Schedule.shouldBeMarkedAsNotified(
-        scheduleFrom: TimetableLectureReminder.Schedule,
-        scheduleTo: TimetableLectureReminder.Schedule,
-        now: Instant,
+        startSchedule: TimetableLectureReminder.Schedule,
+        endSchedule: TimetableLectureReminder.Schedule,
+        currentTime: Instant,
     ): Boolean {
-        val isInTimeWindow = this.isWithin(scheduleFrom, scheduleTo)
+        val isInTimeWindow = this.isWithin(startSchedule, endSchedule)
         val hasNotBeenNotifiedRecently =
             this.recentNotifiedAt == null ||
-                this.recentNotifiedAt < now.minusSeconds(REMINDER_TIME_WINDOW_MINUTES * 60L)
+                this.recentNotifiedAt < currentTime.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
 
         return isInTimeWindow && hasNotBeenNotifiedRecently
     }
