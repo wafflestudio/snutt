@@ -9,7 +9,6 @@ import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
-import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
@@ -144,7 +143,7 @@ class TimetableLectureReminderNotifierServiceImpl(
         val userIdToPushMessage =
             targets
                 .mapNotNull {
-                    val pushMessage = it.toPushMessage() ?: return@mapNotNull null
+                    val pushMessage = buildPushMessage(it, it.reminder.offsetMinutes) ?: return@mapNotNull null
                     it.timetable.userId to pushMessage
                 }.toMap()
 
@@ -200,28 +199,25 @@ class TimetableLectureReminderNotifierServiceImpl(
         return isInTimeWindow && hasNotBeenNotifiedRecently
     }
 
-    private fun TimetableAndReminder.toPushMessage(): PushMessage? {
+    private fun buildPushMessage(
+        timetableAndReminder: TimetableAndReminder,
+        offsetMinutes: Int,
+    ): PushMessage? {
         val timetableLecture =
-            timetable.lectures.find { it.id == reminder.timetableLectureId } ?: return null
+            timetableAndReminder.timetable.lectures.find { it.id == timetableAndReminder.reminder.timetableLectureId } ?: return null
+
+        val typeString = if (timetableLecture.lectureId == null) "일정" else "수업"
+        val pushTitle = "\uD83D\uDCDA $typeString 리마인더"
+        val pushBody =
+            when {
+                offsetMinutes == 0 -> "${timetableLecture.courseTitle} $typeString 시간이에요."
+                offsetMinutes > 0 -> "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 후예요."
+                else -> "${timetableLecture.courseTitle} $typeString 시작 ${-offsetMinutes}분 전이에요."
+            }
+
         return PushMessage(
-            timetableLecture.toPushTitle(),
-            timetableLecture.toPushBody(reminder.offsetMinutes),
+            pushTitle,
+            pushBody,
         )
-    }
-
-    private fun TimetableLecture.toPushTitle(): String =
-        if (lectureId == null) {
-            "\uD83D\uDCDA 일정 리마인더"
-        } else {
-            "\uD83D\uDCDA 강의 리마인더"
-        }
-
-    private fun TimetableLecture.toPushBody(offsetMinutes: Int): String {
-        val typeString = if (lectureId == null) "일정" else "수업"
-        return when {
-            offsetMinutes == 0 -> "$courseTitle $typeString 시간이에요."
-            offsetMinutes > 0 -> "$courseTitle $typeString 시작 ${offsetMinutes}분 후예요."
-            else -> "$courseTitle $typeString 시작 ${-offsetMinutes}분 전이에요."
-        }
     }
 }
