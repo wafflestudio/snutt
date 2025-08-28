@@ -9,7 +9,6 @@ import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
-import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
@@ -128,7 +127,7 @@ class TimetableLectureReminderNotifierServiceImpl(
         val currentSemesterPrimaryTimetableAndReminders =
             timetableAndReminders
                 .filter {
-                    it.timetable.isInSemester(currentYear, currentSemester) && it.timetable.isPrimary == true
+                    it.timetable.year == currentYear && it.timetable.semester == currentSemester && it.timetable.isPrimary == true
                 }
         sendPushes(currentSemesterPrimaryTimetableAndReminders)
         markRemindersAsNotified(currentSemesterPrimaryTimetableAndReminders.map { it.reminder }, currentTime)
@@ -136,7 +135,7 @@ class TimetableLectureReminderNotifierServiceImpl(
 
         val pastSemesterTimetableAndReminders =
             timetableAndReminders.filter {
-                it.timetable.isBeforeSemester(currentYear, currentSemester)
+                it.timetable.year < currentYear || (it.timetable.year == currentYear && it.timetable.semester < currentSemester)
             }
         deletePastSemesterReminders(pastSemesterTimetableAndReminders.map { it.reminder })
     }
@@ -200,16 +199,6 @@ class TimetableLectureReminderNotifierServiceImpl(
 
         return isInTimeWindow && hasNotBeenNotifiedRecently
     }
-
-    private fun Timetable.isInSemester(
-        year: Int,
-        semester: Semester,
-    ) = this.year == year && this.semester == semester
-
-    private fun Timetable.isBeforeSemester(
-        year: Int,
-        semester: Semester,
-    ) = this.year < year || (this.year == year && this.semester < semester)
 
     private fun TimetableAndReminder.toPushMessage(): PushMessage? {
         val timetableLecture =
