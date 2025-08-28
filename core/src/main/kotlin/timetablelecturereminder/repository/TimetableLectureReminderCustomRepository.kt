@@ -1,8 +1,7 @@
 package com.wafflestudio.snutt.timetablelecturereminder.repository
 
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
@@ -49,7 +48,7 @@ class TimetableLectureReminderCustomRepositoryImpl(
         return reactiveMongoTemplate
             .find<TimetableLectureReminder>(
                 Query(criteria),
-            ).asFlow()
-            .toList()
+            ).collectList()
+            .awaitSingle()
     }
 }

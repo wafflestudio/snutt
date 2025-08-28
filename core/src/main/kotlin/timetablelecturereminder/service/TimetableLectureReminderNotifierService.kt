@@ -9,8 +9,6 @@ import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
-import com.wafflestudio.snutt.timetables.data.Timetable
-import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
@@ -125,69 +123,27 @@ class TimetableLectureReminderNotifierServiceImpl(
                 }
             }
 
-        processCurrentSemesterReminders(timetableAndReminders, currentYear, currentSemester, currentTime)
-        processPastSemesterReminders(timetableAndReminders, currentYear, currentSemester)
-        processNextSemesterReminders(timetableAndReminders, currentYear, currentSemester)
-    }
-
-    private suspend fun processCurrentSemesterReminders(
-        timetableAndReminders: List<TimetableAndReminder>,
-        currentYear: Int,
-        currentSemester: Semester,
-        currentTime: Instant,
-    ) {
-        val (currentSemesterPrimaryTimetableAndReminders, currentSemesterNonPrimaryTimetableAndReminders) =
+        val currentSemesterPrimaryTimetableAndReminders =
             timetableAndReminders
                 .filter {
-                    it.timetable.isInSemester(currentYear, currentSemester)
-                }.partition { it.timetable.isPrimary == true }
+                    it.timetable.year == currentYear && it.timetable.semester == currentSemester && it.timetable.isPrimary == true
+                }
+        sendPushes(currentSemesterPrimaryTimetableAndReminders)
+        markRemindersAsNotified(currentSemesterPrimaryTimetableAndReminders.map { it.reminder }, currentTime)
+        logger.info("${currentSemesterPrimaryTimetableAndReminders.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
 
-        if (currentSemesterPrimaryTimetableAndReminders.isNotEmpty()) {
-            sendPushes(currentSemesterPrimaryTimetableAndReminders)
-            markRemindersAsNotified(currentSemesterPrimaryTimetableAndReminders.map { it.reminder }, currentTime)
-            logger.info("${currentSemesterPrimaryTimetableAndReminders.size}개의 현재 학기 리마인더에 알림을 보냈습니다.")
-        }
-
-        if (currentSemesterNonPrimaryTimetableAndReminders.isNotEmpty()) {
-            logger.debug("${currentSemesterNonPrimaryTimetableAndReminders.size}개의 대표시간표의 강의가 아닌 현재 학기 리마인더를 건너뛰었습니다.")
-        }
-    }
-
-    private suspend fun processPastSemesterReminders(
-        timetableAndReminders: List<TimetableAndReminder>,
-        currentYear: Int,
-        currentSemester: Semester,
-    ) {
         val pastSemesterTimetableAndReminders =
             timetableAndReminders.filter {
-                it.timetable.isBeforeSemester(currentYear, currentSemester)
+                it.timetable.year < currentYear || (it.timetable.year == currentYear && it.timetable.semester < currentSemester)
             }
-        if (pastSemesterTimetableAndReminders.isNotEmpty()) {
-            // 앞으로 알림 보낼 일 없는 리마인더이므로 삭제한다.
-            deletePastSemesterReminders(pastSemesterTimetableAndReminders.map { it.reminder })
-            logger.info("${pastSemesterTimetableAndReminders.size}개의 지난 학기 리마인더를 삭제했습니다.")
-        }
-    }
-
-    private fun processNextSemesterReminders(
-        timetableAndReminders: List<TimetableAndReminder>,
-        currentYear: Int,
-        currentSemester: Semester,
-    ) {
-        val nextSemesterTimetableAndReminders =
-            timetableAndReminders.filter {
-                it.timetable.isAfterSemester(currentYear, currentSemester)
-            }
-        if (nextSemesterTimetableAndReminders.isNotEmpty()) {
-            logger.debug("${nextSemesterTimetableAndReminders.size}개의 다음 학기 리마인더를 건너뛰었습니다.")
-        }
+        deletePastSemesterReminders(pastSemesterTimetableAndReminders.map { it.reminder })
     }
 
     private suspend fun sendPushes(targets: List<TimetableAndReminder>) {
         val userIdToPushMessage =
             targets
                 .mapNotNull {
-                    val pushMessage = it.toPushMessage() ?: return@mapNotNull null
+                    val pushMessage = buildPushMessage(it, it.reminder.offsetMinutes) ?: return@mapNotNull null
                     it.timetable.userId to pushMessage
                 }.toMap()
 
@@ -243,43 +199,25 @@ class TimetableLectureReminderNotifierServiceImpl(
         return isInTimeWindow && hasNotBeenNotifiedRecently
     }
 
-    private fun Timetable.isAfterSemester(
-        year: Int,
-        semester: Semester,
-    ) = this.year > year || (this.year == year && this.semester > semester)
-
-    private fun Timetable.isInSemester(
-        year: Int,
-        semester: Semester,
-    ) = this.year == year && this.semester == semester
-
-    private fun Timetable.isBeforeSemester(
-        year: Int,
-        semester: Semester,
-    ) = this.year < year || (this.year == year && this.semester < semester)
-
-    private fun TimetableAndReminder.toPushMessage(): PushMessage? {
+    private fun buildPushMessage(
+        timetableAndReminder: TimetableAndReminder,
+        offsetMinutes: Int,
+    ): PushMessage? {
         val timetableLecture =
-            timetable.lectures.find { it.id == reminder.timetableLectureId } ?: return null
+            timetableAndReminder.timetable.lectures.find { it.id == timetableAndReminder.reminder.timetableLectureId } ?: return null
+
+        val typeString = if (timetableLecture.lectureId == null) "일정" else "수업"
+        val pushTitle = "\uD83D\uDCDA $typeString 리마인더"
+        val pushBody =
+            when {
+                offsetMinutes == 0 -> "${timetableLecture.courseTitle} $typeString 시간이에요."
+                offsetMinutes > 0 -> "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 후예요."
+                else -> "${timetableLecture.courseTitle} $typeString 시작 ${-offsetMinutes}분 전이에요."
+            }
+
         return PushMessage(
-            timetableLecture.toPushTitle(),
-            timetableLecture.toPushBody(reminder.offsetMinutes),
+            pushTitle,
+            pushBody,
         )
-    }
-
-    private fun TimetableLecture.toPushTitle(): String =
-        if (lectureId == null) {
-            "\uD83D\uDCDA 일정 리마인더"
-        } else {
-            "\uD83D\uDCDA 강의 리마인더"
-        }
-
-    private fun TimetableLecture.toPushBody(offsetMinutes: Int): String {
-        val typeString = if (lectureId == null) "일정" else "수업"
-        return when {
-            offsetMinutes == 0 -> "$courseTitle $typeString 시간이에요."
-            offsetMinutes > 0 -> "$courseTitle $typeString 시작 ${offsetMinutes}분 후예요."
-            else -> "$courseTitle $typeString 시작 ${-offsetMinutes}분 전이에요."
-        }
     }
 }
