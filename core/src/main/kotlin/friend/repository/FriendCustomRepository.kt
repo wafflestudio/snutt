@@ -3,9 +3,8 @@ package com.wafflestudio.snutt.friend.repository
 import com.wafflestudio.snutt.common.extension.desc
 import com.wafflestudio.snutt.friend.data.Friend
 import com.wafflestudio.snutt.friend.dto.FriendState
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
@@ -56,8 +55,8 @@ class FriendCustomRepositoryImpl(
                             }
                         },
                     ).with(Friend::createdAt.desc()),
-            ).asFlow()
-            .toList()
+            ).collectList()
+            .awaitSingle()
 
     override suspend fun findByUserPair(userIds: Pair<String, String>): Friend? =
         reactiveMongoTemplate
