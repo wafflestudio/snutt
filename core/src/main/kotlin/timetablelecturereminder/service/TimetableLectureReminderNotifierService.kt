@@ -216,8 +216,9 @@ class TimetableLectureReminderNotifierServiceImpl(
             }
 
         return PushMessage(
-            pushTitle,
-            pushBody,
+            title = pushTitle,
+            body = pushBody,
+            isUrgentOnAndroid = true,
         )
     }
 }
