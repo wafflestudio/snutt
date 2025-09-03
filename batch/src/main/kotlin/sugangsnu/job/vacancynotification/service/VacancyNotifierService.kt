@@ -114,6 +114,7 @@ class VacancyNotifierServiceImpl(
                                 title = "빈자리 알림",
                                 body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
                                 urlScheme = DeeplinkType.VACANCY,
+                                isUrgentOnAndroid = true,
                             )
                         pushWithNotificationService.sendPushesAndNotifications(
                             pushMessage,
