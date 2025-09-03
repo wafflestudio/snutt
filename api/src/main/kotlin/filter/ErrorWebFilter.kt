@@ -39,6 +39,7 @@ class ErrorWebFilter(
                             throwable.errorResponse.let {
                                 ErrorBody(
                                     it.error.code,
+                                    "",
                                     it.error.message,
                                     it.error.message,
                                 )
@@ -82,11 +83,12 @@ class ErrorWebFilter(
             }
 
     private fun makeErrorBody(exception: SnuttException): ErrorBody =
-        ErrorBody(exception.error.errorCode, exception.errorMessage, exception.displayMessage, exception.ext)
+        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage, exception.ext)
 }
 
 private data class ErrorBody(
     val errcode: Long,
+    val title: String,
     val message: String,
     val displayMessage: String,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제

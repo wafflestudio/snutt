@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.auth.AuthProvider
 
 open class SnuttException(
     val error: ErrorType = ErrorType.DEFAULT_ERROR,
+    val title: String = error.title,
     val errorMessage: String = error.errorMessage,
     val displayMessage: String = error.displayMessage,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제
