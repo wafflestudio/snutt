@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.util.CoroutineUtils
 import com.wafflestudio.snutt.notification.data.UserDevice
 import com.wafflestudio.snutt.notification.repository.UserDeviceRepository
 import com.wafflestudio.snutt.users.repository.UserRepository
@@ -29,7 +30,9 @@ class DeviceService internal constructor(
 
         coroutineScope {
             launch {
-                pushClient.subscribeGlobalTopic(registrationId)
+                CoroutineUtils.retryWithExponentialBackoff {
+                    pushClient.subscribeGlobalTopic(registrationId)
+                }
             }
 
             launch {
@@ -92,7 +95,9 @@ class DeviceService internal constructor(
         registrationId: String,
     ) = coroutineScope {
         launch {
-            pushClient.unsubscribeGlobalTopic(registrationId)
+            CoroutineUtils.retryWithExponentialBackoff {
+                pushClient.unsubscribeGlobalTopic(registrationId)
+            }
         }
 
         launch {
