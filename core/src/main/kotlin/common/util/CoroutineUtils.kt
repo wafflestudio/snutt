@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 
 object CoroutineUtils {
     suspend fun <T> retryWithExponentialBackoff(
-        retries: Int = 5,
+        retries: Int = 10,
         initialDelay: Long = 1000L,
         factor: Long = 2,
         block: suspend () -> T,
