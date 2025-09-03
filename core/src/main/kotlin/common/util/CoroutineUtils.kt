@@ -6,7 +6,7 @@ object CoroutineUtils {
     suspend fun <T> retryWithExponentialBackoff(
         retries: Int = 10,
         initialDelay: Long = 1000L,
-        factor: Long = 2,
+        factor: Long = 2L,
         block: suspend () -> T,
     ): T {
         var currentDelay = initialDelay
