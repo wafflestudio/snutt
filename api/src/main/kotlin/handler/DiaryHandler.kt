@@ -60,4 +60,13 @@ class DiaryHandler(
             diaryService.submitDiary(userId, body)
             OkResponse()
         }
+
+    suspend fun removeDiarySubmission(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val id = req.pathVariable("id")
+
+            diaryService.removeSubmission(userId, id)
+            OkResponse()
+        }
 }

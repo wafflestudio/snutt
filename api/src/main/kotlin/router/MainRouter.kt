@@ -363,6 +363,7 @@ class MainRouter(
                 POST("/questionnaire", diaryHandler::getQuestionnaireFromActivities)
                 GET("/activities", diaryHandler::getActivities)
                 POST("", diaryHandler::submitDiary)
+                DELETE("/{id}", diaryHandler::removeDiarySubmission)
             }
         }
 

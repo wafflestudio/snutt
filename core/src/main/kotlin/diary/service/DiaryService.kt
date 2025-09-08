@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.diary.service
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
+import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
@@ -40,6 +41,11 @@ interface DiaryService {
         year: Int,
         semester: Semester,
     ): List<DiarySubmission>
+
+    suspend fun removeSubmission(
+        submissionId: String,
+        userId: String,
+    )
 
     suspend fun getSubmissionIdShortQuestionRepliesMap(submissions: List<DiarySubmission>): Map<String, List<DiaryShortQuestionReply>>
 
@@ -120,6 +126,18 @@ class DiaryServiceImpl(
             year,
             semester,
         )
+
+    override suspend fun removeSubmission(
+        submissionId: String,
+        userId: String,
+    ) {
+        val submission = diarySubmissionRepository.findById(submissionId)
+        if (submission?.userId == userId) {
+            diarySubmissionRepository.deleteById(submissionId)
+        } else {
+            throw DiarySubmissionNotFoundException
+        }
+    }
 
     override suspend fun getSubmissionIdShortQuestionRepliesMap(
         submissions: List<DiarySubmission>,

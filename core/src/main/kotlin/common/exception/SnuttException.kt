@@ -136,6 +136,8 @@ object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_
 
 object DiaryActivityNotFoundException : SnuttException(ErrorType.DIARY_ACTIVITY_NOT_FOUND)
 
+object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)
+
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : SnuttException(ErrorType.THEME_NOT_FOUND)
