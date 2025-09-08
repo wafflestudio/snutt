@@ -5,7 +5,9 @@ import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.stereotype.Component
 
-data class AppVersion(val appVersion: String) : Comparable<AppVersion> {
+data class AppVersion(
+    val appVersion: String,
+) : Comparable<AppVersion> {
     override fun compareTo(other: AppVersion): Int {
         val thisVersion = this.toInts()
         val otherVersion = other.toInts()

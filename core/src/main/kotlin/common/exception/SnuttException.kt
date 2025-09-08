@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.auth.AuthProvider
 
 open class SnuttException(
     val error: ErrorType = ErrorType.DEFAULT_ERROR,
+    val title: String = error.title,
     val errorMessage: String = error.errorMessage,
     val displayMessage: String = error.displayMessage,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제
@@ -40,17 +41,23 @@ object LectureNotFoundException : SnuttException(ErrorType.LECTURE_NOT_FOUND)
 
 object UserNotFoundException : SnuttException(ErrorType.USER_NOT_FOUND)
 
-class MissingRequiredParameterException(fieldName: String) :
-    SnuttException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
+object TimetableLectureNotFoundException : SnuttException(ErrorType.TIMETABLE_LECTURE_NOT_FOUND)
 
-class InvalidPathParameterException(fieldName: String) :
-    SnuttException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (path parameter: $fieldName)")
+class MissingRequiredParameterException(
+    fieldName: String,
+) : SnuttException(ErrorType.MISSING_PARAMETER, "필수값이 누락되었습니다. ($fieldName)")
 
-class InvalidQueryParameterException(fieldName: String) :
-    SnuttException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (query parameter: $fieldName)")
+class InvalidPathParameterException(
+    fieldName: String,
+) : SnuttException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (path parameter: $fieldName)")
 
-class InvalidBodyFieldValueException(fieldName: String) :
-    SnuttException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: $fieldName)")
+class InvalidQueryParameterException(
+    fieldName: String,
+) : SnuttException(ErrorType.INVALID_PARAMETER, "잘못된 값입니다. (query parameter: $fieldName)")
+
+class InvalidBodyFieldValueException(
+    fieldName: String,
+) : SnuttException(ErrorType.INVALID_BODY_FIELD_VALUE, "잘못된 값입니다. (request body: $fieldName)")
 
 object InvalidOsTypeException : SnuttException(ErrorType.INVALID_OS_TYPE)
 
@@ -101,17 +108,19 @@ object DuplicateTimetableLectureException : SnuttException(ErrorType.DUPLICATE_L
 
 object WrongSemesterException : SnuttException(ErrorType.WRONG_SEMESTER)
 
-class LectureTimeOverlapException(confirmMessage: String) : SnuttException(
-    error = ErrorType.LECTURE_TIME_OVERLAP,
-    displayMessage = confirmMessage,
-    ext = mapOf("confirm_message" to confirmMessage),
-)
+class LectureTimeOverlapException(
+    confirmMessage: String,
+) : SnuttException(
+        error = ErrorType.LECTURE_TIME_OVERLAP,
+        displayMessage = confirmMessage,
+        ext = mapOf("confirm_message" to confirmMessage),
+    )
 
 object CustomLectureResetException : SnuttException(ErrorType.CANNOT_RESET_CUSTOM_LECTURE)
 
 object TimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND)
 
-object PrimaryTimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND)
+object PrimaryTimetableNotFoundException : SnuttException(ErrorType.PRIMARY_TIMETABLE_NOT_FOUND)
 
 object TimetableNotPrimaryException : SnuttException(ErrorType.DEFAULT_ERROR)
 
@@ -123,6 +132,10 @@ object FriendLinkNotFoundException : SnuttException(ErrorType.FRIEND_LINK_NOT_FO
 
 object SocialProviderNotAttachedException : SnuttException(ErrorType.SOCIAL_PROVIDER_NOT_ATTACHED)
 
+object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_NOT_FOUND)
+
+object DiaryActivityNotFoundException : SnuttException(ErrorType.DIARY_ACTIVITY_NOT_FOUND)
+
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : SnuttException(ErrorType.THEME_NOT_FOUND)
@@ -133,18 +146,20 @@ object TagListNotFoundException : SnuttException(ErrorType.TAG_LIST_NOT_FOUND)
 
 object DuplicateVacancyNotificationException : SnuttException(ErrorType.DUPLICATE_VACANCY_NOTIFICATION)
 
-class DuplicateEmailException(authProviders: List<AuthProvider>) : SnuttException(
-    ErrorType.DUPLICATE_EMAIL,
-    displayMessage =
-        run {
-            val socialProviders = authProviders.filter { it != AuthProvider.LOCAL }
-            when {
-                socialProviders.isNotEmpty() -> "이미 ${socialProviders.joinToString(", ") { it.korName }}과(와) 연동된 계정이 있습니다."
-                authProviders.contains(AuthProvider.LOCAL) -> "이미 가입된 이메일입니다. 아이디 찾기를 이용해주세요."
-                else -> throw IllegalStateException("로그인 방법이 없는 계정")
-            }
-        },
-)
+class DuplicateEmailException(
+    authProviders: List<AuthProvider>,
+) : SnuttException(
+        ErrorType.DUPLICATE_EMAIL,
+        displayMessage =
+            run {
+                val socialProviders = authProviders.filter { it != AuthProvider.LOCAL }
+                when {
+                    socialProviders.isNotEmpty() -> "이미 ${socialProviders.joinToString(", ") { it.korName }}과(와) 연동된 계정이 있습니다."
+                    authProviders.contains(AuthProvider.LOCAL) -> "이미 가입된 이메일입니다. 아이디 찾기를 이용해주세요."
+                    else -> throw IllegalStateException("로그인 방법이 없는 계정")
+                }
+            },
+    )
 
 object DuplicateFriendException : SnuttException(ErrorType.DUPLICATE_FRIEND)
 
@@ -163,3 +178,5 @@ object DuplicateSocialAccountException : SnuttException(ErrorType.DUPLICATE_SOCI
 object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_REMOVE_LAST_AUTH_PROVIDER)
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
+
+object PastSemesterException : SnuttException(ErrorType.PAST_SEMESTER)

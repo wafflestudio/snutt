@@ -25,9 +25,7 @@ data class Friend(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
-    fun includes(userId: String): Boolean {
-        return fromUserId == userId || toUserId == userId
-    }
+    fun includes(userId: String): Boolean = fromUserId == userId || toUserId == userId
 
     fun getPartnerUserId(userId: String): String {
         check(this.includes(userId))

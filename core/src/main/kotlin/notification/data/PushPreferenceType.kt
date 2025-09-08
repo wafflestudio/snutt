@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.notification.data
 
-enum class PushPreferenceType(val isEnabledByDefault: Boolean) {
+enum class PushPreferenceType(
+    val isEnabledByDefault: Boolean,
+) {
     NORMAL(true),
     LECTURE_UPDATE(true),
     VACANCY_NOTIFICATION(true),

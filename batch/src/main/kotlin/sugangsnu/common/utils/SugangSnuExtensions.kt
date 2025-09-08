@@ -21,11 +21,10 @@ fun KProperty1<Lecture, *>.toKoreanFieldName(): String =
         else -> "기타"
     }
 
-fun Coursebook.nextCoursebook(): Coursebook {
-    return when (this.semester) {
+fun Coursebook.nextCoursebook(): Coursebook =
+    when (this.semester) {
         Semester.SPRING -> Coursebook(year = this.year, semester = Semester.SUMMER)
         Semester.SUMMER -> Coursebook(year = this.year, semester = Semester.AUTUMN)
         Semester.AUTUMN -> Coursebook(year = this.year, semester = Semester.WINTER)
         Semester.WINTER -> Coursebook(year = this.year + 1, semester = Semester.SPRING)
     }
-}

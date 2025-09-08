@@ -188,6 +188,17 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
+        path = "/v1/themes/{themeId}/publish",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "deletePublishedTheme",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "themeId", required = true)],
+                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema())])],
+            ),
+    ),
+    RouterOperation(
         path = "/v1/themes/{themeId}/download",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],

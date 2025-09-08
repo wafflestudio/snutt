@@ -6,7 +6,9 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface NotificationRepository : CoroutineCrudRepository<Notification, String>, NotificationCustomRepository {
+interface NotificationRepository :
+    CoroutineCrudRepository<Notification, String>,
+    NotificationCustomRepository {
     suspend fun countByUserIdInAndCreatedAtAfter(
         userIds: List<String?>,
         createdAt: LocalDateTime,
@@ -16,6 +18,4 @@ interface NotificationRepository : CoroutineCrudRepository<Notification, String>
 suspend fun NotificationRepository.countUnreadNotifications(
     userId: String,
     createdAt: LocalDateTime,
-): Long {
-    return countByUserIdInAndCreatedAtAfter(listOf(userId, null), createdAt)
-}
+): Long = countByUserIdInAndCreatedAtAfter(listOf(userId, null), createdAt)

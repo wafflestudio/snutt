@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.common.push.fcm
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
@@ -33,7 +34,8 @@ internal class FcmPushClient(
 
     init {
         val options =
-            FirebaseOptions.builder()
+            FirebaseOptions
+                .builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccountString.byteInputStream()))
                 .setDatabaseUrl("https://$projectId.firebaseio.com/")
                 .build()
@@ -68,8 +70,7 @@ internal class FcmPushClient(
                                 null
                             }
                         }
-                    }
-                    .awaitAll()
+                    }.awaitAll()
                     .filterNotNull()
                     .flatMap { it.responses }
 
@@ -100,10 +101,17 @@ internal class FcmPushClient(
 
     private fun TargetedPushMessage.toFcmMessage(): Message {
         val notification =
-            Notification.builder()
+            Notification
+                .builder()
                 .setTitle(message.title)
                 .setBody(message.body)
                 .build()
+        val androidConfig =
+            AndroidConfig
+                .builder()
+                .setPriority(
+                    if (message.isUrgentOnAndroid) AndroidConfig.Priority.HIGH else AndroidConfig.Priority.NORMAL,
+                ).build()
         return Message.builder().run {
             when (this@toFcmMessage) {
                 is TargetedPushMessageWithToken -> setToken(targetToken)
@@ -111,6 +119,7 @@ internal class FcmPushClient(
             }
             message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.build().value) }
             setNotification(notification)
+            setAndroidConfig(androidConfig)
             putAllData(message.data.payload)
             build()
         }

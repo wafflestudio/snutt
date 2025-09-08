@@ -26,8 +26,9 @@ class ErrorWebFilter(
     override fun filter(
         exchange: ServerWebExchange,
         chain: WebFilterChain,
-    ): Mono<Void> {
-        return chain.filter(exchange)
+    ): Mono<Void> =
+        chain
+            .filter(exchange)
             .onErrorResume { throwable ->
                 val errorBody: ErrorBody
                 val httpStatusCode: HttpStatusCode
@@ -38,6 +39,7 @@ class ErrorWebFilter(
                             throwable.errorResponse.let {
                                 ErrorBody(
                                     it.error.code,
+                                    "",
                                     it.error.message,
                                     it.error.message,
                                 )
@@ -79,15 +81,14 @@ class ErrorWebFilter(
                     Mono.empty()
                 }
             }
-    }
 
-    private fun makeErrorBody(exception: SnuttException): ErrorBody {
-        return ErrorBody(exception.error.errorCode, exception.errorMessage, exception.displayMessage, exception.ext)
-    }
+    private fun makeErrorBody(exception: SnuttException): ErrorBody =
+        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage, exception.ext)
 }
 
 private data class ErrorBody(
     val errcode: Long,
+    val title: String,
     val message: String,
     val displayMessage: String,
     // TODO: 구버전 대응용 ext 필드. 추후 삭제

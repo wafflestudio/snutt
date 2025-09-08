@@ -39,8 +39,8 @@ data class Lecture(
     val evInfo: EvInfo? = null,
     var categoryPre2025: String?,
 ) {
-    infix fun equalsMetadata(other: Lecture): Boolean {
-        return this === other ||
+    infix fun equalsMetadata(other: Lecture): Boolean =
+        this === other ||
             academicYear == other.academicYear &&
             category == other.category &&
             classPlaceAndTimes == other.classPlaceAndTimes &&
@@ -57,5 +57,4 @@ data class Lecture(
             courseNumber == other.courseNumber &&
             courseTitle == other.courseTitle &&
             categoryPre2025 == other.categoryPre2025
-    }
 }

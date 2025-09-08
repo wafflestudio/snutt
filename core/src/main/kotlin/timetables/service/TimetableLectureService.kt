@@ -14,7 +14,9 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
+import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 interface TimetableLectureService {
@@ -59,6 +61,7 @@ class TimetableLectureServiceImpl(
     private val timetableThemeService: TimetableThemeService,
     private val timetableRepository: TimetableRepository,
     private val lectureRepository: LectureRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : TimetableLectureService {
     override suspend fun addLecture(
         userId: String,
@@ -114,7 +117,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = originalLecture.categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        return updatedTimetable
     }
 
     override suspend fun modifyTimetableLecture(
@@ -144,7 +149,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
+        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        return updatedTimetable
     }
 
     override suspend fun deleteTimetableLecture(
@@ -165,7 +172,8 @@ class TimetableLectureServiceImpl(
             timetable.lectures.filter {
                 timetableLecture.id != it.id &&
                     ClassTimeUtils.timesOverlap(
-                        timetableLecture.classPlaceAndTimes, it.classPlaceAndTimes,
+                        timetableLecture.classPlaceAndTimes,
+                        it.classPlaceAndTimes,
                     )
             }
         when {
@@ -184,6 +192,6 @@ class TimetableLectureServiceImpl(
         val overlappingLectureTitles =
             overlappingLectures.map { "'${it.courseTitle}'" }.take(2).joinToString(", ")
         val shortFormOfTitles = if (overlappingLectures.size < 3) "" else "외 ${overlappingLectures.size - 2}개의 "
-        return "$overlappingLectureTitles ${shortFormOfTitles}강의와 시간이 겹칩니다. 강의를 덮어쓰시겠습니까?"
+        return "$overlappingLectureTitles ${shortFormOfTitles}강의와 시간이 겹칩니다. 강의를 덮어씌우겠습니까?"
     }
 }

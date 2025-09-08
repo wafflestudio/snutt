@@ -46,7 +46,8 @@ class PushPreferenceServiceImpl(
             }
 
         pushPreferenceRepository.save(
-            pushPreferenceRepository.findByUserId(user.id!!)
+            pushPreferenceRepository
+                .findByUserId(user.id!!)
                 ?.copy(pushPreferences = pushPreferenceItemsWithDefault)
                 ?: PushPreference(
                     userId = user.id,
@@ -56,7 +57,8 @@ class PushPreferenceServiceImpl(
     }
 
     override suspend fun getPushPreferenceDto(user: User): PushPreferenceDto =
-        pushPreferenceRepository.findByUserId(user.id!!)
+        pushPreferenceRepository
+            .findByUserId(user.id!!)
             ?.let { PushPreferenceDto(it) }
             ?: PushPreferenceDto(
                 pushPreferences =
@@ -96,8 +98,7 @@ class PushPreferenceServiceImpl(
                 .findByUserIdIn(userIds)
                 .associateBy { it.userId }
 
-        return userIds.filter {
-                userId ->
+        return userIds.filter { userId ->
             val customEnabled =
                 userIdsToCustomPushPreferences[userId]
                     ?.pushPreferences

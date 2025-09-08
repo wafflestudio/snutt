@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 
 @Component
-class NativeClientInfoMiddleware() : Middleware {
+class NativeClientInfoMiddleware : Middleware {
     override suspend fun invoke(
         req: ServerRequest,
         context: RequestContext,

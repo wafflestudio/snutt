@@ -32,13 +32,15 @@ class StorageClient {
         key: String,
     ): String {
         val request =
-            PutObjectRequest.builder()
+            PutObjectRequest
+                .builder()
                 .bucket(storageType.bucketName)
                 .key(key)
                 .build()
 
         val presignRequest =
-            PutObjectPresignRequest.builder()
+            PutObjectPresignRequest
+                .builder()
                 .signatureDuration(uploadDuration)
                 .putObjectRequest(request)
                 .build()
@@ -62,13 +64,15 @@ class StorageClient {
         key: String,
     ): String {
         val request =
-            GetObjectRequest.builder()
+            GetObjectRequest
+                .builder()
                 .bucket(bucketName)
                 .key(key)
                 .build()
 
         val presignRequest =
-            GetObjectPresignRequest.builder()
+            GetObjectPresignRequest
+                .builder()
                 .signatureDuration(getDuration)
                 .getObjectRequest(request)
                 .build()
@@ -77,6 +81,4 @@ class StorageClient {
     }
 }
 
-fun String.toGetUri(): String {
-    return StorageClient.instance.generateGetUri(this)
-}
+fun String.toGetUri(): String = StorageClient.instance.generateGetUri(this)

@@ -18,7 +18,8 @@ class BuildingHandler(
     suspend fun searchBuildings(req: ServerRequest): ServerResponse =
         handle(req) {
             val placesQuery =
-                req.parseRequiredQueryParam<String>("places")
+                req
+                    .parseRequiredQueryParam<String>("places")
                     .split(",")
                     .flatMap { PlaceInfo.getValuesOf(it) }
                     .distinct()

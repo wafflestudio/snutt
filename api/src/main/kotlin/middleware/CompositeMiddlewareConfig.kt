@@ -3,11 +3,17 @@ package com.wafflestudio.snutt.middleware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-class SnuttRestApiDefaultMiddleware(middleware: Middleware) : Middleware by middleware
+class SnuttRestApiDefaultMiddleware(
+    middleware: Middleware,
+) : Middleware by middleware
 
-class SnuttRestAdminApiMiddleware(middleware: Middleware) : Middleware by middleware
+class SnuttRestAdminApiMiddleware(
+    middleware: Middleware,
+) : Middleware by middleware
 
-class SnuttRestApiNoAuthMiddleware(middleware: Middleware) : Middleware by middleware
+class SnuttRestApiNoAuthMiddleware(
+    middleware: Middleware,
+) : Middleware by middleware
 
 @Configuration
 class CompositeMiddlewareConfig(

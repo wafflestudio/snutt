@@ -39,16 +39,14 @@ class ClientConfigService(
     private suspend fun getAdaptableConfigs(
         osType: OsType,
         appVersion: AppVersion,
-    ): List<ClientConfig> {
-        return clientConfigRepository.findAll()
+    ): List<ClientConfig> =
+        clientConfigRepository
+            .findAll()
             .toList()
             .filter { it.isAdaptable(osType, appVersion) }
             .distinctBy { it.name }
-    }
 
-    suspend fun getConfigsByName(name: String): List<ClientConfig> {
-        return clientConfigRepository.findByNameOrderByCreatedAtDesc(name)
-    }
+    suspend fun getConfigsByName(name: String): List<ClientConfig> = clientConfigRepository.findByNameOrderByCreatedAtDesc(name)
 
     suspend fun postConfig(
         name: String,
@@ -58,13 +56,14 @@ class ClientConfigService(
 
         val config =
             with(body) {
-                clientConfigRepository.findByNameAndVersions(
-                    name = name,
-                    minIosVersion = minVersion?.iosAppVersion,
-                    minAndroidVersion = minVersion?.androidAppVersion,
-                    maxIosVersion = maxVersion?.iosAppVersion,
-                    maxAndroidVersion = maxVersion?.androidAppVersion,
-                )?.copy(value = value) ?: ClientConfig(
+                clientConfigRepository
+                    .findByNameAndVersions(
+                        name = name,
+                        minIosVersion = minVersion?.iosAppVersion,
+                        minAndroidVersion = minVersion?.androidAppVersion,
+                        maxIosVersion = maxVersion?.iosAppVersion,
+                        maxAndroidVersion = maxVersion?.androidAppVersion,
+                    )?.copy(value = value) ?: ClientConfig(
                     name = name,
                     value = value,
                     minIosVersion = minVersion?.iosAppVersion,

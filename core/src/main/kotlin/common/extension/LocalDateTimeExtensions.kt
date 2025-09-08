@@ -4,6 +4,4 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-fun LocalDateTime.toZonedDateTime(zonedId: ZoneId = ZoneId.of("UTC")): ZonedDateTime {
-    return ZonedDateTime.of(this, zonedId)
-}
+fun LocalDateTime.toZonedDateTime(zonedId: ZoneId = ZoneId.of("UTC")): ZonedDateTime = ZonedDateTime.of(this, zonedId)

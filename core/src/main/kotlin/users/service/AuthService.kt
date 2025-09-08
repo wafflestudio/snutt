@@ -74,9 +74,7 @@ class AuthServiceImpl(
     override fun isMatchedPassword(
         user: User,
         password: String,
-    ): Boolean {
-        return passwordEncoder.matches(password, user.credential.localPw)
-    }
+    ): Boolean = passwordEncoder.matches(password, user.credential.localPw)
 
     override fun generateCredentialHash(credential: Credential): String {
         val credentialString = objectMapper.writeValueAsString(credential)

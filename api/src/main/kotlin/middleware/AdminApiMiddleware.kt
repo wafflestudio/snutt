@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 
 @Component
-class AdminApiMiddleware(private val userService: UserService) : Middleware {
+class AdminApiMiddleware(
+    private val userService: UserService,
+) : Middleware {
     override suspend fun invoke(
         req: ServerRequest,
         context: RequestContext,

@@ -23,13 +23,14 @@ class AppleClient(
     private val objectMapper: ObjectMapper,
 ) : OAuth2Client {
     private val webClient =
-        webClientBuilder.clientConnector(
-            ReactorClientHttpConnector(
-                HttpClient.create().responseTimeout(
-                    Duration.ofSeconds(3),
+        webClientBuilder
+            .clientConnector(
+                ReactorClientHttpConnector(
+                    HttpClient.create().responseTimeout(
+                        Duration.ofSeconds(3),
+                    ),
                 ),
-            ),
-        ).build()
+            ).build()
 
     companion object {
         private const val APPLE_JWK_URI = "https://appleid.apple.com/auth/keys"
@@ -38,8 +39,11 @@ class AppleClient(
     override suspend fun getMe(token: String): OAuth2UserResponse? {
         val jwtHeader = extractJwtHeader(token)
         val appleJwk =
-            webClient.get<Map<String, List<AppleJwk>>>(uri = APPLE_JWK_URI).getOrNull()
-                ?.get("keys")?.find {
+            webClient
+                .get<Map<String, List<AppleJwk>>>(uri = APPLE_JWK_URI)
+                .getOrNull()
+                ?.get("keys")
+                ?.find {
                     it.kid == jwtHeader.kid && it.alg == jwtHeader.alg
                 } ?: return null
         val publicKey = convertJwkToPublicKey(appleJwk)
@@ -75,7 +79,12 @@ class AppleClient(
     private suspend fun verifyAndDecodeToken(
         token: String,
         publicKey: PublicKey,
-    ) = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).body
+    ) = Jwts
+        .parser()
+        .verifyWith(publicKey)
+        .build()
+        .parseSignedClaims(token)
+        .payload
 }
 
 private data class AppleJwtHeader(

@@ -95,7 +95,8 @@ class FriendServiceImpl(
         state: FriendState,
     ): List<Pair<Friend, User>> {
         val userIdToFriend =
-            friendRepository.findAllFriends(myUserId, state)
+            friendRepository
+                .findAllFriends(myUserId, state)
                 .associateBy { it.getPartnerUserId(myUserId) }
                 .ifEmpty { return emptyList() }
 
@@ -212,9 +213,7 @@ class FriendServiceImpl(
         friendRepository.delete(friend)
     }
 
-    override suspend fun get(friendId: String): Friend? {
-        return friendRepository.findById(friendId)
-    }
+    override suspend fun get(friendId: String): Friend? = friendRepository.findById(friendId)
 
     override suspend fun generateFriendRequestLink(userId: String): String {
         val bytes = ByteArray(8)
@@ -232,7 +231,8 @@ class FriendServiceImpl(
         requestToken: String,
     ): Pair<Friend, User> {
         val fromUserId =
-            redisTemplate.opsForValue()
+            redisTemplate
+                .opsForValue()
                 .getAndAwait(FRIEND_LINK_REDIS_PREFIX + requestToken) ?: throw FriendLinkNotFoundException
         val fromUser = userRepository.findByIdAndActiveTrue(fromUserId) ?: throw UserNotFoundException
         if (fromUser.id == userId) {
