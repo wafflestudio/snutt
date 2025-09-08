@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     name: Deploy-prod
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     env:
       IMAGE_TAG: ${{ github.run_number }}
       BUILD_NUMBER: ${{ github.run_number }}
