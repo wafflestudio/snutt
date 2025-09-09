@@ -8,7 +8,6 @@ import com.wafflestudio.snutt.common.util.CoroutineUtils
 import com.wafflestudio.snutt.notification.data.UserDevice
 import com.wafflestudio.snutt.notification.repository.UserDeviceRepository
 import com.wafflestudio.snutt.users.repository.UserRepository
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -28,41 +27,39 @@ class DeviceService internal constructor(
         val cacheKey = CacheKey.LOCK_ADD_FCM_REGISTRATION_ID.build(userId, registrationId)
         if (!cache.acquireLock(cacheKey)) return
 
-        coroutineScope {
-            launch {
-                CoroutineUtils.retryWithExponentialBackoff {
-                    pushClient.subscribeGlobalTopic(registrationId)
-                }
-            }
-
-            launch {
-                val userDevice =
-                    clientInfo.deviceId?.let {
-                        userDeviceRepository.findByUserIdAndDeviceIdAndIsDeletedFalse(userId, it)
-                    } ?: userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)
-
-                userDevice?.apply {
-                    if (updateIfChanged(clientInfo, registrationId)) {
-                        userDeviceRepository.save(this)
-                    }
-                } ?: run {
-                    userDeviceRepository.save(
-                        UserDevice(
-                            userId = userId,
-                            osType = clientInfo.osType,
-                            osVersion = clientInfo.osVersion,
-                            deviceId = clientInfo.deviceId,
-                            deviceModel = clientInfo.deviceModel,
-                            appType = clientInfo.appType,
-                            appVersion = clientInfo.appVersion,
-                            fcmRegistrationId = registrationId,
-                        ),
-                    )
-                }
+        CoroutineUtils.applicationScope.launch {
+            CoroutineUtils.retryWithExponentialBackoff {
+                pushClient.subscribeGlobalTopic(registrationId)
             }
         }
 
-        cache.releaseLock(cacheKey)
+        try {
+            val userDevice =
+                clientInfo.deviceId?.let {
+                    userDeviceRepository.findByUserIdAndDeviceIdAndIsDeletedFalse(userId, it)
+                } ?: userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)
+
+            userDevice?.apply {
+                if (updateIfChanged(clientInfo, registrationId)) {
+                    userDeviceRepository.save(this)
+                }
+            } ?: run {
+                userDeviceRepository.save(
+                    UserDevice(
+                        userId = userId,
+                        osType = clientInfo.osType,
+                        osVersion = clientInfo.osVersion,
+                        deviceId = clientInfo.deviceId,
+                        deviceModel = clientInfo.deviceModel,
+                        appType = clientInfo.appType,
+                        appVersion = clientInfo.appVersion,
+                        fcmRegistrationId = registrationId,
+                    ),
+                )
+            }
+        } finally {
+            cache.releaseLock(cacheKey)
+        }
     }
 
     private fun UserDevice.updateIfChanged(
@@ -93,18 +90,15 @@ class DeviceService internal constructor(
     suspend fun removeRegistrationId(
         userId: String,
         registrationId: String,
-    ) = coroutineScope {
-        launch {
+    ) {
+        CoroutineUtils.applicationScope.launch {
             CoroutineUtils.retryWithExponentialBackoff {
                 pushClient.unsubscribeGlobalTopic(registrationId)
             }
         }
-
-        launch {
-            userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)?.let {
-                it.isDeleted = true
-                userDeviceRepository.save(it)
-            }
+        userDeviceRepository.findByUserIdAndFcmRegistrationIdAndIsDeletedFalse(userId, registrationId)?.let {
+            it.isDeleted = true
+            userDeviceRepository.save(it)
         }
     }
 
