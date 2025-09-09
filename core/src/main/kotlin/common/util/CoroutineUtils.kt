@@ -1,8 +1,18 @@
 package com.wafflestudio.snutt.common.util
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
+import java.util.concurrent.Executors
 
 object CoroutineUtils {
+    val Dispatchers.Loom: CoroutineDispatcher
+        get() = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Loom)
+
     suspend fun <T> retryWithExponentialBackoff(
         retries: Int = 10,
         initialDelay: Long = 1000L,
@@ -21,6 +31,6 @@ object CoroutineUtils {
                 currentDelay *= factor
             }
         }
-        throw IllegalStateException("재시도 실패")
+        throw IllegalStateException("Can't reach here")
     }
 }
