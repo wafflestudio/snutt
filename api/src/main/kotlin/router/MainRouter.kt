@@ -156,7 +156,6 @@ class MainRouter(
                 POST("/{timetableId}/primary", timeTableHandler::setPrimary)
                 DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
                 "{timetableId}/lecture".nest {
-                    GET("/reminders", timetableLectureReminderHandler::getReminders)
                     POST("", timeTableLectureHandler::addCustomLecture)
                     POST("/{lectureId}", timeTableLectureHandler::addLecture)
                     PUT("/{timetableLectureId}/reset", timeTableLectureHandler::resetTimetableLecture)
@@ -165,6 +164,7 @@ class MainRouter(
                     GET("/{timetableLectureId}/reminder", timetableLectureReminderHandler::getReminder)
                     PUT("/{timetableLectureId}/reminder", timetableLectureReminderHandler::modifyReminder)
                     DELETE("/{timetableLectureId}/reminder", timetableLectureReminderHandler::deleteReminder)
+                    GET("/reminders", timetableLectureReminderHandler::getReminders)
                 }
             }
         }
