@@ -40,6 +40,7 @@ import com.wafflestudio.snutt.router.docs.LectureSearchDocs
 import com.wafflestudio.snutt.router.docs.NotificationDocs
 import com.wafflestudio.snutt.router.docs.PopupDocs
 import com.wafflestudio.snutt.router.docs.PushDocs
+import com.wafflestudio.snutt.router.docs.SemesterDocs
 import com.wafflestudio.snutt.router.docs.TagDocs
 import com.wafflestudio.snutt.router.docs.ThemeDocs
 import com.wafflestudio.snutt.router.docs.TimetableDocs
@@ -389,6 +390,7 @@ class MainRouter(
         }
 
     @Bean
+    @SemesterDocs
     fun semestersRouter() =
         v1CoRouter {
             GET("/semesters/status", semesterHandler::getSemesterStatus)
