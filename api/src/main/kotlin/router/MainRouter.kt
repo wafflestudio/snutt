@@ -17,6 +17,7 @@ import com.wafflestudio.snutt.handler.LectureSearchHandler
 import com.wafflestudio.snutt.handler.NotificationHandler
 import com.wafflestudio.snutt.handler.PopupHandler
 import com.wafflestudio.snutt.handler.PushPreferenceHandler
+import com.wafflestudio.snutt.handler.SemesterHandler
 import com.wafflestudio.snutt.handler.StaticPageHandler
 import com.wafflestudio.snutt.handler.TagHandler
 import com.wafflestudio.snutt.handler.TimetableHandler
@@ -78,6 +79,7 @@ class MainRouter(
     private val evServiceHandler: EvServiceHandler,
     private val pushPreferenceHandler: PushPreferenceHandler,
     private val timetableLectureReminderHandler: TimetableLectureReminderHandler,
+    private val semesterHandler: SemesterHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -384,5 +386,11 @@ class MainRouter(
                 GET("", pushPreferenceHandler::getPushPreferences)
                 POST("", pushPreferenceHandler::savePushPreferences)
             }
+        }
+
+    @Bean
+    fun semestersRouter() =
+        v1CoRouter {
+            GET("/semesters/status", semesterHandler::getSemesterStatus)
         }
 }
