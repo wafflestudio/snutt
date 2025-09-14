@@ -206,13 +206,14 @@ class TimetableLectureReminderNotifierServiceImpl(
         val timetableLecture =
             timetableAndReminder.timetable.lectures.find { it.id == timetableAndReminder.reminder.timetableLectureId } ?: return null
 
-        val typeString = if (timetableLecture.lectureId == null) "일정" else "수업"
-        val pushTitle = "\uD83D\uDCDA $typeString 리마인더"
+        val pushTitleType = if (timetableLecture.lectureId == null) "일정" else "강의"
+        val pushBodyType = if (timetableLecture.lectureId == null) "" else "강의"
+        val pushTitle = "\uD83D\uDCDA $pushTitleType 리마인더"
         val pushBody =
             when {
-                offsetMinutes == 0 -> "${timetableLecture.courseTitle} $typeString 시간이에요."
-                offsetMinutes > 0 -> "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 후예요."
-                else -> "${timetableLecture.courseTitle} $typeString 시작 ${-offsetMinutes}분 전이에요."
+                offsetMinutes == 0 -> "${timetableLecture.courseTitle} $pushBodyType 시간이에요."
+                offsetMinutes > 0 -> "${timetableLecture.courseTitle} $pushBodyType 시작 ${offsetMinutes}분 후예요."
+                else -> "${timetableLecture.courseTitle} $pushBodyType 시작 ${-offsetMinutes}분 전이에요."
             }
 
         return PushMessage(
