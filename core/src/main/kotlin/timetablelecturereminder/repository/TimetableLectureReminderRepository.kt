@@ -9,4 +9,6 @@ interface TimetableLectureReminderRepository :
     suspend fun findByTimetableLectureId(timetableLectureId: String): TimetableLectureReminder?
 
     suspend fun findByTimetableLectureIdIn(timetableLectureIds: List<String>): List<TimetableLectureReminder>
+
+    suspend fun deleteByTimetableLectureId(timetableLectureId: String)
 }
