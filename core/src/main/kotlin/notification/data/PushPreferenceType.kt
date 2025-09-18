@@ -6,11 +6,13 @@ enum class PushPreferenceType(
     NORMAL(true),
     LECTURE_UPDATE(true),
     VACANCY_NOTIFICATION(true),
+    DIARY(true),
 }
 
 fun PushPreferenceType(notificationType: NotificationType) =
     when (notificationType) {
         NotificationType.LECTURE_UPDATE -> PushPreferenceType.LECTURE_UPDATE
         NotificationType.LECTURE_VACANCY -> PushPreferenceType.VACANCY_NOTIFICATION
+        NotificationType.DIARY -> PushPreferenceType.DIARY
         else -> PushPreferenceType.NORMAL
     }

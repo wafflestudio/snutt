@@ -1,10 +1,13 @@
 package com.wafflestudio.snutt.diary.service
 
+import com.wafflestudio.snutt.common.cache.Cache
+import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
+import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiarySubmission
@@ -12,11 +15,18 @@ import com.wafflestudio.snutt.diary.dto.DiaryShortQuestionReply
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.repository.DiaryActivityRepository
+import com.wafflestudio.snutt.diary.repository.DiaryNotificationHistoryRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.Duration
+import java.time.Instant
 
 interface DiaryService {
     suspend fun generateQuestionnaire(
@@ -56,6 +66,8 @@ interface DiaryService {
     suspend fun addQuestion(request: DiaryAddQuestionRequestDto)
 
     suspend fun removeQuestion(questionId: String)
+
+    suspend fun sendNotifier()
 }
 
 @Service
@@ -63,8 +75,17 @@ class DiaryServiceImpl(
     private val diaryActivityRepository: DiaryActivityRepository,
     private val diaryQuestionRepository: DiaryQuestionRepository,
     private val diarySubmissionRepository: DiarySubmissionRepository,
+    private val diaryNotificationHistoryRepository: DiaryNotificationHistoryRepository,
+    private val timetableRepository: TimetableRepository,
     private val lectureService: LectureService,
+    private val cache: Cache,
 ) : DiaryService {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+    companion object {
+        const val SAMPLE_RATE = 0.2
+    }
+
     override suspend fun generateQuestionnaire(
         userId: String,
         lectureId: String,
@@ -189,5 +210,38 @@ class DiaryServiceImpl(
         val question = diaryQuestionRepository.findById(questionId) ?: return
         question.active = false
         diaryQuestionRepository.save(question)
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    override suspend fun sendNotifier() {
+        val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
+        cache.withLock(lockKey) {
+            try {
+                val currentTime = Instant.now()
+                val (currentYear, currentSemester) =
+                    SemesterUtils.getCurrentYearAndSemester(currentTime) ?: run {
+                        logger.debug("현재 진행 중인 학기가 없습니다.")
+                        return@withLock
+                    }
+                val sampledUserIdPrimaryTimetableMap =
+                    timetableRepository
+                        .samplePrimaryOfRateByYearAndSemester(SAMPLE_RATE, currentYear, currentSemester)
+                        .toList()
+                        .associateBy { it.userId }
+                val targetUserIds =
+                    diaryNotificationHistoryRepository
+                        .findAllByUserIdInAndRecentNotifiedAtBefore(
+                            sampledUserIdPrimaryTimetableMap.keys,
+                            currentTime.minusSeconds(Duration.ofDays(3).toSeconds()),
+                        ).map { it.userId }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun buildPushMessage(
+        lectureId: String,
+        lectureTitle: String,
+    ) {
     }
 }
