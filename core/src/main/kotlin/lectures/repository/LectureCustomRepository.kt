@@ -29,7 +29,7 @@ class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
     companion object {
-        private val placeRegex = """^\d+(?:-\d+)?(?:-\d+)?-[A-Z]?\d+[A-Z]?$""".toRegex()
+        private val placeRegex = """^(?:|#|\*)\d+(?:-\d+)?(?:-\d+)?-[A-Z]?\d+[A-Z]?$""".toRegex()
         private val buildingRegex = """^\d+(?:-\d+)?동$""".toRegex()
     }
 
