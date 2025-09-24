@@ -17,6 +17,7 @@ import com.wafflestudio.snutt.handler.LectureSearchHandler
 import com.wafflestudio.snutt.handler.NotificationHandler
 import com.wafflestudio.snutt.handler.PopupHandler
 import com.wafflestudio.snutt.handler.PushPreferenceHandler
+import com.wafflestudio.snutt.handler.SemesterHandler
 import com.wafflestudio.snutt.handler.StaticPageHandler
 import com.wafflestudio.snutt.handler.TagHandler
 import com.wafflestudio.snutt.handler.TimetableHandler
@@ -39,6 +40,7 @@ import com.wafflestudio.snutt.router.docs.LectureSearchDocs
 import com.wafflestudio.snutt.router.docs.NotificationDocs
 import com.wafflestudio.snutt.router.docs.PopupDocs
 import com.wafflestudio.snutt.router.docs.PushDocs
+import com.wafflestudio.snutt.router.docs.SemesterDocs
 import com.wafflestudio.snutt.router.docs.TagDocs
 import com.wafflestudio.snutt.router.docs.ThemeDocs
 import com.wafflestudio.snutt.router.docs.TimetableDocs
@@ -78,6 +80,7 @@ class MainRouter(
     private val evServiceHandler: EvServiceHandler,
     private val pushPreferenceHandler: PushPreferenceHandler,
     private val timetableLectureReminderHandler: TimetableLectureReminderHandler,
+    private val semesterHandler: SemesterHandler,
 ) {
     @Bean
     fun healthCheck() =
@@ -155,10 +158,6 @@ class MainRouter(
                 PUT("/{timetableId}/theme", timeTableHandler::modifyTimetableTheme)
                 POST("/{timetableId}/primary", timeTableHandler::setPrimary)
                 DELETE("/{timetableId}/primary", timeTableHandler::unSetPrimary)
-                GET(
-                    "/active-semester/primary/lecture/reminders",
-                    timetableLectureReminderHandler::getRemindersInActiveSemesterPrimaryTimetable,
-                )
                 "{timetableId}/lecture".nest {
                     POST("", timeTableLectureHandler::addCustomLecture)
                     POST("/{lectureId}", timeTableLectureHandler::addLecture)
@@ -168,6 +167,7 @@ class MainRouter(
                     GET("/{timetableLectureId}/reminder", timetableLectureReminderHandler::getReminder)
                     PUT("/{timetableLectureId}/reminder", timetableLectureReminderHandler::modifyReminder)
                     DELETE("/{timetableLectureId}/reminder", timetableLectureReminderHandler::deleteReminder)
+                    GET("/reminders", timetableLectureReminderHandler::getReminders)
                 }
             }
         }
@@ -387,5 +387,12 @@ class MainRouter(
                 GET("", pushPreferenceHandler::getPushPreferences)
                 POST("", pushPreferenceHandler::savePushPreferences)
             }
+        }
+
+    @Bean
+    @SemesterDocs
+    fun semestersRouter() =
+        v1CoRouter {
+            GET("/semesters/status", semesterHandler::getSemesterStatus)
         }
 }

@@ -1,18 +1,14 @@
 package com.wafflestudio.snutt.timetablelecturereminder.service
 
 import com.wafflestudio.snutt.common.exception.InvalidTimeException
-import com.wafflestudio.snutt.common.exception.PastSemesterException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
-import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
-import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 interface TimetableLectureReminderService {
     suspend fun getReminder(
@@ -40,15 +36,13 @@ class TimetableLectureReminderServiceImpl(
         timetableId: String,
         timetableLectureId: String,
     ): TimetableLectureReminder? {
-        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        validateTimetableSemester(timetable)
+        if (timetableRepository.existsById(timetableId).not()) throw TimetableNotFoundException
         val reminder = timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)
         return reminder
     }
 
     override suspend fun getReminders(timetableId: String): List<TimetableLectureReminder> {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        validateTimetableSemester(timetable)
         val reminders = timetableLectureReminderRepository.findByTimetableLectureIdIn(timetable.lectures.map { it.id })
         return reminders
     }
@@ -59,7 +53,6 @@ class TimetableLectureReminderServiceImpl(
         offsetMinutes: Int,
     ): TimetableLectureReminder {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        validateTimetableSemester(timetable)
         val timetableLecture =
             timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
@@ -86,13 +79,6 @@ class TimetableLectureReminderServiceImpl(
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId) ?: return
         timetableLectureReminderRepository.delete(reminder)
-    }
-
-    private fun validateTimetableSemester(timetable: Timetable) {
-        val (activeYear, activeSemester) = SemesterUtils.getCurrentOrNextYearAndSemester(Instant.now())
-        if (timetable.year < activeYear || (timetable.year == activeYear && timetable.semester < activeSemester)) {
-            throw PastSemesterException
-        }
     }
 
     @EventListener

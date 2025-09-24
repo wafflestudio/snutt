@@ -4,8 +4,8 @@ import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.push.dto.PushMessage
-import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.notification.service.PushService
+import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
@@ -28,6 +28,7 @@ class TimetableLectureReminderNotifierServiceImpl(
     private val timetableLectureReminderRepository: TimetableLectureReminderRepository,
     private val timetableRepository: TimetableRepository,
     private val pushService: PushService,
+    private val semesterService: SemesterService,
 ) : TimetableLectureReminderNotifierService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -44,7 +45,7 @@ class TimetableLectureReminderNotifierServiceImpl(
                 logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
                 val currentTime = Instant.now()
                 val (currentYear, currentSemester) =
-                    SemesterUtils.getCurrentYearAndSemester(currentTime) ?: run {
+                    semesterService.getCurrentYearAndSemester(currentTime) ?: run {
                         logger.debug("현재 진행 중인 학기가 없습니다.")
                         return@withLock
                     }
