@@ -117,9 +117,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = originalLecture.categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
-        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
-        return updatedTimetable
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture).also {
+            eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        }
     }
 
     override suspend fun modifyTimetableLecture(
@@ -149,9 +149,9 @@ class TimetableLectureServiceImpl(
             categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
-        val updatedTimetable = timetableRepository.updateTimetableLecture(timetableId, timetableLecture)
-        eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
-        return updatedTimetable
+        return timetableRepository.updateTimetableLecture(timetableId, timetableLecture).also {
+            eventPublisher.publishEvent(TimetableLectureModifiedEvent(timetableLecture))
+        }
     }
 
     override suspend fun deleteTimetableLecture(

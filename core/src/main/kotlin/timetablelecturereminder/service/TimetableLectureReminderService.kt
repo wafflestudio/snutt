@@ -98,14 +98,14 @@ class TimetableLectureReminderServiceImpl(
     @EventListener
     suspend fun handleTimetableLectureModifiedEvent(event: TimetableLectureModifiedEvent) {
         val modifiedTimetableLecture = event.timetableLecture
+        if (modifiedTimetableLecture.classPlaceAndTimes.isEmpty()) { // 강의의 시간을 없애면 리마인더도 없앤다.
+            timetableLectureReminderRepository.deleteByTimetableLectureId(modifiedTimetableLecture.id)
+            return
+        }
+
         val reminder =
             timetableLectureReminderRepository.findByTimetableLectureId(modifiedTimetableLecture.id)
                 ?: return
-
-        if (modifiedTimetableLecture.classPlaceAndTimes.isEmpty()) { // 강의의 시간을 없애면 리마인더도 없앤다.
-            timetableLectureReminderRepository.delete(reminder)
-            return
-        }
 
         val existingSchedulesMap =
             reminder.schedules.associateBy { it.day to it.minute }
@@ -120,6 +120,7 @@ class TimetableLectureReminderServiceImpl(
                 val existingSchedule = existingSchedulesMap[newSchedule.day to newSchedule.minute]
                 existingSchedule ?: newSchedule // 이미 알림을 보낸 schedule의 recentNotifiedAt은 유지하고, 새로 추가된 schedule에 대해서는 null로 설정
             }
+        if (newSchedules == reminder.schedules) return
         timetableLectureReminderRepository.save(reminder.copy(schedules = newSchedules))
     }
 }
