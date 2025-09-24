@@ -54,7 +54,7 @@ class SemesterServiceImpl : SemesterService {
             }
 
     override fun getCurrentYearAndSemester(currentTime: Instant): YearAndSemester? {
-        val currentDate = currentTime.atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
+        val currentDate = currentTime.atZone(KST).toLocalDate()
         return generateSemesterSequence(currentDate.year - 1)
             .takeWhile { currentDate >= it.startDate }
             .firstOrNull { currentDate in it.startDate..it.endDate }
@@ -62,9 +62,13 @@ class SemesterServiceImpl : SemesterService {
     }
 
     override fun getNextYearAndSemester(currentTime: Instant): YearAndSemester {
-        val currentDate = currentTime.atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
+        val currentDate = currentTime.atZone(KST).toLocalDate()
         return generateSemesterSequence(currentDate.year)
             .first { currentDate < it.startDate }
             .let { YearAndSemester(year = it.year, semester = it.semester) }
+    }
+
+    companion object {
+        private val KST = ZoneId.of("Asia/Seoul")
     }
 }
