@@ -20,6 +20,7 @@ import com.wafflestudio.snutt.diary.repository.DiaryActivityRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
@@ -245,7 +246,7 @@ class DiaryServiceImpl(
                         buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
                     }
 
-                pushService.sendTargetPushes(targetedPushMessages)
+                pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
             } catch (e: Exception) {
                 logger.error("강의 일기장 알림 전송 중 문제 발생", e)
             }
