@@ -139,7 +139,7 @@ class FriendServiceImpl(
             PushMessage(
                 title = "친구 요청",
                 body = "'$fromUserNickname'님의 친구 요청을 수락하고 서로의 대표 시간표를 확인해보세요!",
-                urlScheme = DeeplinkType.FRIENDS,
+                urlScheme = DeeplinkType.FRIENDS.build(),
             )
         pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.FRIEND, toUserId)
     }
@@ -170,7 +170,7 @@ class FriendServiceImpl(
             PushMessage(
                 title = "친구 요청 수락",
                 body = "'$toUserNickname'님과 친구가 되었어요.",
-                urlScheme = DeeplinkType.FRIENDS,
+                urlScheme = DeeplinkType.FRIENDS.build(),
             )
         pushWithNotificationService.sendPushAndNotification(pushMessage, NotificationType.FRIEND, fromUserId)
     }
