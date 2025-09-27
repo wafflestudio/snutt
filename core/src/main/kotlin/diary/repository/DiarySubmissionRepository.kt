@@ -1,18 +1,15 @@
 package com.wafflestudio.snutt.diary.repository
 
-import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import java.time.Instant
 
 interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, String> {
-    suspend fun findAllByUserIdAndYearAndSemesterOrderByCreatedAtDesc(
-        userId: String,
-        year: Int,
-        semester: Semester,
-    ): List<DiarySubmission>
+    suspend fun findAllByUserIdOrderByCreatedAtDesc(userId: String): List<DiarySubmission>
 
-    suspend fun findAllByUserIdAndLectureIdOrderByCreatedAtDesc(
+    suspend fun findAllByUserIdAndLectureIdAndCreatedAtAfterOrderByCreatedAtDesc(
         userId: String,
         lectureId: String,
+        createdAt: Instant,
     ): List<DiarySubmission>
 }

@@ -1,10 +1,8 @@
 package com.wafflestudio.snutt.handler
 
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.common.enum.Semester
-import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
-import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
+import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
@@ -26,23 +24,28 @@ class DiaryHandler(
             val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            diaryService.generateQuestionnaire(userId, body.lectureId, body.activities).map {
-                DiaryQuestionDto(it)
-            }
+            DiaryQuestionnaireDto(diaryService.generateQuestionnaire(userId, body.lectureId, body.activities))
         }
 
     suspend fun getMySubmissions(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
-            val year = req.pathVariable("year").toInt()
-            val semester =
-                Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
-            val submissions = diaryService.getMySubmissions(userId, year, semester)
+            val submissions = diaryService.getMySubmissions(userId)
             val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
 
-            submissions.map { submission ->
-                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
-            }
+            submissions
+                .groupBy { submission ->
+                    submission.year
+                }.mapValues {
+                    it.value
+                        .groupBy { submission ->
+                            submission.semester.value
+                        }.mapValues { it2 ->
+                            it2.value.map { submission ->
+                                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
+                            }
+                        }
+                }
         }
 
     suspend fun getActivities(req: ServerRequest) =
