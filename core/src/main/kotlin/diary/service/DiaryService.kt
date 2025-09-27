@@ -259,7 +259,7 @@ class DiaryServiceImpl(
         PushMessage(
             title = "이번주 강의일기를 작성해보세요.",
             body = "최근 수강한 <$courseTitle> 강의에 대한 강의일기를 작성해보세요.\uD83D\uDCD4 ",
-            urlScheme = DeeplinkType.DIARY,
+            urlScheme = DeeplinkType.DIARY.build(lectureId),
             isUrgentOnAndroid = false,
         )
 }
