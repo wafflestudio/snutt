@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.common.push.dto
 
-import com.wafflestudio.snutt.common.push.DeeplinkType
+import com.wafflestudio.snutt.common.push.Deeplink
 import com.wafflestudio.snutt.notification.data.Notification
 import com.wafflestudio.snutt.notification.data.NotificationType
 
@@ -30,7 +30,7 @@ data class TargetedPushMessageWithTopic(
 data class PushMessage(
     val title: String,
     val body: String,
-    val urlScheme: DeeplinkType? = null,
+    val urlScheme: Deeplink? = null,
     val data: Data = Data(emptyMap()),
     val isUrgentOnAndroid: Boolean = false, // true라면 안드로이드 doze 모드(배터리 절약 모드) 중에 기기를 깨우고 정확한 알림을 보낸다
 ) {
@@ -47,7 +47,7 @@ data class PushMessage(
             title = title,
             message = body,
             type = notificationType,
-            deeplink = urlScheme?.build()?.value,
+            deeplink = urlScheme?.value,
         )
 }
 

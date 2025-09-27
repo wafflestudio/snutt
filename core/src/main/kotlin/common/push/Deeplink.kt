@@ -2,6 +2,11 @@ package com.wafflestudio.snutt.common.push
 
 import com.wafflestudio.snutt.config.PhaseUtils
 
+@JvmInline
+value class Deeplink(
+    val value: String,
+)
+
 enum class DeeplinkType(
     private val url: String,
 ) {
@@ -10,6 +15,7 @@ enum class DeeplinkType(
     FRIENDS("friends?openDrawer=true"),
     TIMETABLE_LECTURE("timetable-lecture?timetableId=%s&lectureId=%s"),
     BOOKMARKS("bookmarks?year=%s&semester=%s&lectureId=%s"),
+    DIARY("diary?timetableId=%s&lectureId=%s"),
     ;
 
     fun build(
@@ -27,9 +33,4 @@ enum class DeeplinkType(
 
         return Deeplink("$fullScheme?referrer=$referrer")
     }
-
-    @JvmInline
-    value class Deeplink(
-        val value: String,
-    )
 }
