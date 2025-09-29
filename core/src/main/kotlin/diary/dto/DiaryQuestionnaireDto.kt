@@ -6,6 +6,7 @@ data class DiaryQuestionnaireDto(
     val lectureTitle: String,
     val questions: List<DiaryQuestionDto>,
     val nextLectureId: String,
+    val nextLectureTitle: String,
 )
 
 fun DiaryQuestionnaireDto(diaryQuestionnaire: DiaryQuestionnaire) =
@@ -16,4 +17,5 @@ fun DiaryQuestionnaireDto(diaryQuestionnaire: DiaryQuestionnaire) =
                 DiaryQuestionDto(it)
             },
         nextLectureId = diaryQuestionnaire.nextLectureId,
+        nextLectureTitle = diaryQuestionnaire.nextLectureTitle,
     )

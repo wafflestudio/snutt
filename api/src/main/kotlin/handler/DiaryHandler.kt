@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
+import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryService
@@ -35,17 +36,17 @@ class DiaryHandler(
 
             submissions
                 .groupBy { submission ->
-                    submission.year
-                }.mapValues {
-                    it.value
-                        .groupBy { submission ->
-                            submission.semester.value
-                        }.mapValues { it2 ->
-                            it2.value.map { submission ->
-                                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
-                            }
-                        }
-                }
+                    submission.year to submission.semester
+                }.map {
+                    DiarySubmissionsOfYearSemesterDto(
+                        year = it.key.first,
+                        semester = it.key.second.value,
+                        submissions =
+                            it.value.map { submission ->
+                                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id]!!)
+                            },
+                    )
+                }.sortedWith(compareByDescending<DiarySubmissionsOfYearSemesterDto> { it.year }.thenByDescending { it.semester })
         }
 
     suspend fun getActivities(req: ServerRequest) =

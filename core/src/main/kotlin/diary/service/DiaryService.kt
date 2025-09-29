@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.time.Duration
 import java.time.Instant
 
 interface DiaryService {
@@ -91,16 +90,8 @@ class DiaryServiceImpl(
         lectureId: String,
         activityNames: List<String>,
     ): DiaryQuestionnaire {
-        val activityIds = diaryActivityRepository.findByNameIn(activityNames).map { it.id!! }
-        val availableQuestions = diaryQuestionRepository.findByTargetActivityIdsContainsAndActiveTrue(activityIds)
-        val recentlyAnsweredQuestionIds =
-            diarySubmissionRepository
-                .findAllByUserIdAndLectureIdAndCreatedAtAfterOrderByCreatedAtDesc(
-                    userId,
-                    lectureId,
-                    Instant.now().minus(Duration.ofDays(14)),
-                ).flatMap { submission -> submission.questionAnswers.map { it.questionId } }
-
+        val activityIds = diaryActivityRepository.findAllByNameIn(activityNames).map { it.id!! }
+        val availableQuestions = diaryQuestionRepository.findByTargetActivityIdsInAndActiveTrue(activityIds)
         val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
 
         val userTimetable =
@@ -108,19 +99,18 @@ class DiaryServiceImpl(
                 ?: throw TimetableNotFoundException
 
         val nextLectureCandidates = userTimetable.lectures.filterNot { it.lectureId == lectureId }
-        val nextLecture = nextLectureCandidates.random()
+        val nextLecture = nextLectureCandidates.randomOrNull()
 
         val questions =
             availableQuestions
-                .filterNot { question -> question.id in recentlyAnsweredQuestionIds }
                 .shuffled()
                 .take(3)
 
         return DiaryQuestionnaire(
             lectureTitle = lecture.courseTitle,
             questions = questions,
-            nextLectureId = nextLecture.lectureId!!,
-            nextLectureTitle = nextLecture.courseTitle,
+            nextLectureId = nextLecture?.lectureId,
+            nextLectureTitle = nextLecture?.courseTitle,
         )
     }
 
@@ -135,7 +125,7 @@ class DiaryServiceImpl(
         request: DiarySubmissionRequestDto,
     ) {
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
-        val activities = diaryActivityRepository.findByNameIn(request.activities)
+        val activities = diaryActivityRepository.findAllByNameIn(request.activities)
         val questionIds = request.questionAnswers.map { it.questionId }
         if (diaryQuestionRepository.countByIdIn(questionIds) != questionIds.size) {
             throw DiaryQuestionNotFoundException
@@ -203,7 +193,7 @@ class DiaryServiceImpl(
     }
 
     override suspend fun addQuestion(request: DiaryAddQuestionRequestDto) {
-        val targetActivityIds = diaryActivityRepository.findByNameIn(request.targetActivities).mapNotNull { it.id }
+        val targetActivityIds = diaryActivityRepository.findAllByNameIn(request.targetActivities).mapNotNull { it.id }
         if (targetActivityIds.size != request.targetActivities.size) {
             throw DiaryActivityNotFoundException
         }
@@ -224,7 +214,7 @@ class DiaryServiceImpl(
         diaryQuestionRepository.save(question)
     }
 
-    @Scheduled(cron = "0 0 18 * * MON")
+    @Scheduled(cron = "0 0 19 * * MON,WED,FRI")
     override suspend fun sendNotifier() {
         val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
         cache.withLock(lockKey) {
@@ -239,12 +229,14 @@ class DiaryServiceImpl(
                     timetableRepository
                         .samplePrimaryOfRateByYearAndSemester(SAMPLE_RATE, currentYear, currentSemester)
                         .toList()
+                        .filter { it.lectures.size > 2 }
                         .associateBy { it.userId }
                 val targetedPushMessages =
-                    sampledUserIdPrimaryTimetableMap.mapValues {
-                        val targetLecture = it.value.lectures.random()
-                        buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
-                    }
+                    sampledUserIdPrimaryTimetableMap
+                        .mapNotNull {
+                            val targetLecture = it.value.lectures.randomOrNull() ?: return@mapNotNull null
+                            it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
+                        }.toMap()
 
                 pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
             } catch (e: Exception) {

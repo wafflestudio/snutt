@@ -2,8 +2,8 @@ package com.wafflestudio.snutt.router.docs
 
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
-import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
-import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
+import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
+import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import io.swagger.v3.oas.annotations.Operation
@@ -28,7 +28,11 @@ import org.springframework.web.bind.annotation.RequestMethod
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiarySubmissionSummaryDto::class)))],
+                        content = [
+                            Content(
+                                array = ArraySchema(schema = Schema(implementation = DiarySubmissionsOfYearSemesterDto::class)),
+                            ),
+                        ],
                     ),
                 ],
             ),
@@ -53,7 +57,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryQuestionDto::class)))],
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryQuestionnaireDto::class)))],
                     ),
                 ],
             ),
