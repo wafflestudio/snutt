@@ -5,8 +5,8 @@ import com.wafflestudio.snutt.diary.data.DiaryQuestionnaire
 data class DiaryQuestionnaireDto(
     val lectureTitle: String,
     val questions: List<DiaryQuestionDto>,
-    val nextLectureId: String,
-    val nextLectureTitle: String,
+    val nextLectureId: String?,
+    val nextLectureTitle: String?,
 )
 
 fun DiaryQuestionnaireDto(diaryQuestionnaire: DiaryQuestionnaire) =
