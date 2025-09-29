@@ -7,6 +7,8 @@ import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -94,6 +96,22 @@ import org.springframework.web.bind.annotation.RequestMethod
                         ],
                         required = true,
                     ),
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
+            ),
+    ),
+    RouterOperation(
+        path = "/v1/diary/{id}",
+        method = [RequestMethod.DELETE],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        operation =
+            Operation(
+                operationId = "removeDiarySubmission",
+                parameters = [Parameter(`in` = ParameterIn.PATH, name = "id", required = true)],
                 responses = [
                     ApiResponse(
                         responseCode = "200",
