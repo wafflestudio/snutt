@@ -447,7 +447,7 @@ import timetables.dto.TimetableBriefDto
                 requestBody =
                     RequestBody(
                         required = true,
-                        description = "강의 리마인더 설정 옵션 (없음, 10분전, 0분, 10분후)",
+                        description = "강의 리마인더 설정 옵션 (NONE, BEFORE_TEN_MINUTES, ZERO_MINUTE, AFTER_TEN_MINUTES)",
                         content = [
                             Content(
                                 schema = Schema(implementation = TimetableLectureReminderModifyRequestDto::class),

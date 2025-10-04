@@ -5,7 +5,7 @@ enum class TimetableLectureReminderOption(
 ) {
     NONE(null),
     TEN_MINUTES_BEFORE(-10),
-    ZERO_MINUTES(0),
+    ZERO_MINUTE(0),
     TEN_MINUTES_AFTER(10),
     ;
 
@@ -14,7 +14,7 @@ enum class TimetableLectureReminderOption(
             when (offsetMinutes) {
                 null -> NONE
                 -10 -> TEN_MINUTES_BEFORE
-                0 -> ZERO_MINUTES
+                0 -> ZERO_MINUTE
                 10 -> TEN_MINUTES_AFTER
                 else -> throw IllegalArgumentException("Invalid offsetMinutes: $offsetMinutes")
             }
