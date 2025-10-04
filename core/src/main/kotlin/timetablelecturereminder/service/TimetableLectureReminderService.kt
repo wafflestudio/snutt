@@ -3,7 +3,9 @@ package com.wafflestudio.snutt.timetablelecturereminder.service
 import com.wafflestudio.snutt.common.exception.InvalidTimeException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
+import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
+import com.wafflestudio.snutt.timetablelecturereminder.dto.TimetableLectureReminderOption
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
 import com.wafflestudio.snutt.timetables.event.data.TimetableLectureModifiedEvent
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
@@ -14,17 +16,15 @@ interface TimetableLectureReminderService {
     suspend fun getReminder(
         timetableId: String,
         timetableLectureId: String,
-    ): TimetableLectureReminder?
+    ): TimetableLectureAndReminder
 
-    suspend fun getReminders(timetableId: String): List<TimetableLectureReminder>
+    suspend fun getReminders(timetableId: String): List<TimetableLectureAndReminder>
 
     suspend fun modifyReminder(
         timetableId: String,
         timetableLectureId: String,
-        offsetMinutes: Int,
-    ): TimetableLectureReminder
-
-    suspend fun deleteReminder(timetableLectureId: String)
+        option: TimetableLectureReminderOption,
+    ): TimetableLectureAndReminder
 }
 
 @Service
@@ -35,29 +35,53 @@ class TimetableLectureReminderServiceImpl(
     override suspend fun getReminder(
         timetableId: String,
         timetableLectureId: String,
-    ): TimetableLectureReminder? {
-        if (timetableRepository.existsById(timetableId).not()) throw TimetableNotFoundException
+    ): TimetableLectureAndReminder {
+        val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        val lecture =
+            timetable.lectures.find { it.id == timetableLectureId }
+                ?: throw TimetableLectureNotFoundException
         val reminder = timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId)
-        return reminder
+
+        return TimetableLectureAndReminder(
+            timetableLecture = lecture,
+            reminder = reminder,
+        )
     }
 
-    override suspend fun getReminders(timetableId: String): List<TimetableLectureReminder> {
+    override suspend fun getReminders(timetableId: String): List<TimetableLectureAndReminder> {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         val reminders = timetableLectureReminderRepository.findByTimetableLectureIdIn(timetable.lectures.map { it.id })
-        return reminders
+        val reminderMap = reminders.associateBy { it.timetableLectureId }
+
+        return timetable.lectures.map { lecture ->
+            TimetableLectureAndReminder(
+                timetableLecture = lecture,
+                reminder = reminderMap[lecture.id],
+            )
+        }
     }
 
     override suspend fun modifyReminder(
         timetableId: String,
         timetableLectureId: String,
-        offsetMinutes: Int,
-    ): TimetableLectureReminder {
+        option: TimetableLectureReminderOption,
+    ): TimetableLectureAndReminder {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
         val timetableLecture =
             timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
         if (timetableLecture.classPlaceAndTimes.isEmpty()) throw InvalidTimeException
 
+        // '없음' 옵션인 경우 기존 리마인더 삭제
+        if (option == TimetableLectureReminderOption.NONE) {
+            timetableLectureReminderRepository.deleteByTimetableLectureId(timetableLecture.id)
+            return TimetableLectureAndReminder(
+                timetableLecture = timetableLecture,
+                reminder = null,
+            )
+        }
+
+        val offsetMinutes = option.offsetMinutes!!
         val schedules =
             timetableLecture.classPlaceAndTimes.map {
                 TimetableLectureReminder.Schedule(it.day, it.startMinute).plusMinutes(offsetMinutes)
@@ -72,13 +96,10 @@ class TimetableLectureReminderServiceImpl(
                 offsetMinutes = offsetMinutes,
                 schedules = schedules,
             )
-        return timetableLectureReminderRepository.save(reminder)
-    }
-
-    override suspend fun deleteReminder(timetableLectureId: String) {
-        val reminder =
-            timetableLectureReminderRepository.findByTimetableLectureId(timetableLectureId) ?: return
-        timetableLectureReminderRepository.delete(reminder)
+        return TimetableLectureAndReminder(
+            timetableLecture = timetableLecture,
+            reminder = timetableLectureReminderRepository.save(reminder),
+        )
     }
 
     @EventListener

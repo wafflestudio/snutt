@@ -18,13 +18,19 @@ class TimetableLectureReminderHandler(
         handle(req) {
             val timetableId = req.pathVariable("timetableId")
             val timetableLectureId = req.pathVariable("timetableLectureId")
-            timetableLectureReminderService.getReminder(timetableId, timetableLectureId)?.let(::TimetableLectureReminderDto)
+
+            timetableLectureReminderService
+                .getReminder(timetableId, timetableLectureId)
+                .let(::TimetableLectureReminderDto)
         }
 
     suspend fun getReminders(req: ServerRequest): ServerResponse =
         handle(req) {
             val timetableId = req.pathVariable("timetableId")
-            timetableLectureReminderService.getReminders(timetableId).map(::TimetableLectureReminderDto)
+
+            timetableLectureReminderService
+                .getReminders(timetableId)
+                .map(::TimetableLectureReminderDto)
         }
 
     suspend fun modifyReminder(req: ServerRequest): ServerResponse =
@@ -32,17 +38,12 @@ class TimetableLectureReminderHandler(
             val timetableId = req.pathVariable("timetableId")
             val timetableLectureId = req.pathVariable("timetableLectureId")
             val body = req.awaitBody<TimetableLectureReminderModifyRequestDto>()
+
             timetableLectureReminderService
                 .modifyReminder(
                     timetableId,
                     timetableLectureId,
-                    body.offsetMinutes,
+                    body.option,
                 ).let(::TimetableLectureReminderDto)
-        }
-
-    suspend fun deleteReminder(req: ServerRequest): ServerResponse =
-        handle(req) {
-            val timetableLectureId = req.pathVariable("timetableLectureId")
-            timetableLectureReminderService.deleteReminder(timetableLectureId)
         }
 }
