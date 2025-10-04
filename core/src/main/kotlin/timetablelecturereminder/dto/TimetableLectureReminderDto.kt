@@ -1,16 +1,19 @@
 package com.wafflestudio.snutt.timetablelecturereminder.dto
 
-import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
+import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureAndReminder
 
 data class TimetableLectureReminderDto(
-    val id: String,
     val timetableLectureId: String,
-    val offsetMinutes: Int,
+    val courseTitle: String,
+    val option: TimetableLectureReminderOption,
 )
 
-fun TimetableLectureReminderDto(timetableLectureReminder: TimetableLectureReminder): TimetableLectureReminderDto =
+fun TimetableLectureReminderDto(timetableLectureAndReminder: TimetableLectureAndReminder): TimetableLectureReminderDto =
     TimetableLectureReminderDto(
-        id = timetableLectureReminder.id!!,
-        timetableLectureId = timetableLectureReminder.timetableLectureId,
-        offsetMinutes = timetableLectureReminder.offsetMinutes,
+        timetableLectureId = timetableLectureAndReminder.timetableLecture.id,
+        courseTitle = timetableLectureAndReminder.timetableLecture.courseTitle,
+        option =
+            timetableLectureAndReminder.reminder?.let {
+                TimetableLectureReminderOption.fromOffsetMinutes(it.offsetMinutes)
+            } ?: TimetableLectureReminderOption.NONE,
     )
