@@ -447,7 +447,7 @@ import timetables.dto.TimetableBriefDto
                 requestBody =
                     RequestBody(
                         required = true,
-                        description = "강의 시작 시각으로부터 알림을 받을 시간의 오프셋(분)",
+                        description = "강의 리마인더 설정 옵션 (NONE, BEFORE_TEN_MINUTES, ZERO_MINUTE, AFTER_TEN_MINUTES)",
                         content = [
                             Content(
                                 schema = Schema(implementation = TimetableLectureReminderModifyRequestDto::class),
@@ -458,33 +458,6 @@ import timetables.dto.TimetableBriefDto
                     ApiResponse(
                         responseCode = "200",
                         content = [Content(schema = Schema(implementation = TimetableLectureReminderDto::class))],
-                    ),
-                ],
-            ),
-    ),
-    RouterOperation(
-        path = "/v1/tables/{timetableId}/lecture/{timetableLectureId}/reminder",
-        method = [RequestMethod.DELETE],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation =
-            Operation(
-                operationId = "deleteReminder",
-                parameters = [
-                    Parameter(
-                        `in` = ParameterIn.PATH,
-                        name = "timetableId",
-                        required = true,
-                    ),
-                    Parameter(
-                        `in` = ParameterIn.PATH,
-                        name = "timetableLectureId",
-                        required = true,
-                    ),
-                ],
-                responses = [
-                    ApiResponse(
-                        responseCode = "200",
-                        content = [Content(schema = Schema(implementation = Unit::class))],
                     ),
                 ],
             ),

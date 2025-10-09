@@ -166,7 +166,6 @@ class MainRouter(
                     DELETE("/{timetableLectureId}", timeTableLectureHandler::deleteTimetableLecture)
                     GET("/{timetableLectureId}/reminder", timetableLectureReminderHandler::getReminder)
                     PUT("/{timetableLectureId}/reminder", timetableLectureReminderHandler::modifyReminder)
-                    DELETE("/{timetableLectureId}/reminder", timetableLectureReminderHandler::deleteReminder)
                     GET("/reminders", timetableLectureReminderHandler::getReminders)
                 }
             }
