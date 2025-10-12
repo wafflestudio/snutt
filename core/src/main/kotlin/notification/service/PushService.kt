@@ -110,9 +110,11 @@ class PushServiceImpl internal constructor(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
     ) {
+        val userPushPreferenceEnabled = pushPreferenceService.isPushPreferenceEnabled(userToPushMessage.keys.toList(), pushPreferenceType)
+
         val filteredUserToPushMessage =
             userToPushMessage.filterKeys { userId ->
-                pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)
+                userPushPreferenceEnabled[userId] ?: pushPreferenceType.isEnabledByDefault
             }
 
         if (filteredUserToPushMessage.isNotEmpty()) {
