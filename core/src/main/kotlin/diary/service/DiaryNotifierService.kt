@@ -9,11 +9,10 @@ import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.toList
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
-import org.slf4j.LoggerFactory
-
 
 interface DiaryNotifierService {
     suspend fun sendNotifier()
@@ -25,7 +24,7 @@ class DiaryNotifierServiceImpl(
     private val semesterService: SemesterService,
     private val pushService: PushService,
     private val cache: Cache,
-    ): DiaryNotifierService {
+) : DiaryNotifierService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {

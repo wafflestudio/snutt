@@ -1,14 +1,11 @@
 package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.cache.Cache
-import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
-import com.wafflestudio.snutt.common.push.DeeplinkType
-import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.diary.data.DiaryActivity
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiaryQuestionnaire
@@ -20,14 +17,11 @@ import com.wafflestudio.snutt.diary.repository.DiaryActivityRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
-import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.toList
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.time.LocalDateTime
 
 interface DiaryService {
@@ -90,10 +84,12 @@ class DiaryServiceImpl(
             timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, lecture.year, lecture.semester)
                 ?: throw TimetableNotFoundException
 
-        val recentlySubmittedIds = diarySubmissionRepository.findAllByUserIdAndCreatedAtIsAfter(
-            userId,
-            LocalDateTime.now().minusDays(1)
-        ).map { it.lectureId }
+        val recentlySubmittedIds =
+            diarySubmissionRepository
+                .findAllByUserIdAndCreatedAtIsAfter(
+                    userId,
+                    LocalDateTime.now().minusDays(1),
+                ).map { it.lectureId }
         val nextLectureCandidates =
             userTimetable.lectures.filterNot { it.lectureId == lectureId || recentlySubmittedIds.contains(it.lectureId) }
         val nextLecture = nextLectureCandidates.randomOrNull()
@@ -151,7 +147,8 @@ class DiaryServiceImpl(
         submissionId: String,
         userId: String,
     ) {
-        diarySubmissionRepository.findById(submissionId)
+        diarySubmissionRepository
+            .findById(submissionId)
             ?.takeIf { it.userId == userId } ?: throw DiarySubmissionNotFoundException
 
         diarySubmissionRepository.deleteById(submissionId)
