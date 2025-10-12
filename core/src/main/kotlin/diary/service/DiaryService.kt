@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.time.LocalDateTime
 
 interface DiaryService {
     suspend fun generateQuestionnaire(
@@ -98,7 +99,9 @@ class DiaryServiceImpl(
             timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, lecture.year, lecture.semester)
                 ?: throw TimetableNotFoundException
 
-        val nextLectureCandidates = userTimetable.lectures.filterNot { it.lectureId == lectureId }
+        val recentlySubmittedIds = diarySubmissionRepository.findAllByUserIdAndCreatedAtIsAfter(userId,
+            LocalDateTime.now().minusDays(1)).map { it.lectureId }
+        val nextLectureCandidates = userTimetable.lectures.filterNot { it.lectureId == lectureId || recentlySubmittedIds.contains(it.lectureId) }
         val nextLecture = nextLectureCandidates.randomOrNull()
 
         val questions =
