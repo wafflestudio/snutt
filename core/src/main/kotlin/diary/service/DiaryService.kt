@@ -154,12 +154,10 @@ class DiaryServiceImpl(
         submissionId: String,
         userId: String,
     ) {
-        val submission = diarySubmissionRepository.findById(submissionId)
-        if (submission?.userId == userId) {
-            diarySubmissionRepository.deleteById(submissionId)
-        } else {
-            throw DiarySubmissionNotFoundException
-        }
+        diarySubmissionRepository.findById(submissionId)
+            ?.takeIf { it.userId == userId } ?: throw DiarySubmissionNotFoundException
+
+        diarySubmissionRepository.deleteById(submissionId)
     }
 
     override suspend fun getSubmissionIdShortQuestionRepliesMap(
@@ -214,7 +212,7 @@ class DiaryServiceImpl(
         diaryQuestionRepository.save(question)
     }
 
-    @Scheduled(cron = "0 0 19 * * MON,WED,FRI")
+    @Scheduled(cron = "0 0 19 * * MON,WED,FRI", zone = "Asia/Seoul")
     override suspend fun sendNotifier() {
         val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
         cache.withLock(lockKey) {
