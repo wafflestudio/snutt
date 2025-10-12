@@ -8,9 +8,7 @@ import com.wafflestudio.snutt.common.extension.regex
 import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.bson.types.ObjectId
 import org.springframework.data.mapping.toDotPath
@@ -72,8 +70,8 @@ interface TimetableCustomRepository {
         title: String,
     ): Timetable?
 
-    suspend fun samplePrimaryOfRateByYearAndSemester(
-        rate: Double,
+    suspend fun samplePrimaryOfSizeByYearAndSemester(
+        size: Long,
         year: Int,
         semester: Semester,
     ): Flow<Timetable>
@@ -206,17 +204,12 @@ class TimetableCustomRepositoryImpl(
                 Timetable::class.java,
             ).awaitSingleOrNull()
 
-    override suspend fun samplePrimaryOfRateByYearAndSemester(
-        rate: Double,
+    override suspend fun samplePrimaryOfSizeByYearAndSemester(
+        size: Long,
         year: Int,
         semester: Semester,
     ): Flow<Timetable> {
-        val criteria = Timetable::year isEqualTo year and Timetable::semester isEqualTo semester
-        val totalCount = reactiveMongoTemplate.count(Query(criteria), Timetable::class.java).awaitSingle()
-        val size = (totalCount * rate).toLong()
-        if (size == 0L) {
-            return emptyFlow()
-        }
+        val criteria = Timetable::year isEqualTo year and Timetable::semester isEqualTo semester and Timetable::isPrimary isEqualTo true
 
         val aggregation =
             TypedAggregation.newAggregation(

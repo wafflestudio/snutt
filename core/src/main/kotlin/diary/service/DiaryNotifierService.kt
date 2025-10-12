@@ -42,9 +42,10 @@ class DiaryNotifierServiceImpl(
                         logger.debug("현재 진행 중인 학기가 없습니다.")
                         return@withLock
                     }
+                val totalCount = timetableRepository.countAllByIsPrimaryTrueAndYearAndSemester(currentYear, currentSemester)
                 val sampledUserIdPrimaryTimetableMap =
                     timetableRepository
-                        .samplePrimaryOfRateByYearAndSemester(SAMPLE_RATE, currentYear, currentSemester)
+                        .samplePrimaryOfSizeByYearAndSemester((totalCount * SAMPLE_RATE).toLong(), currentYear, currentSemester)
                         .toList()
                         .filter { it.lectures.size > 2 }
                         .associateBy { it.userId }
