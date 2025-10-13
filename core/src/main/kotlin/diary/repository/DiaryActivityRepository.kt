@@ -8,5 +8,5 @@ interface DiaryActivityRepository : CoroutineCrudRepository<DiaryActivity, Strin
 
     suspend fun findByName(name: String): DiaryActivity?
 
-    suspend fun findByNameIn(names: List<String>): List<DiaryActivity>
+    suspend fun findAllByNameIn(names: List<String>): List<DiaryActivity>
 }

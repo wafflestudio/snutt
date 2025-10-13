@@ -4,6 +4,8 @@ import com.wafflestudio.snutt.diary.data.DiarySubmission
 import java.time.LocalDateTime
 
 data class DiarySubmissionSummaryDto(
+    val id: String,
+    val lectureId: String,
     val date: LocalDateTime,
     val lectureTitle: String,
     val shortQuestionReplies: List<DiaryShortQuestionReply>,
@@ -20,6 +22,8 @@ fun DiarySubmissionSummaryDto(
     shortQuestionReplies: List<DiaryShortQuestionReply>,
 ): DiarySubmissionSummaryDto =
     DiarySubmissionSummaryDto(
+        id = submission.id!!,
+        lectureId = submission.lectureId,
         date = submission.createdAt,
         lectureTitle = submission.courseTitle,
         shortQuestionReplies = shortQuestionReplies,

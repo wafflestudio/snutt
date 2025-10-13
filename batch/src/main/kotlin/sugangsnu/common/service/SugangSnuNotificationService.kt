@@ -73,7 +73,7 @@ class SugangSnuNotificationServiceImpl(
                     PushMessage(
                         title = "수강편람 업데이트",
                         body = messageBody,
-                        urlScheme = DeeplinkType.NOTIFICATIONS,
+                        urlScheme = DeeplinkType.NOTIFICATIONS.build(),
                     )
                 }
             pushService.sendTargetPushes(userIdToMessage, PushPreferenceType.LECTURE_UPDATE)

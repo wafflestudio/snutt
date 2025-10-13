@@ -358,10 +358,11 @@ class MainRouter(
     fun diaryRouter() =
         v1CoRouter {
             "/diary".nest {
-                GET("/{year}/{semester}", diaryHandler::getMySubmissions)
+                GET("/my", diaryHandler::getMySubmissions)
                 POST("/questionnaire", diaryHandler::getQuestionnaireFromActivities)
                 GET("/activities", diaryHandler::getActivities)
                 POST("", diaryHandler::submitDiary)
+                DELETE("/{id}", diaryHandler::removeDiarySubmission)
             }
         }
 

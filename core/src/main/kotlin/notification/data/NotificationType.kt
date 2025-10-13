@@ -17,6 +17,7 @@ enum class NotificationType(
     LECTURE_VACANCY(4),
     FRIEND(5),
     FEATURE_NEW(6),
+    DIARY(7),
     ;
 
     companion object {

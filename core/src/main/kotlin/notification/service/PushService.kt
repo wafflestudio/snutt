@@ -54,7 +54,8 @@ class PushServiceImpl internal constructor(
     ) {
         val userDevices = deviceService.getUserDevices(userId).ifEmpty { return }
 
-        val targetedPushMessageWithTokens = userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
+        val targetedPushMessageWithTokens =
+            userDevices.map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
         pushClient.sendMessages(targetedPushMessageWithTokens)
     }
 
@@ -74,12 +75,14 @@ class PushServiceImpl internal constructor(
 
     override suspend fun sendGlobalPush(pushMessage: PushMessage) = pushClient.sendGlobalMessage(pushMessage)
 
-    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>) =
+    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>) {
+        val usersDevicesMap = deviceService.getUsersDevices(userToPushMessage.keys.toList())
         userToPushMessage.entries
             .flatMap { (userId, pushMessage) ->
-                deviceService.getUserDevices(userId).map { it.fcmRegistrationId to pushMessage }
+                usersDevicesMap[userId]?.map { it.fcmRegistrationId to pushMessage } ?: listOf()
             }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
             .let { pushClient.sendMessages(it) }
+    }
 
     override suspend fun sendPush(
         pushMessage: PushMessage,
@@ -107,9 +110,11 @@ class PushServiceImpl internal constructor(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
     ) {
+        val userPushPreferenceEnabled = pushPreferenceService.isPushPreferenceEnabled(userToPushMessage.keys.toList(), pushPreferenceType)
+
         val filteredUserToPushMessage =
             userToPushMessage.filterKeys { userId ->
-                pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)
+                userPushPreferenceEnabled[userId] ?: pushPreferenceType.isEnabledByDefault
             }
 
         if (filteredUserToPushMessage.isNotEmpty()) {
