@@ -30,7 +30,7 @@ class LectureCustomRepositoryImpl(
 ) : LectureCustomRepository {
     companion object {
         private val placeRegex = """^(?:|#|\*)\d+(?:-\d+|-[A-Z])?-[A-Z]?\d+[A-Z]?(?:-\d+)?$""".toRegex()
-        private val buildingRegex = """^\d+(?:-\d+)?동$""".toRegex()
+        private val buildingRegex = """^(?:|#|\*)\d+(?:-\d+)?동$""".toRegex()
     }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> =
@@ -122,7 +122,7 @@ class LectureCustomRepositoryImpl(
                         val placeKeyword = keyword.replace("동", "")
                         Lecture::classPlaceAndTimes elemMatch
                             Criteria().orOperator(
-                                ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}[^\\d]*", "i"),
+                                ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}-", "i"),
                             )
                     }
 
