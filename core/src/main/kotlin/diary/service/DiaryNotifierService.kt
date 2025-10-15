@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.push.DeeplinkType
 import com.wafflestudio.snutt.common.push.dto.PushMessage
+import com.wafflestudio.snutt.config.PhaseUtils
 import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.semester.service.SemesterService
@@ -28,7 +29,7 @@ class DiaryNotifierServiceImpl(
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     companion object {
-        const val SAMPLE_RATE = 0.1
+        val SAMPLE_RATE = if (PhaseUtils.getPhase().isProd) 0.1 else 1.0
     }
 
     @Scheduled(cron = "0 0 19 * * MON,WED,FRI", zone = "Asia/Seoul")
