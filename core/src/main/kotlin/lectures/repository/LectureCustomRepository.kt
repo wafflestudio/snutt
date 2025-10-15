@@ -30,7 +30,7 @@ class LectureCustomRepositoryImpl(
 ) : LectureCustomRepository {
     companion object {
         private val placeRegex = """^(?:|#|\*)\d+(?:-\d+|-[A-Z])?-[A-Z]?\d+[A-Z]?(?:-\d+)?$""".toRegex()
-        private val buildingRegex = """^\d+(?:-\d+)?동$""".toRegex()
+        private val buildingRegex = """^(?:|#|\*)\d+(?:-\d+)?동$""".toRegex()
     }
 
     override fun searchLectures(searchCondition: SearchDto): Flow<Lecture> =
