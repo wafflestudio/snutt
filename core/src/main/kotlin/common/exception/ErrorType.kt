@@ -64,6 +64,7 @@ enum class ErrorType(
     UPDATE_APP_VERSION(HttpStatus.BAD_REQUEST, 40021, "앱 버전을 업데이트해주세요", "앱 버전을 업데이트해주세요"),
     NOT_PUBLISHED_THEME(HttpStatus.BAD_REQUEST, 40022, "공유한 테마가 아닙니다", "공유한 테마가 아닙니다"),
     PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "테마마켓에서 테마를 내린 뒤 다시 시도해주세요", "테마마켓에서 테마를 내린 뒤 다시 시도해주세요"),
+    TIMETABLE_LECTURE_REMINDER_INVALID_TIME(HttpStatus.BAD_REQUEST, 40024, "리마인더는 시간이 설정된 강의에만 등록할 수 있어요", "리마인더는 시간이 설정된 강의에만 등록할 수 있어요"),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다", "소셜 로그인에 실패했습니다"),
