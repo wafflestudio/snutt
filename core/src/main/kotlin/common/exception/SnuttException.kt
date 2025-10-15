@@ -93,6 +93,8 @@ object NotPublishedThemeException : SnuttException(ErrorType.NOT_PUBLISHED_THEME
 
 object PublishedThemeDeleteErrorException : SnuttException(ErrorType.PUBLISHED_THEME_DELETE_ERROR)
 
+object TimetableLectureReminderInvalidTimeException : SnuttException(ErrorType.TIMETABLE_LECTURE_REMINDER_INVALID_TIME)
+
 object SocialConnectFailException : SnuttException(ErrorType.SOCIAL_CONNECT_FAIL)
 
 object InvalidAppleLoginTokenException : SnuttException(ErrorType.INVALID_APPLE_LOGIN_TOKEN)

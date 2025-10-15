@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.timetablelecturereminder.service
 
-import com.wafflestudio.snutt.common.exception.InvalidTimeException
 import com.wafflestudio.snutt.common.exception.TimetableLectureNotFoundException
+import com.wafflestudio.snutt.common.exception.TimetableLectureReminderInvalidTimeException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
@@ -70,7 +70,7 @@ class TimetableLectureReminderServiceImpl(
         val timetableLecture =
             timetable.lectures.find { it.id == timetableLectureId } ?: throw TimetableLectureNotFoundException
 
-        if (timetableLecture.classPlaceAndTimes.isEmpty()) throw InvalidTimeException
+        if (timetableLecture.classPlaceAndTimes.isEmpty()) throw TimetableLectureReminderInvalidTimeException
 
         // '없음' 옵션인 경우 기존 리마인더 삭제
         if (option == TimetableLectureReminderOption.NONE) {
