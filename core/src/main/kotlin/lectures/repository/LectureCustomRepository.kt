@@ -122,7 +122,7 @@ class LectureCustomRepositoryImpl(
                         val placeKeyword = keyword.replace("동", "")
                         Lecture::classPlaceAndTimes elemMatch
                             Criteria().orOperator(
-                                ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}[^\\d]*", "i"),
+                                ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}-", "i"),
                             )
                     }
 
