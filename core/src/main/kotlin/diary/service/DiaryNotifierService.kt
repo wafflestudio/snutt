@@ -62,7 +62,7 @@ class DiaryNotifierServiceImpl(
                             it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
                         }.toMap()
 
-                logger.debug("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
+                logger.info("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
                 pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
             } catch (e: Exception) {
                 logger.error("강의 일기장 알림 전송 중 문제 발생", e)
