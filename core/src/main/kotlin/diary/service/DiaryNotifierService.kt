@@ -53,8 +53,9 @@ class DiaryNotifierServiceImpl(
                 val targetedPushMessages =
                     sampledUserIdPrimaryTimetableMap
                         .mapNotNull {
-                            val targetLecture = it.value.lectures.randomOrNull() ?: return@mapNotNull null
-                            it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
+                            val targetLecture = it.value.lectures.randomOrNull()
+                            val lectureId = targetLecture?.lectureId ?: return@mapNotNull null
+                            it.key to buildPushMessage(lectureId, targetLecture.courseTitle)
                         }.toMap()
 
                 pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
