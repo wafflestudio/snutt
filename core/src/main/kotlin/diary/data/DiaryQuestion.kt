@@ -14,6 +14,6 @@ data class DiaryQuestion(
     val answers: List<String>,
     val shortAnswers: List<String>,
     @Field(targetType = FieldType.OBJECT_ID)
-    val targetActivityIds: List<String>,
+    val targetDailyClassTypeIds: List<String>,
     var active: Boolean = true,
 )

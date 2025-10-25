@@ -224,10 +224,10 @@ class MainRouter(
                 POST("/popups", adminHandler::postPopup)
                 DELETE("/popups/{id}", adminHandler::deletePopup)
 
-                GET("/diary/activities", adminHandler::getAllDiaryActivities)
+                GET("/diary/dailyClassTypes", adminHandler::getAllDiaryDailyClassTypes)
                 GET("/diary/questions", adminHandler::getDiaryQuestions)
-                POST("/diary/activities", adminHandler::insertDiaryActivity)
-                DELETE("/diary/activities", adminHandler::removeDiaryActivity)
+                POST("/diary/dailyClassTypes", adminHandler::insertDiaryDailyClassType)
+                DELETE("/diary/dailyClassTypes", adminHandler::removeDiaryDailyClassType)
                 POST("/diary/questions", adminHandler::insertDiaryQuestion)
                 DELETE("/diary/questions/{id}", adminHandler::removeDiaryQuestion)
             }
@@ -359,8 +359,8 @@ class MainRouter(
         v1CoRouter {
             "/diary".nest {
                 GET("/my", diaryHandler::getMySubmissions)
-                POST("/questionnaire", diaryHandler::getQuestionnaireFromActivities)
-                GET("/activities", diaryHandler::getActivities)
+                POST("/questionnaire", diaryHandler::getQuestionnaireFromDailyClassTypes)
+                GET("/dailyClassTypes", diaryHandler::getDailyClassTypes)
                 POST("", diaryHandler::submitDiary)
                 DELETE("/{id}", diaryHandler::removeDiarySubmission)
             }
