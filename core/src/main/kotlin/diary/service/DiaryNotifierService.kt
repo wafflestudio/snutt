@@ -37,6 +37,7 @@ class DiaryNotifierServiceImpl(
         val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
         cache.withLock(lockKey) {
             try {
+                logger.debug("강의 일기장 알림 전송 작업을 시작합니다.")
                 val currentTime = Instant.now()
                 val (currentYear, currentSemester) =
                     semesterService.getCurrentYearAndSemester(currentTime) ?: run {
@@ -53,10 +54,15 @@ class DiaryNotifierServiceImpl(
                 val targetedPushMessages =
                     sampledUserIdPrimaryTimetableMap
                         .mapNotNull {
-                            val targetLecture = it.value.lectures.randomOrNull() ?: return@mapNotNull null
+                            val targetLecture =
+                                it.value.lectures
+                                    .filterNot { lecture -> lecture.lectureId == null }
+                                    .randomOrNull()
+                                    ?: return@mapNotNull null
                             it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
                         }.toMap()
 
+                logger.info("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
                 pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
             } catch (e: Exception) {
                 logger.error("강의 일기장 알림 전송 중 문제 발생", e)
