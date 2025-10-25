@@ -90,17 +90,16 @@ class EvService(
                     }
             }
 
-        val lectureInfoParam = objectMapper.writeValueAsString(recentLectures)
         return snuttEvWebClient
-            .get()
+            .post()
             .uri { builder ->
                 builder
                     .path("/v1/users/me/lectures/latest")
-                    .queryParam("snutt_lecture_info", "{lectureInfoParam}")
                     .queryParams(requestQueryParams)
-                    .build(lectureInfoParam)
+                    .build()
             }.header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
+            .bodyValue(recentLectures)
             .awaitExchange { response ->
                 if (response.statusCode().is2xxSuccessful) {
                     response.awaitBody()
