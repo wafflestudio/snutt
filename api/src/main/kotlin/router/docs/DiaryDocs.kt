@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.router.docs
 
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
+import com.wafflestudio.snutt.diary.dto.DiaryDailyClassTypeDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
@@ -65,16 +65,16 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/diary/activities",
+        path = "/v1/diary/dailyClassTypes",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getActivities",
+                operationId = "getDailyClassTypes",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryActivityDto::class)))],
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryDailyClassTypeDto::class)))],
                     ),
                 ],
             ),

@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.handler
 
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
+import com.wafflestudio.snutt.diary.dto.DiaryDailyClassTypeDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
@@ -20,12 +20,12 @@ class DiaryHandler(
 ) : ServiceHandler(
         handlerMiddleware = snuttRestApiDefaultMiddleware,
     ) {
-    suspend fun getQuestionnaireFromActivities(req: ServerRequest) =
+    suspend fun getQuestionnaireFromDailyClassTypes(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            DiaryQuestionnaireDto(diaryService.generateQuestionnaire(userId, body.lectureId, body.activities))
+            DiaryQuestionnaireDto(diaryService.generateQuestionnaire(userId, body.lectureId, body.dailyClassTypes))
         }
 
     suspend fun getMySubmissions(req: ServerRequest) =
@@ -49,10 +49,10 @@ class DiaryHandler(
                 }.sortedWith(compareByDescending<DiarySubmissionsOfYearSemesterDto> { it.year }.thenByDescending { it.semester })
         }
 
-    suspend fun getActivities(req: ServerRequest) =
+    suspend fun getDailyClassTypes(req: ServerRequest) =
         handle(req) {
-            diaryService.getActiveActivities().map {
-                DiaryActivityDto(it)
+            diaryService.getActiveDailyClassTypes().map {
+                DiaryDailyClassTypeDto(it)
             }
         }
 
