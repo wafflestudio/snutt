@@ -67,7 +67,8 @@ class TimetableLectureReminderNotifierServiceImpl(
     private suspend fun getTargetReminders(currentTime: Instant): List<TimetableLectureReminder> {
         val endSchedule = TimetableLectureReminder.Schedule.fromInstant(currentTime)
         val startSchedule = endSchedule.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
-        val lastNotifiedBefore = currentTime.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
+        // 10분 전에 알림 보내놓고 다시 보내는 경우를 막기 위해 버퍼로 1분을 더한다.
+        val lastNotifiedBefore = currentTime.minus(REMINDER_TIME_WINDOW_MINUTES + 1, ChronoUnit.MINUTES)
 
         val reminders =
             if (startSchedule.day == endSchedule.day) {
