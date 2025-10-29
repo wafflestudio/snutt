@@ -32,7 +32,17 @@ data class PushMessage(
     val body: String,
     val urlScheme: Deeplink? = null,
     val data: Data = Data(emptyMap()),
-    val isUrgentOnAndroid: Boolean = false, // true라면 안드로이드 doze 모드(배터리 절약 모드) 중에 기기를 깨우고 정확한 알림을 보낸다
+    /**
+     * true라면 안드로이드 doze 모드(배터리 절약 모드) 중에
+     * 기기를 깨우고 정확한 알림을 보낸다
+     */
+    val isUrgentOnAndroid: Boolean = false,
+    /**
+     * true라면 data message로 보내고, false라면 notification message로 보낸다.
+     * data message는 클라이언트에서 직접
+     * @see [Firebase 문서](https://firebase.google.com/docs/cloud-messaging/customize-messages/set-message-type)
+     */
+    val shouldSendAsDataMessage: Boolean = false,
 ) {
     data class Data(
         val payload: Map<String, String>,
