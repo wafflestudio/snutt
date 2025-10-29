@@ -39,7 +39,8 @@ data class PushMessage(
     val isUrgentOnAndroid: Boolean = false,
     /**
      * true라면 data message로 보내고, false라면 notification message로 보낸다.
-     * data message는 클라이언트에서 직접
+     *
+     * notification message는 안드로이드 앱이 백그라운드에 있을 때 알림 배너가 제대로 노출되지 않으므로, 궁극적으로는 data message로 모두 바꿔야 한다.
      * @see [Firebase 문서](https://firebase.google.com/docs/cloud-messaging/customize-messages/set-message-type)
      */
     val shouldSendAsDataMessage: Boolean = false,
