@@ -38,6 +38,7 @@ class EvServiceHandler(
 
     suspend fun getMyLatestLectures(req: ServerRequest) =
         handle(req) {
-            evService.getMyLatestLectures(req.userId, req.queryParams())
+            val limit = req.parseQueryParam<Int>("limit") ?: 100
+            evService.getMyLatestLectures(req.userId, req.queryParams(), limit)
         }
 }

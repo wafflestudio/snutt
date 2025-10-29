@@ -73,34 +73,37 @@ class EvService(
     suspend fun getMyLatestLectures(
         userId: String,
         requestQueryParams: MultiValueMap<String, String> = buildMultiValueMap(mapOf()),
+        limit: Int,
     ): Map<String, Any?> {
         val recentLectures: List<EvLectureInfoDto> =
-            coursebookService.getLastTwoCourseBooksBeforeCurrent().flatMap { coursebook ->
-                timetableRepository
-                    .findAllByUserIdAndYearAndSemester(userId, coursebook.year, coursebook.semester)
-                    .toList()
-                    .flatMap { timetable ->
-                        timetable.lectures.map { lecture ->
-                            EvLectureInfoDto(
-                                lecture,
-                                coursebook.year,
-                                coursebook.semester,
-                            )
+            coursebookService
+                .getLastTwoCourseBooksBeforeCurrent()
+                .flatMap { coursebook ->
+                    timetableRepository
+                        .findAllByUserIdAndYearAndSemester(userId, coursebook.year, coursebook.semester)
+                        .toList()
+                        .flatMap { timetable ->
+                            timetable.lectures.map { lecture ->
+                                EvLectureInfoDto(
+                                    lecture,
+                                    coursebook.year,
+                                    coursebook.semester,
+                                )
+                            }
                         }
-                    }
-            }
+                }.distinct()
+                .take(limit)
 
-        val lectureInfoParam = objectMapper.writeValueAsString(recentLectures)
         return snuttEvWebClient
-            .get()
+            .post()
             .uri { builder ->
                 builder
                     .path("/v1/users/me/lectures/latest")
-                    .queryParam("snutt_lecture_info", "{lectureInfoParam}")
                     .queryParams(requestQueryParams)
-                    .build(lectureInfoParam)
+                    .build()
             }.header("Snutt-User-Id", userId)
             .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
+            .bodyValue(recentLectures)
             .awaitExchange { response ->
                 if (response.statusCode().is2xxSuccessful) {
                     response.awaitBody()
