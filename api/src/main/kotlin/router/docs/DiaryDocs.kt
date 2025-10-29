@@ -59,7 +59,7 @@ import org.springframework.web.bind.annotation.RequestMethod
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryQuestionnaireDto::class)))],
+                        content = [Content(schema = Schema(implementation = DiaryQuestionnaireDto::class))],
                     ),
                 ],
             ),
