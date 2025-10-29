@@ -42,7 +42,7 @@ class TimetableLectureReminderNotifierServiceImpl(
         val lockKey = CacheKey.LOCK_SEND_TIMETABLE_LECTURE_REMINDER_NOTIFICATION.build()
         cache.withLock(lockKey) {
             try {
-                logger.info("강의 리마인더 알림 전송 작업을 시작합니다.")
+                logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
                 val currentTime = Instant.now()
                 val (currentYear, currentSemester) =
                     semesterService.getCurrentYearAndSemester(currentTime) ?: run {
