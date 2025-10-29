@@ -27,6 +27,8 @@ internal class FcmPushClient(
     @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
 ) : PushClient {
     private object PayloadKeys {
+        const val TITLE = "title"
+        const val BODY = "body"
         const val URL_SCHEME = "url_scheme"
     }
 
@@ -118,7 +120,12 @@ internal class FcmPushClient(
                 is TargetedPushMessageWithTopic -> setTopic(topic)
             }
             message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.value) }
-            setNotification(notification)
+            if (message.shouldSendAsDataMessage) {
+                putData(PayloadKeys.TITLE, message.title)
+                putData(PayloadKeys.BODY, message.body)
+            } else {
+                setNotification(notification)
+            }
             setAndroidConfig(androidConfig)
             putAllData(message.data.payload)
             build()
