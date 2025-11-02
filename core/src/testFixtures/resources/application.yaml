@@ -12,6 +12,8 @@ google:
     project-id:
     service-account:
     api-key:
+    ios:
+      bundle-id:
     dynamic-link:
       domain-uri-prefix:
       link-prefix: "https://snutt.page.link"
