@@ -42,12 +42,12 @@ class SemesterServiceImpl : SemesterService {
                         semester = Semester.AUTUMN,
                         year = year,
                         startDate = LocalDate.of(year, 9, 1),
-                        endDate = LocalDate.of(year, 10, 31),
+                        endDate = LocalDate.of(year, 12, 19),
                     ),
                     SemesterWithDateRange(
                         semester = Semester.WINTER,
                         year = year,
-                        startDate = LocalDate.of(year, 11, 2),
+                        startDate = LocalDate.of(year, 12, 20),
                         endDate = LocalDate.of(year + 1, 1, 31),
                     ),
                 )
