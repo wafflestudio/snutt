@@ -4,6 +4,8 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.AndroidConfig
+import com.google.firebase.messaging.ApnsConfig
+import com.google.firebase.messaging.Aps
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service
 internal class FcmPushClient(
     @Value("\${google.firebase.project-id}") private val projectId: String,
     @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
+    @Value("\${google.firebase.ios.bundle-id}") private val iosBundleId: String,
 ) : PushClient {
     private object PayloadKeys {
         const val TITLE = "title"
@@ -114,6 +117,18 @@ internal class FcmPushClient(
                 .setPriority(
                     if (message.isUrgentOnAndroid) AndroidConfig.Priority.HIGH else AndroidConfig.Priority.NORMAL,
                 ).build()
+        val apnsConfig =
+            ApnsConfig
+                .builder()
+                .putHeader("apns-push-type", "background")
+                .putHeader("apns-priority", "5")
+                .putHeader("apns-topic", iosBundleId)
+                .setAps(
+                    Aps
+                        .builder()
+                        .setContentAvailable(true)
+                        .build(),
+                ).build()
         return Message.builder().run {
             when (this@toFcmMessage) {
                 is TargetedPushMessageWithToken -> setToken(targetToken)
@@ -124,9 +139,10 @@ internal class FcmPushClient(
                 putData(PayloadKeys.TITLE, message.title)
                 putData(PayloadKeys.BODY, message.body)
             } else {
-                setNotification(notification)
+                setNotification(notification) // 추후 클리닝할 분기
             }
             setAndroidConfig(androidConfig)
+            setApnsConfig(apnsConfig)
             putAllData(message.data.payload)
             build()
         }
