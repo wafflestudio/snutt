@@ -6,6 +6,11 @@ spring:
 
 snutt:
   secret-key:
+
+springdoc:
+  packages-to-scan: com.wafflestudio.snutt
+  pre-loading-enabled: true
+  pre-loading-locales: ko_KR,en_US,en_KR
 ---
 spring:
   config:
