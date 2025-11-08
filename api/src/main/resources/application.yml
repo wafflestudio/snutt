@@ -8,9 +8,12 @@ snutt:
   secret-key:
 
 springdoc:
-  packages-to-scan: com.wafflestudio.snutt
   pre-loading-enabled: true
-  pre-loading-locales: ko_KR,en_US,en_KR
+  pre-loading-locales: ko-KR,en-US
+
+logging:
+  level:
+    org.springdoc: trace
 ---
 spring:
   config:
