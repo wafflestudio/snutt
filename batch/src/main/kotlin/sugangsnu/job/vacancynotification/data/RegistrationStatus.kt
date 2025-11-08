@@ -4,4 +4,5 @@ data class RegistrationStatus(
     val courseNumber: String,
     val lectureNumber: String,
     val registrationCount: Int,
+    val remainingPlace: Boolean,
 )
