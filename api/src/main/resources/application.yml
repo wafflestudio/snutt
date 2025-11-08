@@ -6,6 +6,14 @@ spring:
 
 snutt:
   secret-key:
+
+springdoc:
+  pre-loading-enabled: true
+  pre-loading-locales: ko-KR,en-US
+
+logging:
+  level:
+    org.springdoc: trace
 ---
 spring:
   config:
