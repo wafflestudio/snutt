@@ -68,8 +68,8 @@ enum class ErrorType(
     VACANCY_NOTIFICATION_TEMPORARILY_UNAVAILABLE(
         HttpStatus.BAD_REQUEST,
         40025,
-        "빈자리 알림은 현재 일시 중단되었습니다. 자세한 내용은 알림을 참고해 주세요.",
-        "빈자리 알림은 현재 일시 중단되었습니다. 자세한 내용은 알림을 참고해 주세요.",
+        "현재 일시 중단된 기능입니다. 자세한 내용은 알림을 참고해 주세요.",
+        "현재 일시 중단된 기능입니다. 자세한 내용은 알림을 참고해 주세요.",
     ),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
