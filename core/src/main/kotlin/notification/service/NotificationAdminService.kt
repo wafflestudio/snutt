@@ -23,7 +23,7 @@ class NotificationAdminService(
                 title = request.title,
                 body = request.body,
                 data = PushMessage.Data(request.dataPayload),
-                shouldSendAsDataMessage = true,
+                shouldSendAsDataMessage = request.shouldSendAsDataMessage,
             )
         val notificationType = request.type
 
