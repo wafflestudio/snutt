@@ -42,9 +42,16 @@ import org.springframework.web.bind.annotation.RequestMethod
                             ),
                         ],
                         required = true,
-                        description = "userId == null이면 모든 유저에게 보냄\ninsertFcm == true && shouldSendAsDataMessage == true이면 FCM data message(클라에서 직접 대응 필요한 메시지)로 푸시 보냄",
+                        description =
+                            "userId == null이면 모든 유저에게 보냄\n" +
+                                "insertFcm == true && shouldSendAsDataMessage == true이면 FCM data message(클라에서 직접 대응 필요한 메시지)로 보냄",
                     ),
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -233,7 +240,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -246,7 +258,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -266,7 +283,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                         ],
                         required = true,
                     ),
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -279,7 +301,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                 parameters = [
                     Parameter(`in` = ParameterIn.PATH, name = "id", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
 )
