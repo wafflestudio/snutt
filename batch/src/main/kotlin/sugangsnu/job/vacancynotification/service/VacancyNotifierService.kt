@@ -6,7 +6,6 @@ import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
-import com.wafflestudio.snutt.notification.data.NotificationType
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
@@ -116,11 +115,13 @@ class VacancyNotifierServiceImpl(
                                 urlScheme = DeeplinkType.VACANCY,
                                 isUrgentOnAndroid = true,
                             )
+                        /*
                         pushWithNotificationService.sendPushesAndNotifications(
                             pushMessage,
                             NotificationType.LECTURE_VACANCY,
                             userIds,
                         )
+                         */
                     }
                 }
             }
