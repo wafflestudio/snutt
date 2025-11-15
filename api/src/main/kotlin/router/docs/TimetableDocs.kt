@@ -467,6 +467,7 @@ import timetables.dto.TimetableBriefDto
                         content = [
                             Content(
                                 schema = Schema(implementation = TimetableLectureReminderModifyRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
                             ),
                         ],
                     ),
