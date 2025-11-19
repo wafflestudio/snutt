@@ -92,7 +92,7 @@ class VacancyNotifierServiceImpl(
                     .map { (lecture, status) ->
                         lecture.apply {
                             registrationCount = status.registrationCount
-                            wasFull = wasFull || lecture.isFull()
+                            wasFull = status.wasFull
                         }
                     }
             lectureService.upsertLectures(updated)
@@ -179,10 +179,16 @@ class VacancyNotifierServiceImpl(
                                 .split("/")
                                 .first()
                                 .toInt()
+                        val wasFull =
+                            info
+                                .select("li.state > span[data-dialog-target='remaining-place-dialog']")
+                                .isNotEmpty()
+
                         RegistrationStatus(
                             courseNumber = courseNumber,
                             lectureNumber = lectureNumber,
                             registrationCount = registrationCount,
+                            wasFull = wasFull,
                         )
                     }
             }
