@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.ApnsConfig
 import com.google.firebase.messaging.Aps
+import com.google.firebase.messaging.ApsAlert
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
@@ -105,12 +106,6 @@ internal class FcmPushClient(
     }
 
     private fun TargetedPushMessage.toFcmMessage(): Message {
-        val notification =
-            Notification
-                .builder()
-                .setTitle(message.title)
-                .setBody(message.body)
-                .build()
         val androidConfig =
             AndroidConfig
                 .builder()
@@ -120,13 +115,19 @@ internal class FcmPushClient(
         val apnsConfig =
             ApnsConfig
                 .builder()
-                .putHeader("apns-push-type", "background")
+                .putHeader("apns-push-type", "alert")
                 .putHeader("apns-priority", "5")
                 .putHeader("apns-topic", iosBundleId)
                 .setAps(
                     Aps
                         .builder()
-                        .setContentAvailable(true)
+                        .setAlert(
+                            ApsAlert
+                                .builder()
+                                .setTitle(message.title)
+                                .setBody(message.body)
+                                .build(),
+                        ).setContentAvailable(true)
                         .build(),
                 ).build()
         return Message.builder().run {
@@ -139,7 +140,13 @@ internal class FcmPushClient(
                 putData(PayloadKeys.TITLE, message.title)
                 putData(PayloadKeys.BODY, message.body)
             } else {
-                setNotification(notification) // 추후 클리닝할 분기
+                setNotification(
+                    Notification
+                        .builder()
+                        .setTitle(message.title)
+                        .setBody(message.body)
+                        .build(),
+                ) // 추후 클리닝할 분기
             }
             setAndroidConfig(androidConfig)
             setApnsConfig(apnsConfig)
