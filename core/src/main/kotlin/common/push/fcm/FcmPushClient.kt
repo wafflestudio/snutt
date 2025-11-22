@@ -106,12 +106,6 @@ internal class FcmPushClient(
     }
 
     private fun TargetedPushMessage.toFcmMessage(): Message {
-        val notification =
-            Notification
-                .builder()
-                .setTitle(message.title)
-                .setBody(message.body)
-                .build()
         val androidConfig =
             AndroidConfig
                 .builder()
@@ -146,7 +140,13 @@ internal class FcmPushClient(
                 putData(PayloadKeys.TITLE, message.title)
                 putData(PayloadKeys.BODY, message.body)
             } else {
-                setNotification(notification) // 추후 클리닝할 분기
+                setNotification(
+                    Notification
+                        .builder()
+                        .setTitle(message.title)
+                        .setBody(message.body)
+                        .build(),
+                ) // 추후 클리닝할 분기
             }
             setAndroidConfig(androidConfig)
             setApnsConfig(apnsConfig)
