@@ -16,7 +16,6 @@ import com.wafflestudio.snutt.common.exception.InvalidEmailException
 import com.wafflestudio.snutt.common.exception.InvalidLocalIdException
 import com.wafflestudio.snutt.common.exception.InvalidPasswordException
 import com.wafflestudio.snutt.common.exception.InvalidVerificationCodeException
-import com.wafflestudio.snutt.common.exception.SnuttException
 import com.wafflestudio.snutt.common.exception.SocialProviderNotAttachedException
 import com.wafflestudio.snutt.common.exception.TooManyVerificationCodeRequestException
 import com.wafflestudio.snutt.common.exception.UpdateAppVersionException
@@ -177,9 +176,8 @@ class UserServiceImpl(
 
         val cacheKey = CacheKey.LOCK_REGISTER_LOCAL.build(localId)
 
-        runCatching {
-            if (!cache.acquireLock(cacheKey)) throw DuplicateLocalIdException
-
+        if (!cache.acquireLock(cacheKey)) throw DuplicateLocalIdException
+        try {
             if (!authService.isValidLocalId(localId)) throw InvalidLocalIdException
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
             email?.let {
@@ -193,9 +191,8 @@ class UserServiceImpl(
 
             val credential = authService.buildLocalCredential(localId, password)
             return signup(credential, email, isEmailVerified = false)
-        }.getOrElse {
-            if (it is SnuttException) cache.releaseLock(cacheKey)
-            throw it
+        } finally {
+            cache.releaseLock(cacheKey)
         }
     }
 
