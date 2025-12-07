@@ -34,6 +34,7 @@ class DiaryNotifierServiceImpl(
 
     @Scheduled(cron = "0 0 19 * * MON,WED,FRI", zone = "Asia/Seoul")
     override suspend fun sendNotifier() {
+        if (PhaseUtils.getPhase().isProd) return
         val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
         cache.withLock(lockKey) {
             try {
