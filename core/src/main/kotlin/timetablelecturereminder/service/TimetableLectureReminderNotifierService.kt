@@ -4,8 +4,8 @@ import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.push.dto.PushMessage
-import com.wafflestudio.snutt.common.util.SemesterUtils
 import com.wafflestudio.snutt.notification.service.PushService
+import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableAndReminder
 import com.wafflestudio.snutt.timetablelecturereminder.data.TimetableLectureReminder
 import com.wafflestudio.snutt.timetablelecturereminder.repository.TimetableLectureReminderRepository
@@ -28,6 +28,7 @@ class TimetableLectureReminderNotifierServiceImpl(
     private val timetableLectureReminderRepository: TimetableLectureReminderRepository,
     private val timetableRepository: TimetableRepository,
     private val pushService: PushService,
+    private val semesterService: SemesterService,
 ) : TimetableLectureReminderNotifierService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -44,7 +45,7 @@ class TimetableLectureReminderNotifierServiceImpl(
                 logger.debug("강의 리마인더 알림 전송 작업을 시작합니다.")
                 val currentTime = Instant.now()
                 val (currentYear, currentSemester) =
-                    SemesterUtils.getCurrentYearAndSemester(currentTime) ?: run {
+                    semesterService.getCurrentYearAndSemester(currentTime) ?: run {
                         logger.debug("현재 진행 중인 학기가 없습니다.")
                         return@withLock
                     }
@@ -66,7 +67,8 @@ class TimetableLectureReminderNotifierServiceImpl(
     private suspend fun getTargetReminders(currentTime: Instant): List<TimetableLectureReminder> {
         val endSchedule = TimetableLectureReminder.Schedule.fromInstant(currentTime)
         val startSchedule = endSchedule.minusMinutes(REMINDER_TIME_WINDOW_MINUTES.toInt())
-        val lastNotifiedBefore = currentTime.minus(REMINDER_TIME_WINDOW_MINUTES, ChronoUnit.MINUTES)
+        // 10분 전에 알림 보내놓고 다시 보내는 경우를 막기 위해 버퍼로 1분을 더한다.
+        val lastNotifiedBefore = currentTime.minus(REMINDER_TIME_WINDOW_MINUTES + 1, ChronoUnit.MINUTES)
 
         val reminders =
             if (startSchedule.day == endSchedule.day) {
@@ -206,19 +208,19 @@ class TimetableLectureReminderNotifierServiceImpl(
         val timetableLecture =
             timetableAndReminder.timetable.lectures.find { it.id == timetableAndReminder.reminder.timetableLectureId } ?: return null
 
-        val typeString = if (timetableLecture.lectureId == null) "일정" else "수업"
-        val pushTitle = "\uD83D\uDCDA $typeString 리마인더"
+        val pushTitle = "\uD83D\uDCDA 강의 리마인더"
         val pushBody =
             when {
-                offsetMinutes == 0 -> "${timetableLecture.courseTitle} $typeString 시간이에요."
-                offsetMinutes > 0 -> "${timetableLecture.courseTitle} $typeString 시작 ${offsetMinutes}분 후예요."
-                else -> "${timetableLecture.courseTitle} $typeString 시작 ${-offsetMinutes}분 전이에요."
+                offsetMinutes == 0 -> "${timetableLecture.courseTitle} 강의 시간이에요."
+                offsetMinutes > 0 -> "${timetableLecture.courseTitle} 강의 시작 ${offsetMinutes}분 후예요."
+                else -> "${timetableLecture.courseTitle} 강의 시작 ${-offsetMinutes}분 전이에요."
             }
 
         return PushMessage(
             title = pushTitle,
             body = pushBody,
             isUrgentOnAndroid = true,
+            shouldSendAsDataMessage = true,
         )
     }
 }

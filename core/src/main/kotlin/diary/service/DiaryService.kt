@@ -1,32 +1,36 @@
 package com.wafflestudio.snutt.diary.service
 
-import com.wafflestudio.snutt.common.enum.Semester
-import com.wafflestudio.snutt.common.exception.DiaryActivityNotFoundException
+import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
+import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
-import com.wafflestudio.snutt.diary.data.DiaryActivity
+import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
+import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
+import com.wafflestudio.snutt.diary.data.DiaryQuestionnaire
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import com.wafflestudio.snutt.diary.dto.DiaryShortQuestionReply
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
-import com.wafflestudio.snutt.diary.repository.DiaryActivityRepository
+import com.wafflestudio.snutt.diary.repository.DiaryDailyClassTypeRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 interface DiaryService {
     suspend fun generateQuestionnaire(
         userId: String,
         lectureId: String,
-        activityNames: List<String>,
-    ): List<DiaryQuestion>
+        dailyClassTypeNames: List<String>,
+    ): DiaryQuestionnaire
 
-    suspend fun getActiveActivities(): List<DiaryActivity>
+    suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType>
 
-    suspend fun getAllActivities(): List<DiaryActivity>
+    suspend fun getAllDailyClassTypes(): List<DiaryDailyClassType>
 
     suspend fun getActiveQuestions(): List<DiaryQuestion>
 
@@ -35,17 +39,18 @@ interface DiaryService {
         request: DiarySubmissionRequestDto,
     )
 
-    suspend fun getMySubmissions(
+    suspend fun getMySubmissions(userId: String): List<DiarySubmission>
+
+    suspend fun removeSubmission(
+        submissionId: String,
         userId: String,
-        year: Int,
-        semester: Semester,
-    ): List<DiarySubmission>
+    )
 
     suspend fun getSubmissionIdShortQuestionRepliesMap(submissions: List<DiarySubmission>): Map<String, List<DiaryShortQuestionReply>>
 
-    suspend fun addOrEnableActivity(name: String)
+    suspend fun addOrEnableDailyClassType(name: String)
 
-    suspend fun disableActivity(name: String)
+    suspend fun disableDailyClassType(name: String)
 
     suspend fun addQuestion(request: DiaryAddQuestionRequestDto)
 
@@ -54,32 +59,51 @@ interface DiaryService {
 
 @Service
 class DiaryServiceImpl(
-    private val diaryActivityRepository: DiaryActivityRepository,
+    private val diaryDailyClassTypeRepository: DiaryDailyClassTypeRepository,
     private val diaryQuestionRepository: DiaryQuestionRepository,
     private val diarySubmissionRepository: DiarySubmissionRepository,
+    private val timetableRepository: TimetableRepository,
     private val lectureService: LectureService,
 ) : DiaryService {
     override suspend fun generateQuestionnaire(
         userId: String,
         lectureId: String,
-        activityNames: List<String>,
-    ): List<DiaryQuestion> {
-        val activityIds = diaryActivityRepository.findByNameIn(activityNames).map { it.id!! }
-        val questions = diaryQuestionRepository.findByTargetActivityIdsContainsAndActiveTrue(activityIds)
-        val answeredQuestionIds =
-            diarySubmissionRepository
-                .findAllByUserIdAndLectureIdOrderByCreatedAtDesc(userId, lectureId)
-                .flatMap { submission -> submission.questionAnswers.map { it.questionId } }
+        dailyClassTypeNames: List<String>,
+    ): DiaryQuestionnaire {
+        val dailyClassTypeIds = diaryDailyClassTypeRepository.findAllByNameIn(dailyClassTypeNames).map { it.id!! }
+        val availableQuestions = diaryQuestionRepository.findByTargetDailyClassTypeIdsInAndActiveTrue(dailyClassTypeIds)
+        val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
 
-        return questions
-            .filterNot { question -> question.id in answeredQuestionIds }
-            .shuffled()
-            .take(3)
+        val userTimetable =
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, lecture.year, lecture.semester)
+                ?: throw TimetableNotFoundException
+
+        val recentlySubmittedIds =
+            diarySubmissionRepository
+                .findAllByUserIdAndCreatedAtIsAfter(
+                    userId,
+                    LocalDateTime.now().minusDays(1),
+                ).map { it.lectureId }
+        val nextLectureCandidates =
+            userTimetable.lectures.filterNot { it.lectureId == lectureId || recentlySubmittedIds.contains(it.lectureId) }
+        val nextLecture = nextLectureCandidates.randomOrNull()
+
+        val questions =
+            availableQuestions
+                .shuffled()
+                .take(3)
+
+        return DiaryQuestionnaire(
+            lectureTitle = lecture.courseTitle,
+            questions = questions,
+            nextLectureId = nextLecture?.lectureId,
+            nextLectureTitle = nextLecture?.courseTitle,
+        )
     }
 
-    override suspend fun getActiveActivities(): List<DiaryActivity> = diaryActivityRepository.findAllByActiveTrue()
+    override suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAllByActiveTrue()
 
-    override suspend fun getAllActivities(): List<DiaryActivity> = diaryActivityRepository.findAll().toList()
+    override suspend fun getAllDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAll().toList()
 
     override suspend fun getActiveQuestions(): List<DiaryQuestion> = diaryQuestionRepository.findAllByActiveTrue()
 
@@ -88,13 +112,13 @@ class DiaryServiceImpl(
         request: DiarySubmissionRequestDto,
     ) {
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
-        val activities = diaryActivityRepository.findByNameIn(request.activities)
+        val dailyClassTypes = diaryDailyClassTypeRepository.findAllByNameIn(request.dailyClassTypes)
         val questionIds = request.questionAnswers.map { it.questionId }
         if (diaryQuestionRepository.countByIdIn(questionIds) != questionIds.size) {
             throw DiaryQuestionNotFoundException
         }
-        if (activities.size != request.activities.size) {
-            throw DiaryActivityNotFoundException
+        if (dailyClassTypes.size != request.dailyClassTypes.size) {
+            throw DiaryDailyClassTypeNotFoundException
         }
         val submission =
             DiarySubmission(
@@ -103,23 +127,26 @@ class DiaryServiceImpl(
                 lectureId = request.lectureId,
                 courseTitle = lecture.courseTitle,
                 questionAnswers = request.questionAnswers,
-                activityIds = activities.map { it.id!! },
+                dailyClassTypeIds = dailyClassTypes.map { it.id!! },
                 year = lecture.year,
                 semester = lecture.semester,
             )
         diarySubmissionRepository.save(submission)
     }
 
-    override suspend fun getMySubmissions(
+    override suspend fun getMySubmissions(userId: String): List<DiarySubmission> =
+        diarySubmissionRepository.findAllByUserIdOrderByCreatedAtDesc(userId)
+
+    override suspend fun removeSubmission(
+        submissionId: String,
         userId: String,
-        year: Int,
-        semester: Semester,
-    ): List<DiarySubmission> =
-        diarySubmissionRepository.findAllByUserIdAndYearAndSemesterOrderByCreatedAtDesc(
-            userId,
-            year,
-            semester,
-        )
+    ) {
+        diarySubmissionRepository
+            .findById(submissionId)
+            ?.takeIf { it.userId == userId } ?: throw DiarySubmissionNotFoundException
+
+        diarySubmissionRepository.deleteById(submissionId)
+    }
 
     override suspend fun getSubmissionIdShortQuestionRepliesMap(
         submissions: List<DiarySubmission>,
@@ -139,22 +166,22 @@ class DiaryServiceImpl(
         }
     }
 
-    override suspend fun addOrEnableActivity(name: String) {
-        val activity = diaryActivityRepository.findByName(name) ?: DiaryActivity(name = name, active = true)
-        activity.active = true
-        diaryActivityRepository.save(activity)
+    override suspend fun addOrEnableDailyClassType(name: String) {
+        val dailyClassType = diaryDailyClassTypeRepository.findByName(name) ?: DiaryDailyClassType(name = name, active = true)
+        dailyClassType.active = true
+        diaryDailyClassTypeRepository.save(dailyClassType)
     }
 
-    override suspend fun disableActivity(name: String) {
-        val activity = diaryActivityRepository.findByName(name) ?: return
-        activity.active = false
-        diaryActivityRepository.save(activity)
+    override suspend fun disableDailyClassType(name: String) {
+        val dailyClassType = diaryDailyClassTypeRepository.findByName(name) ?: return
+        dailyClassType.active = false
+        diaryDailyClassTypeRepository.save(dailyClassType)
     }
 
     override suspend fun addQuestion(request: DiaryAddQuestionRequestDto) {
-        val targetActivityIds = diaryActivityRepository.findByNameIn(request.targetActivities).mapNotNull { it.id }
-        if (targetActivityIds.size != request.targetActivities.size) {
-            throw DiaryActivityNotFoundException
+        val targetDailyClassTypeIds = diaryDailyClassTypeRepository.findAllByNameIn(request.targetDailyClassTypes).mapNotNull { it.id }
+        if (targetDailyClassTypeIds.size != request.targetDailyClassTypes.size) {
+            throw DiaryDailyClassTypeNotFoundException
         }
         val question =
             DiaryQuestion(
@@ -162,7 +189,7 @@ class DiaryServiceImpl(
                 shortAnswers = request.shortAnswers,
                 question = request.question,
                 shortQuestion = request.shortQuestion,
-                targetActivityIds = targetActivityIds,
+                targetDailyClassTypeIds = targetDailyClassTypeIds,
             )
         diaryQuestionRepository.save(question)
     }

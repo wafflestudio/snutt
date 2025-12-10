@@ -14,6 +14,8 @@ import org.bson.types.ObjectId
 import org.springframework.data.mapping.toDotPath
 import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation
 import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.findModifyAndAwait
 import org.springframework.data.mongodb.core.query.Query
@@ -67,6 +69,12 @@ interface TimetableCustomRepository {
         semester: Semester,
         title: String,
     ): Timetable?
+
+    suspend fun samplePrimaryOfSizeByYearAndSemester(
+        size: Long,
+        year: Int,
+        semester: Semester,
+    ): Flow<Timetable>
 }
 
 class TimetableCustomRepositoryImpl(
@@ -195,4 +203,21 @@ class TimetableCustomRepositoryImpl(
                     ).with(Timetable::title.desc()),
                 Timetable::class.java,
             ).awaitSingleOrNull()
+
+    override suspend fun samplePrimaryOfSizeByYearAndSemester(
+        size: Long,
+        year: Int,
+        semester: Semester,
+    ): Flow<Timetable> {
+        val criteria = Timetable::year isEqualTo year and Timetable::semester isEqualTo semester and Timetable::isPrimary isEqualTo true
+
+        val aggregation =
+            TypedAggregation.newAggregation(
+                Timetable::class.java,
+                Aggregation.match(criteria),
+                Aggregation.sample(size),
+            )
+
+        return reactiveMongoTemplate.aggregate(aggregation, Timetable::class.java).asFlow()
+    }
 }

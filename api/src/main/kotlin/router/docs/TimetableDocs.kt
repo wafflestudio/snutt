@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.router.docs
 import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snutt.timetablelecturereminder.dto.TimetableLectureReminderDto
 import com.wafflestudio.snutt.timetablelecturereminder.dto.request.TimetableLectureReminderModifyRequestDto
-import com.wafflestudio.snutt.timetablelecturereminder.dto.response.TimetableLectureRemindersWithTimetableIdResponse
 import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
@@ -50,21 +49,6 @@ import timetables.dto.TimetableBriefDto
                     ApiResponse(
                         responseCode = "200",
                         content = [Content(schema = Schema(implementation = TimetableLegacyDto::class))],
-                    ),
-                ],
-            ),
-    ),
-    RouterOperation(
-        path = "/v1/tables/active-semester/primary/lecture/reminders",
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        operation =
-            Operation(
-                operationId = "getRemindersInActiveSemesterPrimaryTimetable",
-                responses = [
-                    ApiResponse(
-                        responseCode = "200",
-                        content = [Content(schema = Schema(implementation = TimetableLectureRemindersWithTimetableIdResponse::class))],
                     ),
                 ],
             ),
@@ -463,10 +447,11 @@ import timetables.dto.TimetableBriefDto
                 requestBody =
                     RequestBody(
                         required = true,
-                        description = "강의 시작 시각으로부터 알림을 받을 시간의 오프셋(분)",
+                        description = "강의 리마인더 설정 옵션 (NONE, TEN_MINUTES_BEFORE, ZERO_MINUTE, TEN_MINUTES_AFTER)",
                         content = [
                             Content(
                                 schema = Schema(implementation = TimetableLectureReminderModifyRequestDto::class),
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
                             ),
                         ],
                     ),
@@ -479,28 +464,23 @@ import timetables.dto.TimetableBriefDto
             ),
     ),
     RouterOperation(
-        path = "/v1/tables/{timetableId}/lecture/{timetableLectureId}/reminder",
-        method = [RequestMethod.DELETE],
+        path = "/v1/tables/{timetableId}/lecture/reminders",
+        method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "deleteReminder",
+                operationId = "getReminders",
                 parameters = [
                     Parameter(
                         `in` = ParameterIn.PATH,
                         name = "timetableId",
                         required = true,
                     ),
-                    Parameter(
-                        `in` = ParameterIn.PATH,
-                        name = "timetableLectureId",
-                        required = true,
-                    ),
                 ],
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(schema = Schema(implementation = Unit::class))],
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = TimetableLectureReminderDto::class)))],
                     ),
                 ],
             ),

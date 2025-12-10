@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.common.push.dto
 
-import com.wafflestudio.snutt.common.push.DeeplinkType
+import com.wafflestudio.snutt.common.push.Deeplink
 import com.wafflestudio.snutt.notification.data.Notification
 import com.wafflestudio.snutt.notification.data.NotificationType
 
@@ -30,9 +30,20 @@ data class TargetedPushMessageWithTopic(
 data class PushMessage(
     val title: String,
     val body: String,
-    val urlScheme: DeeplinkType? = null,
+    val urlScheme: Deeplink? = null,
     val data: Data = Data(emptyMap()),
-    val isUrgentOnAndroid: Boolean = false, // true라면 안드로이드 doze 모드(배터리 절약 모드) 중에 기기를 깨우고 정확한 알림을 보낸다
+    /**
+     * true라면 안드로이드 doze 모드(배터리 절약 모드) 중에
+     * 기기를 깨우고 정확한 알림을 보낸다
+     */
+    val isUrgentOnAndroid: Boolean = false,
+    /**
+     * true라면 data message로 보내고, false라면 notification message로 보낸다.
+     *
+     * notification message는 안드로이드 앱이 백그라운드에 있을 때 알림 배너가 제대로 노출되지 않으므로, 궁극적으로는 data message로 모두 바꿔야 한다.
+     * @see [Firebase 문서](https://firebase.google.com/docs/cloud-messaging/customize-messages/set-message-type)
+     */
+    val shouldSendAsDataMessage: Boolean = false,
 ) {
     data class Data(
         val payload: Map<String, String>,
@@ -47,7 +58,7 @@ data class PushMessage(
             title = title,
             message = body,
             type = notificationType,
-            deeplink = urlScheme?.build()?.value,
+            deeplink = urlScheme?.value,
         )
 }
 

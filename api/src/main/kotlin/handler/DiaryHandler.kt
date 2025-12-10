@@ -1,11 +1,10 @@
 package com.wafflestudio.snutt.handler
 
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.common.enum.Semester
-import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
-import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
-import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
+import com.wafflestudio.snutt.diary.dto.DiaryDailyClassTypeDto
+import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
+import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryService
@@ -21,34 +20,39 @@ class DiaryHandler(
 ) : ServiceHandler(
         handlerMiddleware = snuttRestApiDefaultMiddleware,
     ) {
-    suspend fun getQuestionnaireFromActivities(req: ServerRequest) =
+    suspend fun getQuestionnaireFromDailyClassTypes(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
             val body = req.awaitBody<DiaryQuestionnaireRequestDto>()
 
-            diaryService.generateQuestionnaire(userId, body.lectureId, body.activities).map {
-                DiaryQuestionDto(it)
-            }
+            DiaryQuestionnaireDto(diaryService.generateQuestionnaire(userId, body.lectureId, body.dailyClassTypes))
         }
 
     suspend fun getMySubmissions(req: ServerRequest) =
         handle(req) {
             val userId = req.userId
-            val year = req.pathVariable("year").toInt()
-            val semester =
-                Semester.getOfValue(req.pathVariable("semester").toInt()) ?: throw InvalidPathParameterException("semester")
-            val submissions = diaryService.getMySubmissions(userId, year, semester)
+            val submissions = diaryService.getMySubmissions(userId)
             val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
 
-            submissions.map { submission ->
-                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id!!]!!)
-            }
+            submissions
+                .groupBy { submission ->
+                    submission.year to submission.semester
+                }.map {
+                    DiarySubmissionsOfYearSemesterDto(
+                        year = it.key.first,
+                        semester = it.key.second.value,
+                        submissions =
+                            it.value.map { submission ->
+                                DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id]!!)
+                            },
+                    )
+                }.sortedWith(compareByDescending<DiarySubmissionsOfYearSemesterDto> { it.year }.thenByDescending { it.semester })
         }
 
-    suspend fun getActivities(req: ServerRequest) =
+    suspend fun getDailyClassTypes(req: ServerRequest) =
         handle(req) {
-            diaryService.getActiveActivities().map {
-                DiaryActivityDto(it)
+            diaryService.getActiveDailyClassTypes().map {
+                DiaryDailyClassTypeDto(it)
             }
         }
 
@@ -58,6 +62,15 @@ class DiaryHandler(
             val body = req.awaitBody<DiarySubmissionRequestDto>()
 
             diaryService.submitDiary(userId, body)
+            OkResponse()
+        }
+
+    suspend fun removeDiarySubmission(req: ServerRequest) =
+        handle(req) {
+            val userId = req.userId
+            val id = req.pathVariable("id")
+
+            diaryService.removeSubmission(userId, id)
             OkResponse()
         }
 }

@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.elemMatch
-import org.springframework.data.mongodb.core.query.gt
+import org.springframework.data.mongodb.core.query.gte
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.core.query.lt
 import org.springframework.data.mongodb.core.query.lte
@@ -36,7 +36,7 @@ class TimetableLectureReminderCustomRepositoryImpl(
                 Criteria().andOperator(
                     TimetableLectureReminder.Schedule::day isEqualTo dayOfWeek,
                     Criteria().andOperator(
-                        TimetableLectureReminder.Schedule::minute gt startMinute,
+                        TimetableLectureReminder.Schedule::minute gte startMinute,
                         TimetableLectureReminder.Schedule::minute lte endMinute,
                     ),
                     Criteria().orOperator(

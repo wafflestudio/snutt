@@ -15,6 +15,7 @@ enum class CacheKey(
     LOCK_REGISTER_LOCAL("lock:register_local:%s", Duration.ofMinutes(1)), // localId
     LOCK_ADD_FCM_REGISTRATION_ID("lock:add_registration_id:%s_%s", Duration.ofMinutes(1)), // userId, registrationId
     LOCK_SEND_TIMETABLE_LECTURE_REMINDER_NOTIFICATION("lock:send_timetable_lecture_reminder_notification", Duration.ofSeconds(55)),
+    LOCK_SEND_LECTURE_DIARY_NOTIFICATION("lock:send_lecture_diary_notification", Duration.ofMinutes(55)),
     ;
 
     fun build(vararg args: Any?): BuiltCacheKey {

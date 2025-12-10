@@ -5,6 +5,6 @@ data class DiaryAddQuestionRequestDto(
     val shortQuestion: String,
     val answers: List<String>,
     val shortAnswers: List<String>,
-    val targetActivities: List<String>,
+    val targetDailyClassTypes: List<String>,
     var active: Boolean = true,
 )

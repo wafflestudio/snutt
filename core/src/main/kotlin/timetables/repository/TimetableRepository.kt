@@ -50,4 +50,9 @@ interface TimetableRepository :
         userId: String,
         themeId: String,
     ): List<Timetable>
+
+    suspend fun countAllByIsPrimaryTrueAndYearAndSemester(
+        year: Int,
+        semester: Semester,
+    ): Long
 }

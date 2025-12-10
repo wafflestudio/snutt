@@ -45,7 +45,7 @@ subprojects {
 
         implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.9")
+        implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.14")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("io.projectreactor:reactor-test")

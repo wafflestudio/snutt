@@ -5,7 +5,7 @@ import com.wafflestudio.snutt.clientconfig.dto.PatchConfigRequest
 import com.wafflestudio.snutt.clientconfig.dto.PostConfigRequest
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
-import com.wafflestudio.snutt.diary.dto.DiaryActivityDto
+import com.wafflestudio.snutt.diary.dto.DiaryDailyClassTypeDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.popup.dto.PopupResponse
@@ -42,9 +42,16 @@ import org.springframework.web.bind.annotation.RequestMethod
                             ),
                         ],
                         required = true,
-                        description = "userId null이면 모든 유저에게 보냄",
+                        description =
+                            "userId == null이면 모든 유저에게 보냄\n" +
+                                "insertFcm == true && shouldSendAsDataMessage == true이면 FCM data message(클라에서 직접 대응 필요한 메시지)로 보냄",
                     ),
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -194,16 +201,16 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activities",
+        path = "/v1/admin/diary/dailyClassTypes",
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "getAllDiaryActivities",
+                operationId = "getAllDiaryDailyClassTypes",
                 responses = [
                     ApiResponse(
                         responseCode = "200",
-                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryActivityDto::class)))],
+                        content = [Content(array = ArraySchema(schema = Schema(implementation = DiaryDailyClassTypeDto::class)))],
                     ),
                 ],
             ),
@@ -224,29 +231,39 @@ import org.springframework.web.bind.annotation.RequestMethod
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activities",
+        path = "/v1/admin/diary/dailyClassTypes",
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "insertDiaryActivity",
+                operationId = "insertDiaryDailyClassType",
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
-        path = "/v1/admin/diary/activities",
+        path = "/v1/admin/diary/dailyClassTypes",
         method = [RequestMethod.DELETE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
         operation =
             Operation(
-                operationId = "removeDiaryActivity",
+                operationId = "removeDiaryDailyClassType",
                 parameters = [
                     Parameter(`in` = ParameterIn.QUERY, name = "name", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -266,7 +283,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                         ],
                         required = true,
                     ),
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
     RouterOperation(
@@ -279,7 +301,12 @@ import org.springframework.web.bind.annotation.RequestMethod
                 parameters = [
                     Parameter(`in` = ParameterIn.PATH, name = "id", required = true),
                 ],
-                responses = [ApiResponse(responseCode = "200", content = [Content(schema = Schema(implementation = OkResponse::class))])],
+                responses = [
+                    ApiResponse(
+                        responseCode = "200",
+                        content = [Content(schema = Schema(implementation = OkResponse::class))],
+                    ),
+                ],
             ),
     ),
 )

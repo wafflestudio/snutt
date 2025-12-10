@@ -29,7 +29,7 @@ class LectureCustomRepositoryImpl(
     private val reactiveMongoTemplate: ReactiveMongoTemplate,
 ) : LectureCustomRepository {
     companion object {
-        private val placeRegex = """^(?:|#|\*)\d+(?:-\d+|-[A-Z])?-[A-Z]?\d+[A-Z]?(?:-\d+)?$""".toRegex()
+        private val placeRegex = """^(?:|#|\*)\d+(?:-\d+|-[a-zA-Z])?-[a-zA-Z]?\d+[a-zA-Z]?(?:-\d+)?$""".toRegex()
         private val buildingRegex = """^(?:|#|\*)\d+(?:-\d+)?동$""".toRegex()
     }
 
@@ -119,10 +119,12 @@ class LectureCustomRepositoryImpl(
                     keyword in listOf("군휴학", "군휴학원격") -> Lecture::remark regex ".*ⓜⓞ.*"
 
                     placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
-                        val placeKeyword = keyword.replace("동", "")
+                        val placeKeyword = keyword.replace("동", "").uppercase()
+
                         Lecture::classPlaceAndTimes elemMatch
                             Criteria().orOperator(
                                 ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}-", "i"),
+                                ClassPlaceAndTime::place.regex("^${Regex.escape(placeKeyword)}$", "m"),
                             )
                     }
 

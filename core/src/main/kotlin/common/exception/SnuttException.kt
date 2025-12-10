@@ -93,6 +93,8 @@ object NotPublishedThemeException : SnuttException(ErrorType.NOT_PUBLISHED_THEME
 
 object PublishedThemeDeleteErrorException : SnuttException(ErrorType.PUBLISHED_THEME_DELETE_ERROR)
 
+object TimetableLectureReminderInvalidTimeException : SnuttException(ErrorType.TIMETABLE_LECTURE_REMINDER_INVALID_TIME)
+
 object VacancyNotificationTemporarilyUnavailableException : SnuttException(ErrorType.VACANCY_NOTIFICATION_TEMPORARILY_UNAVAILABLE)
 
 object SocialConnectFailException : SnuttException(ErrorType.SOCIAL_CONNECT_FAIL)
@@ -136,7 +138,9 @@ object SocialProviderNotAttachedException : SnuttException(ErrorType.SOCIAL_PROV
 
 object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_NOT_FOUND)
 
-object DiaryActivityNotFoundException : SnuttException(ErrorType.DIARY_ACTIVITY_NOT_FOUND)
+object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAILY_CLASS_TYPE_NOT_FOUND)
+
+object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)
 
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
@@ -180,5 +184,3 @@ object DuplicateSocialAccountException : SnuttException(ErrorType.DUPLICATE_SOCI
 object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_REMOVE_LAST_AUTH_PROVIDER)
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
-
-object PastSemesterException : SnuttException(ErrorType.PAST_SEMESTER)

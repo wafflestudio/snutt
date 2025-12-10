@@ -21,6 +21,11 @@ interface PushPreferenceService {
         pushPreferenceType: PushPreferenceType,
     ): Boolean
 
+    suspend fun isPushPreferenceEnabled(
+        userIds: List<String>,
+        pushPreferenceType: PushPreferenceType,
+    ): Map<String, Boolean>
+
     suspend fun filterUsersByPushPreference(
         userIds: List<String>,
         pushPreferenceType: PushPreferenceType,
@@ -72,17 +77,20 @@ class PushPreferenceServiceImpl(
     override suspend fun isPushPreferenceEnabled(
         userId: String,
         pushPreferenceType: PushPreferenceType,
-    ): Boolean {
-        if (pushPreferenceType == PushPreferenceType.NORMAL) {
-            return true
-        }
+    ): Boolean = isPushPreferenceEnabled(listOf(userId), pushPreferenceType)[userId]!!
 
-        return pushPreferenceRepository
-            .findByUserId(userId)
-            ?.pushPreferences
-            ?.find { it.type == pushPreferenceType }
-            ?.isEnabled
-            ?: pushPreferenceType.isEnabledByDefault
+    override suspend fun isPushPreferenceEnabled(
+        userIds: List<String>,
+        pushPreferenceType: PushPreferenceType,
+    ): Map<String, Boolean> {
+        if (pushPreferenceType == PushPreferenceType.NORMAL) {
+            return userIds.associateWith { true }
+        }
+        val userPushPreferences = pushPreferenceRepository.findByUserIdIn(userIds).associateBy { it.userId }
+        return userIds.associateWith { userId ->
+            userPushPreferences[userId]?.pushPreferences?.find { it.type == pushPreferenceType }?.isEnabled
+                ?: pushPreferenceType.isEnabledByDefault
+        }
     }
 
     override suspend fun filterUsersByPushPreference(

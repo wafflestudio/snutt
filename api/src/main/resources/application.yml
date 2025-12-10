@@ -6,6 +6,10 @@ spring:
 
 snutt:
   secret-key:
+
+springdoc:
+  pre-loading-enabled: true
+  pre-loading-locales: ko-KR,en-US
 ---
 spring:
   config:
