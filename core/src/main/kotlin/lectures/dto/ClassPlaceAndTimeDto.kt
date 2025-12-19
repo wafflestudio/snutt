@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enums.DayOfWeek
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.utils.endPeriod
 import com.wafflestudio.snutt.lectures.utils.minuteToString

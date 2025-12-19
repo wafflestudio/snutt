@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto

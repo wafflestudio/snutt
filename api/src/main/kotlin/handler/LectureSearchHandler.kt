@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.handler
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.dto.SearchDto
 import com.wafflestudio.snutt.lectures.dto.SearchTimeDto
 import com.wafflestudio.snutt.lectures.service.LectureService

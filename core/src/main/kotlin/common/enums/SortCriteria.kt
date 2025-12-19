@@ -1,4 +1,4 @@
-package com.wafflestudio.snutt.common.enum
+package com.wafflestudio.snutt.common.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
 import com.wafflestudio.snutt.common.extension.desc
@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.lectures.data.EvInfo
 import com.wafflestudio.snutt.lectures.data.Lecture
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.div
+import kotlin.collections.get
 
 enum class SortCriteria(
     val value: Int,

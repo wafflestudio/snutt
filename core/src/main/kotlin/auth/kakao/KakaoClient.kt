@@ -12,13 +12,11 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Component("KAKAO")
-class KakaoClient(
-    webClientBuilder: WebClient.Builder,
-) : OAuth2Client {
+class KakaoClient : OAuth2Client {
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
-    private val webClient = webClientBuilder.clientConnector(ReactorClientHttpConnector(httpClient)).build()
+    private val webClient = WebClient.builder().clientConnector(ReactorClientHttpConnector(httpClient)).build()
 
     companion object {
         private const val USER_INFO_URI = "https://kapi.kakao.com/v2/user/me"

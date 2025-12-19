@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.users.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.auth.AuthProvider
 import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
@@ -10,6 +9,7 @@ import com.wafflestudio.snutt.users.data.User
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import tools.jackson.databind.ObjectMapper
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 

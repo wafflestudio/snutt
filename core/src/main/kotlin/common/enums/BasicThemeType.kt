@@ -1,4 +1,4 @@
-package com.wafflestudio.snutt.common.enum
+package com.wafflestudio.snutt.common.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
 import org.springframework.core.convert.converter.Converter

@@ -2,7 +2,7 @@ package com.wafflestudio.snutt.bookmark.service
 
 import com.wafflestudio.snutt.bookmark.data.Bookmark
 import com.wafflestudio.snutt.bookmark.repository.BookmarkRepository
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture

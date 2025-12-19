@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-alpine
+FROM ghcr.io/graalvm/jdk-community:21
 WORKDIR /app
 ARG CODEARTIFACT_AUTH_TOKEN
 COPY . /app

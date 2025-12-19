@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.sugangsnu.common.utils
 
-import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enums.DayOfWeek
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuClassTime
 import org.slf4j.LoggerFactory

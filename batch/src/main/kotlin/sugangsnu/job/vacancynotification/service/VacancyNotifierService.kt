@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.sugangsnu.job.vacancynotification.service
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.push.DeeplinkType
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.coursebook.data.Coursebook

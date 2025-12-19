@@ -1,7 +1,5 @@
 package com.wafflestudio.snutt.users.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.wafflestudio.snutt.auth.AuthProvider
 import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
@@ -44,6 +42,8 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.stereotype.Service
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.time.Duration
 import java.util.Base64
 import kotlin.random.Random

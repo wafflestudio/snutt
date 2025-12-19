@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.theme.service
 
-import com.wafflestudio.snutt.common.enum.BasicThemeType
+import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.exception.AlreadyDownloadedThemeException
 import com.wafflestudio.snutt.common.exception.DuplicateThemeNameException
 import com.wafflestudio.snutt.common.exception.InvalidThemeColorCountException

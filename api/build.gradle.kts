@@ -6,11 +6,10 @@ plugins {
 dependencies {
     implementation(project(":core"))
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
-    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
-    implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.0")
     runtimeOnly("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 
     testImplementation(testFixtures(project(":core")))

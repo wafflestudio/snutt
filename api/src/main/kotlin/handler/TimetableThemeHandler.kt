@@ -2,7 +2,7 @@ package com.wafflestudio.snutt.handler
 
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.common.enum.BasicThemeType
+import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
 import com.wafflestudio.snutt.theme.dto.TimetableThemeDto

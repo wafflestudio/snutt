@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.handler
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.FriendNotFoundException
 import com.wafflestudio.snutt.friend.service.FriendService
 import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware

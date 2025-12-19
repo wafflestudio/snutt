@@ -11,14 +11,13 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Component("FACEBOOK")
-class FacebookClient(
-    webClientBuilder: WebClient.Builder,
-) : OAuth2Client {
+class FacebookClient : OAuth2Client {
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
     private val webClient =
-        webClientBuilder
+        WebClient
+            .builder()
             .clientConnector(ReactorClientHttpConnector(httpClient))
             .build()
 

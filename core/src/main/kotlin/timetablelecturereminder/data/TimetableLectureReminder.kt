@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.timetablelecturereminder.data
 
-import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enums.DayOfWeek
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.Indexed
