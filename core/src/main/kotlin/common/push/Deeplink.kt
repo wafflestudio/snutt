@@ -15,7 +15,7 @@ enum class DeeplinkType(
     FRIENDS("friends?openDrawer=true"),
     TIMETABLE_LECTURE("timetable-lecture?timetableId=%s&lectureId=%s"),
     BOOKMARKS("bookmarks?year=%s&semester=%s&lectureId=%s"),
-    DIARY("diary?lectureId=%s"),
+    DIARY("diary?lectureId=%s&courseTitle=%s"),
     ;
 
     fun build(
