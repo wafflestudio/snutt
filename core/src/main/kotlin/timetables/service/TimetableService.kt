@@ -114,7 +114,7 @@ class TimetableServiceImpl(
     private val timetableRepository: TimetableRepository,
     private val evService: EvService,
     private val dynamicLinkClient: DynamicLinkClient,
-    @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
+    @param:Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
     override suspend fun getTimetables(userId: String): List<Timetable> = timetableRepository.findAllByUserId(userId).toList()
 

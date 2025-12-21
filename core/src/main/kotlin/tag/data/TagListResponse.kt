@@ -6,13 +6,13 @@ import com.wafflestudio.snutt.common.enum.SortCriteria
 data class TagListResponse(
     val classification: List<String>,
     val department: List<String>,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     val academicYear: List<String>,
     val credit: List<String>,
     val instructor: List<String>,
     val category: List<String>,
     val sortCriteria: List<String>,
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     val updatedAt: Long,
     val categoryPre2025: List<String>,
 )

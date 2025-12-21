@@ -4,20 +4,20 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.theme.data.ColorSet
 
 data class TimetableLectureModifyLegacyRequestDto(
-    @JsonProperty("course_title")
+    @param:JsonProperty("course_title")
     val courseTitle: String?,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     val academicYear: String?,
     val category: String?,
     val classification: String?,
     val instructor: String?,
     val credit: Long?,
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     val classPlaceAndTimes: List<ClassPlaceAndTimeLegacyRequestDto>?,
     val remark: String?,
     val color: ColorSet?,
     val colorIndex: Int?,
-    @JsonProperty("is_forced")
+    @param:JsonProperty("is_forced")
     val isForced: Boolean = false,
     val categoryPre2025: String?,
 )

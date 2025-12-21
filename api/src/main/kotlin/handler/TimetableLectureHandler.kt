@@ -101,7 +101,7 @@ class TimetableLectureHandler(
         }
 
     data class ForcedReq(
-        @JsonProperty("is_forced")
+        @param:JsonProperty("is_forced")
         val isForced: Boolean?,
     )
 }

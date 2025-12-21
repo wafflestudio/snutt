@@ -13,7 +13,7 @@ import java.time.Instant
 @Document("timetables")
 data class Timetable(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     @Indexed
     @Field("user_id", targetType = FieldType.OBJECT_ID)
@@ -21,7 +21,7 @@ data class Timetable(
     var year: Int,
     var semester: Semester,
     @Field("lecture_list")
-    @JsonProperty("lecture_list")
+    @param:JsonProperty("lecture_list")
     var lectures: List<TimetableLecture> = emptyList(),
     var title: String,
     var theme: BasicThemeType,
@@ -29,6 +29,6 @@ data class Timetable(
     @Field("is_primary")
     var isPrimary: Boolean? = null,
     @Field("updated_at")
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
 )

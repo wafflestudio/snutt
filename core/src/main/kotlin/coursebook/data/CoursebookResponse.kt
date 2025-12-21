@@ -7,7 +7,7 @@ import java.time.Instant
 data class CoursebookResponse(
     val year: Int,
     val semester: Semester,
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     val updatedAt: Instant,
 ) {
     constructor(coursebook: Coursebook) : this(

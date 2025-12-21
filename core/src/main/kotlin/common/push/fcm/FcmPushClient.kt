@@ -26,9 +26,9 @@ import org.springframework.stereotype.Service
 @Service
 @Profile("!test")
 internal class FcmPushClient(
-    @Value("\${google.firebase.project-id}") private val projectId: String,
-    @Value("\${google.firebase.service-account}") private val serviceAccountString: String,
-    @Value("\${google.firebase.ios.bundle-id}") private val iosBundleId: String,
+    @param:Value("\${google.firebase.project-id}") private val projectId: String,
+    @param:Value("\${google.firebase.service-account}") private val serviceAccountString: String,
+    @param:Value("\${google.firebase.ios.bundle-id}") private val iosBundleId: String,
 ) : PushClient {
     private object PayloadKeys {
         const val TITLE = "title"

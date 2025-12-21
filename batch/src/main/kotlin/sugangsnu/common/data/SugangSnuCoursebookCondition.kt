@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.enum.Semester
 
 data class SugangSnuCoursebookCondition(
-    @JsonProperty("currSchyy")
+    @param:JsonProperty("currSchyy")
     val latestYear: Int,
-    @JsonProperty("currShtmFg")
+    @param:JsonProperty("currShtmFg")
     private val semesterFlagPrev: String,
-    @JsonProperty("currDetaShtmFg")
+    @param:JsonProperty("currDetaShtmFg")
     private val semesterFlagNext: String,
 ) {
     val latestSugangSnuSemester: String

@@ -12,7 +12,7 @@ import java.time.Instant
 @CompoundIndex(def = "{ 'year': 1, 'semester': 1 }", unique = true)
 class Coursebook(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     val year: Int,
     val semester: Semester,

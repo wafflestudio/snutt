@@ -52,7 +52,7 @@ interface AuthService {
 class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val objectMapper: ObjectMapper,
-    @Value("\${snutt.secret-key}") private val secretKey: String,
+    @param:Value("\${snutt.secret-key}") private val secretKey: String,
     clients: Map<String, OAuth2Client>,
 ) : AuthService {
     companion object {

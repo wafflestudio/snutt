@@ -20,7 +20,7 @@ interface MailService {
 
 @Service
 class MailServiceImpl(
-    @Value("userMailTemplate.txt") private val mailTemplateResource: ClassPathResource,
+    @param:Value("userMailTemplate.txt") private val mailTemplateResource: ClassPathResource,
     private val mailClient: MailClient,
     private val authService: AuthService,
 ) : MailService {
