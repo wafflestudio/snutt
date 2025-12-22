@@ -8,6 +8,7 @@ snutt:
   secret-key:
 
 springdoc:
+  paths-to-match: /v1/**
   pre-loading-enabled: true
   pre-loading-locales: ko-KR,en-US
 ---
