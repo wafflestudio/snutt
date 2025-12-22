@@ -286,4 +286,4 @@ import org.springframework.web.bind.annotation.RequestMethod
 )
 annotation class ThemeDocs
 
-private class ThemesResponse : ListResponse<TimetableThemeDto>(listOf())
+class ThemesResponse : ListResponse<TimetableThemeDto>(listOf())

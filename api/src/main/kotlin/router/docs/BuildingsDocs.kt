@@ -43,4 +43,4 @@ import org.springframework.web.bind.annotation.RequestMethod
 )
 annotation class BuildingsDocs
 
-private class BuildingsResponse : ListResponse<LectureBuilding>(listOf())
+class BuildingsResponse : ListResponse<LectureBuilding>(listOf())

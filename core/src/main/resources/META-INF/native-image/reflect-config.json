@@ -1,0 +1,6 @@
+[
+  {
+    "name": "io.jsonwebtoken.impl.security.DefaultMacAlgorithm",
+    "allDeclaredConstructors": true
+  }
+]

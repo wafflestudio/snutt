@@ -30,4 +30,4 @@ import org.springframework.web.bind.annotation.RequestMethod
 )
 annotation class PopupDocs
 
-private class PopupsResponse : ListResponse<PopupResponse>(listOf())
+class PopupsResponse : ListResponse<PopupResponse>(listOf())

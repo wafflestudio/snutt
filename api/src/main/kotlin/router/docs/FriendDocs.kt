@@ -181,4 +181,4 @@ import org.springframework.web.bind.annotation.RequestMethod
 )
 annotation class FriendDocs
 
-private class FriendsResponse : ListResponse<FriendResponse>(listOf())
+class FriendsResponse : ListResponse<FriendResponse>(listOf())

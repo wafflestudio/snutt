@@ -1,0 +1,49 @@
+{
+  "reflection": [
+    {
+      "type": "com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    },
+    {
+      "type": "com.wafflestudio.snutt.timetables.dto.TimetableLectureLegacyDto",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    },
+    {
+      "type": "com.wafflestudio.snutt.timetables.dto.ClassPlaceAndTimeLegacyDto",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    },
+    {
+      "type": "com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    },
+    {
+      "type": "com.wafflestudio.snutt.common.enums.DayOfWeek",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    }
+  ]
+}

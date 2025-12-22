@@ -1,0 +1,8 @@
+FROM ghcr.io/graalvm/native-image-community:21
+WORKDIR /app
+ARG CODEARTIFACT_AUTH_TOKEN
+COPY . /app
+RUN microdnf install findutils --nodocs
+RUN ./gradlew :api:nativeCompile -PcodeArtifactAuthToken=$CODEARTIFACT_AUTH_TOKEN --stacktrace
+EXPOSE 8080
+ENTRYPOINT java $JAVA_OPTS -jar api/build/libs/snutt-api.jar

@@ -3,16 +3,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 
 plugins {
+    id("org.graalvm.buildtools.native") version "0.11.3" apply false
     id("org.springframework.boot") version "4.0.1" apply false
     id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm") version "2.3.0"
     kotlin("plugin.spring") version "2.2.0"
 }
 
 group = "com.wafflestudio"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_21
-java.targetCompatibility = JavaVersion.VERSION_21
+java.sourceCompatibility = JavaVersion.VERSION_25
+java.targetCompatibility = JavaVersion.VERSION_25
 
 allprojects {
     repositories {
@@ -24,6 +25,7 @@ allprojects {
 
 subprojects {
     apply {
+        plugin("org.graalvm.buildtools.native")
         plugin("kotlin")
         plugin("org.jlleitschuh.gradle.ktlint")
         plugin("org.jetbrains.kotlin.jvm")
@@ -34,7 +36,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         compilerOptions {
             freeCompilerArgs.add("-Xjsr305=strict")
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(JvmTarget.JVM_25)
         }
     }
 
