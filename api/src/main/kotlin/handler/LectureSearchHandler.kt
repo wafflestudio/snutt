@@ -32,9 +32,9 @@ data class SearchQueryLegacy(
     val title: String? = null,
     val classification: List<String>? = null,
     val credit: List<Int>? = null,
-    @JsonProperty("course_number")
+    @param:JsonProperty("course_number")
     val courseNumber: List<String>? = null,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     val academicYear: List<String>? = null,
     val department: List<String>? = null,
     val category: List<String>? = null,

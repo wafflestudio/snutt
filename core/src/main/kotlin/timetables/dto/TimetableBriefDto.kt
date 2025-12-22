@@ -5,15 +5,15 @@ import com.wafflestudio.snutt.timetables.data.Timetable
 import java.time.Instant
 
 data class TimetableBriefDto(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String,
     val year: Int,
     val semester: Int,
     val title: String,
     val isPrimary: Boolean,
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     val updatedAt: Instant,
-    @JsonProperty("total_credit")
+    @param:JsonProperty("total_credit")
     val totalCredit: Long,
 )
 

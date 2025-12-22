@@ -27,13 +27,13 @@ data class ClassPlaceAndTimeLegacyDto(
     val place: String?,
     val startMinute: Int,
     val endMinute: Int,
-    @JsonProperty("start_time")
+    @param:JsonProperty("start_time")
     val startTime: String,
-    @JsonProperty("end_time")
+    @param:JsonProperty("end_time")
     val endTime: String,
-    @JsonProperty("len")
+    @param:JsonProperty("len")
     val periodLength: Double,
-    @JsonProperty("start")
+    @param:JsonProperty("start")
     val startPeriod: Double,
 )
 

@@ -20,8 +20,8 @@ data class UserLegacyDto(
     val regDate: ZonedDateTime,
     val notificationCheckedAt: ZonedDateTime,
     val email: String?,
-    @JsonProperty("local_id")
+    @param:JsonProperty("local_id")
     val localId: String?,
-    @JsonProperty("fb_name")
+    @param:JsonProperty("fb_name")
     val fbName: String?,
 )

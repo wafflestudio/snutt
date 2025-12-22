@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 @CompoundIndex(def = "{'user_id': 1, 'year': 1, 'semester': 1}", unique = true)
 class Bookmark(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String? = null,
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String,

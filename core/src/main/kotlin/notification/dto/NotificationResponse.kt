@@ -7,15 +7,15 @@ import com.wafflestudio.snutt.notification.data.NotificationType
 import java.time.ZonedDateTime
 
 data class NotificationResponse(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String? = null,
-    @JsonProperty("user_id")
+    @param:JsonProperty("user_id")
     val userId: String?,
     val title: String,
     val message: String,
     val type: NotificationType,
     val deeplink: String?,
-    @JsonProperty("created_at")
+    @param:JsonProperty("created_at")
     val createdAt: ZonedDateTime,
 ) {
     companion object {

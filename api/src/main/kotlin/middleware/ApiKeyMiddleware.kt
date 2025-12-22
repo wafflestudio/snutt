@@ -11,7 +11,7 @@ import javax.crypto.spec.SecretKeySpec
 
 @Component
 class ApiKeyMiddleware(
-    @Value("\${snutt.secret-key}") private val secretKey: String,
+    @param:Value("\${snutt.secret-key}") private val secretKey: String,
 ) : Middleware {
     companion object {
         const val API_KEY_HEADER = "x-access-apikey"

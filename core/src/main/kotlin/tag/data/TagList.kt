@@ -12,15 +12,15 @@ import java.time.Instant
 @CompoundIndex(def = "{'year': 1, 'semester': 1}", unique = true)
 data class TagList(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     val year: Int,
     val semester: Semester,
     @Field("updated_at")
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     val updatedAt: Instant = Instant.now(),
     @Field("tags")
-    @JsonProperty("tags")
+    @param:JsonProperty("tags")
     val tagCollection: TagCollection,
 )
 

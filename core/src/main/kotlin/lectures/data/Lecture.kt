@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }")
 data class Lecture(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,

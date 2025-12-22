@@ -9,13 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Field
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLecture(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,
     var category: String?,
     @Field("class_time_json")
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTime>,
     var classification: String?,
     var credit: Long,

@@ -6,7 +6,7 @@ import com.wafflestudio.snutt.users.data.User
 data class EvUserDto(
     val id: String?,
     val email: String?,
-    @JsonProperty("local_id")
+    @param:JsonProperty("local_id")
     val localId: String?,
 )
 

@@ -6,27 +6,27 @@ import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.Lecture
 
 data class LectureDto(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String? = null,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     val academicYear: String?,
     val category: String?,
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     val classPlaceAndTimes: List<ClassPlaceAndTimeLegacyDto>,
     val classification: String?,
     val credit: Long,
     val department: String?,
     val instructor: String?,
-    @JsonProperty("lecture_number")
+    @param:JsonProperty("lecture_number")
     val lectureNumber: String,
     val quota: Int?,
     val freshmanQuota: Int? = null,
     val remark: String?,
     val semester: Semester,
     val year: Int,
-    @JsonProperty("course_number")
+    @param:JsonProperty("course_number")
     val courseNumber: String,
-    @JsonProperty("course_title")
+    @param:JsonProperty("course_title")
     val courseTitle: String,
     val registrationCount: Int,
     val wasFull: Boolean,

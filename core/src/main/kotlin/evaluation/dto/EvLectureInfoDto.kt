@@ -8,7 +8,7 @@ data class EvLectureInfoDto(
     val year: Int,
     val semester: Int,
     val instructor: String?,
-    @JsonProperty("course_number")
+    @param:JsonProperty("course_number")
     val courseNumber: String?,
 )
 
