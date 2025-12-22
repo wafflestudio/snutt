@@ -2,53 +2,71 @@ package com.wafflestudio.snutt.timetable
 
 import BaseIntegTest
 import com.ninjasquad.springmockk.MockkBean
+import com.wafflestudio.snutt.config.USER_ATTRIBUTE_KEY
 import com.wafflestudio.snutt.evaluation.service.EvService
+import com.wafflestudio.snutt.filter.ApiKeyWebFilter
+import com.wafflestudio.snutt.filter.UserAuthenticationWebFilter
 import com.wafflestudio.snutt.fixture.TimetableFixture
 import com.wafflestudio.snutt.fixture.UserFixture
-import com.wafflestudio.snutt.handler.RequestContext
-import com.wafflestudio.snutt.middleware.SnuttRestApiDefaultMiddleware
-import com.wafflestudio.snutt.router.MainRouter
 import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import kotlinx.coroutines.reactor.mono
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.server.WebFilterChain
 import timetables.dto.TimetableBriefDto
 
 @SpringBootTest
+@AutoConfigureWebTestClient
 class TimetableIntegTest(
-    @MockkBean private val mockMiddleware: SnuttRestApiDefaultMiddleware,
     @MockkBean private val mockSnuttEvService: EvService,
-    val mainRouter: MainRouter,
+    @MockkBean private val apiKeyWebFilter: ApiKeyWebFilter,
+    @MockkBean private val userAuthenticationWebFilter: UserAuthenticationWebFilter,
+    val webTestClient: WebTestClient,
     val timetableFixture: TimetableFixture,
     val userFixture: UserFixture,
     val timetableRepository: TimetableRepository,
     val repositories: List<CoroutineCrudRepository<*, *>>,
 ) : BaseIntegTest({
-        val timetableServer =
-            WebTestClient
-                .bindToRouterFunction(mainRouter.tableRoute())
-                .configureClient()
-                .defaultHeaders { header ->
-                    header.contentType = MediaType.APPLICATION_JSON
-                }.build()
-
         coEvery { mockSnuttEvService.getSummariesByIds(any()) } returns emptyList()
         coEvery { mockSnuttEvService.getEvIdsBySnuttIds(any()) } returns emptyList()
-        coEvery { mockMiddleware.invoke(any(), any()) } returns RequestContext(user = userFixture.testUser)
-        afterContainer { repositories.forEach { it.deleteAll() } }
+        coEvery {
+            apiKeyWebFilter.filter(any(), any())
+        } answers {
+            val exchange = firstArg<ServerWebExchange>()
+            val chain = secondArg<WebFilterChain>()
+            chain.filter(exchange)
+        }
+        coEvery {
+            userAuthenticationWebFilter.filter(any(), any())
+        } answers {
+            val exchange = firstArg<ServerWebExchange>()
+            val chain = secondArg<WebFilterChain>()
+            mono {
+                exchange.attributes[USER_ATTRIBUTE_KEY] = userFixture.testUser
+            }.then(chain.filter(exchange))
+        }
+
+        afterContainer {
+            repositories.forEach { it.deleteAll() }
+        }
 
         "POST /v1/tables" should {
             "success" {
-                timetableServer
+                webTestClient
                     .post()
                     .uri("/v1/tables")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("x-access-token", userFixture.testUser.credentialHash)
                     .bodyValue("""{"year":2016, "semester":3, "title":"MyTimeTable"}""".trimIndent())
                     .exchange()
                     .expectStatus()
@@ -69,9 +87,10 @@ class TimetableIntegTest(
         "GET /v1/tables 요청시" should {
             val table = timetableFixture.getTimetable("test").let { timetableRepository.save(it) }
             "정상 반환" {
-                timetableServer
+                webTestClient
                     .get()
                     .uri("/v1/tables")
+                    .header("x-access-token", userFixture.testUser.credentialHash)
                     .exchange()
                     .expectStatus()
                     .isOk
@@ -90,9 +109,10 @@ class TimetableIntegTest(
                     }
             }
             "json 형태 확인" {
-                timetableServer
+                webTestClient
                     .get()
                     .uri("/v1/tables")
+                    .header("x-access-token", userFixture.testUser.credentialHash)
                     .exchange()
                     .expectStatus()
                     .isOk
@@ -116,9 +136,10 @@ class TimetableIntegTest(
         "GET /v1/tables/{tableId} 요청 시" should {
             val table = timetableFixture.getTimetable("test").let { timetableRepository.save(it) }
             "정상 반환" {
-                timetableServer
+                webTestClient
                     .get()
                     .uri("/v1/tables/${table.id}")
+                    .header("x-access-token", userFixture.testUser.credentialHash)
                     .exchange()
                     .expectStatus()
                     .isOk
@@ -138,9 +159,10 @@ class TimetableIntegTest(
                     }
             }
             "json 형태 확인" {
-                timetableServer
+                webTestClient
                     .get()
                     .uri("/v1/tables/${table.id}")
+                    .header("x-access-token", userFixture.testUser.credentialHash)
                     .exchange()
                     .expectStatus()
                     .isOk
