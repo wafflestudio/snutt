@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec
  * 모든 요청에 대해 x-access-apikey 헤더를 검증
  */
 @Component
-@Order(0) // 가장 먼저 실행
+@Order(1)
 class ApiKeyWebFilter(
     @param:Value("\${snutt.secret-key}") private val secretKey: String,
 ) : WebFilter {

@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono
  * 실제 인증 여부는 Controller에서 @CurrentUser나 @CurrentUserId를 사용할 때 확인됩니다.
  */
 @Component
-@Order(2)
+@Order(3)
 class UserAuthenticationWebFilter(
     private val userService: UserService,
 ) : WebFilter {

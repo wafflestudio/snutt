@@ -20,7 +20,7 @@ const val CLIENT_INFO_ATTRIBUTE_KEY = "clientInfo"
  * 모든 요청에 대해 실행되어야 하므로 Order를 낮게 설정
  */
 @Component
-@Order(1)
+@Order(2)
 class ClientInfoWebFilter : WebFilter {
     override fun filter(
         exchange: ServerWebExchange,

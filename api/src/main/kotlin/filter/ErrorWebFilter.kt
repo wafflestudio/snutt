@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
 import kotlinx.coroutines.CancellationException
 import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono
 import reactor.netty.channel.AbortedException
 
 @Component
+@Order(0)
 class ErrorWebFilter(
     private val objectMapper: ObjectMapper,
 ) : WebFilter {
