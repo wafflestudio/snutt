@@ -31,9 +31,10 @@ dependencies {
     testFixturesApi("io.mockk:mockk:1.14.7")
     testFixturesApi("io.mockk:mockk-agent-jvm:1.14.7")
     testFixturesApi("com.ninja-squad:springmockk:5.0.1")
-    testFixturesApi("io.kotest:kotest-extensions-spring:6.0.7")
-    testFixturesApi("io.kotest:kotest-runner-junit5:6.0.7")
-    testFixturesApi("io.kotest:kotest-assertions-core:6.0.7")
+
+    testFixturesApi("io.kotest.extensions:kotest-extensions-spring:1.3.0")
+    testFixturesApi("io.kotest:kotest-runner-junit5:5.9.1")
+    testFixturesApi("io.kotest:kotest-assertions-core:5.9.1")
 
     testFixturesImplementation("org.testcontainers:mongodb:1.21.3")
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")

@@ -16,7 +16,6 @@ dependencies {
     testImplementation(testFixtures(project(":core")))
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:mongodb:1.21.3")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
     testImplementation("org.springframework.boot:spring-boot-webtestclient")
 }
 
