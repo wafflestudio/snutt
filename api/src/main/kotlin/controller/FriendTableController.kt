@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.controller
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.common.exception.FriendNotFoundException
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.friend.service.FriendService
 import com.wafflestudio.snutt.timetables.dto.TimetableDto
 import com.wafflestudio.snutt.timetables.service.TimetableService
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/friends/{friendId}", "/friends/{friendId}")
 class FriendTableController(
     private val friendService: FriendService,

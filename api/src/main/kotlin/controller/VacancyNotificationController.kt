@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.ExistenceResponse
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.vacancynotification.dto.VacancyNotificationLecturesResponse
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/vacancy-notifications", "/vacancy-notifications")
 class VacancyNotificationController(
     private val vacancyNotificationService: VacancyNotificationService,

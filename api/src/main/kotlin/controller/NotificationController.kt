@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.notification.dto.NotificationCountResponse
 import com.wafflestudio.snutt.notification.dto.NotificationQuery
 import com.wafflestudio.snutt.notification.dto.NotificationResponse
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/notification", "/notification")
 class NotificationController(
     private val notificationService: NotificationService,

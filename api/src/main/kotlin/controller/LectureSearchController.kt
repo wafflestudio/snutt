@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import com.wafflestudio.snutt.lectures.dto.SearchDto
 import com.wafflestudio.snutt.lectures.dto.SearchTimeDto
 import com.wafflestudio.snutt.lectures.service.LectureService
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttNoAuthApiFilterTarget
 @RequestMapping("/v1/search_query", "/search_query")
 class LectureSearchController(
     private val lectureService: LectureService,

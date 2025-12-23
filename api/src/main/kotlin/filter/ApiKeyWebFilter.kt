@@ -19,6 +19,7 @@ import javax.crypto.spec.SecretKeySpec
 @Component
 @Order(1)
 class ApiKeyWebFilter(
+    private val handlerAnnotationResolver: HandlerAnnotationResolver,
     @param:Value("\${snutt.secret-key}") private val secretKey: String,
 ) : WebFilter {
     companion object {
@@ -62,22 +63,31 @@ class ApiKeyWebFilter(
         exchange: ServerWebExchange,
         chain: WebFilterChain,
     ): Mono<Void> =
-        runCatching {
-            val apiKey =
-                exchange.request.headers.getFirst(API_KEY_HEADER)
-                    ?: throw WrongApiKeyException
+        handlerAnnotationResolver
+            .isFilterTarget(exchange, ApiKeyWebFilterTarget::class.java)
+            .flatMap { isFilterTarget ->
+                if (isFilterTarget) {
+                    runCatching {
+                        val apiKey =
+                            exchange.request.headers.getFirst(API_KEY_HEADER)
+                                ?: throw WrongApiKeyException
 
-            val claims = jwtParser.parseSignedClaims(apiKey).payload
+                        val claims = jwtParser.parseSignedClaims(apiKey).payload
 
-            val string = claims["string"]?.toString() ?: throw WrongApiKeyException
-            val keyVersion = claims["key_version"]?.toString() ?: throw WrongApiKeyException
+                        val string = claims["string"]?.toString() ?: throw WrongApiKeyException
+                        val keyVersion = claims["key_version"]?.toString() ?: throw WrongApiKeyException
 
-            if (stringToKeyVersionMap[string] != keyVersion) {
-                throw WrongApiKeyException
+                        if (stringToKeyVersionMap[string] != keyVersion) {
+                            throw WrongApiKeyException
+                        }
+                    }.getOrElse {
+                        throw WrongApiKeyException
+                    }
+                }
+                chain.filter(exchange)
             }
-
-            chain.filter(exchange)
-        }.getOrElse {
-            throw WrongApiKeyException
-        }
 }
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class ApiKeyWebFilterTarget

@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegacyRequestDto
 import com.wafflestudio.snutt.timetables.service.TimetableLectureService
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/tables/{timetableId}/lecture", "/tables/{timetableId}/lecture")
 class TimetableLectureController(
     private val timetableLectureService: TimetableLectureService,

@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.auth.AuthProvider
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.extension.toZonedDateTime
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.dto.AuthProvidersCheckDto
 import com.wafflestudio.snutt.users.dto.EmailVerificationResultDto
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/user", "/user")
 class UserController(
     private val userService: UserService,
@@ -141,6 +143,7 @@ class UserController(
 }
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/users", "/users")
 class UsersController(
     private val userService: UserService,

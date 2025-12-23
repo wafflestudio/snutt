@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.notification.service.DeviceService
 import com.wafflestudio.snutt.users.data.User
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/user/device", "/user/device")
 class DeviceController(
     private val deviceService: DeviceService,

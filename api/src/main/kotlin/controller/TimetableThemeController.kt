@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.enum.BasicThemeType
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.theme.dto.TimetableThemeDto
 import com.wafflestudio.snutt.theme.dto.request.TimetableThemeAddRequestDto
 import com.wafflestudio.snutt.theme.dto.request.TimetableThemeDownloadRequestDto
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/themes", "/themes")
 class TimetableThemeController(
     private val timetableThemeService: TimetableThemeService,

@@ -1,9 +1,10 @@
 package com.wafflestudio.snutt.filter
 
 import com.wafflestudio.snutt.common.exception.NoUserTokenException
+import com.wafflestudio.snutt.common.exception.UserNotAdminException
 import com.wafflestudio.snutt.config.USER_ATTRIBUTE_KEY
+import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.service.UserService
-import kotlinx.coroutines.reactor.mono
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
@@ -16,8 +17,8 @@ import reactor.core.publisher.Mono
  * ClientInfoWebFilter 이후에 실행되어야 하므로 Order를 높게 설정
  */
 @Component
-@Order(3)
-class UserAuthenticationWebFilter(
+@Order(4)
+class AdminWebFilter(
     private val handlerAnnotationResolver: HandlerAnnotationResolver,
     private val userService: UserService,
 ) : WebFilter {
@@ -26,20 +27,19 @@ class UserAuthenticationWebFilter(
         chain: WebFilterChain,
     ): Mono<Void> =
         handlerAnnotationResolver
-            .isFilterTarget(exchange, UserAuthenticationWebFilterTarget::class.java)
+            .isFilterTarget(exchange, AdminWebFilterTarget::class.java)
             .flatMap { isTarget ->
                 if (isTarget) {
-                    val token = exchange.request.headers.getFirst("x-access-token") ?: throw NoUserTokenException
-                    mono {
-                        val user = userService.getUserByCredentialHash(token)
-                        exchange.attributes[USER_ATTRIBUTE_KEY] = user
-                    }.then(chain.filter(exchange))
-                } else {
-                    chain.filter(exchange)
+                    val currentUser = exchange.attributes[USER_ATTRIBUTE_KEY] as? User ?: throw NoUserTokenException
+
+                    if (!currentUser.isAdmin) {
+                        throw UserNotAdminException
+                    }
                 }
+                chain.filter(exchange)
             }
 }
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class UserAuthenticationWebFilterTarget
+annotation class AdminWebFilterTarget

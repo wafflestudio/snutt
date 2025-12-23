@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableModifyRequestDto
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import timetables.dto.TimetableBriefDto
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/tables", "/tables")
 class TimetableController(
     private val timetableService: TimetableService,

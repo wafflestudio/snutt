@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.bookmark.service.BookmarkService
 import com.wafflestudio.snutt.common.dto.ExistenceResponse
 import com.wafflestudio.snutt.common.enum.Semester
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/bookmarks", "/bookmarks")
 class BookmarkController(
     private val bookmarkService: BookmarkService,

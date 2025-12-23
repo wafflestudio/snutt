@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.evaluation.service.EvService
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import org.springframework.http.HttpMethod
 import org.springframework.util.MultiValueMap
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/ev-service", "/ev-service")
 class EvServiceController(
     private val evService: EvService,

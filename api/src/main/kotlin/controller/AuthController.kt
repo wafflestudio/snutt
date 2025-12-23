@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.dto.EmailResponse
 import com.wafflestudio.snutt.users.dto.FacebookLoginRequest
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttNoAuthApiFilterTarget
 @RequestMapping("/v1/auth", "/auth")
 class AuthController(
     private val userService: UserService,

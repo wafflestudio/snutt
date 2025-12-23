@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.friend.dto.FriendRequest
 import com.wafflestudio.snutt.friend.dto.FriendRequestLinkResponse
 import com.wafflestudio.snutt.friend.dto.FriendResponse
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/friends", "/friends")
 class FriendController(
     private val friendService: FriendService,

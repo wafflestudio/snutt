@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.web.bind.annotation.GetMapping
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("")
 class StaticPageController {
     companion object {

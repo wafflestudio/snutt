@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.timetablelecturereminder.dto.TimetableLectureReminderDto
 import com.wafflestudio.snutt.timetablelecturereminder.dto.request.TimetableLectureReminderModifyRequestDto
 import com.wafflestudio.snutt.timetablelecturereminder.service.TimetableLectureReminderService
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttDefaultApiFilterTarget
 @RequestMapping("/v1/tables/{timetableId}", "/tables/{timetableId}")
 class TimetableLectureReminderController(
     private val timetableLectureReminderService: TimetableLectureReminderService,

@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.feedback.dto.FeedbackPostRequestDto
 import com.wafflestudio.snutt.feedback.service.FeedbackService
+import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@SnuttNoAuthApiFilterTarget
 @RequestMapping("/v1/feedback", "/feedback")
 class FeedbackController(
     private val feedbackService: FeedbackService,
