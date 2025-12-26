@@ -1,0 +1,7 @@
+FROM ghcr.io/graalvm/jdk-community:25
+WORKDIR /app
+ARG CODEARTIFACT_AUTH_TOKEN
+COPY . /app
+RUN microdnf install -y findutils --nodocs
+RUN ./gradlew :batch:nativeCompile -PcodeArtifactAuthToken=$CODEARTIFACT_AUTH_TOKEN
+ENTRYPOINT batch/build/native/nativeCompile/batch --job.name=${JOB_NAME}
