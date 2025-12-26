@@ -7,8 +7,6 @@ open class SnuttException(
     val title: String = error.title,
     val errorMessage: String = error.errorMessage,
     val displayMessage: String = error.displayMessage,
-    // TODO: 구버전 대응용 ext 필드. 추후 삭제
-    val ext: Map<String, String> = mapOf(),
 ) : RuntimeException(errorMessage)
 
 object InvalidTimeException : SnuttException(ErrorType.INVALID_TIME)
@@ -117,7 +115,6 @@ class LectureTimeOverlapException(
 ) : SnuttException(
         error = ErrorType.LECTURE_TIME_OVERLAP,
         displayMessage = confirmMessage,
-        ext = mapOf("confirm_message" to confirmMessage),
     )
 
 object CustomLectureResetException : SnuttException(ErrorType.CANNOT_RESET_CUSTOM_LECTURE)

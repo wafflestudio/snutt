@@ -1,0 +1,20 @@
+package com.wafflestudio.snutt.filter
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@ApiKeyWebFilterTarget
+@UserAuthenticationWebFilterTarget
+@ClientInfoWebFilterTarget
+annotation class SnuttDefaultApiFilterTarget
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@ApiKeyWebFilterTarget
+@UserAuthenticationWebFilterTarget
+@AdminWebFilterTarget
+@ClientInfoWebFilterTarget
+annotation class SnuttAdminApiFilterTarget
+
+@ApiKeyWebFilterTarget
+@ClientInfoWebFilterTarget
+annotation class SnuttNoAuthApiFilterTarget

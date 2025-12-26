@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
 import kotlinx.coroutines.CancellationException
 import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono
 import reactor.netty.channel.AbortedException
 
 @Component
+@Order(0)
 class ErrorWebFilter(
     private val objectMapper: ObjectMapper,
 ) : WebFilter {
@@ -83,7 +85,7 @@ class ErrorWebFilter(
             }
 
     private fun makeErrorBody(exception: SnuttException): ErrorBody =
-        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage, exception.ext)
+        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage)
 }
 
 private data class ErrorBody(
@@ -91,6 +93,4 @@ private data class ErrorBody(
     val title: String,
     val message: String,
     val displayMessage: String,
-    // TODO: 구버전 대응용 ext 필드. 추후 삭제
-    val ext: Map<String, String> = mapOf(),
 )
