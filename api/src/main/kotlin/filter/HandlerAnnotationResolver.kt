@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.filter
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
@@ -9,6 +10,7 @@ import reactor.core.publisher.Mono
 
 @Component
 class HandlerAnnotationResolver(
+    @param:Qualifier("requestMappingHandlerMapping")
     private val handlerMapping: RequestMappingHandlerMapping,
 ) {
     fun isFilterTarget(

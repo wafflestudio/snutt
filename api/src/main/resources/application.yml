@@ -11,6 +11,13 @@ springdoc:
   paths-to-match: /v1/**
   pre-loading-enabled: true
   pre-loading-locales: ko-KR,en-US
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        health: health-check
 ---
 spring:
   config:
