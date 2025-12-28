@@ -18,6 +18,9 @@ management:
       base-path: /
       path-mapping:
         health: health-check
+  health:
+    defaults:
+      enabled: false
 ---
 spring:
   config:
