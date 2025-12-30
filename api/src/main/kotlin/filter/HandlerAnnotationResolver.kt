@@ -9,13 +9,13 @@ import reactor.core.publisher.Mono
 
 @Component
 class HandlerAnnotationResolver(
-    private val handlerMapping: RequestMappingHandlerMapping,
+    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
 ) {
     fun isFilterTarget(
         exchange: ServerWebExchange,
         annotationType: Class<out Annotation>,
     ): Mono<Boolean> =
-        handlerMapping
+        requestMappingHandlerMapping
             .getHandler(exchange)
             .map { handler ->
                 if (handler is HandlerMethod) {
