@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.bookmark.repository
 
 import com.wafflestudio.snutt.bookmark.data.Bookmark
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.extension.elemMatch
 import com.wafflestudio.snutt.common.extension.isEqualTo
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture

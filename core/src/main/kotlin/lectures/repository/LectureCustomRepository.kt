@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.lectures.repository
 
-import com.wafflestudio.snutt.common.enum.SortCriteria
+import com.wafflestudio.snutt.common.enums.SortCriteria
 import com.wafflestudio.snutt.common.extension.isEqualTo
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.data.Lecture

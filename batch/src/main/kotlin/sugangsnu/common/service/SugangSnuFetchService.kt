@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.sugangsnu.common.service
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository

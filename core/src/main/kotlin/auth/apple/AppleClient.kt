@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.auth.apple
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.common.exception.InvalidAppleLoginTokenException
@@ -10,6 +9,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import tools.jackson.databind.ObjectMapper
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -19,11 +19,11 @@ import java.util.Base64
 
 @Component("APPLE")
 class AppleClient(
-    webClientBuilder: WebClient.Builder,
     private val objectMapper: ObjectMapper,
 ) : OAuth2Client {
     private val webClient =
-        webClientBuilder
+        WebClient
+            .builder()
             .clientConnector(
                 ReactorClientHttpConnector(
                     HttpClient.create().responseTimeout(

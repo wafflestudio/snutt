@@ -1,32 +1,30 @@
 package com.wafflestudio.snutt.timetables.job
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.JobFailureLoggingListener
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.timetables.data.Timetable
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import io.github.resilience4j.kotlin.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.kotlin.ratelimiter.executeSuspendFunction
-import io.github.resilience4j.kotlin.ratelimiter.rateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiter
-import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobScope
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.batch.infrastructure.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.count
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
@@ -46,9 +44,11 @@ class AutoPrimaryJobConfig(
     @Bean
     fun primaryTimetableAutoSetJob(
         jobRepository: JobRepository,
+        jobFailureLoggingListener: JobFailureLoggingListener,
         primaryTimetableAutoSetStep: Step,
     ): Job =
         JobBuilder(JOB_NAME, jobRepository)
+            .listener(jobFailureLoggingListener)
             .start(primaryTimetableAutoSetStep)
             .build()
 

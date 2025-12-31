@@ -1,7 +1,5 @@
 package com.wafflestudio.snutt.controller
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.clientconfig.service.ClientConfigService
 import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
@@ -9,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 
 @RestController
 @SnuttNoAuthApiFilterTarget

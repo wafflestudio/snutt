@@ -1,8 +1,8 @@
 package com.wafflestudio.snutt.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.BasicThemeType
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.BasicThemeType
+import com.wafflestudio.snutt.common.enums.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document

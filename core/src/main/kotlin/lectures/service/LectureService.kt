@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.lectures.service
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.dto.LectureDto

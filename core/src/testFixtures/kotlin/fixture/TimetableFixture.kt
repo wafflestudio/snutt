@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.fixture
 
-import com.wafflestudio.snutt.common.enum.BasicThemeType
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.BasicThemeType
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.timetables.data.Timetable
 import org.springframework.stereotype.Component
 

@@ -1,8 +1,5 @@
 package com.wafflestudio.snutt.common.cache
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,6 +11,9 @@ import org.springframework.data.redis.core.getAndAwait
 import org.springframework.data.redis.core.setAndAwait
 import org.springframework.data.redis.core.setIfAbsentAndAwait
 import org.springframework.stereotype.Component
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
 
 interface Cache {
     suspend fun <T : Any> Cache.get(
