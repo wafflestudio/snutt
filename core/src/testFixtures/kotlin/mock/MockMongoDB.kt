@@ -10,5 +10,5 @@ import org.testcontainers.utility.DockerImageName
 class MockMongoDB {
     @Bean
     @ServiceConnection
-    fun mockMongo(): MongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:4.4.16")).also { it.start() }
+    fun mockMongo(): MongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:8.2.1")).also { it.start() }
 }
