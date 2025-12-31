@@ -2,7 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.common.dto.OkResponse
-import com.wafflestudio.snutt.common.enum.BasicThemeType
+import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.exception.InvalidPathParameterException
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget

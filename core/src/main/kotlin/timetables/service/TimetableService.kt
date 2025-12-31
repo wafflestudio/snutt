@@ -2,8 +2,8 @@ package com.wafflestudio.snutt.timetables.service
 
 import com.wafflestudio.snutt.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
-import com.wafflestudio.snutt.common.enum.BasicThemeType
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.BasicThemeType
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException

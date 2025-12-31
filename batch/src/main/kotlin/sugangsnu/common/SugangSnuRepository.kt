@@ -1,8 +1,6 @@
 package com.wafflestudio.snutt.sugangsnu.common
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.convertSemesterToSugangSnuSearchString
 import com.wafflestudio.snutt.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
@@ -13,6 +11,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 
 @Component
 class SugangSnuRepository(

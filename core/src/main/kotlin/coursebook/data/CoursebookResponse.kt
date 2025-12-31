@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.coursebook.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import java.time.Instant
 
 data class CoursebookResponse(

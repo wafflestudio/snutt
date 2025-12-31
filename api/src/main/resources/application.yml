@@ -16,14 +16,12 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    mongodb:
-      uri:
+  mongodb:
+    uri:
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  data:
-    mongodb:
-      uri:
+  mongodb:
+    uri:

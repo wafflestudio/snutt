@@ -15,8 +15,8 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import kotlinx.coroutines.reactor.mono
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient

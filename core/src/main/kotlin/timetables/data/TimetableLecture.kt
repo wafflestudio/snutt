@@ -1,8 +1,6 @@
 package com.wafflestudio.snutt.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.theme.data.ColorSet
@@ -11,6 +9,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimetableLecture(

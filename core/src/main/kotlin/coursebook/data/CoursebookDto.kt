@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.coursebook.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 
 data class CoursebookDto(
     val year: Int,

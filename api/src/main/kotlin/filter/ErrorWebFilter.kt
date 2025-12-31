@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.filter
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.common.exception.ErrorType
 import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
@@ -17,6 +16,7 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import reactor.netty.channel.AbortedException
+import tools.jackson.databind.ObjectMapper
 
 @Component
 @Order(0)

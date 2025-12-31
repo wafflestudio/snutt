@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.controller
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.REDIRECT_PREFIX_URL
 import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.parseSyllabusUrl
 import com.wafflestudio.snutt.coursebook.data.CoursebookOfficialResponse

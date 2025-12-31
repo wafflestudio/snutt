@@ -1,16 +1,17 @@
 package com.wafflestudio.snutt.sugangsnu.job.vacancynotification
 
+import com.wafflestudio.snutt.common.JobFailureLoggingListener
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuNotificationService
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.service.VacancyNotifierService
 import kotlinx.coroutines.runBlocking
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.Step
+import org.springframework.batch.core.job.Job
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.step.Step
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.batch.infrastructure.repeat.RepeatStatus
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
@@ -22,9 +23,11 @@ class VacancyNotificationJobConfig {
     @Bean
     fun vacancyNotificationJob(
         jobRepository: JobRepository,
+        jobFailureLoggingListener: JobFailureLoggingListener,
         vacancyNotificationStep: Step,
     ): Job =
         JobBuilder("vacancyNotificationJob", jobRepository)
+            .listener(jobFailureLoggingListener)
             .start(vacancyNotificationStep)
             .build()
 

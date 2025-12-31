@@ -1,4 +1,4 @@
-package com.wafflestudio.snutt.common.enum
+package com.wafflestudio.snutt.common.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
 import org.springframework.core.convert.converter.Converter
@@ -21,8 +21,8 @@ enum class DayOfWeek(
     ;
 
     companion object {
-        private val valueMap = DayOfWeek.entries.associateBy { e -> e.value }
-        private val koreanTextMap = DayOfWeek.entries.associateBy { e -> e.korText }
+        private val valueMap = entries.associateBy { e -> e.value }
+        private val koreanTextMap = entries.associateBy { e -> e.korText }
 
         fun getOfValue(dayOfWeek: Int): DayOfWeek? = valueMap[dayOfWeek]
 

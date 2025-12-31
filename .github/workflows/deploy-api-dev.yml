@@ -37,6 +37,6 @@ jobs:
       - name: Docker build, tag, and push image to ECR
         id: build-push-image
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token)
+          docker build -f api/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token) --platform linux/arm64
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

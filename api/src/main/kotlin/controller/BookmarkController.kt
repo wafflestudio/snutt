@@ -4,7 +4,7 @@ import com.wafflestudio.snutt.bookmark.dto.BookmarkLectureModifyRequest
 import com.wafflestudio.snutt.bookmark.dto.BookmarkResponse
 import com.wafflestudio.snutt.bookmark.service.BookmarkService
 import com.wafflestudio.snutt.common.dto.ExistenceResponse
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
