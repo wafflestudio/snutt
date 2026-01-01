@@ -22,3 +22,13 @@ dependencies {
 tasks.bootJar {
     archiveFileName.set("snutt-api.jar")
 }
+
+graalvmNative {
+    binaries {
+        named("main") {
+            buildArgs.add("--gc=G1")
+            buildArgs.add("-R:MaxRAMPercentage=60.0")
+            buildArgs.add("-R:MaxGCPauseMillis=100")
+        }
+    }
+}
