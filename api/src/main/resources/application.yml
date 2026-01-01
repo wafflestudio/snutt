@@ -18,6 +18,11 @@ spring:
       on-profile: dev
   mongodb:
     uri:
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 ---
 spring:
   config:
@@ -25,3 +30,8 @@ spring:
       on-profile: prod
   mongodb:
     uri:
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

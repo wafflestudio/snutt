@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
 import kotlinx.coroutines.CancellationException
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -20,6 +21,7 @@ import tools.jackson.databind.ObjectMapper
 
 @Component
 @Order(0)
+@RegisterReflectionForBinding(ErrorBody::class)
 class ErrorWebFilter(
     private val objectMapper: ObjectMapper,
 ) : WebFilter {
@@ -88,7 +90,7 @@ class ErrorWebFilter(
         ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage)
 }
 
-private data class ErrorBody(
+data class ErrorBody(
     val errcode: Long,
     val title: String,
     val message: String,

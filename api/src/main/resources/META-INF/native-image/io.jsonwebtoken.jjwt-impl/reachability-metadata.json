@@ -1,0 +1,191 @@
+{
+  "reflection": [
+    {
+      "type": "io.jsonwebtoken.impl.security.DefaultMacAlgorithm",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultClaimsBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwtBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwtHeaderBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwtParserBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultDynamicJwkBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwkParserBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwkSetBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultJwkSetParserBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultKeyOperationBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.DefaultKeyOperationPolicyBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardEncryptionAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardSignatureAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardKeyAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardEllipticCurves",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardKeyTypes",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardMacAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardOctetKeyParameters",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardRsaPaddingSchemes",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardRsaKeyParameters",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardX25519KeyParameters",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardX448KeyParameters",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardEcKeyParameters",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardKeyUse",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardSecureDigestAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.io.StandardCompressionAlgorithms",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.StandardKeyOperations",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.DefaultKeyOperationBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.DefaultKeyOperationPolicyBuilder$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.DefaultMacAlgorithm",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.io.DefaultCompressionAlgorithm",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.io.DefaultCompressionAlgorithmResolver$Supplier",
+      "allDeclaredConstructors": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "io.jsonwebtoken.impl.security.DefaultSecureDigestAlgorithm",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    }
+  ]
+}

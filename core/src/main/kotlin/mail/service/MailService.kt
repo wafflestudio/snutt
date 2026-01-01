@@ -5,8 +5,7 @@ import com.wafflestudio.snutt.common.mail.MailClient
 import com.wafflestudio.snutt.mail.data.MailContent
 import com.wafflestudio.snutt.mail.data.UserMailType
 import com.wafflestudio.snutt.users.service.AuthService
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 
 interface MailService {
@@ -20,10 +19,14 @@ interface MailService {
 
 @Service
 class MailServiceImpl(
-    @param:Value("userMailTemplate.txt") private val mailTemplateResource: ClassPathResource,
+    private val resourceLoader: ResourceLoader,
     private val mailClient: MailClient,
     private val authService: AuthService,
 ) : MailService {
+    private val mailTemplateResource by lazy {
+        resourceLoader.getResource("classpath:userMailTemplate.txt")
+    }
+
     override suspend fun sendUserMail(
         type: UserMailType,
         to: String,

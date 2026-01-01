@@ -15,6 +15,11 @@ import javax.crypto.spec.SecretKeySpec
 /**
  * API Key를 검증하는 필터
  * 모든 요청에 대해 x-access-apikey 헤더를 검증
+ * TODO: 현재 보안이 취약하므로 추후 개선 필요
+ *
+ * 짧은 secretKey를 사용하기 위해 reflection을 사용하여 JJWT의 기본 MacAlgorithm 구현체를 대체
+ * META-INF/native-image/io.jsonwebtoken.jjwt-impl/reachability-metadata.json 에 reflection 명시
+ * 추후 ApiKeyWebFilter와 같이 변경 필요
  */
 @Component
 @Order(1)
