@@ -15,7 +15,7 @@ class StaticPageController(
     private val resourceLoader: ResourceLoader,
 ) {
     companion object {
-        private const val RESOURCE_PATH = "/views"
+        private const val RESOURCE_PATH = "classpath:views"
         private val staticResponse =
             ResponseEntity
                 .ok()
