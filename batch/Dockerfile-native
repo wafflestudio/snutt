@@ -1,13 +1,7 @@
-# Build stage
-FROM container-registry.oracle.com/graalvm/native-image:25-muslib AS builder
+FROM ghcr.io/graalvm/jdk-community:25
 WORKDIR /app
 ARG CODEARTIFACT_AUTH_TOKEN
 COPY . /app
+RUN microdnf install -y findutils --nodocs
 RUN ./gradlew :batch:nativeCompile -PcodeArtifactAuthToken=$CODEARTIFACT_AUTH_TOKEN
-
-# Runtime stage
-FROM scratch
-WORKDIR /app
-COPY --from=builder /app/api/build/native/nativeCompile/batch /app/batch
-EXPOSE 8080
-ENTRYPOINT ["/app/batch", "--job.name=${JOB_NAME}"]
+ENTRYPOINT batch/build/native/nativeCompile/batch --job.name=${JOB_NAME}
