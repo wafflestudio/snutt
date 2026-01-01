@@ -7,6 +7,6 @@ RUN --mount=type=secret,id=codeartifact_token ./gradlew :batch:nativeCompile -Pc
 # Runtime stage
 FROM docker.io/debian:bookworm-slim
 WORKDIR /app
-COPY --from=builder /app/api/build/native/nativeCompile/batch /app/batch
+COPY --from=builder /app/batch/build/native/nativeCompile/batch /app/batch
 EXPOSE 8080
 ENTRYPOINT ["/app/batch", "--job.name=${JOB_NAME}"]
