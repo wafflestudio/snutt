@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.controller
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.FriendNotFoundException
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.coursebook.data.CoursebookDto
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.friend.service.FriendService
 import com.wafflestudio.snutt.timetables.dto.TimetableDto
@@ -44,7 +45,7 @@ class FriendTableController(
     suspend fun getCoursebooks(
         @CurrentUser user: User,
         @PathVariable friendId: String,
-    ): Any {
+    ): List<CoursebookDto> {
         val userId = user.id!!
         val friend =
             friendService

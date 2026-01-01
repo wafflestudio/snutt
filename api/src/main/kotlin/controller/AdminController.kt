@@ -7,6 +7,9 @@ import com.wafflestudio.snutt.clientconfig.service.ClientConfigService
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.storage.StorageService
 import com.wafflestudio.snutt.common.storage.StorageSource
+import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
+import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
+import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.filter.SnuttAdminApiFilterTarget
@@ -79,7 +82,7 @@ class AdminController(
     suspend fun getUploadSignedUris(
         @PathVariable source: String,
         @RequestParam(defaultValue = "1") count: Int,
-    ): Any =
+    ): List<FileUploadUriDto> =
         storageService.getUploadSignedUris(
             StorageSource.from(source) ?: throw IllegalArgumentException("Invalid source"),
             count,
@@ -98,10 +101,10 @@ class AdminController(
     }
 
     @GetMapping("/diary/dailyClassTypes")
-    suspend fun getAllDiaryDailyClassTypes(): Any = diaryService.getAllDailyClassTypes()
+    suspend fun getAllDiaryDailyClassTypes(): List<DiaryDailyClassType> = diaryService.getAllDailyClassTypes()
 
     @GetMapping("/diary/questions")
-    suspend fun getDiaryQuestions(): Any = diaryService.getActiveQuestions()
+    suspend fun getDiaryQuestions(): List<DiaryQuestion> = diaryService.getActiveQuestions()
 
     @PostMapping("/diary/dailyClassTypes")
     suspend fun insertDiaryDailyClassType(
