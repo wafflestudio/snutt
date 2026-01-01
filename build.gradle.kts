@@ -49,6 +49,15 @@ subprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
+
+    configure<org.graalvm.buildtools.gradle.dsl.GraalVMExtension> {
+        binaries {
+            named("main") {
+                buildArgs.add("--static")
+                buildArgs.add("--libc=musl")
+            }
+        }
+    }
 }
 
 interface InjectedExecOps {
