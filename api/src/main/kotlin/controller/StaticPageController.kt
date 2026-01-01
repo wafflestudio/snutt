@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.controller
 
-import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.CacheControl
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,7 +10,6 @@ import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import java.time.Duration
 
 @RestController
-@SnuttDefaultApiFilterTarget
 @RequestMapping("")
 class StaticPageController(
     private val resourceLoader: ResourceLoader,
