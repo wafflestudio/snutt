@@ -3,6 +3,8 @@
     "includes": [
       { "pattern": "adjectives.txt" },
       { "pattern": "nouns.txt" },
-      { "pattern": "userMailTemplate.txt" }    ]
+      { "pattern": "userMailTemplate.txt" },
+      { "pattern": "admin_sdk.properties" }
+    ]
   }
 }
