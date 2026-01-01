@@ -10,7 +10,7 @@ data class InsertNotificationRequest(
     val title: String,
     val body: String,
     val insertFcm: Boolean,
-    val shouldSendAsDataMessage: Boolean,
+    val shouldSendAsDataMessage: Boolean = false,
     val type: NotificationType = NotificationType.NORMAL,
     val dataPayload: Map<String, String> = emptyMap(),
 )
