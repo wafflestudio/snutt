@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
-
     api("org.jetbrains.kotlin:kotlin-reflect")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("tools.jackson.module:jackson-module-kotlin")
