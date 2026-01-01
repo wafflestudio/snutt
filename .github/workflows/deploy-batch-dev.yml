@@ -32,11 +32,11 @@ jobs:
       - name: Get and save Auth Token for CodeArtifact
         id: get-save-codeartifact-auth-token
         run: |
-          aws codeartifact get-authorization-token --domain wafflestudio --domain-owner 405906814034 --query authorizationToken --region ap-northeast-1 --output text > .codeartifact-auth-token
+          aws codeartifact get-authorization-token --domain wafflestudio --domain-owner 405906814034 --query authorizationToken --region ap-northeast-1 --output text > .codeartifact_token
 
       - name: Docker build, tag, and push image to ECR
         id: build-push-image
         run: |
-          docker build -f batch/Dockerfile -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG . --build-arg CODEARTIFACT_AUTH_TOKEN=$(cat .codeartifact-auth-token) --platform linux/arm64
+          docker build --secret id=codeartifact_token,src=./.codeartifact_token -f batch/Dockerfile -t $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG . --platform linux/arm64
           docker push $ECR_REGISTRY/$ECR_BATCH_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
