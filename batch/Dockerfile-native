@@ -2,7 +2,7 @@
 FROM container-registry.oracle.com/graalvm/native-image:25 AS builder
 WORKDIR /app
 COPY . /app
-RUN ./gradlew :batch:nativeCompile -PcodeArtifactAuthToken=$(cat /run/secrets/codeartifact_token)
+RUN --mount=type=secret,id=codeartifact_token ./gradlew :batch:nativeCompile -PcodeArtifactAuthToken=$(cat /run/secrets/codeartifact_token)
 
 # Runtime stage
 FROM docker.io/debian:bookworm-slim
