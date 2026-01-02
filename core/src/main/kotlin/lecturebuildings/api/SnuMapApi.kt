@@ -1,11 +1,18 @@
 package com.wafflestudio.snutt.lecturebuildings.api
 
+import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchItem
+import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchResult
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
+@RegisterReflectionForBinding(
+    SnuMapSearchResult::class,
+    SnuMapSearchItem::class,
+)
 class SnuMapApiConfig {
     companion object {
         const val SNU_MAP_BASE_URL = "https://map.snu.ac.kr"
