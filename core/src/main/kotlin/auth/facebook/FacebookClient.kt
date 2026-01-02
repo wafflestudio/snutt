@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.common.extension.get
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -11,6 +12,7 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Component("FACEBOOK")
+@RegisterReflectionForBinding(FacebookOAuth2UserResponse::class)
 class FacebookClient : OAuth2Client {
     private val log = LoggerFactory.getLogger(javaClass)
 

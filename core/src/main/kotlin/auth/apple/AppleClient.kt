@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.common.exception.InvalidAppleLoginTokenException
 import com.wafflestudio.snutt.common.extension.get
 import io.jsonwebtoken.Jwts
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -18,6 +19,7 @@ import java.time.Duration
 import java.util.Base64
 
 @Component("APPLE")
+@RegisterReflectionForBinding(AppleJwk::class)
 class AppleClient(
     private val objectMapper: ObjectMapper,
 ) : OAuth2Client {
