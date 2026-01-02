@@ -1,23 +1,8 @@
 {
-  "bundles": [
-    {
-      "name": "org.apache.xmlbeans.impl.regex.message"
-    }
-  ],
   "resources": {
     "includes": [
-      {
-        "pattern": "org/apache/xmlbeans/impl/regex/message.*\\.properties"
-      },
-      {
-        "pattern": "org/apache/xmlbeans/metadata/system/.*"
-      },
-      {
-        "pattern": "org/apache/poi/schemas/ooxml/system/ooxml/.*"
-      },
-      {
-        "pattern": "org/openxmlformats/schemas/.*"
-      }
+      { "pattern": "org/apache/xmlbeans/.*\\.properties" },
+      { "pattern": "org/apache/.*\\.xsb" }
     ]
   }
 }
