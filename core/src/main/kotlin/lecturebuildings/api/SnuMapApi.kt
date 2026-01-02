@@ -1,8 +1,5 @@
 package com.wafflestudio.snutt.lecturebuildings.api
 
-import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchItem
-import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchResult
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.ExchangeStrategies
