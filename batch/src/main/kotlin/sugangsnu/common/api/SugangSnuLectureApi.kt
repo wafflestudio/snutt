@@ -1,11 +1,22 @@
 package com.wafflestudio.snutt.sugangsnu.common.api
 
+import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuClassTime
+import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
+import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuLectureInfo
+import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuLectureSubInfo
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
+@RegisterReflectionForBinding(
+    SugangSnuCoursebookCondition::class,
+    SugangSnuLectureInfo::class,
+    SugangSnuLectureSubInfo::class,
+    SugangSnuClassTime::class
+)
 class SugangSnuApiConfig {
     companion object {
         const val SUGANG_SNU_BASEURL = "https://sugang.snu.ac.kr"
