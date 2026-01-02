@@ -11,16 +11,14 @@ class PhaseUtils(
     companion object {
         private lateinit var env: Environment
 
-        fun getPhase(): Phase {
-            val profiles = env.activeProfiles.toList()
-            return when {
-                profiles.contains("dev") -> Phase.DEV
-                profiles.contains("prod") -> Phase.PROD
-                profiles.contains("local") -> Phase.LOCAL
-                profiles.contains("test") -> Phase.TEST
+        fun getPhase(): Phase =
+            when {
+                env.matchesProfiles("dev") -> Phase.DEV
+                env.matchesProfiles("prod") -> Phase.PROD
+                env.matchesProfiles("local") -> Phase.LOCAL
+                env.matchesProfiles("test") -> Phase.TEST
                 else -> throw IllegalArgumentException("Invalid profile")
             }
-        }
     }
 
     @PostConstruct
