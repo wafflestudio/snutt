@@ -6,7 +6,6 @@ dependencies {
     implementation(project(":core"))
 
     implementation("org.springframework.boot:spring-boot-starter-batch")
-    implementation("com.h2database:h2")
 
     implementation("io.github.resilience4j:resilience4j-reactor:2.3.0")
     implementation("io.github.resilience4j:resilience4j-kotlin:2.3.0")
@@ -18,6 +17,14 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.5.1")
 
     testImplementation("org.springframework.batch:spring-batch-test")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            buildArgs.add("-H:+AddAllCharsets")
+        }
+    }
 }
 
 tasks.bootJar {
