@@ -29,4 +29,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          ./gradlew clean test
+          ./gradlew clean test -x processAot -x processTestAot
