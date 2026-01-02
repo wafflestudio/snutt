@@ -19,6 +19,14 @@ dependencies {
     testImplementation("org.springframework.batch:spring-batch-test")
 }
 
+graalvmNative {
+    binaries {
+        named("main") {
+            buildArgs.add("-H:+AddAllCharsets")
+        }
+    }
+}
+
 tasks.bootJar {
     archiveFileName.set("snutt-batch.jar")
 }
