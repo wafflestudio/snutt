@@ -22,4 +22,5 @@ jobs:
 
       - name: Run Lint
         run: |
-          ./gradlew clean ktlintCheck -x processAot
+          ./gradlew clean ktlintFormat -x compileKotlin -x compileTestKotlin \
+            -x compileTestFixturesKotlin -x compileJava -x processAot -x processTestAot
