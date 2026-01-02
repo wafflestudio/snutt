@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.convertSemesterToSug
 import com.wafflestudio.snutt.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuLectureInfo
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -15,6 +16,10 @@ import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.kotlin.readValue
 
 @Component
+@RegisterReflectionForBinding(
+    SugangSnuCoursebookCondition::class,
+    SugangSnuLectureInfo::class,
+)
 class SugangSnuRepository(
     private val sugangSnuApi: SugangSnuApi,
     private val objectMapper: ObjectMapper,
