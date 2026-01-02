@@ -8,6 +8,7 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.dynamiclink.dto.IosInfo
 import com.wafflestudio.snutt.common.exception.DynamicLinkGenerationFailedException
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
@@ -23,6 +24,7 @@ interface DynamicLinkClient {
 }
 
 @Service
+@RegisterReflectionForBinding(DynamicLinkResponse::class)
 class FirebaseDynamicLinkClient(
     val firebaseDynamicLinkApi: FirebaseDynamicLinkApi,
     @param:Value("\${google.firebase.api-key}") val apiKey: String,

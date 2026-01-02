@@ -1,0 +1,8 @@
+{
+  "resources": {
+    "includes": [
+      { "pattern": "org/apache/xmlbeans/.*\\.properties" },
+      { "pattern": "org/apache/.*\\.xsb" }
+    ]
+  }
+}
