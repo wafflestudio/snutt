@@ -5,7 +5,7 @@ COPY . /app
 RUN --mount=type=secret,id=codeartifact_token ./gradlew :batch:nativeCompile -PcodeArtifactAuthToken=$(cat /run/secrets/codeartifact_token)
 
 # Runtime stage
-FROM docker.io/debian:bookworm-slim
+FROM docker.io/debian:stable-slim
 WORKDIR /app
 COPY --from=builder /app/batch/build/native/nativeCompile/batch /app/batch
 EXPOSE 8080
