@@ -1,12 +1,16 @@
 package com.wafflestudio.snutt.lecturebuildings.api
 
 import com.wafflestudio.snutt.lecturebuildings.data.SnuMapSearchResult
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.kotlin.readValue
 
 @Component
+@RegisterReflectionForBinding(
+    SnuMapSearchResult::class,
+)
 class SnuMapRepository(
     private val snuMapApi: SnuMapApi,
     private val objectMapper: ObjectMapper,

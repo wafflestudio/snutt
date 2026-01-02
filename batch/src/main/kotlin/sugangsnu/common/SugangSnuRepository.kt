@@ -16,6 +16,10 @@ import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.kotlin.readValue
 
 @Component
+@RegisterReflectionForBinding(
+    SugangSnuCoursebookCondition::class,
+    SugangSnuLectureInfo::class,
+)
 class SugangSnuRepository(
     private val sugangSnuApi: SugangSnuApi,
     private val objectMapper: ObjectMapper,

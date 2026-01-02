@@ -11,12 +11,6 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-@RegisterReflectionForBinding(
-    SugangSnuCoursebookCondition::class,
-    SugangSnuLectureInfo::class,
-    SugangSnuLectureSubInfo::class,
-    SugangSnuClassTime::class
-)
 class SugangSnuApiConfig {
     companion object {
         const val SUGANG_SNU_BASEURL = "https://sugang.snu.ac.kr"

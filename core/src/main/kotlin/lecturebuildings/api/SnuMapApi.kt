@@ -9,10 +9,6 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-@RegisterReflectionForBinding(
-    SnuMapSearchResult::class,
-    SnuMapSearchItem::class,
-)
 class SnuMapApiConfig {
     companion object {
         const val SNU_MAP_BASE_URL = "https://map.snu.ac.kr"
