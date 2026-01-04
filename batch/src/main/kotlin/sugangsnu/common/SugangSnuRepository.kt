@@ -53,7 +53,7 @@ class SugangSnuRepository(
     suspend fun getSearchPageHtml(
         year: Int,
         semester: Semester,
-        pageNo: Int = 1
+        pageNo: Int = 1,
     ): PooledDataBuffer =
         sugangSnuApi
             .get()

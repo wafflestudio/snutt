@@ -4,8 +4,11 @@ import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
+import com.wafflestudio.snutt.sugangsnu.common.data.LectureIdentifier
 import com.wafflestudio.snutt.sugangsnu.common.utils.SugangSnuClassTimeUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
 import org.apache.poi.ss.usermodel.Cell
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -21,10 +24,13 @@ interface SugangSnuFetchService {
     suspend fun getSugangSnuSearchContent(
         year: Int,
         semester: Semester,
-        pageNo: Int
+        pageNo: Int,
     ): Element
 
-    suspend fun getPageCount(year: Int, semester: Semester): Int
+    suspend fun getPageCount(
+        year: Int,
+        semester: Semester,
+    ): Int
 }
 
 @Service
@@ -34,6 +40,7 @@ class SugangSnuFetchServiceImpl(
 ) : SugangSnuFetchService {
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
+    private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
 
     companion object {
         private const val COUNT_PER_PAGE = 10
@@ -44,59 +51,60 @@ class SugangSnuFetchServiceImpl(
         semester: Semester,
     ): List<Lecture> {
         val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
-        val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "ko")
-        val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "en")
-        val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)
-        val englishSheet = HSSFWorkbook(englishLectureXlsx.asInputStream()).getSheetAt(0)
-        val fullSheet = koreanSheet.zip(englishSheet).map { (koreanRow, englishRow) -> koreanRow + englishRow }
-        val columnNameIndex = fullSheet[2].associate { it.stringCellValue to it.columnIndex }
-        return fullSheet
-            .drop(3)
-            .map { row ->
-                convertSugangSnuRowToLecture(row, columnNameIndex, year, semester)
-            }.also {
-                koreanLectureXlsx.release()
-                englishLectureXlsx.release()
-            }.map { lecture ->
-                val extraLectureInfo =
-                    sugangSnuRepository.getLectureInfo(year, semester, lecture.courseNumber, lecture.lectureNumber)
+        val pageCount = getPageCount(year, semester)
 
-                val extraCourseTitle =
-                    if (extraLectureInfo.subInfo.courseSubName.isNullOrEmpty()) {
-                        extraLectureInfo.subInfo.courseName
-                    } else {
-                        "${extraLectureInfo.subInfo.courseName} (${extraLectureInfo.subInfo.courseSubName})"
-                    }
-                val extraDepartment =
-                    if (extraLectureInfo.subInfo.departmentKorNm != null && extraLectureInfo.subInfo.majorKorNm != null) {
-                        "${extraLectureInfo.subInfo.departmentKorNm}(${extraLectureInfo.subInfo.majorKorNm})"
-                    } else {
-                        null
-                    }
+        return (1..pageCount).chunked(pageCount / 20).flatMap { chunkedPages ->
+            val lectureIdentifiers = getLectureIdentifiers(year, semester, chunkedPages)
+            lectureIdentifiers.map { (courseNumber, lectureNumber) ->
+                val lectureInfo = sugangSnuRepository.getLectureInfo(year, semester, courseNumber, lectureNumber)
+                val classPlaceAndTimes =
+                    SugangSnuClassTimeUtils.convertTextToClassTimeObject(
+                        lectureInfo.ltTime,
+                        lectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") },
+                    )
+                val subInfo = lectureInfo.subInfo
 
-                lecture.apply {
-                    classPlaceAndTimes =
-                        SugangSnuClassTimeUtils.convertTextToClassTimeObject(
-                            extraLectureInfo.ltTime,
-                            extraLectureInfo.ltRoom.map { it.replace("(무선랜제공)", "") },
-                        )
-                    academicYear = extraLectureInfo.subInfo.academicCourse.takeIf { it != "학사" }
-                        ?: extraLectureInfo.subInfo.academicYear?.let { "${it}학년" } ?: academicYear
-                    courseTitle = extraCourseTitle ?: courseTitle
-                    instructor = (extraLectureInfo.subInfo.professorName ?: instructor)?.substringBeforeLast(" (")
-                    category = extraLectureInfo.subInfo.category ?: category
-                    department = extraDepartment ?: department
-                    quota = extraLectureInfo.subInfo.quota ?: quota
-                    remark = extraLectureInfo.subInfo.remark ?: remark
-                    categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
-                }
+                Lecture(
+                    academicYear =
+                        subInfo.academicCourse.takeIf { it != "학사" }
+                            ?: subInfo.academicYear?.let { "${it}학년" },
+                    category = subInfo.category,
+                    categoryPre2025 = courseNumberCategoryPre2025Map[courseNumber],
+                    classification = subInfo.classification,
+                    classPlaceAndTimes = classPlaceAndTimes,
+                    courseNumber = courseNumber,
+                    courseTitle =
+                        if (subInfo.courseSubName.isNullOrEmpty()) {
+                            subInfo.courseName!!
+                        } else {
+                            "${subInfo.courseName} (${subInfo.courseSubName})"
+                        },
+                    credit = subInfo.credit?.toLong() ?: 0,
+                    department =
+                        if (subInfo.departmentKorNm != null) {
+                            if (subInfo.majorKorNm != null) {
+                                "${subInfo.departmentKorNm}(${subInfo.majorKorNm})"
+                            } else {
+                                subInfo.departmentKorNm
+                            }
+                        } else {
+                            subInfo.college
+                        },
+                    instructor = subInfo.professorName?.substringBeforeLast(" ("),
+                    lectureNumber = lectureNumber,
+                    quota = subInfo.quota ?: 0,
+                    remark = subInfo.remark,
+                    semester = semester,
+                    year = year,
+                )
             }
+        }
     }
 
     override suspend fun getSugangSnuSearchContent(
         year: Int,
         semester: Semester,
-        pageNo: Int
+        pageNo: Int,
     ): Element {
         val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(year, semester, pageNo)
         return try {
@@ -109,12 +117,30 @@ class SugangSnuFetchServiceImpl(
         }
     }
 
-    override suspend fun getPageCount(year: Int, semester: Semester): Int {
+    override suspend fun getPageCount(
+        year: Int,
+        semester: Semester,
+    ): Int {
         val firstPageContent = getSugangSnuSearchContent(year, semester, 1)
         val totalCount =
             firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
         return (totalCount + 9) / COUNT_PER_PAGE
     }
+
+    private suspend fun getLectureIdentifiers(
+        year: Int,
+        semester: Semester,
+        pages: List<Int>,
+    ): List<LectureIdentifier> =
+        supervisorScope {
+            pages
+                .map { page ->
+                    async {
+                        getSugangSnuSearchContent(year, semester, page).extractLectureIdentifier()
+                    }
+                }.awaitAll()
+                .flatten()
+        }
 
     /*
     엑셀 항목 (2023/01/26): 교과구분, 개설대학, 개설학과, 이수과정, 학년, 교과목번호, 강좌번호, 교과목명,
@@ -183,4 +209,26 @@ class SugangSnuFetchServiceImpl(
             categoryPre2025 = null,
         )
     }
+
+    private fun Element.extractLectureIdentifier() =
+        this
+            .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
+            .map { course ->
+                course
+                    .select("div.course-info-item ul.course-info")
+                    .first()!!
+                    .let { info ->
+                        val (courseNumber, lectureNumber) =
+                            info
+                                .select("li:nth-of-type(1) > span:nth-of-type(3)")
+                                .text()
+                                .takeIf { courseNumberRegex.matches(it) }!!
+                                .let { courseNumberRegex.find(it)!!.groups }
+                                .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
+                        LectureIdentifier(
+                            courseNumber = courseNumber,
+                            lectureNumber = lectureNumber,
+                        )
+                    }
+            }
 }

@@ -70,6 +70,15 @@ data class SugangSnuLectureSubInfo(
     // 비고
     @param:JsonProperty("openLtRemk")
     val remark: String? = null,
+    // 분류
+    @param:JsonProperty("submattFgNm")
+    val classification: String? = null,
+    // 단과대학
+    @param:JsonProperty("univsKorNm")
+    val college: String? = null,
+    // 학점
+    @param:JsonProperty("openPnt")
+    val credit: Int? = null,
 //    @param:JsonProperty("openLtEngRemk")
 //    val openLtEngRemk: String? = null,
 //    @param:JsonProperty("frnStdTlsnLmtYn")
@@ -122,16 +131,10 @@ data class SugangSnuLectureSubInfo(
 //    val stdIntrvPosbTmList: String? = null,
 //    @param:JsonProperty("stdIntrvPosbTmEngList")
 //    val stdIntrvPosbTmEngList: String? = null,
-//    @param:JsonProperty("openPnt")
-//    val openPnt: Int? = null,
 //    @param:JsonProperty("mrksRelevalYn")
 //    val mrksRelevalYn: String? = null,
 //    @param:JsonProperty("theoryLtTmCnt")
 //    val theoryLtTmCnt: Int? = null,
-//    @param:JsonProperty("univsKorNm")
-//    val univsKorNm: String? = null,
-//    @param:JsonProperty("submattFgNm")
-//    val submattFgNm: String? = null,
 //    @param:JsonProperty("testPracLtTmCnt")
 //    val testPracLtTmCnt: Int? = null,
 //    @param:JsonProperty("genrlRemoteLtYn")
