@@ -7,6 +7,8 @@ import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -15,6 +17,14 @@ interface SugangSnuFetchService {
         year: Int,
         semester: Semester,
     ): List<Lecture>
+
+    suspend fun getSugangSnuSearchContent(
+        year: Int,
+        semester: Semester,
+        pageNo: Int
+    ): Element
+
+    suspend fun getPageCount(year: Int, semester: Semester): Int
 }
 
 @Service
@@ -24,6 +34,10 @@ class SugangSnuFetchServiceImpl(
 ) : SugangSnuFetchService {
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
+
+    companion object {
+        private const val COUNT_PER_PAGE = 10
+    }
 
     override suspend fun getSugangSnuLectures(
         year: Int,
@@ -77,6 +91,29 @@ class SugangSnuFetchServiceImpl(
                     categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
                 }
             }
+    }
+
+    override suspend fun getSugangSnuSearchContent(
+        year: Int,
+        semester: Semester,
+        pageNo: Int
+    ): Element {
+        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(year, semester, pageNo)
+        return try {
+            Jsoup
+                .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
+                .select("html > body > form#CC100 > div#wrapper > div#skip-con > div.content")
+                .first()!!
+        } finally {
+            webPageDataBuffer.release()
+        }
+    }
+
+    override suspend fun getPageCount(year: Int, semester: Semester): Int {
+        val firstPageContent = getSugangSnuSearchContent(year, semester, 1)
+        val totalCount =
+            firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
+        return (totalCount + 9) / COUNT_PER_PAGE
     }
 
     /*

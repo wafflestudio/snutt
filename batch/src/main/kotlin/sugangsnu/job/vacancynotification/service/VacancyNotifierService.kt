@@ -8,6 +8,7 @@ import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
+import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snutt.vacancynotification.repository.VacancyNotificationRepository
@@ -37,10 +38,9 @@ class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
     private val pushWithNotificationService: PushWithNotificationService,
     private val vacancyNotificationRepository: VacancyNotificationRepository,
-    private val sugangSnuRepository: SugangSnuRepository,
+    private val sugangSnuFetchService: SugangSnuFetchService
 ) : VacancyNotifierService {
     companion object {
-        private const val COUNT_PER_PAGE = 10
         private const val DELAY_PER_CHUNK = 300L
         private val pushCoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     }
@@ -58,7 +58,7 @@ class VacancyNotifierServiceImpl(
         log.info("시작")
         val pageCount =
             runCatching {
-                getPageCount()
+                sugangSnuFetchService.getPageCount(coursebook.year, coursebook.semester)
             }.getOrElse {
                 log.error("에러가 발생했거나 부하 기간입니다. {}", it.message, it)
                 delay(30L.seconds)
@@ -70,7 +70,7 @@ class VacancyNotifierServiceImpl(
 
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
-            val registrationStatus = getRegistrationStatus(chunkedPages)
+            val registrationStatus = getRegistrationStatus(coursebook.year, coursebook.semester, chunkedPages)
             if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
             val registrationStatusMap =
@@ -139,19 +139,16 @@ class VacancyNotifierServiceImpl(
         }
     }
 
-    private suspend fun getPageCount(): Int {
-        val firstPageContent = getSugangSnuSearchContent(1)
-        val totalCount =
-            firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
-        return (totalCount + 9) / COUNT_PER_PAGE
-    }
-
-    private suspend fun getRegistrationStatus(pages: List<Int>): List<RegistrationStatus> =
+    private suspend fun getRegistrationStatus(
+        year: Int,
+        semester: Semester,
+        pages: List<Int>
+    ): List<RegistrationStatus> =
         supervisorScope {
             pages
                 .map { page ->
                     async {
-                        getSugangSnuSearchContent(page).extractRegistrationStatus()
+                        sugangSnuFetchService.getSugangSnuSearchContent(year, semester, page).extractRegistrationStatus()
                     }
                 }.awaitAll()
                 .flatten()
@@ -192,20 +189,4 @@ class VacancyNotifierServiceImpl(
                         )
                     }
             }
-
-    private suspend fun getSugangSnuSearchContent(
-        year: Int,
-        semester: Semester,
-        pageNo: Int
-    ): Element {
-        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(year, semester, pageNo)
-        return try {
-            Jsoup
-                .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
-                .select("html > body > form#CC100 > div#wrapper > div#skip-con > div.content")
-                .first()!!
-        } finally {
-            webPageDataBuffer.release()
-        }
-    }
 }
