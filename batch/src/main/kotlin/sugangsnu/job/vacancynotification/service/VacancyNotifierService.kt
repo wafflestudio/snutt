@@ -193,8 +193,12 @@ class VacancyNotifierServiceImpl(
                     }
             }
 
-    private suspend fun getSugangSnuSearchContent(pageNo: Int): Element {
-        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(pageNo)
+    private suspend fun getSugangSnuSearchContent(
+        year: Int,
+        semester: Semester,
+        pageNo: Int
+    ): Element {
+        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(year, semester, pageNo)
         return try {
             Jsoup
                 .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
