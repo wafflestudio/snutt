@@ -12,6 +12,7 @@ import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
+import com.wafflestudio.snutt.sugangsnu.common.utils.nextCoursebook
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
@@ -373,8 +374,13 @@ class SugangSnuSyncServiceImpl(
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
     }
 
-    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
-        this.year == sugangSnuCoursebookCondition.latestYear && this.semester == sugangSnuCoursebookCondition.latestSemester
+    private suspend fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean {
+        if (this < Coursebook(year = sugangSnuCoursebookCondition.latestYear, semester = sugangSnuCoursebookCondition.latestSemester)) {
+            return false
+        }
+        val nextCoursebook = this.nextCoursebook()
+        return sugangSnuFetchService.getPageCount(nextCoursebook.year, nextCoursebook.semester) == 0
+    }
 }
 
 data class ParsedTags(
