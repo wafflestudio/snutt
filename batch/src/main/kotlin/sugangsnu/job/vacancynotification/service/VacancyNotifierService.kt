@@ -7,7 +7,6 @@ import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
-import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -38,7 +36,7 @@ class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
     private val pushWithNotificationService: PushWithNotificationService,
     private val vacancyNotificationRepository: VacancyNotificationRepository,
-    private val sugangSnuFetchService: SugangSnuFetchService
+    private val sugangSnuFetchService: SugangSnuFetchService,
 ) : VacancyNotifierService {
     companion object {
         private const val DELAY_PER_CHUNK = 300L
@@ -142,7 +140,7 @@ class VacancyNotifierServiceImpl(
     private suspend fun getRegistrationStatus(
         year: Int,
         semester: Semester,
-        pages: List<Int>
+        pages: List<Int>,
     ): List<RegistrationStatus> =
         supervisorScope {
             pages
