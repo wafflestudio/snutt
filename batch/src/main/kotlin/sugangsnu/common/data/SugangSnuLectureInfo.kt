@@ -70,7 +70,7 @@ data class SugangSnuLectureSubInfo(
     // 비고
     @param:JsonProperty("openLtRemk")
     val remark: String? = null,
-    // 분류
+    // 교과 구분
     @param:JsonProperty("submattFgNm")
     val classification: String? = null,
     // 단과대학
