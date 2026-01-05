@@ -57,6 +57,7 @@ class SugangSnuFetchServiceImpl(
     ): List<Lecture> {
         val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val pageCount = getPageCount(year, semester)
+        log.info("total: $pageCount pages")
 
         return (1..pageCount).chunked(pageCount / 20).flatMap { chunkedPages ->
             val registrationStatus = getRegistrationStatus(year, semester, chunkedPages)
