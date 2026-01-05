@@ -8,20 +8,15 @@ import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
-import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snutt.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Calendar
@@ -44,7 +39,6 @@ class VacancyNotifierServiceImpl(
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
     private val isFreshmanRegistrationCompleted =
         Calendar.getInstance() >
             Calendar.getInstance().apply {
@@ -68,7 +62,7 @@ class VacancyNotifierServiceImpl(
 
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
-            val registrationStatus = getRegistrationStatus(coursebook.year, coursebook.semester, chunkedPages)
+            val registrationStatus = sugangSnuFetchService.getRegistrationStatus(coursebook.year, coursebook.semester, chunkedPages)
             if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
             val registrationStatusMap =
@@ -136,55 +130,4 @@ class VacancyNotifierServiceImpl(
             this.quota == this.registrationCount
         }
     }
-
-    private suspend fun getRegistrationStatus(
-        year: Int,
-        semester: Semester,
-        pages: List<Int>,
-    ): List<RegistrationStatus> =
-        supervisorScope {
-            pages
-                .map { page ->
-                    async {
-                        sugangSnuFetchService.getSugangSnuSearchContent(year, semester, page).extractRegistrationStatus()
-                    }
-                }.awaitAll()
-                .flatten()
-        }
-
-    private fun Element.extractRegistrationStatus() =
-        this
-            .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
-            .map { course ->
-                course
-                    .select("div.course-info-item ul.course-info")
-                    .first()!!
-                    .let { info ->
-                        val (courseNumber, lectureNumber) =
-                            info
-                                .select("li:nth-of-type(1) > span:nth-of-type(3)")
-                                .text()
-                                .takeIf { courseNumberRegex.matches(it) }!!
-                                .let { courseNumberRegex.find(it)!!.groups }
-                                .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
-                        val registrationCount =
-                            info
-                                .select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
-                                .text()
-                                .split("/")
-                                .first()
-                                .toInt()
-                        val wasFull =
-                            info
-                                .select("li.state > span[data-dialog-target='remaining-place-dialog']")
-                                .isNotEmpty()
-
-                        RegistrationStatus(
-                            courseNumber = courseNumber,
-                            lectureNumber = lectureNumber,
-                            registrationCount = registrationCount,
-                            wasFull = wasFull,
-                        )
-                    }
-            }
 }

@@ -4,12 +4,11 @@ import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
-import com.wafflestudio.snutt.sugangsnu.common.data.LectureIdentifier
+import com.wafflestudio.snutt.sugangsnu.common.data.RegistrationStatus
 import com.wafflestudio.snutt.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
-import org.apache.poi.ss.usermodel.Cell
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
@@ -31,6 +30,12 @@ interface SugangSnuFetchService {
         year: Int,
         semester: Semester,
     ): Int
+
+    suspend fun getRegistrationStatus(
+        year: Int,
+        semester: Semester,
+        pages: List<Int>,
+    ): List<RegistrationStatus>
 }
 
 @Service
@@ -39,8 +44,8 @@ class SugangSnuFetchServiceImpl(
     private val categoryPre2025FetchService: CategoryPre2025FetchService,
 ) : SugangSnuFetchService {
     private val log = LoggerFactory.getLogger(javaClass)
-    private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
+    private val enrollmentRegex = """(?<registrationCount>\d+)\s*/\s*(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
 
     companion object {
         private const val COUNT_PER_PAGE = 10
@@ -54,9 +59,9 @@ class SugangSnuFetchServiceImpl(
         val pageCount = getPageCount(year, semester)
 
         return (1..pageCount).chunked(pageCount / 20).flatMap { chunkedPages ->
-            val lectureIdentifiers = getLectureIdentifiers(year, semester, chunkedPages)
-            lectureIdentifiers.map { (courseNumber, lectureNumber) ->
-                val lectureInfo = sugangSnuRepository.getLectureInfo(year, semester, courseNumber, lectureNumber)
+            val registrationStatus = getRegistrationStatus(year, semester, chunkedPages)
+            registrationStatus.map { it ->
+                val lectureInfo = sugangSnuRepository.getLectureInfo(year, semester, it.courseNumber, it.lectureNumber)
                 val classPlaceAndTimes =
                     SugangSnuClassTimeUtils.convertTextToClassTimeObject(
                         lectureInfo.ltTime,
@@ -67,12 +72,12 @@ class SugangSnuFetchServiceImpl(
                 Lecture(
                     academicYear =
                         subInfo.academicCourse.takeIf { it != "학사" }
-                            ?: subInfo.academicYear?.let { "${it}학년" },
-                    category = subInfo.category,
-                    categoryPre2025 = courseNumberCategoryPre2025Map[courseNumber],
+                            ?: subInfo.academicYear?.let { "${it}학년" } ?: "",
+                    category = subInfo.category ?: "",
+                    categoryPre2025 = courseNumberCategoryPre2025Map[it.courseNumber],
                     classification = subInfo.classification,
                     classPlaceAndTimes = classPlaceAndTimes,
-                    courseNumber = courseNumber,
+                    courseNumber = it.courseNumber,
                     courseTitle =
                         if (subInfo.courseSubName.isNullOrEmpty()) {
                             subInfo.courseName!!
@@ -81,19 +86,20 @@ class SugangSnuFetchServiceImpl(
                         },
                     credit = subInfo.credit?.toLong() ?: 0,
                     department =
-                        if (subInfo.departmentKorNm != null) {
-                            if (subInfo.majorKorNm != null) {
+                        if (!subInfo.departmentKorNm.isNullOrEmpty()) {
+                            if (!subInfo.majorKorNm.isNullOrEmpty()) {
                                 "${subInfo.departmentKorNm}(${subInfo.majorKorNm})"
                             } else {
                                 subInfo.departmentKorNm
                             }
                         } else {
                             subInfo.college
-                        },
+                        } ?: "",
                     instructor = subInfo.professorName?.substringBeforeLast(" ("),
-                    lectureNumber = lectureNumber,
-                    quota = subInfo.quota ?: 0,
-                    remark = subInfo.remark,
+                    lectureNumber = it.lectureNumber,
+                    quota = subInfo.quota ?: it.quota,
+                    freshmanQuota = it.freshmanQuota,
+                    remark = subInfo.remark ?: "",
                     semester = semester,
                     year = year,
                 )
@@ -127,90 +133,22 @@ class SugangSnuFetchServiceImpl(
         return (totalCount + 9) / COUNT_PER_PAGE
     }
 
-    private suspend fun getLectureIdentifiers(
+    override suspend fun getRegistrationStatus(
         year: Int,
         semester: Semester,
         pages: List<Int>,
-    ): List<LectureIdentifier> =
+    ): List<RegistrationStatus> =
         supervisorScope {
             pages
                 .map { page ->
                     async {
-                        getSugangSnuSearchContent(year, semester, page).extractLectureIdentifier()
+                        getSugangSnuSearchContent(year, semester, page).extractRegistrationStatus()
                     }
                 }.awaitAll()
                 .flatten()
         }
 
-    /*
-    엑셀 항목 (2023/01/26): 교과구분, 개설대학, 개설학과, 이수과정, 학년, 교과목번호, 강좌번호, 교과목명,
-    부제명, 학점, 강의, 실습, 수업교시, 수업형태, 강의실(동-호)(#연건, *평창), 주담당교수,
-    장바구니신청, 신입생장바구니신청, 재학생장바구니신청, 정원, 수강신청인원, 비고, 강의언어, 개설상태,
-     */
-    private fun convertSugangSnuRowToLecture(
-        row: List<Cell>,
-        columnNameIndex: Map<String, Int>,
-        year: Int,
-        semester: Semester,
-    ): Lecture {
-        fun List<Cell>.getCellByColumnName(key: String): String =
-            this[
-                columnNameIndex.getOrElse(key) {
-                    log.error("$key 와 매칭되는 excel 컬럼이 존재하지 않습니다.")
-                    this.size
-                },
-            ].stringCellValue
-
-        val classification = row.getCellByColumnName("교과구분")
-        val college = row.getCellByColumnName("개설대학")
-        val department = row.getCellByColumnName("개설학과")
-        val academicCourse = row.getCellByColumnName("이수과정")
-        val academicYear = row.getCellByColumnName("학년")
-        val courseNumber = row.getCellByColumnName("교과목번호")
-        val lectureNumber = row.getCellByColumnName("강좌번호")
-        val courseTitle = row.getCellByColumnName("교과목명")
-        val courseSubtitle = row.getCellByColumnName("부제명")
-        val credit = row.getCellByColumnName("학점").toLong()
-        val classTimeText = row.getCellByColumnName("수업교시")
-        val location = row.getCellByColumnName("강의실(동-호)(#연건, *평창)")
-        val instructor = row.getCellByColumnName("주담당교수")
-        val (quota, quotaForCurrentStudent) =
-            row
-                .getCellByColumnName("정원")
-                .takeIf { quotaRegex.matches(it) }
-                ?.let { quotaRegex.find(it)!!.groups }
-                ?.let { it["quota"]!!.value.toInt() to (it["quotaForCurrentStudent"]?.value?.toInt() ?: 0) } ?: (0 to 0)
-        val remark = row.getCellByColumnName("비고")
-        val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
-
-        val classTimes =
-            SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText.split("/"), location.split("/"))
-
-        val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
-
-        return Lecture(
-            classification = classification,
-            // null(과학교육계) 존재한다고 함 (old snutt에서 참고)
-            department = department.replace("null", "").ifEmpty { college },
-            academicYear = academicCourse.takeIf { academicCourse != "학사" } ?: academicYear,
-            courseNumber = courseNumber,
-            lectureNumber = lectureNumber,
-            courseTitle = courseFullTitle,
-            credit = credit,
-            instructor = instructor,
-            remark = remark,
-            quota = quota,
-            freshmanQuota = (quota - quotaForCurrentStudent).takeIf { it > 0 },
-            year = year,
-            semester = semester,
-            category = "",
-            classPlaceAndTimes = classTimes,
-            registrationCount = registrationCount,
-            categoryPre2025 = null,
-        )
-    }
-
-    private fun Element.extractLectureIdentifier() =
+    private fun Element.extractRegistrationStatus() =
         this
             .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
             .map { course ->
@@ -225,9 +163,26 @@ class SugangSnuFetchServiceImpl(
                                 .takeIf { courseNumberRegex.matches(it) }!!
                                 .let { courseNumberRegex.find(it)!!.groups }
                                 .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
-                        LectureIdentifier(
+                        val regMatchResult =
+                            enrollmentRegex.find(
+                                info.select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em").text(),
+                            )
+                        val registrationCount = regMatchResult?.groups["registrationCount"]?.value?.toInt() ?: 0
+                        val quota = regMatchResult?.groups["quota"]?.value?.toInt() ?: 0
+                        val quotaForCurrentStudent = regMatchResult?.groups["quotaForCurrentStudent"]?.value?.toInt() ?: 0
+                        val freshmanQuota = (quota - quotaForCurrentStudent).takeIf { it > 0 }
+                        val wasFull =
+                            info
+                                .select("li.state > span[data-dialog-target='remaining-place-dialog']")
+                                .isNotEmpty()
+
+                        RegistrationStatus(
                             courseNumber = courseNumber,
                             lectureNumber = lectureNumber,
+                            registrationCount = registrationCount,
+                            quota = quota,
+                            freshmanQuota = freshmanQuota,
+                            wasFull = wasFull,
                         )
                     }
             }
