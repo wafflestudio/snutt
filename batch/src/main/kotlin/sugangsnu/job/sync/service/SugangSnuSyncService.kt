@@ -115,7 +115,7 @@ class SugangSnuSyncServiceImpl(
                         old,
                         new,
                         Lecture::class.memberProperties.filter {
-                            it != Lecture::id && it.get(old) != it.get(new)
+                            it != Lecture::id && it != Lecture::evInfo && it.get(old) != it.get(new)
                         },
                     )
                 }
