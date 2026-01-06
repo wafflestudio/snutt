@@ -38,6 +38,7 @@ import com.wafflestudio.snutt.users.dto.UserPatchRequest
 import com.wafflestudio.snutt.users.event.data.SignupEvent
 import com.wafflestudio.snutt.users.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
@@ -131,6 +132,7 @@ interface UserService {
 }
 
 @Service
+@RegisterReflectionForBinding(RedisVerificationValue::class)
 class UserServiceImpl(
     private val authService: AuthService,
     private val deviceService: DeviceService,
