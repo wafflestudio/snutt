@@ -40,7 +40,7 @@ object SugangSnuClassTimeUtils {
                     )
                 }.sortedWith(compareBy({ it.day.value }, { it.startMinute }))
         }.getOrElse {
-            log.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesTexts, locationsTexts)
+            log.error("classtime으로 변환 실패 (time: {}, location: {})", classTimesTexts, locationsTexts, it)
             emptyList()
         }
 
