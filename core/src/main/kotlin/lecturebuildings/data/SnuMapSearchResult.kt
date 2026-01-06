@@ -13,9 +13,9 @@ data class SnuMapSearchItem(
     @JsonProperty("lon_val")
     val longitudeInDMS: Double,
     @JsonProperty("lat_val1")
-    val latitudeInDecimal: Double,
+    val latitudeInDecimal: Double = 0.0,
     @JsonProperty("lon_val1")
-    val longitudeInDecimal: Double,
+    val longitudeInDecimal: Double = 0.0,
     @JsonProperty("vil_dong_nm")
     val buildingNumber: String?,
     val name: String,
