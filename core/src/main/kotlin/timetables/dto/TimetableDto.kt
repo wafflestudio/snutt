@@ -1,8 +1,8 @@
 package com.wafflestudio.snutt.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.BasicThemeType
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.BasicThemeType
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.timetables.data.Timetable
 import java.time.Instant
 
@@ -42,19 +42,19 @@ fun TimetableDto(
 )
 
 data class TimetableLegacyDto(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
-    @JsonProperty("user_id")
+    @param:JsonProperty("user_id")
     var userId: String,
     var year: Int,
     var semester: Semester,
-    @JsonProperty("lecture_list")
+    @param:JsonProperty("lecture_list")
     var lectures: List<TimetableLectureLegacyDto> = emptyList(),
     var title: String,
     val theme: BasicThemeType,
     val themeId: String?,
     val isPrimary: Boolean,
-    @JsonProperty("updated_at")
+    @param:JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
 )
 

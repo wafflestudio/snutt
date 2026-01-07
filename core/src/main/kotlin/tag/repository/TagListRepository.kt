@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.tag.repository
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.tag.data.TagList
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository

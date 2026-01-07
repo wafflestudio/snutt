@@ -1,8 +1,6 @@
 spring:
   config:
     import: application-common.yml
-  jpa:
-    show-sql: true
   batch:
     job:
       name: ${job.name:EMPTY}
@@ -13,15 +11,9 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    mongodb:
-      uri:
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  data:
-    mongodb:
-      uri:

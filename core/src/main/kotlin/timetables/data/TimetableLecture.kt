@@ -1,8 +1,6 @@
 package com.wafflestudio.snutt.timetables.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.theme.data.ColorSet
@@ -11,18 +9,20 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class TimetableLecture(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String = ObjectId.get().toHexString(),
     @Field("academic_year")
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
     @Field("class_time_json")
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTime>,
     var classification: String?,
     var credit: Long?,
@@ -38,9 +38,9 @@ data class TimetableLecture(
     @Field("course_title")
     var courseTitle: String,
     var color: ColorSet? = null,
-    @JsonProperty("color_index")
+    @param:JsonProperty("color_index")
     var colorIndex: Int = 0,
-    @JsonProperty("lecture_id")
+    @param:JsonProperty("lecture_id")
     @Field("lecture_id", targetType = FieldType.OBJECT_ID)
     @Indexed
     var lectureId: String? = null,

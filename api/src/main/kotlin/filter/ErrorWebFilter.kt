@@ -1,11 +1,12 @@
 package com.wafflestudio.snutt.filter
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.common.exception.ErrorType
 import com.wafflestudio.snutt.common.exception.EvServiceProxyException
 import com.wafflestudio.snutt.common.exception.SnuttException
 import kotlinx.coroutines.CancellationException
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -16,8 +17,11 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import reactor.netty.channel.AbortedException
+import tools.jackson.databind.ObjectMapper
 
 @Component
+@Order(0)
+@RegisterReflectionForBinding(ErrorBody::class)
 class ErrorWebFilter(
     private val objectMapper: ObjectMapper,
 ) : WebFilter {
@@ -83,14 +87,12 @@ class ErrorWebFilter(
             }
 
     private fun makeErrorBody(exception: SnuttException): ErrorBody =
-        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage, exception.ext)
+        ErrorBody(exception.error.errorCode, exception.title, exception.errorMessage, exception.displayMessage)
 }
 
-private data class ErrorBody(
+data class ErrorBody(
     val errcode: Long,
     val title: String,
     val message: String,
     val displayMessage: String,
-    // TODO: 구버전 대응용 ext 필드. 추후 삭제
-    val ext: Map<String, String> = mapOf(),
 )

@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.common.util
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import org.springframework.web.util.DefaultUriBuilderFactory
 
 object SugangSnuUrlUtils {

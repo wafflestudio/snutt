@@ -55,30 +55,30 @@ fun TimetableLectureDto(
 )
 
 data class TimetableLectureLegacyDto(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTimeLegacyDto>,
     var classification: String?,
     var credit: Long?,
     var department: String?,
     var instructor: String?,
-    @JsonProperty("lecture_number")
+    @param:JsonProperty("lecture_number")
     var lectureNumber: String?,
     var quota: Int?,
-    @JsonProperty("freshman_quota")
+    @param:JsonProperty("freshman_quota")
     var freshmanQuota: Int?,
     var remark: String?,
-    @JsonProperty("course_number")
+    @param:JsonProperty("course_number")
     var courseNumber: String?,
-    @JsonProperty("course_title")
+    @param:JsonProperty("course_title")
     var courseTitle: String,
     var color: ColorSet?,
     var colorIndex: Int = 0,
-    @JsonProperty("lecture_id")
+    @param:JsonProperty("lecture_id")
     var lectureId: String? = null,
     val snuttEvLecture: SnuttEvLectureIdDto? = null,
     val categoryPre2025: String?,

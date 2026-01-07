@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.sugangsnu.common.utils
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlin.reflect.KProperty1

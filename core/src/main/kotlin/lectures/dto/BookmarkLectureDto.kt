@@ -5,25 +5,25 @@ import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture
 
 data class BookmarkLectureDto(
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
-    @JsonProperty("academic_year")
+    @param:JsonProperty("academic_year")
     var academicYear: String?,
     var category: String?,
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     var classTimes: List<ClassPlaceAndTimeLegacyDto>,
     var classification: String?,
     var credit: Long,
     var department: String?,
     var instructor: String?,
-    @JsonProperty("lecture_number")
+    @param:JsonProperty("lecture_number")
     var lectureNumber: String,
     var quota: Int?,
     var freshmanQuota: Int?,
     var remark: String?,
-    @JsonProperty("course_number")
+    @param:JsonProperty("course_number")
     var courseNumber: String,
-    @JsonProperty("course_title")
+    @param:JsonProperty("course_title")
     var courseTitle: String,
     val snuttEvLecture: SnuttEvLectureSummaryDto? = null,
 )

@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.lectures.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.mapping.Document
@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @CompoundIndex(def = "{ 'course_number': 1, 'lecture_number': 1 }")
 data class Lecture(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,

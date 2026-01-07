@@ -1,7 +1,5 @@
 package com.wafflestudio.snutt.users.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.wafflestudio.snutt.auth.AuthProvider
 import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
@@ -40,10 +38,13 @@ import com.wafflestudio.snutt.users.dto.UserPatchRequest
 import com.wafflestudio.snutt.users.event.data.SignupEvent
 import com.wafflestudio.snutt.users.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.stereotype.Service
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.time.Duration
 import java.util.Base64
 import kotlin.random.Random
@@ -131,6 +132,7 @@ interface UserService {
 }
 
 @Service
+@RegisterReflectionForBinding(RedisVerificationValue::class)
 class UserServiceImpl(
     private val authService: AuthService,
     private val deviceService: DeviceService,

@@ -4,6 +4,7 @@ import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.common.extension.get
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Component
@@ -12,13 +13,12 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Component("GOOGLE")
-class GoogleClient(
-    webClientBuilder: WebClient.Builder,
-) : OAuth2Client {
+@RegisterReflectionForBinding(GoogleOAuth2UserResponse::class)
+class GoogleClient : OAuth2Client {
     private val log = LoggerFactory.getLogger(javaClass)
 
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
-    private val webClient = webClientBuilder.clientConnector(ReactorClientHttpConnector(httpClient)).build()
+    private val webClient = WebClient.builder().clientConnector(ReactorClientHttpConnector(httpClient)).build()
 
     companion object {
         private const val USER_INFO_URI = "https://www.googleapis.com/oauth2/v1/userinfo"

@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.semester.service
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.semester.data.YearAndSemester
 import org.springframework.stereotype.Service
 import java.time.Instant

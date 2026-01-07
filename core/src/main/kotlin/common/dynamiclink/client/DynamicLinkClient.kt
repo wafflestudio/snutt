@@ -8,6 +8,7 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.dynamiclink.dto.IosInfo
 import com.wafflestudio.snutt.common.exception.DynamicLinkGenerationFailedException
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.awaitBody
@@ -23,13 +24,14 @@ interface DynamicLinkClient {
 }
 
 @Service
+@RegisterReflectionForBinding(DynamicLinkResponse::class)
 class FirebaseDynamicLinkClient(
     val firebaseDynamicLinkApi: FirebaseDynamicLinkApi,
-    @Value("\${google.firebase.api-key}") val apiKey: String,
-    @Value("\${google.firebase.dynamic-link.domain-uri-prefix}") val domainUriPrefix: String,
-    @Value("\${google.firebase.dynamic-link.android.package-name}") val androidPackageName: String,
-    @Value("\${google.firebase.dynamic-link.ios.bundle-id}") val iosBundleId: String,
-    @Value("\${google.firebase.dynamic-link.ios.app-store-id:#{null}}") val iosAppStoreId: String?,
+    @param:Value("\${google.firebase.api-key}") val apiKey: String,
+    @param:Value("\${google.firebase.dynamic-link.domain-uri-prefix}") val domainUriPrefix: String,
+    @param:Value("\${google.firebase.dynamic-link.android.package-name}") val androidPackageName: String,
+    @param:Value("\${google.firebase.dynamic-link.ios.bundle-id}") val iosBundleId: String,
+    @param:Value("\${google.firebase.dynamic-link.ios.app-store-id:#{null}}") val iosAppStoreId: String?,
 ) : DynamicLinkClient {
     private val log = LoggerFactory.getLogger(javaClass)
 

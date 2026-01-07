@@ -1,20 +1,25 @@
 package com.wafflestudio.snutt.sugangsnu.common
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.convertSemesterToSugangSnuSearchString
 import com.wafflestudio.snutt.sugangsnu.common.api.SugangSnuApi
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuLectureInfo
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.core.io.buffer.PooledDataBuffer
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 
 @Component
+@RegisterReflectionForBinding(
+    SugangSnuCoursebookCondition::class,
+    SugangSnuLectureInfo::class,
+)
 class SugangSnuRepository(
     private val sugangSnuApi: SugangSnuApi,
     private val objectMapper: ObjectMapper,

@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.timetables.repository
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.extension.desc
 import com.wafflestudio.snutt.common.extension.elemMatch
 import com.wafflestudio.snutt.common.extension.isEqualTo

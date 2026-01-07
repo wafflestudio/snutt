@@ -1,21 +1,21 @@
 package com.wafflestudio.snutt.lectures.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Field
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLecture(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     var id: String? = null,
     @Field("academic_year")
     var academicYear: String?,
     var category: String?,
     @Field("class_time_json")
-    @JsonProperty("class_time_json")
+    @param:JsonProperty("class_time_json")
     var classPlaceAndTimes: List<ClassPlaceAndTime>,
     var classification: String?,
     var credit: Long,

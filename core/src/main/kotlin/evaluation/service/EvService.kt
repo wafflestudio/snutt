@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.evaluation.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.common.exception.EvDataNotFoundException
 import com.wafflestudio.snutt.common.exception.EvServiceProxyException
@@ -27,6 +26,7 @@ import org.springframework.web.reactive.function.client.awaitBodyOrNull
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.awaitExchangeOrNull
 import org.springframework.web.reactive.function.client.createExceptionAndAwait
+import tools.jackson.databind.ObjectMapper
 
 @Service
 class EvService(
@@ -50,7 +50,7 @@ class EvService(
             snuttEvWebClient
                 .method(method)
                 .uri { builder -> builder.path(requestPath).queryParams(requestQueryParams).build() }
-                .header("Snutt-User-Id", user.id)
+                .header("Snutt-User-Id", user.id!!)
                 .header(HttpHeaders.CONTENT_ENCODING, "UTF-8")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(originalBody)
