@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.clientconfig.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.snutt.clientconfig.data.ClientConfig
 import com.wafflestudio.snutt.clientconfig.dto.PatchConfigRequest
 import com.wafflestudio.snutt.clientconfig.dto.PostConfigRequest
@@ -16,6 +15,7 @@ import com.wafflestudio.snutt.common.exception.ConfigNotFoundException
 import com.wafflestudio.snutt.config.PhaseUtils
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
 
 @Service

@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 @CompoundIndex(def = "{ 'userId': 1, 'lectureId': 1 }", unique = true)
 data class VacancyNotification(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String? = null,
     @Indexed
     @Field(targetType = FieldType.OBJECT_ID)

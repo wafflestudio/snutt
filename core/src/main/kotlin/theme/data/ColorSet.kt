@@ -5,9 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 data class ColorSet(
     @Field("bg")
-    @JsonProperty("bg")
+    @param:JsonProperty("bg")
     var backgroundColor: String? = null,
     @Field("fg")
-    @JsonProperty("fg")
+    @param:JsonProperty("fg")
     var foregroundColor: String? = null,
 )

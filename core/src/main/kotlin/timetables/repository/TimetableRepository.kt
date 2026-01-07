@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.timetables.repository
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.timetables.data.Timetable
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository

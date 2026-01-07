@@ -1,0 +1,26 @@
+{
+  "reflection": [
+    {
+      "type": "org.springdoc.core.providers.SpringWebProvider$$SpringCGLIB$$0",
+      "fields": [
+        {
+          "name": "CGLIB$FACTORY_DATA"
+        },
+        {
+          "name": "CGLIB$CALLBACK_FILTER"
+        }
+      ]
+    },
+    {
+      "type": "org.springdoc.core.providers.SpringWebProvider",
+      "methods": [
+        {
+          "name": "findPathPrefix",
+          "parameterTypes": [
+            "org.springdoc.core.properties.SpringDocConfigProperties"
+          ]
+        }
+      ]
+    }
+  ]
+}

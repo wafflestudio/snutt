@@ -2,8 +2,8 @@ package com.wafflestudio.snutt.timetables.service
 
 import com.wafflestudio.snutt.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
-import com.wafflestudio.snutt.common.enum.BasicThemeType
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.BasicThemeType
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
@@ -114,7 +114,7 @@ class TimetableServiceImpl(
     private val timetableRepository: TimetableRepository,
     private val evService: EvService,
     private val dynamicLinkClient: DynamicLinkClient,
-    @Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
+    @param:Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
     override suspend fun getTimetables(userId: String): List<Timetable> = timetableRepository.findAllByUserId(userId).toList()
 

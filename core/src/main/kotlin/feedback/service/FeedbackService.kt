@@ -26,9 +26,9 @@ interface FeedbackService {
 
 @Service
 class FeedbackServiceImpl(
-    @Value("\${github.feedback.token}") private val token: String,
-    @Value("\${github.feedback.repo.owner}") private val repoOwner: String,
-    @Value("\${github.feedback.repo.name}") private val repoName: String,
+    @param:Value("\${github.feedback.token}") private val token: String,
+    @param:Value("\${github.feedback.repo.owner}") private val repoOwner: String,
+    @param:Value("\${github.feedback.repo.name}") private val repoName: String,
     private val githubRestApiClient: GithubRestApiClient,
 ) : FeedbackService {
     override suspend fun addGithubIssue(

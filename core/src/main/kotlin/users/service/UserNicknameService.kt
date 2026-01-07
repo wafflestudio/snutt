@@ -5,18 +5,21 @@ import com.wafflestudio.snutt.users.dto.NicknameDto
 import com.wafflestudio.snutt.users.repository.UserRepository
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.toSet
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
 @Component
 class UserNicknameService(
     private val userRepository: UserRepository,
-    @Value("adjectives.txt") adjectivesResource: ClassPathResource,
-    @Value("nouns.txt") nounsResource: ClassPathResource,
+    private val resourceLoader: ResourceLoader,
 ) {
-    private val adjectives = readAndSplitByComma(adjectivesResource)
-    private val nouns = readAndSplitByComma(nounsResource)
+    private val adjectives by lazy {
+        readAndSplitByComma(resourceLoader.getResource("classpath:adjectives.txt"))
+    }
+    private val nouns by lazy {
+        readAndSplitByComma(resourceLoader.getResource("classpath:nouns.txt"))
+    }
 
     companion object {
         private const val TAG_DELIMITER = "#"
@@ -25,7 +28,7 @@ class UserNicknameService(
         private val nicknameRegex = "^[a-zA-Z가-힣0-9 ]+$".toRegex()
     }
 
-    private fun readAndSplitByComma(resource: ClassPathResource): List<String> =
+    private fun readAndSplitByComma(resource: Resource): List<String> =
         resource.inputStream
             .readBytes()
             .decodeToString()

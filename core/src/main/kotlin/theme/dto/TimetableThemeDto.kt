@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.theme.dto
 
-import com.wafflestudio.snutt.common.enum.BasicThemeType
+import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.theme.data.ColorSet
 import com.wafflestudio.snutt.theme.data.ThemeOrigin
 import com.wafflestudio.snutt.theme.data.ThemeStatus

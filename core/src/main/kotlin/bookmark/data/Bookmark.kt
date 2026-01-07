@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.bookmark.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.data.BookmarkLecture
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex
@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 @CompoundIndex(def = "{'user_id': 1, 'year': 1, 'semester': 1}", unique = true)
 class Bookmark(
     @Id
-    @JsonProperty("_id")
+    @param:JsonProperty("_id")
     val id: String? = null,
     @Field("user_id", targetType = FieldType.OBJECT_ID)
     val userId: String,

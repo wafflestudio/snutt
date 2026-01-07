@@ -1,6 +1,6 @@
 package com.wafflestudio.snutt.diary.data
 
-import com.wafflestudio.snutt.common.enum.Semester
+import com.wafflestudio.snutt.common.enums.Semester
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.Indexed

@@ -1,7 +1,7 @@
 package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.wafflestudio.snutt.common.enum.DayOfWeek
+import com.wafflestudio.snutt.common.enums.DayOfWeek
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
 import com.wafflestudio.snutt.lectures.utils.endPeriod
 import com.wafflestudio.snutt.lectures.utils.minuteToString
@@ -27,13 +27,13 @@ data class ClassPlaceAndTimeLegacyDto(
     val place: String?,
     val startMinute: Int,
     val endMinute: Int,
-    @JsonProperty("start_time")
+    @param:JsonProperty("start_time")
     val startTime: String,
-    @JsonProperty("end_time")
+    @param:JsonProperty("end_time")
     val endTime: String,
-    @JsonProperty("len")
+    @param:JsonProperty("len")
     val periodLength: Double,
-    @JsonProperty("start")
+    @param:JsonProperty("start")
     val startPeriod: Double,
 )
 

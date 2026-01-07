@@ -1,0 +1,42 @@
+name: Deploy-api-dev-native
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy:
+    name: Deploy-api-dev-native
+    runs-on: ubuntu-24.04-arm
+    env:
+      IMAGE_TAG: ${{ github.run_number }}
+      BUILD_NUMBER: ${{ github.run_number }}
+      ECR_REGISTRY: 405906814034.dkr.ecr.ap-northeast-2.amazonaws.com
+      ECR_REPOSITORY: snutt-dev/snutt-timetable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Get and save Auth Token for CodeArtifact
+        id: get-save-codeartifact-auth-token
+        run: |
+          aws codeartifact get-authorization-token --domain wafflestudio --domain-owner 405906814034 --query authorizationToken --region ap-northeast-1 --output text > .codeartifact_token
+
+      - name: Docker build, tag, and push image to ECR
+        id: build-push-image
+        run: |
+          docker build --secret id=codeartifact_token,src=./.codeartifact_token -f api/Dockerfile-native -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --platform linux/arm64
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

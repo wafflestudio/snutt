@@ -3,191 +3,191 @@ package com.wafflestudio.snutt.sugangsnu.common.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class SugangSnuLectureInfo(
-    @JsonProperty("ltTime")
+    @param:JsonProperty("ltTime")
     val ltTime: List<String> = listOf(),
-    @JsonProperty("ltRoom")
+    @param:JsonProperty("ltRoom")
     val ltRoom: List<String> = listOf(),
-    @JsonProperty("LISTTAB01")
+    @param:JsonProperty("LISTTAB01")
     val subInfo: SugangSnuLectureSubInfo = SugangSnuLectureSubInfo(),
-//    @JsonProperty("sbjtSubhCd")
+//    @param:JsonProperty("sbjtSubhCd")
 //    val sbjtSubhCd: String? = null,
-//    @JsonProperty("t_profPersNo")
+//    @param:JsonProperty("t_profPersNo")
 //    val tProfPersNo: String? = null,
-//    @JsonProperty("openShtmFg")
+//    @param:JsonProperty("openShtmFg")
 //    val openShtmFg: String? = null,
-//    @JsonProperty("cscLocale")
+//    @param:JsonProperty("cscLocale")
 //    val cscLocale: String? = null,
-//    @JsonProperty("sbjtCd")
+//    @param:JsonProperty("sbjtCd")
 //    val sbjtCd: String? = null,
-//    @JsonProperty("bdegrSystemFg")
+//    @param:JsonProperty("bdegrSystemFg")
 //    val bdegrSystemFg: String? = null,
-//    @JsonProperty("openSchyy")
+//    @param:JsonProperty("openSchyy")
 //    val openSchyy: String? = null,
-//    @JsonProperty("ltType")
+//    @param:JsonProperty("ltType")
 //    val ltType: ArrayList<String> = arrayListOf(),
-//    @JsonProperty("openDetaShtmFg")
+//    @param:JsonProperty("openDetaShtmFg")
 //    val openDetaShtmFg: String? = null,
-//    @JsonProperty("workType")
+//    @param:JsonProperty("workType")
 //    val workType: String? = null,
-//    @JsonProperty("ltNo")
+//    @param:JsonProperty("ltNo")
 //    val ltNo: String? = null,
-//    @JsonProperty("SCOR_CNT")
+//    @param:JsonProperty("SCOR_CNT")
 //    val SCORCNT: String? = null
 )
 
 data class SugangSnuLectureSubInfo(
-    @JsonProperty("sbjtNm")
+    @param:JsonProperty("sbjtNm")
     val courseName: String? = null,
-    @JsonProperty("sbjtSubhNm")
+    @param:JsonProperty("sbjtSubhNm")
     val courseSubName: String? = null,
-    @JsonProperty("profNm")
+    @param:JsonProperty("profNm")
     val professorName: String? = null,
-    @JsonProperty("sbjtFldNm")
+    @param:JsonProperty("sbjtFldNm")
     val category: String? = null,
-    @JsonProperty("departmentKorNm")
+    @param:JsonProperty("departmentKorNm")
     val departmentKorNm: String? = null,
-    @JsonProperty("deptKorNm")
+    @param:JsonProperty("deptKorNm")
     val deptKorNm: String? = null,
-    @JsonProperty("majorKorNm")
+    @param:JsonProperty("majorKorNm")
     val majorKorNm: String? = null,
-    @JsonProperty("departmentEngNm")
+    @param:JsonProperty("departmentEngNm")
     val departmentEngNm: String? = null,
-    @JsonProperty("deptEngNm")
+    @param:JsonProperty("deptEngNm")
     val deptEngNm: String? = null,
-    @JsonProperty("majorEngNm")
+    @param:JsonProperty("majorEngNm")
     val majorEngNm: String? = null,
-    @JsonProperty("upSbjtFldEngNm")
+    @param:JsonProperty("upSbjtFldEngNm")
     val upSbjtFldEngNm: String? = null,
     // 학사 석사
-    @JsonProperty("cptnCorsFgNm")
+    @param:JsonProperty("cptnCorsFgNm")
     val academicCourse: String? = null,
     // 학년
-    @JsonProperty("openShyr")
+    @param:JsonProperty("openShyr")
     val academicYear: String? = null,
     // 정원
-    @JsonProperty("tlsnAplyCapaCnt")
+    @param:JsonProperty("tlsnAplyCapaCnt")
     val quota: Int? = null,
     // 비고
-    @JsonProperty("openLtRemk")
+    @param:JsonProperty("openLtRemk")
     val remark: String? = null,
-//    @JsonProperty("openLtEngRemk")
+//    @param:JsonProperty("openLtEngRemk")
 //    val openLtEngRemk: String? = null,
-//    @JsonProperty("frnStdTlsnLmtYn")
+//    @param:JsonProperty("frnStdTlsnLmtYn")
 //    val frnStdTlsnLmtYn: String? = null,
-//    @JsonProperty("mrksGvMthd")
+//    @param:JsonProperty("mrksGvMthd")
 //    val mrksGvMthd: String? = null,
-//    @JsonProperty("pracSbjtFg")
+//    @param:JsonProperty("pracSbjtFg")
 //    val pracSbjtFg: String? = null,
-//    @JsonProperty("elAttendUseYn")
+//    @param:JsonProperty("elAttendUseYn")
 //    val elAttendUseYn: String? = null,
-//    @JsonProperty("openShtm")
+//    @param:JsonProperty("openShtm")
 //    val openShtm: String? = null,
-//    @JsonProperty("openDetaShtmFg")
+//    @param:JsonProperty("openDetaShtmFg")
 //    val openDetaShtmFg: String? = null,
-//    @JsonProperty("sbjtSubhEngNm")
+//    @param:JsonProperty("sbjtSubhEngNm")
 //    val sbjtSubhEngNm: String? = null,
-//    @JsonProperty("submattCorsEng")
+//    @param:JsonProperty("submattCorsEng")
 //    val submattCorsEng: String? = null,
-//    @JsonProperty("tlsnAddSltTypeFgEngNm")
+//    @param:JsonProperty("tlsnAddSltTypeFgEngNm")
 //    val tlsnAddSltTypeFgEngNm: String? = null,
-//    @JsonProperty("lsnProgType")
+//    @param:JsonProperty("lsnProgType")
 //    val lsnProgType: String? = null,
-//    @JsonProperty("sbjtCdAndNm")
+//    @param:JsonProperty("sbjtCdAndNm")
 //    val sbjtCdAndNm: String? = null,
-//    @JsonProperty("univsEngNm")
+//    @param:JsonProperty("univsEngNm")
 //    val univsEngNm: String? = null,
-//    @JsonProperty("ltTime")
+//    @param:JsonProperty("ltTime")
 //    val ltTime: String? = null,
-//    @JsonProperty("lsnTmtablFormaSmryCtnt")
+//    @param:JsonProperty("lsnTmtablFormaSmryCtnt")
 //    val lsnTmtablFormaSmryCtnt: String? = null,
-//    @JsonProperty("thssRechSbjtYn")
+//    @param:JsonProperty("thssRechSbjtYn")
 //    val thssRechSbjtYn: String? = null,
-//    @JsonProperty("mrksApprMthdChgPosbYn")
+//    @param:JsonProperty("mrksApprMthdChgPosbYn")
 //    val mrksApprMthdChgPosbYn: String? = null,
-//    @JsonProperty("schyyIntgrtnSbjtYn")
+//    @param:JsonProperty("schyyIntgrtnSbjtYn")
 //    val schyyIntgrtnSbjtYn: String? = null,
-//    @JsonProperty("cptnCorsFg")
+//    @param:JsonProperty("cptnCorsFg")
 //    val cptnCorsFg: String? = null,
-//    @JsonProperty("forexamSubstYn")
+//    @param:JsonProperty("forexamSubstYn")
 //    val forexamSubstYn: String? = null,
-//    @JsonProperty("submattCors")
+//    @param:JsonProperty("submattCors")
 //    val submattCors: String? = null,
-//    @JsonProperty("lsnProgLang")
+//    @param:JsonProperty("lsnProgLang")
 //    val lsnProgLang: String? = null,
-//    @JsonProperty("sbjtReptCptnPosbYn")
+//    @param:JsonProperty("sbjtReptCptnPosbYn")
 //    val sbjtReptCptnPosbYn: String? = null,
-//    @JsonProperty("ltType")
+//    @param:JsonProperty("ltType")
 //    val ltType: String? = null,
-//    @JsonProperty("stdIntrvPosbTmList")
+//    @param:JsonProperty("stdIntrvPosbTmList")
 //    val stdIntrvPosbTmList: String? = null,
-//    @JsonProperty("stdIntrvPosbTmEngList")
+//    @param:JsonProperty("stdIntrvPosbTmEngList")
 //    val stdIntrvPosbTmEngList: String? = null,
-//    @JsonProperty("openPnt")
+//    @param:JsonProperty("openPnt")
 //    val openPnt: Int? = null,
-//    @JsonProperty("mrksRelevalYn")
+//    @param:JsonProperty("mrksRelevalYn")
 //    val mrksRelevalYn: String? = null,
-//    @JsonProperty("theoryLtTmCnt")
+//    @param:JsonProperty("theoryLtTmCnt")
 //    val theoryLtTmCnt: Int? = null,
-//    @JsonProperty("univsKorNm")
+//    @param:JsonProperty("univsKorNm")
 //    val univsKorNm: String? = null,
-//    @JsonProperty("submattFgNm")
+//    @param:JsonProperty("submattFgNm")
 //    val submattFgNm: String? = null,
-//    @JsonProperty("testPracLtTmCnt")
+//    @param:JsonProperty("testPracLtTmCnt")
 //    val testPracLtTmCnt: Int? = null,
-//    @JsonProperty("genrlRemoteLtYn")
+//    @param:JsonProperty("genrlRemoteLtYn")
 //    val genrlRemoteLtYn: String? = null,
-//    @JsonProperty("openShtmFg")
+//    @param:JsonProperty("openShtmFg")
 //    val openShtmFg: String? = null,
-//    @JsonProperty("cptnCorsFgEngNm")
+//    @param:JsonProperty("cptnCorsFgEngNm")
 //    val cptnCorsFgEngNm: String? = null,
-//    @JsonProperty("openDetaShtmEng")
+//    @param:JsonProperty("openDetaShtmEng")
 //    val openDetaShtmEng: String? = null,
-//    @JsonProperty("openDetaShtm")
+//    @param:JsonProperty("openDetaShtm")
 //    val openDetaShtm: String? = null,
-//    @JsonProperty("sbjtCd")
+//    @param:JsonProperty("sbjtCd")
 //    val sbjtCd: String? = null,
-//    @JsonProperty("submattPartEng")
+//    @param:JsonProperty("submattPartEng")
 //    val submattPartEng: String? = null,
-//    @JsonProperty("lsnProgTypeEng")
+//    @param:JsonProperty("lsnProgTypeEng")
 //    val lsnProgTypeEng: String? = null,
-//    @JsonProperty("sbjtEngNm")
+//    @param:JsonProperty("sbjtEngNm")
 //    val sbjtEngNm: String? = null,
-//    @JsonProperty("upSbjtFldNm")
+//    @param:JsonProperty("upSbjtFldNm")
 //    val upSbjtFldNm: String? = null,
-//    @JsonProperty("ltRoom")
+//    @param:JsonProperty("ltRoom")
 //    val ltRoom: String? = null,
-//    @JsonProperty("rowIdx")
+//    @param:JsonProperty("rowIdx")
 //    val rowIdx: Int? = null,
-//    @JsonProperty("ltNo")
+//    @param:JsonProperty("ltNo")
 //    val ltNo: String? = null,
-//    @JsonProperty("lsnProgLangEng")
+//    @param:JsonProperty("lsnProgLangEng")
 //    val lsnProgLangEng: String? = null,
-//    @JsonProperty("sbjtSubhCd")
+//    @param:JsonProperty("sbjtSubhCd")
 //    val sbjtSubhCd: String? = null,
-//    @JsonProperty("sbjtFldEngNm")
+//    @param:JsonProperty("sbjtFldEngNm")
 //    val sbjtFldEngNm: String? = null,
-//    @JsonProperty("mrksGvMthdEng")
+//    @param:JsonProperty("mrksGvMthdEng")
 //    val mrksGvMthdEng: String? = null,
-//    @JsonProperty("tlsnAddSltTypeFg")
+//    @param:JsonProperty("tlsnAddSltTypeFg")
 //    val tlsnAddSltTypeFg: String? = null,
-//    @JsonProperty("pntPerTlsnAmtUntprc")
+//    @param:JsonProperty("pntPerTlsnAmtUntprc")
 //    val pntPerTlsnAmtUntprc: String? = null,
-//    @JsonProperty("submattPart")
+//    @param:JsonProperty("submattPart")
 //    val submattPart: String? = null,
-//    @JsonProperty("submattFgEngNm")
+//    @param:JsonProperty("submattFgEngNm")
 //    val submattFgEngNm: String? = null,
-//    @JsonProperty("openSchyy")
+//    @param:JsonProperty("openSchyy")
 //    val openSchyy: String? = null,
-//    @JsonProperty("rowCnt")
+//    @param:JsonProperty("rowCnt")
 //    val rowCnt: Int? = null,
-//    @JsonProperty("openShtmEng")
+//    @param:JsonProperty("openShtmEng")
 //    val openShtmEng: String? = null,
-//    @JsonProperty("tlsnAddSltTypeFgNm")
+//    @param:JsonProperty("tlsnAddSltTypeFgNm")
 //    val tlsnAddSltTypeFgNm: String? = null,
-//    @JsonProperty("profEngNm")
+//    @param:JsonProperty("profEngNm")
 //    val profEngNm: String? = null,
-//    @JsonProperty("teachSbjtYn")
+//    @param:JsonProperty("teachSbjtYn")
 //    val teachSbjtYn: String? = null,
-//    @JsonProperty("lsnTmtablFormaSmryEngCtnt")
+//    @param:JsonProperty("lsnTmtablFormaSmryEngCtnt")
 //    val lsnTmtablFormaSmryEngCtnt: String? = null
 )

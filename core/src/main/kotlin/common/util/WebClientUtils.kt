@@ -1,9 +1,5 @@
 package com.wafflestudio.snutt.common.util
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
@@ -12,7 +8,6 @@ import java.net.URI
 
 object WebClientUtils {
     private val log = LoggerFactory.getLogger(javaClass)
-    val objectMapper: ObjectMapper = jacksonObjectMapper().registerModules(JavaTimeModule())
 
     fun logWebClientError(
         uri: String,
@@ -22,18 +17,6 @@ object WebClientUtils {
             log.error("[WEBCLIENT ERROR] {}\n{}", uri, it.responseBodyAsString, it)
         } else {
             log.error("[WEBCLIENT ERROR] {}\n{}", uri, it.message, it)
-        }
-    }
-
-    inline fun <reified T> Result<*>.tryConvertToErrorBody(): T? {
-        return exceptionOrNull()?.let {
-            return if (it is WebClientResponseException) {
-                runCatching {
-                    objectMapper.readValue<T>(it.responseBodyAsString)
-                }.getOrNull()
-            } else {
-                null
-            }
         }
     }
 }

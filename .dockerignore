@@ -17,4 +17,4 @@ out/
 .github
 .dockerignore
 
-.codeartifact-auth-token
+.codeartifact_token

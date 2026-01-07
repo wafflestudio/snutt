@@ -1,9 +1,9 @@
 spring:
   profiles:
-    active: local
+    default: local
+  mongodb:
+    uri:
   data:
-    mongodb:
-      uri:
     redis:
       repositories:
         enabled: false
@@ -58,10 +58,10 @@ spring:
   config:
     activate:
       on-profile: dev
+  mongodb:
+    uri:
+    auto-index-creation: true
   data:
-    mongodb:
-      uri:
-      auto-index-creation: true
     redis:
       host:
       database:
@@ -98,9 +98,9 @@ spring:
   config:
     activate:
       on-profile: prod
+  mongodb:
+    uri:
   data:
-    mongodb:
-      uri:
     redis:
       host:
       database:

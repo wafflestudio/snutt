@@ -8,6 +8,7 @@ snutt:
   secret-key:
 
 springdoc:
+  paths-to-match: /v1/**
   pre-loading-enabled: true
   pre-loading-locales: ko-KR,en-US
 ---
@@ -15,14 +16,22 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    mongodb:
-      uri:
+  mongodb:
+    uri:
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  data:
-    mongodb:
-      uri:
+  mongodb:
+    uri:
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
