@@ -13,3 +13,17 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notify
+        uses: rtCamp/action-slack-notify@v2.3.3
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: team-snutt-deploy
+          SLACK_TITLE: NEW RELEASE
+          SLACK_USERNAME: snutt-timetable
+          SLACK_ICON: https://user-images.githubusercontent.com/35535636/103177470-2237cb00-48be-11eb-9211-3ffa567c8ac3.png
+          SLACK_MESSAGE: Check <https://argocd.wafflestudio.com|Argo CD> for updated environment
