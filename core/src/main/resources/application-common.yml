@@ -9,6 +9,9 @@ spring:
         enabled: false
       host:
       database:
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: false
 
 google:
   firebase:
