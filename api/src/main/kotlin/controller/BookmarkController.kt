@@ -8,6 +8,7 @@ import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,7 +20,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/bookmarks", "/bookmarks")
+@RequestMapping(
+    "/v1/bookmarks",
+    "/bookmarks",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class BookmarkController(
     private val bookmarkService: BookmarkService,
 ) {

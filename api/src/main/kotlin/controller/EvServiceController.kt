@@ -12,6 +12,7 @@ import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -33,7 +34,11 @@ import org.springframework.web.bind.annotation.RestController
     SnuttEvLectureSummaryDto::class,
     ListResponse::class,
 )
-@RequestMapping("/v1/ev-service", "/ev-service")
+@RequestMapping(
+    "/v1/ev-service",
+    "/ev-service",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class EvServiceController(
     private val evService: EvService,
 ) {

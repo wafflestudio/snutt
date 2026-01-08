@@ -11,6 +11,7 @@ import com.wafflestudio.snutt.friend.dto.UpdateFriendDisplayNameRequest
 import com.wafflestudio.snutt.friend.service.FriendService
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.service.UserNicknameService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -23,7 +24,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/friends", "/friends")
+@RequestMapping(
+    "/v1/friends",
+    "/friends",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class FriendController(
     private val friendService: FriendService,
     private val userNicknameService: UserNicknameService,

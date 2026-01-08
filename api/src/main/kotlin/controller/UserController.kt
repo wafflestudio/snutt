@@ -18,6 +18,7 @@ import com.wafflestudio.snutt.users.dto.UserPatchRequest
 import com.wafflestudio.snutt.users.dto.VerificationCodeRequest
 import com.wafflestudio.snutt.users.service.UserNicknameService
 import com.wafflestudio.snutt.users.service.UserService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -29,7 +30,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/user", "/user")
+@RequestMapping(
+    "/v1/user",
+    "/user",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class UserController(
     private val userService: UserService,
 ) {
@@ -144,7 +149,11 @@ class UserController(
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/users", "/users")
+@RequestMapping(
+    "/v1/users",
+    "/users",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class UsersController(
     private val userService: UserService,
     private val userNicknameService: UserNicknameService,

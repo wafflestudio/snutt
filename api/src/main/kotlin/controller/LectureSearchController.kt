@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.lectures.dto.SearchDto
 import com.wafflestudio.snutt.lectures.dto.SearchTimeDto
 import com.wafflestudio.snutt.lectures.service.LectureService
 import kotlinx.coroutines.flow.toList
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttNoAuthApiFilterTarget
-@RequestMapping("/v1/search_query", "/search_query")
+@RequestMapping(
+    "/v1/search_query",
+    "/search_query",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class LectureSearchController(
     private val lectureService: LectureService,
 ) {

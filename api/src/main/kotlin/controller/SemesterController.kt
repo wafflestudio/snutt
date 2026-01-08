@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.controller
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.semester.dto.GetSemesterStatusResponse
 import com.wafflestudio.snutt.semester.service.SemesterService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -10,7 +11,11 @@ import java.time.Instant
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/semesters", "/semesters")
+@RequestMapping(
+    "/v1/semesters",
+    "/semesters",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class SemesterController(
     private val semesterService: SemesterService,
 ) {
