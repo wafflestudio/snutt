@@ -9,6 +9,7 @@ import com.wafflestudio.snutt.friend.service.FriendService
 import com.wafflestudio.snutt.timetables.dto.TimetableDto
 import com.wafflestudio.snutt.timetables.service.TimetableService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/friends/{friendId}", "/friends/{friendId}")
+@RequestMapping(
+    "/v1/friends/{friendId}",
+    "/friends/{friendId}",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class FriendTableController(
     private val friendService: FriendService,
     private val timetableService: TimetableService,

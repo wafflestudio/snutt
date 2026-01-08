@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.notification.dto.NotificationQuery
 import com.wafflestudio.snutt.notification.dto.NotificationResponse
 import com.wafflestudio.snutt.notification.service.NotificationService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -14,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/notification", "/notification")
+@RequestMapping(
+    "/v1/notification",
+    "/notification",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class NotificationController(
     private val notificationService: NotificationService,
 ) {

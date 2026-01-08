@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.notification.dto.PushPreferenceDto
 import com.wafflestudio.snutt.notification.service.PushPreferenceService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,7 +14,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/push/preferences", "/push/preferences")
+@RequestMapping(
+    "/v1/push/preferences",
+    "/push/preferences",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class PushPreferenceController(
     private val pushPreferenceService: PushPreferenceService,
 ) {

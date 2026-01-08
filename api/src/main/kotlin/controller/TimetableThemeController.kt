@@ -13,6 +13,7 @@ import com.wafflestudio.snutt.theme.dto.request.TimetableThemeModifyRequestDto
 import com.wafflestudio.snutt.theme.dto.request.TimetableThemePublishRequestDto
 import com.wafflestudio.snutt.theme.service.TimetableThemeService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -25,7 +26,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/themes", "/themes")
+@RequestMapping(
+    "/v1/themes",
+    "/themes",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class TimetableThemeController(
     private val timetableThemeService: TimetableThemeService,
 ) {

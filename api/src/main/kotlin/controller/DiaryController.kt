@@ -11,6 +11,7 @@ import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +22,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/diary", "/diary")
+@RequestMapping(
+    "/v1/diary",
+    "/diary",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class DiaryController(
     private val diaryService: DiaryService,
 ) {

@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.tag.TagListService
 import com.wafflestudio.snutt.tag.data.TagListResponse
 import com.wafflestudio.snutt.tag.data.TagListUpdateTimeResponse
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,7 +13,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/tags", "/tags")
+@RequestMapping(
+    "/v1/tags",
+    "/tags",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class TagController(
     private val tagService: TagListService,
 ) {

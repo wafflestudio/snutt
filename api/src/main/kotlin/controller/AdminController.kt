@@ -18,6 +18,7 @@ import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.dto.PostPopupRequest
 import com.wafflestudio.snutt.popup.service.PopupService
 import notification.dto.InsertNotificationRequest
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -30,7 +31,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttAdminApiFilterTarget
-@RequestMapping("/v1/admin", "/admin")
+@RequestMapping(
+    "/v1/admin",
+    "/admin",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class AdminController(
     private val notificationAdminService: NotificationAdminService,
     private val configService: ClientConfigService,

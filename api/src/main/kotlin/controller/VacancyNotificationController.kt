@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.vacancynotification.dto.VacancyNotificationLecturesResponse
 import com.wafflestudio.snutt.vacancynotification.service.VacancyNotificationService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,7 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/vacancy-notifications", "/vacancy-notifications")
+@RequestMapping(
+    "/v1/vacancy-notifications",
+    "/vacancy-notifications",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class VacancyNotificationController(
     private val vacancyNotificationService: VacancyNotificationService,
     private val lectureService: LectureService,
