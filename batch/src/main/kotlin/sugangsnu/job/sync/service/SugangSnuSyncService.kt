@@ -12,6 +12,8 @@ import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
+import com.wafflestudio.snutt.sugangsnu.common.utils.nextCoursebook
+import com.wafflestudio.snutt.sugangsnu.common.utils.toKoreanFieldName
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
@@ -60,11 +62,18 @@ class SugangSnuSyncServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
 
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
+        log.info("${coursebook.year}년도 ${coursebook.semester.fullName} 강의 업데이트 시작")
         val newLectures =
             sugangSnuFetchService.getSugangSnuLectures(coursebook.year, coursebook.semester)
         val oldLectures =
             lectureService.getLecturesByYearAndSemesterAsFlow(coursebook.year, coursebook.semester).toList()
         val compareResult = compareLectures(newLectures, oldLectures)
+
+        compareResult.updatedLectureList.forEach {
+            log.info("강의 업데이트: ${it.newData.courseNumber} ${it.newData.courseTitle} (${it.newData.lectureNumber})")
+            log.info("항목: ${it.updatedField.map { it2 -> it2.toKoreanFieldName() }}")
+        }
+        log.info("추가된 강의: ${compareResult.createdLectureList.size}개, 삭제된 강의: ${compareResult.deletedLectureList.size}개")
 
         syncLectures(compareResult)
         val syncUserLecturesResults = syncSavedUserLectures(compareResult)
@@ -106,7 +115,7 @@ class SugangSnuSyncServiceImpl(
                         old,
                         new,
                         Lecture::class.memberProperties.filter {
-                            it != Lecture::id && it.get(old) != it.get(new)
+                            it != Lecture::id && it != Lecture::evInfo && it.get(old) != it.get(new)
                         },
                     )
                 }
@@ -184,7 +193,10 @@ class SugangSnuSyncServiceImpl(
     private suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
         val updatedLectures =
             compareResult.updatedLectureList.map { diff ->
-                diff.newData.apply { id = diff.oldData.id }
+                diff.newData.apply {
+                    id = diff.oldData.id
+                    evInfo = diff.oldData.evInfo
+                }
             }
 
         lectureService.upsertLectures(compareResult.createdLectureList)
@@ -373,8 +385,13 @@ class SugangSnuSyncServiceImpl(
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
     }
 
-    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
-        this.year == sugangSnuCoursebookCondition.latestYear && this.semester == sugangSnuCoursebookCondition.latestSemester
+    private suspend fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean {
+        if (this < Coursebook(year = sugangSnuCoursebookCondition.latestYear, semester = sugangSnuCoursebookCondition.latestSemester)) {
+            return false
+        }
+        val nextCoursebook = this.nextCoursebook()
+        return sugangSnuFetchService.getPageCount(nextCoursebook.year, nextCoursebook.semester) == 0
+    }
 }
 
 data class ParsedTags(

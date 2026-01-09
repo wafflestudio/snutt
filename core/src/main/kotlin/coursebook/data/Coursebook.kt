@@ -18,4 +18,9 @@ class Coursebook(
     val semester: Semester,
     @Field("updated_at")
     var updatedAt: Instant = Instant.now(),
-)
+) : Comparable<Coursebook> {
+    override fun compareTo(other: Coursebook): Int =
+        compareBy<Coursebook> { it.year }
+            .thenBy { it.semester }
+            .compare(this, other)
+}

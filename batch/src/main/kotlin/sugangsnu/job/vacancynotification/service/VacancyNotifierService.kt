@@ -7,22 +7,16 @@ import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
-import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
-import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
+import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snutt.vacancynotification.repository.VacancyNotificationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Calendar
@@ -37,16 +31,14 @@ class VacancyNotifierServiceImpl(
     private val lectureService: LectureService,
     private val pushWithNotificationService: PushWithNotificationService,
     private val vacancyNotificationRepository: VacancyNotificationRepository,
-    private val sugangSnuRepository: SugangSnuRepository,
+    private val sugangSnuFetchService: SugangSnuFetchService,
 ) : VacancyNotifierService {
     companion object {
-        private const val COUNT_PER_PAGE = 10
         private const val DELAY_PER_CHUNK = 300L
         private val pushCoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
     private val isFreshmanRegistrationCompleted =
         Calendar.getInstance() >
             Calendar.getInstance().apply {
@@ -58,7 +50,7 @@ class VacancyNotifierServiceImpl(
         log.info("시작")
         val pageCount =
             runCatching {
-                getPageCount()
+                sugangSnuFetchService.getPageCount(coursebook.year, coursebook.semester)
             }.getOrElse {
                 log.error("에러가 발생했거나 부하 기간입니다. {}", it.message, it)
                 delay(30L.seconds)
@@ -70,7 +62,7 @@ class VacancyNotifierServiceImpl(
 
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
-            val registrationStatus = getRegistrationStatus(chunkedPages)
+            val registrationStatus = sugangSnuFetchService.getRegistrationStatus(coursebook.year, coursebook.semester, chunkedPages)
             if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
             val registrationStatusMap =
@@ -136,72 +128,6 @@ class VacancyNotifierServiceImpl(
             this.quota - (this.freshmanQuota ?: 0) == this.registrationCount
         } else {
             this.quota == this.registrationCount
-        }
-    }
-
-    private suspend fun getPageCount(): Int {
-        val firstPageContent = getSugangSnuSearchContent(1)
-        val totalCount =
-            firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
-        return (totalCount + 9) / COUNT_PER_PAGE
-    }
-
-    private suspend fun getRegistrationStatus(pages: List<Int>): List<RegistrationStatus> =
-        supervisorScope {
-            pages
-                .map { page ->
-                    async {
-                        getSugangSnuSearchContent(page).extractRegistrationStatus()
-                    }
-                }.awaitAll()
-                .flatten()
-        }
-
-    private fun Element.extractRegistrationStatus() =
-        this
-            .select("div.content > div.course-list-wrap.pd-r > div.course-info-list > div.course-info-item")
-            .map { course ->
-                course
-                    .select("div.course-info-item ul.course-info")
-                    .first()!!
-                    .let { info ->
-                        val (courseNumber, lectureNumber) =
-                            info
-                                .select("li:nth-of-type(1) > span:nth-of-type(3)")
-                                .text()
-                                .takeIf { courseNumberRegex.matches(it) }!!
-                                .let { courseNumberRegex.find(it)!!.groups }
-                                .let { it["courseNumber"]!!.value to (it["lectureNumber"]!!.value) }
-                        val registrationCount =
-                            info
-                                .select("ul.course-info > li:nth-of-type(2) > span:nth-of-type(1) > em")
-                                .text()
-                                .split("/")
-                                .first()
-                                .toInt()
-                        val wasFull =
-                            info
-                                .select("li.state > span[data-dialog-target='remaining-place-dialog']")
-                                .isNotEmpty()
-
-                        RegistrationStatus(
-                            courseNumber = courseNumber,
-                            lectureNumber = lectureNumber,
-                            registrationCount = registrationCount,
-                            wasFull = wasFull,
-                        )
-                    }
-            }
-
-    private suspend fun getSugangSnuSearchContent(pageNo: Int): Element {
-        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(pageNo)
-        return try {
-            Jsoup
-                .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
-                .select("html > body > form#CC100 > div#wrapper > div#skip-con > div.content")
-                .first()!!
-        } finally {
-            webPageDataBuffer.release()
         }
     }
 }
