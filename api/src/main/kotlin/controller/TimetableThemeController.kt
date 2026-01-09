@@ -37,7 +37,7 @@ class TimetableThemeController(
     @GetMapping("/best")
     suspend fun getBestThemes(
         @RequestParam page: Int,
-    ): ListResponse<*> {
+    ): ListResponse<TimetableThemeDto> {
         val themes = timetableThemeService.getBestThemes(page)
         val result = timetableThemeService.convertThemesToTimetableDtos(themes)
         return ListResponse(result)
@@ -47,7 +47,7 @@ class TimetableThemeController(
     suspend fun getFriendsThemes(
         @CurrentUser user: User,
         @RequestParam page: Int,
-    ): ListResponse<*> {
+    ): ListResponse<TimetableThemeDto> {
         val themes = timetableThemeService.getFriendsThemes(user.id!!, page)
         val result = timetableThemeService.convertThemesToTimetableDtos(themes)
         return ListResponse(result)
@@ -57,20 +57,20 @@ class TimetableThemeController(
     suspend fun getTheme(
         @CurrentUser user: User,
         @PathVariable themeId: String,
-    ) = TimetableThemeDto(timetableThemeService.getTheme(user.id!!, themeId))
+    ): TimetableThemeDto = TimetableThemeDto(timetableThemeService.getTheme(user.id!!, themeId))
 
     @PostMapping("")
     suspend fun addTheme(
         @CurrentUser user: User,
         @RequestBody body: TimetableThemeAddRequestDto,
-    ) = timetableThemeService.addTheme(user.id!!, body.name, body.colors).let(::TimetableThemeDto)
+    ): TimetableThemeDto = timetableThemeService.addTheme(user.id!!, body.name, body.colors).let(::TimetableThemeDto)
 
     @PatchMapping("/{themeId}")
     suspend fun modifyTheme(
         @CurrentUser user: User,
         @PathVariable themeId: String,
         @RequestBody body: TimetableThemeModifyRequestDto,
-    ) = timetableThemeService.modifyTheme(user.id!!, themeId, body.name, body.colors).let(::TimetableThemeDto)
+    ): TimetableThemeDto = timetableThemeService.modifyTheme(user.id!!, themeId, body.name, body.colors).let(::TimetableThemeDto)
 
     @PostMapping("/{themeId}/publish")
     suspend fun publishTheme(
@@ -87,12 +87,12 @@ class TimetableThemeController(
         @CurrentUser user: User,
         @PathVariable themeId: String,
         @RequestBody body: TimetableThemeDownloadRequestDto,
-    ) = TimetableThemeDto(timetableThemeService.downloadTheme(user.id!!, themeId, body.name))
+    ): TimetableThemeDto = TimetableThemeDto(timetableThemeService.downloadTheme(user.id!!, themeId, body.name))
 
     @PostMapping("/search")
     suspend fun searchThemes(
         @RequestParam query: String,
-    ): ListResponse<*> {
+    ): ListResponse<TimetableThemeDto> {
         val themes = timetableThemeService.searchThemes(query)
         val result = timetableThemeService.convertThemesToTimetableDtos(themes)
         return ListResponse(result)
@@ -114,13 +114,13 @@ class TimetableThemeController(
     suspend fun copyTheme(
         @CurrentUser user: User,
         @PathVariable themeId: String,
-    ) = timetableThemeService.copyTheme(user.id!!, themeId).let(::TimetableThemeDto)
+    ): TimetableThemeDto = timetableThemeService.copyTheme(user.id!!, themeId).let(::TimetableThemeDto)
 
     @PostMapping("/{themeId}/default")
     suspend fun setDefault(
         @CurrentUser user: User,
         @PathVariable themeId: String,
-    ) = timetableThemeService.setDefault(user.id!!, themeId).let(::TimetableThemeDto)
+    ): TimetableThemeDto = timetableThemeService.setDefault(user.id!!, themeId).let(::TimetableThemeDto)
 
     @PostMapping("/basic/{basicThemeTypeValue}/default")
     suspend fun setBasicThemeTypeDefault(
@@ -137,7 +137,7 @@ class TimetableThemeController(
     suspend fun unsetDefault(
         @CurrentUser user: User,
         @PathVariable themeId: String,
-    ) = timetableThemeService.unsetDefault(user.id!!, themeId).let(::TimetableThemeDto)
+    ): TimetableThemeDto = timetableThemeService.unsetDefault(user.id!!, themeId).let(::TimetableThemeDto)
 
     @DeleteMapping("/basic/{basicThemeTypeValue}/default")
     suspend fun unsetBasicThemeTypeDefault(
