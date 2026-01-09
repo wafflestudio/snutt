@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
+import com.wafflestudio.snutt.lecturebuildings.data.LectureBuilding
 import com.wafflestudio.snutt.lecturebuildings.data.PlaceInfo
 import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
 import org.springframework.http.MediaType
@@ -23,7 +24,7 @@ class BuildingController(
     @GetMapping("")
     suspend fun searchBuildings(
         @RequestParam places: String,
-    ): ListResponse<*> {
+    ): ListResponse<LectureBuilding> {
         val placesQuery =
             places
                 .split(",")
