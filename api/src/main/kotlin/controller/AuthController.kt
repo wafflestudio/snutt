@@ -15,6 +15,7 @@ import com.wafflestudio.snutt.users.dto.SendEmailRequest
 import com.wafflestudio.snutt.users.dto.SocialLoginRequest
 import com.wafflestudio.snutt.users.dto.VerificationCodeRequest
 import com.wafflestudio.snutt.users.service.UserService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,7 +23,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttNoAuthApiFilterTarget
-@RequestMapping("/v1/auth", "/auth")
+@RequestMapping(
+    "/v1/auth",
+    "/auth",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class AuthController(
     private val userService: UserService,
 ) {

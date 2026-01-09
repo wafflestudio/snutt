@@ -9,6 +9,7 @@ import com.wafflestudio.snutt.timetables.dto.request.TimetableModifyRequestDto
 import com.wafflestudio.snutt.timetables.service.TimetableService
 import com.wafflestudio.snutt.users.data.User
 import kotlinx.coroutines.flow.toList
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,7 +23,11 @@ import timetables.dto.TimetableBriefDto
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/tables", "/tables")
+@RequestMapping(
+    "/v1/tables",
+    "/tables",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class TimetableController(
     private val timetableService: TimetableService,
 ) {

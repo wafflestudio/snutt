@@ -7,6 +7,7 @@ import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.notification.service.DeviceService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/user/device", "/user/device")
+@RequestMapping(
+    "/v1/user/device",
+    "/user/device",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class DeviceController(
     private val deviceService: DeviceService,
 ) {

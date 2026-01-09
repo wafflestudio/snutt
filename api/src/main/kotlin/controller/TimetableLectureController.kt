@@ -8,6 +8,7 @@ import com.wafflestudio.snutt.timetables.dto.request.TimetableLectureModifyLegac
 import com.wafflestudio.snutt.timetables.service.TimetableLectureService
 import com.wafflestudio.snutt.timetables.service.TimetableService
 import com.wafflestudio.snutt.users.data.User
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +20,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @SnuttDefaultApiFilterTarget
-@RequestMapping("/v1/tables/{timetableId}/lecture", "/tables/{timetableId}/lecture")
+@RequestMapping(
+    "/v1/tables/{timetableId}/lecture",
+    "/tables/{timetableId}/lecture",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+)
 class TimetableLectureController(
     private val timetableLectureService: TimetableLectureService,
     private val timetableService: TimetableService,
