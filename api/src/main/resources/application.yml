@@ -4,6 +4,10 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+logging:
+  level:
+    io.netty.util.ResourceLeakDetector: OFF
+
 snutt:
   secret-key:
 
