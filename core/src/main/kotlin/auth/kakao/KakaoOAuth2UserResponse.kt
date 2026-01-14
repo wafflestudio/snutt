@@ -1,16 +1,15 @@
 package com.wafflestudio.snutt.auth.kakao
 
-import tools.jackson.databind.PropertyNamingStrategies
-import tools.jackson.databind.annotation.JsonNaming
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class KakaoOAuth2UserResponse(
     val id: Long,
+    @param:JsonProperty("kakao_account")
     val kakaoAccount: KakaoAccountDto,
 )
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class KakaoAccountDto(
     val email: String,
+    @param:JsonProperty("is_email_verified")
     val isEmailVerified: Boolean,
 )

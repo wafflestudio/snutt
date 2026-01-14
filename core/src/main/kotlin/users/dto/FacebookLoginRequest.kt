@@ -1,10 +1,10 @@
 package com.wafflestudio.snutt.users.dto
 
-import tools.jackson.databind.PropertyNamingStrategies
-import tools.jackson.databind.annotation.JsonNaming
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class FacebookLoginRequest(
+    @param:JsonProperty("fb_id")
     val fbId: String?,
+    @param:JsonProperty("fb_token")
     val fbToken: String,
 )
