@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import com.wafflestudio.snutt.users.data.User
 import com.wafflestudio.snutt.users.dto.EmailResponse
@@ -108,6 +109,7 @@ class AuthController(
         return OkResponse()
     }
 
+    @SnuttDefaultApiFilterTarget
     @PostMapping("/logout")
     suspend fun logout(
         @CurrentUser user: User,
