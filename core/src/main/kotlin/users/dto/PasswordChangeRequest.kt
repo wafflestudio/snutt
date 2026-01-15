@@ -1,10 +1,10 @@
 package com.wafflestudio.snutt.users.dto
 
-import tools.jackson.databind.PropertyNamingStrategies
-import tools.jackson.databind.annotation.JsonNaming
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class PasswordChangeRequest(
+    @param:JsonProperty("old_password")
     val oldPassword: String,
+    @param:JsonProperty("new_password")
     val newPassword: String,
 )

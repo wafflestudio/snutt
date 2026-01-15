@@ -1,9 +1,8 @@
 package com.wafflestudio.snutt.bookmark.dto
 
-import tools.jackson.databind.PropertyNamingStrategies
-import tools.jackson.databind.annotation.JsonNaming
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class BookmarkLectureModifyRequest(
+    @param:JsonProperty("lecture_id")
     val lectureId: String,
 )

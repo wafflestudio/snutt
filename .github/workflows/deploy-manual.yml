@@ -3,10 +3,6 @@ name: Deploy Manual
 on:
   workflow_dispatch:
     inputs:
-      target_branch:
-        description: '배포할 브랜치명'
-        required: true
-        type: string
       ecr_repository:
         description: 'ECR 리포지토리 (예: snutt-dev/snutt-timetable)'
         required: true
@@ -20,7 +16,6 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
-      target_branch: ${{ inputs.target_branch }}
       ecr_repository: ${{ inputs.ecr_repository }}
       dockerfile: ${{ inputs.dockerfile }}
     secrets:
