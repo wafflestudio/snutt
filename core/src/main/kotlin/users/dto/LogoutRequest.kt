@@ -1,9 +1,8 @@
 package com.wafflestudio.snutt.users.dto
 
-import tools.jackson.databind.PropertyNamingStrategies
-import tools.jackson.databind.annotation.JsonNaming
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class LogoutRequest(
+    @param:JsonProperty("registration_id")
     val registrationId: String,
 )
