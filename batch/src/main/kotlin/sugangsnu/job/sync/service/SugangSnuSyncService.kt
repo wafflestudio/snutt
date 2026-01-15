@@ -106,7 +106,7 @@ class SugangSnuSyncServiceImpl(
                         old,
                         new,
                         Lecture::class.memberProperties.filter {
-                            it != Lecture::id && it.get(old) != it.get(new)
+                            it != Lecture::id && it != Lecture::evInfo && it.get(old) != it.get(new)
                         },
                     )
                 }
@@ -184,7 +184,10 @@ class SugangSnuSyncServiceImpl(
     private suspend fun syncLectures(compareResult: SugangSnuLectureCompareResult) {
         val updatedLectures =
             compareResult.updatedLectureList.map { diff ->
-                diff.newData.apply { id = diff.oldData.id }
+                diff.newData.apply {
+                    id = diff.oldData.id
+                    evInfo = diff.oldData.evInfo
+                }
             }
 
         lectureService.upsertLectures(compareResult.createdLectureList)
