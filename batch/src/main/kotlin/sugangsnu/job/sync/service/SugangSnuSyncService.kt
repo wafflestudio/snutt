@@ -61,6 +61,10 @@ class SugangSnuSyncServiceImpl(
 ) : SugangSnuSyncService {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    companion object {
+        const val THRESHOLD_SEARCH_PAGES = 5
+    }
+
     override suspend fun updateCoursebook(coursebook: Coursebook): List<UserLectureSyncResult> {
         log.info("${coursebook.year}년도 ${coursebook.semester.fullName} 강의 업데이트 시작")
         val newLectures =
@@ -390,7 +394,7 @@ class SugangSnuSyncServiceImpl(
             return false
         }
         val nextCoursebook = this.nextCoursebook()
-        return sugangSnuFetchService.getPageCount(nextCoursebook.year, nextCoursebook.semester) == 0
+        return sugangSnuFetchService.getPageCount(nextCoursebook.year, nextCoursebook.semester) < THRESHOLD_SEARCH_PAGES
     }
 }
 
