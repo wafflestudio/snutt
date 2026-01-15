@@ -2,7 +2,8 @@
   "resources": {
     "includes": [
       { "pattern": "org/apache/xmlbeans/.*\\.properties" },
-      { "pattern": "org/apache/.*\\.xsb" }
+      { "pattern": "org/apache/.*\\.xsb" },
+      { "pattern": "categoryPre2025.txt" }
     ]
   }
 }
