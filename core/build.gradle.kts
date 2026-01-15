@@ -13,12 +13,6 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     api("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
-    // TODO: https://jira.mongodb.org/browse/JAVA-6038 이슈 해결된 spring-boot-starter-data-mongodb 업그레이드 후 아래 의존성 삭제
-    api("org.mongodb:mongodb-driver-sync:5.5.2")
-    api("org.mongodb:bson:5.5.2")
-    api("org.mongodb:mongodb-driver-core:5.5.2")
-    api("org.mongodb:bson-record-codec:5.5.2")
-
     api("org.springframework.boot:spring-boot-starter-data-redis")
 
     implementation("org.springframework.security:spring-security-crypto")
