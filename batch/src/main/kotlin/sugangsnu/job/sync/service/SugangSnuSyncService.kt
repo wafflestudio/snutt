@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.sugangsnu.job.sync.service
 
 import com.wafflestudio.snutt.bookmark.repository.BookmarkRepository
+import com.wafflestudio.snutt.common.exception.CoursebookRecentThanSugangSnuException
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.coursebook.repository.CoursebookRepository
 import com.wafflestudio.snutt.lecturebuildings.data.Campus
@@ -376,8 +377,18 @@ class SugangSnuSyncServiceImpl(
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
     }
 
-    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
-        this.year == sugangSnuCoursebookCondition.latestYear && this.semester == sugangSnuCoursebookCondition.latestSemester
+    private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean {
+        val sugangSnuCoursebook =
+            Coursebook(
+                year = sugangSnuCoursebookCondition.latestYear,
+                semester = sugangSnuCoursebookCondition.latestSemester,
+            )
+        return when {
+            sugangSnuCoursebook > this -> false
+            sugangSnuCoursebook < this -> throw CoursebookRecentThanSugangSnuException
+            else -> true
+        }
+    }
 }
 
 data class ParsedTags(
