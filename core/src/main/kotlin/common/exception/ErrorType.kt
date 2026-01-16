@@ -101,4 +101,10 @@ enum class ErrorType(
     CANNOT_REMOVE_LAST_AUTH_PROVIDER(HttpStatus.CONFLICT, 40909, "최소 한 개의 로그인 수단은 유지해야 합니다", "최소 한 개의 로그인 수단은 유지해야 합니다"),
 
     DYNAMIC_LINK_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "링크 생성 실패", "링크 생성에 실패했습니다. 잠시 후 다시 시도해주세요"),
+    COURSEBOOK_RECENT_THAN_SUGANGSNU(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        50002,
+        "현재 Coursebook이 수강신청 사이트보다 최근입니다.",
+        "현재 Coursebook이 수강신청 사이트보다 최근입니다.",
+    ),
 }
