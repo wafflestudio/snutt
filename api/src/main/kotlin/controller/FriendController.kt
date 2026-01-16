@@ -102,5 +102,15 @@ class FriendController(
     suspend fun acceptFriendByLink(
         @CurrentUser user: User,
         @PathVariable requestToken: String,
-    ) = friendService.acceptFriendByLink(user.id!!, requestToken)
+    ) = friendService
+        .acceptFriendByLink(user.id!!, requestToken)
+        .let { (friend, partner) ->
+            FriendResponse(
+                id = friend.id!!,
+                userId = partner.id!!,
+                displayName = friend.getPartnerDisplayName(user.id!!),
+                nickname = userNicknameService.getNicknameDto(partner.nickname),
+                createdAt = friend.createdAt,
+            )
+        }
 }
