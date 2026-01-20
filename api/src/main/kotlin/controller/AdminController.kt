@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.clientconfig.dto.PatchConfigRequest
 import com.wafflestudio.snutt.clientconfig.dto.PostConfigRequest
 import com.wafflestudio.snutt.clientconfig.service.ClientConfigService
 import com.wafflestudio.snutt.common.dto.OkResponse
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.storage.StorageService
 import com.wafflestudio.snutt.common.storage.StorageSource
 import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
@@ -17,6 +18,9 @@ import com.wafflestudio.snutt.notification.service.NotificationAdminService
 import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.dto.PostPopupRequest
 import com.wafflestudio.snutt.popup.service.PopupService
+import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
+import com.wafflestudio.snutt.registrationperiod.dto.SemesterRegistrationPeriodRequest
+import com.wafflestudio.snutt.registrationperiod.service.SemesterRegistrationPeriodService
 import notification.dto.InsertNotificationRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -42,6 +46,7 @@ class AdminController(
     private val storageService: StorageService,
     private val popupService: PopupService,
     private val diaryService: DiaryService,
+    private val semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
 ) {
     @PostMapping("/insert_noti")
     suspend fun insertNotification(
@@ -140,6 +145,34 @@ class AdminController(
         @PathVariable id: String,
     ): OkResponse {
         diaryService.removeQuestion(id)
+        return OkResponse()
+    }
+
+    @GetMapping("/registrationPeriods")
+    suspend fun getSemesterRegistrationPeriods(): List<SemesterRegistrationPeriod> = semesterRegistrationPeriodService.getAll()
+
+    @GetMapping("/registrationPeriods/{year}/{semester}")
+    suspend fun getSemesterRegistrationPeriod(
+        @PathVariable year: Int,
+        @PathVariable semester: Semester,
+    ): SemesterRegistrationPeriod? = semesterRegistrationPeriodService.getByYearAndSemester(year, semester)
+
+    @PatchMapping("/registrationPeriods/{year}/{semester}")
+    suspend fun patchSemesterRegistrationPeriod(
+        @PathVariable year: Int,
+        @PathVariable semester: Semester,
+        @RequestBody body: SemesterRegistrationPeriodRequest,
+    ): OkResponse {
+        semesterRegistrationPeriodService.upsert(body)
+        return OkResponse()
+    }
+
+    @DeleteMapping("/registrationPeriods/{year}/{semester}")
+    suspend fun deleteSemesterRegistrationPeriod(
+        @PathVariable year: Int,
+        @PathVariable semester: Semester,
+    ): OkResponse {
+        semesterRegistrationPeriodService.delete(year, semester)
         return OkResponse()
     }
 }
