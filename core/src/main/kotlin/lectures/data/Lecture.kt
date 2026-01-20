@@ -36,7 +36,7 @@ data class Lecture(
     var courseTitle: String,
     var registrationCount: Int = 0,
     var wasFull: Boolean = false,
-    val evInfo: EvInfo? = null,
+    var evInfo: EvInfo? = null,
     var categoryPre2025: String?,
 ) {
     infix fun equalsMetadata(other: Lecture): Boolean =
