@@ -6,7 +6,11 @@ import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.lectures.utils.minuteToString
+import com.wafflestudio.snutt.notification.data.NotificationType
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
+import com.wafflestudio.snutt.registrationperiod.data.RegistrationPhase
+import com.wafflestudio.snutt.registrationperiod.data.RegistrationTimeSlot
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.RegistrationStatus
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
@@ -25,11 +29,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.time.Duration.Companion.seconds
 
 interface VacancyNotifierService {
-    suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult
+    suspend fun notify(
+        coursebook: Coursebook,
+        registrationPhase: RegistrationPhase,
+        vacantSeatRegistrationTimes: List<RegistrationTimeSlot>,
+    ): VacancyNotificationJobResult
 }
 
 @Service
@@ -47,15 +56,13 @@ class VacancyNotifierServiceImpl(
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val courseNumberRegex = """(?<courseNumber>.*)\((?<lectureNumber>.+)\)""".toRegex()
-    private val isFreshmanRegistrationCompleted =
-        Calendar.getInstance() >
-            Calendar.getInstance().apply {
-                set(Calendar.MONTH, Calendar.FEBRUARY)
-                set(Calendar.DAY_OF_MONTH, 14)
-            }
 
-    override suspend fun noti(coursebook: Coursebook): VacancyNotificationJobResult {
-        log.info("시작")
+    override suspend fun notify(
+        coursebook: Coursebook,
+        registrationPhase: RegistrationPhase,
+        vacantSeatRegistrationTimes: List<RegistrationTimeSlot>,
+    ): VacancyNotificationJobResult {
+        log.info("시작: ${registrationPhase.name}")
         val pageCount =
             runCatching {
                 getPageCount()
@@ -82,7 +89,8 @@ class VacancyNotifierServiceImpl(
 
             val notiTargetLectures =
                 lectureAndRegistrationStatus
-                    .filter { (lecture, _) -> lecture.isFull() }
+                    .filter { (lecture, _) -> lecture.isFull(registrationPhase) }
+                    .filter { (_, status) -> status.wasFull }
                     .filter { (lecture, status) -> lecture.registrationCount > status.registrationCount }
                     .map { (lecture, _) -> lecture }
 
@@ -96,6 +104,13 @@ class VacancyNotifierServiceImpl(
                         }
                     }
             lectureService.upsertLectures(updated)
+
+            val currentMinute = Instant.now().atZone(ZoneId.of("Asia/Seoul")).minute
+            val targetTimeString =
+                vacantSeatRegistrationTimes
+                    .filter { currentMinute < it.endMinute }
+                    .minOfOrNull { it.startMinute }
+                    ?.let { minuteToString(it) } ?: "다음 수강신청 일자"
 
             pushCoroutineScope.launch {
                 notiTargetLectures.forEach { lecture ->
@@ -111,33 +126,35 @@ class VacancyNotifierServiceImpl(
                         val pushMessage =
                             PushMessage(
                                 title = "빈자리 알림",
-                                body = """"${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 수강신청 사이트를 확인해보세요!""",
+                                body =
+                                    """
+                                    "${lecture.courseTitle} (${lecture.lectureNumber})" 강의에 빈자리가 생겼습니다. 
+                                    ${targetTimeString}에 수강신청 사이트를 확인해보세요!
+                                    """.trimIndent(),
                                 urlScheme = DeeplinkType.VACANCY.build(),
                                 isUrgentOnAndroid = true,
                             )
-                        /*
+
                         pushWithNotificationService.sendPushesAndNotifications(
                             pushMessage,
                             NotificationType.LECTURE_VACANCY,
                             userIds,
                         )
-                         */
                     }
                 }
             }
+            delay(DELAY_PER_CHUNK)
         }
 
         return VacancyNotificationJobResult.SUCCESS
     }
 
-    private fun Lecture.isFull(): Boolean {
-        val isCurrentStudentRegistrationPeriod = this.semester == Semester.SPRING && !isFreshmanRegistrationCompleted
-        return if (isCurrentStudentRegistrationPeriod) {
+    private fun Lecture.isFull(registrationPhase: RegistrationPhase): Boolean =
+        if (this.semester == Semester.SPRING && registrationPhase == RegistrationPhase.CURRENT_STUDENT) {
             this.quota - (this.freshmanQuota ?: 0) == this.registrationCount
         } else {
             this.quota == this.registrationCount
         }
-    }
 
     private suspend fun getPageCount(): Int {
         val firstPageContent = getSugangSnuSearchContent(1)

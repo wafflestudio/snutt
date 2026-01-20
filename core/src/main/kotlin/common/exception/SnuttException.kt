@@ -181,3 +181,5 @@ object DuplicateSocialAccountException : SnuttException(ErrorType.DUPLICATE_SOCI
 object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_REMOVE_LAST_AUTH_PROVIDER)
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
+
+object RegistrationPeriodNotSetException : SnuttException(ErrorType.REGISTRATION_PERIOD_NOT_SET)
