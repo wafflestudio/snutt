@@ -1,8 +1,8 @@
 package com.wafflestudio.snutt.registrationperiod.service
 
 import com.wafflestudio.snutt.common.enums.Semester
+import com.wafflestudio.snutt.registrationperiod.data.RegistrationDate
 import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
-import com.wafflestudio.snutt.registrationperiod.dto.SemesterRegistrationPeriodRequest
 import com.wafflestudio.snutt.registrationperiod.repository.SemesterRegistrationPeriodRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -15,7 +15,11 @@ interface SemesterRegistrationPeriodService {
         semester: Semester,
     ): SemesterRegistrationPeriod?
 
-    suspend fun upsert(request: SemesterRegistrationPeriodRequest): SemesterRegistrationPeriod
+    suspend fun upsert(
+        year: Int,
+        semester: Semester,
+        registrationPeriods: List<RegistrationDate>,
+    ): SemesterRegistrationPeriod
 
     suspend fun delete(
         year: Int,
@@ -34,14 +38,18 @@ class SemesterRegistrationPeriodServiceImpl(
         semester: Semester,
     ): SemesterRegistrationPeriod? = semesterRegistrationPeriodRepository.findByYearAndSemester(year, semester)
 
-    override suspend fun upsert(request: SemesterRegistrationPeriodRequest): SemesterRegistrationPeriod {
-        val existing = semesterRegistrationPeriodRepository.findByYearAndSemester(request.year, request.semester)
+    override suspend fun upsert(
+        year: Int,
+        semester: Semester,
+        registrationPeriods: List<RegistrationDate>,
+    ): SemesterRegistrationPeriod {
+        val existing = semesterRegistrationPeriodRepository.findByYearAndSemester(year, semester)
         val semesterRegistrationPeriod =
             SemesterRegistrationPeriod(
                 id = existing?.id,
-                year = request.year,
-                semester = request.semester,
-                registrationPeriods = request.registrationPeriods,
+                year = year,
+                semester = semester,
+                registrationPeriods = registrationPeriods,
             )
         return semesterRegistrationPeriodRepository.save(semesterRegistrationPeriod)
     }

@@ -18,8 +18,8 @@ import com.wafflestudio.snutt.notification.service.NotificationAdminService
 import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.dto.PostPopupRequest
 import com.wafflestudio.snutt.popup.service.PopupService
+import com.wafflestudio.snutt.registrationperiod.data.RegistrationDate
 import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
-import com.wafflestudio.snutt.registrationperiod.dto.SemesterRegistrationPeriodRequest
 import com.wafflestudio.snutt.registrationperiod.service.SemesterRegistrationPeriodService
 import notification.dto.InsertNotificationRequest
 import org.springframework.http.MediaType
@@ -161,9 +161,9 @@ class AdminController(
     suspend fun patchSemesterRegistrationPeriod(
         @PathVariable year: Int,
         @PathVariable semester: Semester,
-        @RequestBody body: SemesterRegistrationPeriodRequest,
+        @RequestBody registrationPeriods: List<RegistrationDate>,
     ): OkResponse {
-        semesterRegistrationPeriodService.upsert(body)
+        semesterRegistrationPeriodService.upsert(year, semester, registrationPeriods)
         return OkResponse()
     }
 
