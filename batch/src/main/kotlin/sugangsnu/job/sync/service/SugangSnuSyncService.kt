@@ -9,14 +9,12 @@ import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
-import com.wafflestudio.snutt.registrationperiod.data.RegistrationDate
-import com.wafflestudio.snutt.registrationperiod.data.RegistrationPhase
-import com.wafflestudio.snutt.registrationperiod.data.RegistrationTimeSlot
 import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
 import com.wafflestudio.snutt.registrationperiod.repository.SemesterRegistrationPeriodRepository
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
+import com.wafflestudio.snutt.sugangsnu.common.utils.RegistrationPeriodParseUtils
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
@@ -42,8 +40,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.reflect.full.memberProperties
 
 interface SugangSnuSyncService {
@@ -103,25 +99,7 @@ class SugangSnuSyncServiceImpl(
 
     override suspend fun extractRegistrationPeriod(coursebook: Coursebook) {
         val table = getRegistrationPeriodTable()
-
-        val newDatesMap =
-            table
-                .select("tbody > tr")
-                .mapNotNull { row ->
-                    val typeText = row.select("th[data-th=구분] span").text().trim()
-                    val phase = parseRegistrationPhase(typeText) ?: return@mapNotNull null
-                    val (startDate, endDate) = parseDateRange(row.select("td[data-th=일자]").text())
-
-                    (startDate.toEpochDay()..endDate.toEpochDay()).map { epochDay ->
-                        LocalDate.ofEpochDay(epochDay) to
-                            RegistrationDate(
-                                date = LocalDate.ofEpochDay(epochDay),
-                                vacantSeatRegistrationTimes = getVacantSeatRegistrationTimes(typeText),
-                                phase = phase,
-                            )
-                    }
-                }.flatten()
-                .toMap()
+        val newDatesMap = RegistrationPeriodParseUtils.parseRegistrationDates(table)
 
         val existing = semesterRegistrationPeriodRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
         val existingDatesMap = existing?.registrationPeriods?.associateBy { it.date } ?: emptyMap()
@@ -136,44 +114,6 @@ class SugangSnuSyncServiceImpl(
                 registrationPeriods = mergedRegistrationDates,
             ),
         )
-    }
-
-    private fun parseRegistrationPhase(typeText: String): RegistrationPhase? =
-        when {
-            typeText.contains("전산확정") -> null
-            typeText.contains("정원외") -> null
-            typeText.contains("수강취소") -> null
-            typeText.contains("장바구니") -> null
-            typeText.contains("신입생") && typeText.contains("선착순") -> RegistrationPhase.FRESHMAN
-            typeText.contains("수강신청변경") -> RegistrationPhase.COURSE_CHANGE
-            typeText.contains("선착순") -> RegistrationPhase.CURRENT_STUDENT
-            else -> null
-        }
-
-    private fun getVacantSeatRegistrationTimes(typeText: String): List<RegistrationTimeSlot> =
-        if (typeText.contains("수강신청변경")) {
-            // 수강신청변경: 10~11시, 13~14시, 17~18시
-            listOf(
-                RegistrationTimeSlot(startMinute = 10 * 60, endMinute = 11 * 60),
-                RegistrationTimeSlot(startMinute = 13 * 60, endMinute = 14 * 60),
-                RegistrationTimeSlot(startMinute = 17 * 60, endMinute = 18 * 60),
-            )
-        } else {
-            // 선착순수강신청: 10~11시, 13~14시, 15~16시
-            listOf(
-                RegistrationTimeSlot(startMinute = 10 * 60, endMinute = 11 * 60),
-                RegistrationTimeSlot(startMinute = 13 * 60, endMinute = 14 * 60),
-                RegistrationTimeSlot(startMinute = 15 * 60, endMinute = 16 * 60),
-            )
-        }
-
-    private fun parseDateRange(dateText: String): Pair<LocalDate, LocalDate> {
-        // Format: "2026-01-30(금) ~ 2026-01-30(금)"
-        val datePattern = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val dates = Regex("""(\d{4}-\d{2}-\d{2})""").findAll(dateText).map { it.value }.toList()
-        val startDate = LocalDate.parse(dates[0], datePattern)
-        val endDate = LocalDate.parse(dates.getOrElse(1) { dates[0] }, datePattern)
-        return startDate to endDate
     }
 
     private fun compareLectures(
