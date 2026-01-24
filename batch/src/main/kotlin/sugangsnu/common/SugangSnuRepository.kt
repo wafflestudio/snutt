@@ -25,6 +25,7 @@ class SugangSnuRepository(
     private val objectMapper: ObjectMapper,
 ) {
     companion object {
+        const val MAIN_PAGE_PATH = "/sugang/co/co010.action"
         const val SUGANG_SNU_COURSEBOOK_PATH = "/sugang/cc/cc100ajax.action"
         const val DEFAULT_COURSEBOOK_PARAMS = "openUpDeptCd=&openDeptCd="
         const val SUGANG_SNU_SEARCH_PATH = "/sugang/cc/cc100InterfaceSrch.action"
@@ -119,6 +120,20 @@ class SugangSnuRepository(
                     queryParam("srchOpenShtm", convertSemesterToSugangSnuSearchString(semester))
                     build()
                 }
+            }.accept(MediaType.TEXT_HTML)
+            .awaitExchange {
+                if (it.statusCode().is2xxSuccessful) {
+                    it.awaitBody()
+                } else {
+                    throw it.createExceptionAndAwait()
+                }
+            }
+
+    suspend fun getSugangSnuMainPage(): PooledDataBuffer =
+        sugangSnuApi
+            .get()
+            .uri { builder ->
+                builder.path(MAIN_PAGE_PATH).build()
             }.accept(MediaType.TEXT_HTML)
             .awaitExchange {
                 if (it.statusCode().is2xxSuccessful) {
