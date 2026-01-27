@@ -45,12 +45,14 @@ class SugangSnuSyncJobConfig {
                     runBlocking {
                         val existingCoursebook = coursebookService.getLatestCoursebook()
                         if (sugangSnuSyncService.isSyncWithSugangSnu(existingCoursebook)) {
+                            sugangSnuSyncService.extractRegistrationPeriod(existingCoursebook)
                             val updateResult = sugangSnuSyncService.updateCoursebook(existingCoursebook)
                             sugangSnuNotificationService.notifyUserLectureChanges(updateResult)
                         } else {
                             val newCoursebook = existingCoursebook.nextCoursebook()
                             vacancyNotificationService.deleteAll()
                             sugangSnuSyncService.addCoursebook(newCoursebook)
+                            sugangSnuSyncService.extractRegistrationPeriod(newCoursebook)
                             sugangSnuNotificationService.notifyCoursebookUpdate(newCoursebook)
                         }
                     }

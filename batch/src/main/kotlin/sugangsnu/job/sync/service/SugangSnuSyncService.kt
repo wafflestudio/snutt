@@ -9,9 +9,12 @@ import com.wafflestudio.snutt.lecturebuildings.service.LectureBuildingService
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
 import com.wafflestudio.snutt.lectures.utils.ClassTimeUtils
+import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
+import com.wafflestudio.snutt.registrationperiod.repository.SemesterRegistrationPeriodRepository
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.data.SugangSnuCoursebookCondition
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuFetchService
+import com.wafflestudio.snutt.sugangsnu.common.utils.RegistrationPeriodParseUtils
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureDeleteResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.BookmarkLectureUpdateResult
 import com.wafflestudio.snutt.sugangsnu.job.sync.data.SugangSnuLectureCompareResult
@@ -31,6 +34,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.toList
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -43,6 +48,8 @@ interface SugangSnuSyncService {
     suspend fun addCoursebook(coursebook: Coursebook)
 
     suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean
+
+    suspend fun extractRegistrationPeriod(coursebook: Coursebook)
 }
 
 @Service
@@ -54,6 +61,7 @@ class SugangSnuSyncServiceImpl(
     private val coursebookRepository: CoursebookRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val tagListRepository: TagListRepository,
+    private val semesterRegistrationPeriodRepository: SemesterRegistrationPeriodRepository,
     private val lectureBuildingService: LectureBuildingService,
     private val eventPublisher: ApplicationEventPublisher,
 ) : SugangSnuSyncService {
@@ -87,6 +95,25 @@ class SugangSnuSyncServiceImpl(
     override suspend fun isSyncWithSugangSnu(latestCoursebook: Coursebook): Boolean {
         val sugangSnuLatestCoursebook = sugangSnuRepository.getCoursebookCondition()
         return latestCoursebook.isSyncedToSugangSnu(sugangSnuLatestCoursebook)
+    }
+
+    override suspend fun extractRegistrationPeriod(coursebook: Coursebook) {
+        val table = getRegistrationPeriodTable()
+        val newDatesMap = RegistrationPeriodParseUtils.parseRegistrationDates(table)
+
+        val existing = semesterRegistrationPeriodRepository.findByYearAndSemester(coursebook.year, coursebook.semester)
+        val existingDatesMap = existing?.registrationPeriods?.associateBy { it.date } ?: emptyMap()
+
+        val mergedRegistrationDates = (existingDatesMap + newDatesMap).values.sortedBy { it.date }
+
+        semesterRegistrationPeriodRepository.save(
+            SemesterRegistrationPeriod(
+                id = existing?.id,
+                year = coursebook.year,
+                semester = coursebook.semester,
+                registrationPeriods = mergedRegistrationDates,
+            ),
+        )
     }
 
     private fun compareLectures(
@@ -371,6 +398,18 @@ class SugangSnuSyncServiceImpl(
                 .filter { it.campus == Campus.GWANAK }
                 .distinct()
         lectureBuildingService.updateLectureBuildings(updatedPlaceInfos)
+    }
+
+    private suspend fun getRegistrationPeriodTable(): Element {
+        val webPageDataBuffer = sugangSnuRepository.getSugangSnuMainPage()
+        return try {
+            Jsoup
+                .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
+                .select(".table-con table")
+                .first()!!
+        } finally {
+            webPageDataBuffer.release()
+        }
     }
 
     private fun Coursebook.isSyncedToSugangSnu(sugangSnuCoursebookCondition: SugangSnuCoursebookCondition): Boolean =
