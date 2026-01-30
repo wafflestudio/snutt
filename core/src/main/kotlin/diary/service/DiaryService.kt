@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.diary.service
 
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
@@ -16,6 +17,7 @@ import com.wafflestudio.snutt.diary.repository.DiaryDailyClassTypeRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
@@ -27,6 +29,13 @@ interface DiaryService {
         lectureId: String,
         dailyClassTypeNames: List<String>,
     ): DiaryQuestionnaire
+
+    suspend fun getDiaryTargetLecture(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        filterIds: List<String>,
+    ): TimetableLecture?
 
     suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType>
 
@@ -72,12 +81,30 @@ class DiaryServiceImpl(
     ): DiaryQuestionnaire {
         val dailyClassTypeIds = diaryDailyClassTypeRepository.findAllByNameIn(dailyClassTypeNames).map { it.id!! }
         val availableQuestions = diaryQuestionRepository.findByTargetDailyClassTypeIdsInAndActiveTrue(dailyClassTypeIds)
+        val questions =
+            availableQuestions
+                .shuffled()
+                .take(3)
+
         val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
+        val nextLecture = getDiaryTargetLecture(userId, lecture.year, lecture.semester, listOf(lecture.id!!))
 
+        return DiaryQuestionnaire(
+            courseTitle = lecture.courseTitle,
+            questions = questions,
+            nextLecture = nextLecture,
+        )
+    }
+
+    override suspend fun getDiaryTargetLecture(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        filterIds: List<String>,
+    ): TimetableLecture? {
         val userTimetable =
-            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, lecture.year, lecture.semester)
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
                 ?: throw TimetableNotFoundException
-
         val recentlySubmittedIds =
             diarySubmissionRepository
                 .findAllByUserIdAndCreatedAtIsAfter(
@@ -85,20 +112,15 @@ class DiaryServiceImpl(
                     LocalDateTime.now().minusDays(1),
                 ).map { it.lectureId }
         val nextLectureCandidates =
-            userTimetable.lectures.filterNot { it.lectureId == lectureId || recentlySubmittedIds.contains(it.lectureId) }
-        val nextLecture = nextLectureCandidates.randomOrNull()
+            userTimetable.lectures
+                .filterNot { it.lectureId in filterIds }
+                .let { candidates ->
+                    candidates
+                        .filterNot { recentlySubmittedIds.contains(it.lectureId) }
+                        .ifEmpty { candidates }
+                }
 
-        val questions =
-            availableQuestions
-                .shuffled()
-                .take(3)
-
-        return DiaryQuestionnaire(
-            lectureTitle = lecture.courseTitle,
-            questions = questions,
-            nextLectureId = nextLecture?.lectureId,
-            nextLectureTitle = nextLecture?.courseTitle,
-        )
+        return nextLectureCandidates.randomOrNull()
     }
 
     override suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAllByActiveTrue()
