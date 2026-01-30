@@ -113,6 +113,7 @@ class DiaryServiceImpl(
                 ).map { it.lectureId }
         val nextLectureCandidates =
             userTimetable.lectures
+                .filterNot { it.lectureId == null }
                 .filterNot { it.lectureId in filterIds }
                 .let { candidates ->
                     candidates
