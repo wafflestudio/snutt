@@ -6,6 +6,10 @@ spring:
       name: ${job.name:EMPTY}
   main:
     web-application-type: none
+  task:
+    scheduling:
+      pool:
+        size: 0
 ---
 spring:
   config:
