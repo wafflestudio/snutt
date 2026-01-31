@@ -105,7 +105,8 @@ class VacancyNotifierServiceImpl(
                     }
             lectureService.upsertLectures(updated)
 
-            val currentMinute = Instant.now().atZone(ZoneId.of("Asia/Seoul")).minute
+            val now = Instant.now().atZone(ZoneId.of("Asia/Seoul"))
+            val currentMinute = now.hour * 60 + now.minute
             val targetTimeString =
                 vacantSeatRegistrationTimes
                     .filter { currentMinute < it.endMinute }
