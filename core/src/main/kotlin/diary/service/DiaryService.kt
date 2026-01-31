@@ -34,7 +34,7 @@ interface DiaryService {
         userId: String,
         year: Int,
         semester: Semester,
-        filterIds: List<String>,
+        idsToExclude: List<String>,
     ): TimetableLecture?
 
     suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType>
@@ -100,7 +100,7 @@ class DiaryServiceImpl(
         userId: String,
         year: Int,
         semester: Semester,
-        filterIds: List<String>,
+        idsToExclude: List<String>,
     ): TimetableLecture? {
         val userTimetable =
             timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
@@ -114,7 +114,7 @@ class DiaryServiceImpl(
         val nextLectureCandidates =
             userTimetable.lectures
                 .filterNot { it.lectureId == null }
-                .filterNot { it.lectureId in filterIds }
+                .filterNot { it.lectureId in idsToExclude }
                 .let { candidates ->
                     candidates
                         .filterNot { recentlySubmittedIds.contains(it.lectureId) }
