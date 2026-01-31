@@ -1,8 +1,9 @@
 package com.wafflestudio.snutt.diary.data
 
+import com.wafflestudio.snutt.timetables.data.TimetableLecture
+
 data class DiaryQuestionnaire(
-    val lectureTitle: String,
+    val courseTitle: String,
     val questions: List<DiaryQuestion>,
-    val nextLectureId: String?,
-    val nextLectureTitle: String?,
+    val nextLecture: TimetableLecture?,
 )
