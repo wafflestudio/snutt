@@ -118,7 +118,7 @@ interface UserService {
     suspend fun sendResetPasswordCode(email: String)
 
     suspend fun verifyResetPasswordCode(
-        localId: String,
+        user: User,
         code: String,
     )
 
@@ -567,13 +567,12 @@ class UserServiceImpl(
     }
 
     override suspend fun verifyResetPasswordCode(
-        localId: String,
+        user: User,
         code: String,
     ) {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         checkVerificationValue(key, code)
-        redisTemplate.expire(key, Duration.ofMinutes(3)).subscribe()
+        redisTemplate.expire(key, Duration.ofHours(1)).subscribe()
     }
 
     override suspend fun getMaskedEmail(localId: String): String {
@@ -589,7 +588,7 @@ class UserServiceImpl(
         code: String,
     ) {
         val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
-        verifyResetPasswordCode(localId, code)
+        verifyResetPasswordCode(user, code)
         if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
         user.apply {
             credential.localPw = authService.buildLocalCredential(user.credential.localId!!, newPassword).localPw
