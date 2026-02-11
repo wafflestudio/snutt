@@ -11,7 +11,6 @@ jobs:
       ocir_repository: snutt-prod/snutt-timetable
       dockerfile: api/Dockerfile-native
     secrets:
-      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
       OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
 
   notify:

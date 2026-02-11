@@ -11,8 +11,6 @@ on:
         type: string
         description: 'Dockerfile path (e.g., api/Dockerfile)'
     secrets:
-      OCI_CLI_KEY_CONTENT:
-        required: true
       OCI_AUTH_TOKEN:
         required: true
 
@@ -26,20 +24,13 @@ jobs:
       BUILD_NUMBER: ${{ github.run_number }}
       OCIR_REGISTRY: yny.ocir.io
       OCIR_REPOSITORY: ${{ inputs.ocir_repository }}
-      OCI_CLI_USER: ocid1.user.oc1..aaaaaaaafispxlhint36zqi2zsobz2svs7egdadtzezmpax3hsumz5ogpnma
-      OCI_CLI_TENANCY: ocid1.tenancy.oc1..aaaaaaaajzflhdho73h4er3roso57ebq4jpwt7n5uxg7rrgdnzmjtyeaogxa
-      OCI_CLI_FINGERPRINT: "84:0b:80:25:cd:8e:77:b3:77:e5:f5:0f:59:9d:aa:26"
-      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-      OCI_CLI_REGION: ap-chuncheon-1
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Login to OCIR
-        uses: oracle-actions/login-ocir@v1.3.0
-        with:
-          auth_token: ${{ secrets.OCI_AUTH_TOKEN }}
+        run: echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login $OCIR_REGISTRY -u ax1dvc8vmenm/members/snutt-deployer --password-stdin
 
       - name: Docker build, tag, and push image to OCIR
         id: build-push-image

@@ -11,5 +11,4 @@ jobs:
       ocir_repository: snutt-prod/snutt-timetable-batch
       dockerfile: batch/Dockerfile
     secrets:
-      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
       OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
