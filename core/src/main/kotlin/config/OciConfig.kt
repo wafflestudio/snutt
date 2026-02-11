@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.config
 import com.oracle.bmc.Region
 import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
-import com.oracle.bmc.auth.InstancePrincipalsAuthenticationDetailsProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -16,11 +15,5 @@ class OciConfig {
     }
 
     @Bean
-    @Profile("local")
-    fun localAuthProvider(): BasicAuthenticationDetailsProvider = ConfigFileAuthenticationDetailsProvider("DEFAULT")
-
-    @Bean
-    @Profile("dev", "prod")
-    fun instancePrincipalAuthProvider(): BasicAuthenticationDetailsProvider =
-        InstancePrincipalsAuthenticationDetailsProvider.builder().build()
+    fun ociAuthProvider(): BasicAuthenticationDetailsProvider = ConfigFileAuthenticationDetailsProvider("DEFAULT")
 }
