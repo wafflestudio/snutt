@@ -2,12 +2,12 @@ package com.wafflestudio.snutt.sugangsnu.common.service
 
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.lectures.data.Lecture
-import com.wafflestudio.snutt.pre2025category.service.CategoryPre2025FetchService
 import com.wafflestudio.snutt.sugangsnu.common.SugangSnuRepository
 import com.wafflestudio.snutt.sugangsnu.common.utils.SugangSnuClassTimeUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 
 interface SugangSnuFetchService {
@@ -20,16 +20,27 @@ interface SugangSnuFetchService {
 @Service
 class SugangSnuFetchServiceImpl(
     private val sugangSnuRepository: SugangSnuRepository,
-    private val categoryPre2025FetchService: CategoryPre2025FetchService,
+    private val resourceLoader: ResourceLoader,
 ) : SugangSnuFetchService {
     private val log = LoggerFactory.getLogger(javaClass)
     private val quotaRegex = """(?<quota>\d+)(\s*\((?<quotaForCurrentStudent>\d+)\))?""".toRegex()
+    private val courseNumberCategoryPre2025Map: Map<String, String> by lazy {
+        resourceLoader
+            .getResource("classpath:categoryPre2025.txt")
+            .inputStream
+            .bufferedReader()
+            .lineSequence()
+            .filter { it.contains(":") }
+            .associate { line ->
+                val (courseNumber, category) = line.split(":", limit = 2)
+                courseNumber to category
+            }
+    }
 
     override suspend fun getSugangSnuLectures(
         year: Int,
         semester: Semester,
     ): List<Lecture> {
-        val courseNumberCategoryPre2025Map = categoryPre2025FetchService.getCategoriesPre2025()
         val koreanLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "ko")
         val englishLectureXlsx = sugangSnuRepository.getSugangSnuLectures(year, semester, "en")
         val koreanSheet = HSSFWorkbook(koreanLectureXlsx.asInputStream()).getSheetAt(0)

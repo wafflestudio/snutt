@@ -184,4 +184,6 @@ object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_R
 
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
 
+object CoursebookRecentThanSugangSnuException : SnuttException(ErrorType.COURSEBOOK_RECENT_THAN_SUGANGSNU)
+
 object RegistrationPeriodNotSetException : SnuttException(ErrorType.REGISTRATION_PERIOD_NOT_SET)
