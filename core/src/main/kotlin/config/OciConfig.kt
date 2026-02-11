@@ -9,13 +9,14 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
+@Profile("!test")
 class OciConfig {
     companion object {
         val REGION: Region = Region.AP_CHUNCHEON_1
     }
 
     @Bean
-    @Profile("local", "test")
+    @Profile("local")
     fun localAuthProvider(): BasicAuthenticationDetailsProvider = ConfigFileAuthenticationDetailsProvider("DEFAULT")
 
     @Bean

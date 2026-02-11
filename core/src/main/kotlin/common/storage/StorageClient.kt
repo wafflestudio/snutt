@@ -7,7 +7,6 @@ import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails.A
 import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest
 import com.oracle.bmc.objectstorage.requests.GetNamespaceRequest
 import com.wafflestudio.snutt.config.OciConfig
-import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
@@ -26,7 +25,9 @@ class StorageClient(
             .region(OciConfig.REGION)
             .build(authProvider)
 
-    private lateinit var namespace: String
+    private val namespace: String by lazy {
+        objectStorageClient.getNamespace(GetNamespaceRequest.builder().build()).value
+    }
 
     companion object {
         lateinit var instance: StorageClient
@@ -37,10 +38,8 @@ class StorageClient(
         private const val ENDPOINT = "https://objectstorage.ap-chuncheon-1.oraclecloud.com"
     }
 
-    @PostConstruct
-    fun init() {
+    init {
         instance = this
-        namespace = objectStorageClient.getNamespace(GetNamespaceRequest.builder().build()).value
     }
 
     suspend fun generatePutSignedUris(
