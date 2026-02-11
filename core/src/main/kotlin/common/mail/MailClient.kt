@@ -10,14 +10,13 @@ import com.oracle.bmc.emaildataplane.requests.SubmitEmailRequest
 import com.wafflestudio.snutt.config.OciConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class MailClient(
     authProvider: BasicAuthenticationDetailsProvider,
-    @Value("\${oci.email.compartment-id}") private val compartmentId: String,
 ) {
+    private val compartmentId = "ocid1.compartment.oc1..aaaaaaaaxzo4fga6br76o3e34rshtsl6alzripmgdh7f4lg4u4tzezosypaq"
     private val emailClient =
         EmailDPClient
             .builder()
