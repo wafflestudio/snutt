@@ -23,6 +23,7 @@ jobs:
       IMAGE_TAG: ${{ github.run_number }}
       BUILD_NUMBER: ${{ github.run_number }}
       OCIR_REGISTRY: yny.ocir.io
+      OCIR_NAMESPACE: ax1dvc8vmenm
       OCIR_REPOSITORY: ${{ inputs.ocir_repository }}
 
     steps:
@@ -39,9 +40,9 @@ jobs:
           docker build \
             --secret id=github_token,src=./.github_token \
             -f ${{ inputs.dockerfile }} \
-            -t $OCIR_REGISTRY/$OCIR_REPOSITORY:$IMAGE_TAG \
+            -t $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG \
             . \
             --platform linux/arm64
           rm -f .github_token
-          docker push $OCIR_REGISTRY/$OCIR_REPOSITORY:$IMAGE_TAG
-          echo "image=$OCIR_REGISTRY/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG
+          echo "image=$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
