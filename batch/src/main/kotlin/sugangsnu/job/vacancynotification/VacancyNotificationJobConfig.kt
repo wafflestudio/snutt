@@ -1,7 +1,9 @@
 package com.wafflestudio.snutt.sugangsnu.job.vacancynotification
 
 import com.wafflestudio.snutt.common.JobFailureLoggingListener
+import com.wafflestudio.snutt.common.exception.RegistrationPeriodNotSetException
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
+import com.wafflestudio.snutt.registrationperiod.service.SemesterRegistrationPeriodService
 import com.wafflestudio.snutt.sugangsnu.common.service.SugangSnuNotificationService
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.data.VacancyNotificationJobResult
 import com.wafflestudio.snutt.sugangsnu.job.vacancynotification.service.VacancyNotifierService
@@ -38,14 +40,29 @@ class VacancyNotificationJobConfig {
         vacancyNotifierService: VacancyNotifierService,
         coursebookService: CoursebookService,
         sugangSnuNotificationService: SugangSnuNotificationService,
+        semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
     ): Step =
         StepBuilder("vacancyNotificationStep", jobRepository)
             .tasklet(
                 { _, _ ->
                     runBlocking {
                         val latestCoursebook = coursebookService.getLatestCoursebook()
-                        val updateResult = vacancyNotifierService.noti(latestCoursebook)
-                        if (Instant.now().atZone(ZoneId.of("Asia/Seoul")).hour == 18) return@runBlocking RepeatStatus.FINISHED
+                        val registrationPeriods =
+                            semesterRegistrationPeriodService
+                                .getByYearAndSemester(latestCoursebook.year, latestCoursebook.semester)
+                                ?.registrationPeriods ?: throw RegistrationPeriodNotSetException
+                        if (Instant.now().atZone(KST).hour >= 18) return@runBlocking RepeatStatus.FINISHED
+                        val currentDate = Instant.now().atZone(KST).toLocalDate()
+                        val registrationDay =
+                            registrationPeriods.find {
+                                currentDate == it.date
+                            } ?: return@runBlocking RepeatStatus.FINISHED
+                        val updateResult =
+                            vacancyNotifierService.notify(
+                                latestCoursebook,
+                                registrationDay.phase,
+                                registrationDay.vacantSeatRegistrationTimes,
+                            )
                         when (updateResult) {
                             VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED -> RepeatStatus.FINISHED
                             VacancyNotificationJobResult.OVERLOAD_PERIOD -> RepeatStatus.CONTINUABLE
@@ -55,4 +72,8 @@ class VacancyNotificationJobConfig {
                 },
                 transactionManager,
             ).build()
+
+    companion object {
+        private val KST = ZoneId.of("Asia/Seoul")
+    }
 }

@@ -7,7 +7,7 @@ data class DiarySubmissionSummaryDto(
     val id: String,
     val lectureId: String,
     val date: LocalDateTime,
-    val lectureTitle: String,
+    val courseTitle: String,
     val shortQuestionReplies: List<DiaryShortQuestionReply>,
     val comment: String,
 )
@@ -25,7 +25,7 @@ fun DiarySubmissionSummaryDto(
         id = submission.id!!,
         lectureId = submission.lectureId,
         date = submission.createdAt,
-        lectureTitle = submission.courseTitle,
+        courseTitle = submission.courseTitle,
         shortQuestionReplies = shortQuestionReplies,
         comment = submission.comment,
     )

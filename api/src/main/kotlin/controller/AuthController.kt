@@ -92,7 +92,8 @@ class AuthController(
     suspend fun verifyResetPasswordCode(
         @RequestBody body: VerificationCodeRequest,
     ): OkResponse {
-        userService.verifyResetPasswordCode(body.userId!!, body.code)
+        val user = userService.getUser(body.userId!!)
+        userService.verifyResetPasswordCode(user, body.code)
         return OkResponse()
     }
 

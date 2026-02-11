@@ -36,6 +36,15 @@ subprojects {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.1")
         }
+        dependencies {
+            // Downgrade MongoDB driver to avoid ByteBuf leak (JAVA-6038)
+            dependency("org.mongodb:mongodb-driver-core:5.5.2")
+            dependency("org.mongodb:mongodb-driver-sync:5.5.2")
+            dependency("org.mongodb:mongodb-driver-reactivestreams:5.5.2")
+            dependency("org.mongodb:bson:5.5.2")
+            dependency("org.mongodb:bson-record-codec:5.5.2")
+            dependency("org.mongodb:bson-kotlin:5.5.2")
+        }
     }
 
     tasks.withType<KotlinCompile> {

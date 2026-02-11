@@ -139,6 +139,8 @@ object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAI
 
 object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)
 
+object DiaryTargetLectureNotFoundException : SnuttException(ErrorType.DIARY_TARGET_LECTURE_NOT_FOUND)
+
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)
 
 object ThemeNotFoundException : SnuttException(ErrorType.THEME_NOT_FOUND)
@@ -183,3 +185,5 @@ object CannotRemoveLastAuthProviderException : SnuttException(ErrorType.CANNOT_R
 object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_LINK_GENERATION_FAILED)
 
 object CoursebookRecentThanSugangSnuException : SnuttException(ErrorType.COURSEBOOK_RECENT_THAN_SUGANGSNU)
+
+object RegistrationPeriodNotSetException : SnuttException(ErrorType.REGISTRATION_PERIOD_NOT_SET)
