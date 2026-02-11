@@ -1,0 +1,54 @@
+name: Update image tag in waffle-world-oci
+description: Updates the image tag in waffle-world-oci ArgoCD manifests
+
+inputs:
+  app-id:
+    required: true
+  private-key:
+    required: true
+  ocir-registry:
+    required: true
+  ocir-namespace:
+    required: true
+  ocir-repository:
+    required: true
+  image-tag:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Generate GitHub App token
+      id: app-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}
+        owner: wafflestudio
+        repositories: waffle-world-oci
+
+    - name: Update image tag
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        OCIR_IMAGE: ${{ inputs.ocir-registry }}/${{ inputs.ocir-namespace }}/${{ inputs.ocir-repository }}
+        OCIR_REPOSITORY: ${{ inputs.ocir-repository }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
+      run: |
+        REPO="wafflestudio/waffle-world-oci"
+        DIR="argocd/$OCIR_REPOSITORY"
+
+        for FILE_PATH in $(gh api "repos/$REPO/contents/$DIR" --jq '.[] | select(.name | endswith(".yaml") or endswith(".yml")) | .path'); do
+          CONTENT=$(gh api "repos/$REPO/contents/$FILE_PATH" --jq '.content' | base64 -d)
+          if echo "$CONTENT" | grep -q "image: $OCIR_IMAGE:"; then
+            UPDATED=$(echo "$CONTENT" | sed "s|image: $OCIR_IMAGE:[^ ]*|image: $OCIR_IMAGE:$IMAGE_TAG|g")
+            if [ "$CONTENT" != "$UPDATED" ]; then
+              SHA=$(gh api "repos/$REPO/contents/$FILE_PATH" --jq '.sha')
+              gh api --method PUT "repos/$REPO/contents/$FILE_PATH" \
+                -f message="build: update $OCIR_REPOSITORY to $IMAGE_TAG" \
+                -f content="$(echo "$UPDATED" | base64 -w 0)" \
+                -f sha="$SHA"
+              echo "Updated $FILE_PATH"
+            fi
+          fi
+        done

@@ -12,3 +12,5 @@ jobs:
       dockerfile: api/Dockerfile
     secrets:
       OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PRIVATE_KEY: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}
