@@ -14,13 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
@@ -28,5 +21,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Run Tests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           ./gradlew clean test -x processAot -x processTestAot
