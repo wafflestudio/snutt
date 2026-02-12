@@ -36,7 +36,8 @@ runs:
         IMAGE_TAG: ${{ inputs.image-tag }}
       run: |
         REPO="wafflestudio/waffle-world-oci"
-        DIR="argocd/$OCIR_REPOSITORY"
+        ENV_DIR=$(dirname "$OCIR_REPOSITORY")
+        DIR="argocd/$ENV_DIR"
 
         for FILE_PATH in $(gh api "repos/$REPO/contents/$DIR" --jq '.[] | select(.name | endswith(".yaml") or endswith(".yml")) | .path'); do
           CONTENT=$(gh api "repos/$REPO/contents/$FILE_PATH" --jq '.content' | base64 -d)
