@@ -19,7 +19,6 @@ dependencies {
     implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage:3.80.1")
     implementation("com.oracle.oci.sdk:oci-java-sdk-emaildataplane:3.80.1")
     implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3:3.80.1")
-    implementation("com.oracle.oci.sdk:oci-java-sdk-addons-oke-workload-identity:3.80.1")
     implementation("com.wafflestudio.spring:spring-boot-starter-waffle-oci-vault:2.1.0-SNAPSHOT")
     implementation("com.wafflestudio.spring.truffle:spring-boot-starter-truffle:2.1.0-SNAPSHOT")
     implementation("com.google.firebase:firebase-admin:9.7.0")
