@@ -1,5 +1,17 @@
 [
   {
+    "name": "org.glassfish.jersey.inject.hk2.JerseyClassAnalyzer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.glassfish.jersey.inject.hk2.JerseyClassAnalyzer$Binder",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
     "name": "org.glassfish.hk2.internal.PerThreadContext",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
