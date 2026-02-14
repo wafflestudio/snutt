@@ -56,10 +56,11 @@ api:
     snuttev:
       base-url: http://snutt-ev-api-dev.wafflestudio.com
 
-oci-vault-secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqahycrebaagkzrbtah3mvjtsyrhfw6aoeaarw4iansbkra
+oci:
+  vault:
+    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqahycrebaagkzrbtah3mvjtsyrhfw6aoeaarw4iansbkra
 
 ---
-
 spring:
   config:
     activate:
@@ -68,7 +69,6 @@ logging:
   config: classpath:logback/local.xml
 
 ---
-
 spring:
   config:
     activate:
@@ -108,7 +108,6 @@ logging:
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 ---
-
 spring:
   config:
     activate:
@@ -142,4 +141,6 @@ api:
       base-url: http://snutt-ev.snutt-prod.svc.cluster.local
       read-timeout: 5000
 
-oci-vault-secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqawhuzi5tw7l3zaqqmfqlorwfqi4kr3uhrlc6r2fio7a3a
+oci:
+  vault:
+    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqawhuzi5tw7l3zaqqmfqlorwfqi4kr3uhrlc6r2fio7a3a
