@@ -67,6 +67,9 @@ spring:
       on-profile: local
 logging:
   config: classpath:logback/local.xml
+oci:
+  auth:
+    type: config
 
 ---
 spring:
