@@ -27,7 +27,7 @@ class StorageService(
             val key = "$path${UUID.randomUUID()}.${JPG.value}"
             val uploadUri = storageClient.generatePutSignedUris(storageType, key)
 
-            val fileOriginUri = "oci://${storageType.bucketName}/$key"
+            val fileOriginUri = "s3://${storageType.bucketName}/$key"
             val fileUri = storageClient.generateGetUri(fileOriginUri)
 
             FileUploadUriDto(

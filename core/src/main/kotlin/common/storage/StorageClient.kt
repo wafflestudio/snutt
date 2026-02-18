@@ -70,7 +70,7 @@ class StorageClient(
         }
 
     fun generateGetUri(originUri: String): String {
-        val withoutScheme = originUri.substringAfter("oci://")
+        val withoutScheme = originUri.substringAfter("s3://")
         val bucketName = withoutScheme.substringBefore("/")
         val key = withoutScheme.substringAfter("/")
 
