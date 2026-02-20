@@ -1,6 +1,6 @@
-package com.wafflestudio.snutt.auth.apple
+package com.wafflestudio.snutt.auth.oidc
 
-data class AppleJwk(
+data class OidcJwk(
     val kty: String,
     val kid: String,
     val use: String,
