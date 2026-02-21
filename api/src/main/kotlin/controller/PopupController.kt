@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.common.storage.StorageService
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.service.PopupService
@@ -20,14 +21,18 @@ import org.springframework.web.bind.annotation.RestController
 )
 class PopupController(
     private val popupService: PopupService,
+    private val storageService: StorageService,
 ) {
     @GetMapping("")
     suspend fun getPopups(
         @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ): ListResponse<PopupResponse> {
         val popups = popupService.getPopups(clientInfo)
+        val imageUris = storageService.getFileUris(popups.map { it.imageOriginUri })
+        val responses = popups.zip(imageUris) { popup, imageUri -> PopupResponse(popup, imageUri) }
+
         return ListResponse(
-            content = popups.map(::PopupResponse),
+            content = responses,
             totalCount = popups.size,
         )
     }

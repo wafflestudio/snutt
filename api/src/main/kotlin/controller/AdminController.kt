@@ -101,7 +101,11 @@ class AdminController(
     @PostMapping("/popups")
     suspend fun postPopup(
         @RequestBody body: PostPopupRequest,
-    ): PopupResponse = popupService.postPopup(body).let(::PopupResponse)
+    ): PopupResponse {
+        val popup = popupService.postPopup(body)
+        val imageUri = storageService.getFileUri(popup.imageOriginUri)
+        return PopupResponse(popup, imageUri)
+    }
 
     @DeleteMapping("/popups/{id}")
     suspend fun deletePopup(
