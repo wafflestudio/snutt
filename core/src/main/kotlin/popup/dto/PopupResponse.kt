@@ -1,6 +1,5 @@
 package com.wafflestudio.snutt.popup.dto
 
-import com.wafflestudio.snutt.common.storage.toGetUri
 import com.wafflestudio.snutt.popup.data.Popup
 
 data class PopupResponse(
@@ -16,12 +15,15 @@ data class PopupResponse(
     val hidden_days: Int?,
 )
 
-fun PopupResponse(popup: Popup): PopupResponse =
+fun PopupResponse(
+    popup: Popup,
+    imageUri: String,
+): PopupResponse =
     PopupResponse(
         id = popup.id!!,
         key = popup.key,
-        imageUri = popup.imageOriginUri.toGetUri(),
-        image_url = popup.imageOriginUri.toGetUri(),
+        imageUri = imageUri,
+        image_url = imageUri,
         linkUrl = popup.linkUrl,
         hiddenDays = popup.hiddenDays,
         hidden_days = popup.hiddenDays,

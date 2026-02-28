@@ -8,8 +8,9 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
-      ecr_repository: snutt-dev/snutt-timetable-batch
+      ocir_repository: snutt-dev/snutt-timetable-batch
       dockerfile: batch/Dockerfile
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PRIVATE_KEY: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}

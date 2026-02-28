@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.ByteArrayOutputStream
 
 plugins {
     id("org.graalvm.buildtools.native") version "0.11.3" apply false
@@ -17,7 +16,22 @@ version = "0.0.1-SNAPSHOT"
 allprojects {
     repositories {
         mavenCentral()
-        mavenCodeArtifact()
+        maven {
+            url = uri("https://maven.pkg.github.com/wafflestudio/spring-waffle")
+            credentials {
+                username = "wafflestudio"
+                password = findProperty("gpr.key") as String?
+                    ?: System.getenv("GITHUB_TOKEN")
+                    ?: runCatching {
+                        ProcessBuilder("gh", "auth", "token")
+                            .start()
+                            .inputStream
+                            .bufferedReader()
+                            .readText()
+                            .trim()
+                    }.getOrDefault("")
+            }
+        }
         mavenLocal()
     }
 }
@@ -64,45 +78,5 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
-    }
-}
-
-interface InjectedExecOps {
-    @get:Inject val execOps: ExecOperations
-}
-
-fun RepositoryHandler.mavenCodeArtifact() {
-    val injected = project.objects.newInstance<InjectedExecOps>()
-    maven {
-        val authToken =
-            properties["codeArtifactAuthToken"] as String? ?: ByteArrayOutputStream().use {
-                runCatching {
-                    injected.execOps.exec {
-                        commandLine =
-                            listOf(
-                                "aws",
-                                "codeartifact",
-                                "get-authorization-token",
-                                "--domain",
-                                "wafflestudio",
-                                "--domain-owner",
-                                "405906814034",
-                                "--query",
-                                "authorizationToken",
-                                "--region",
-                                "ap-northeast-1",
-                                "--output",
-                                "text",
-                            )
-                        standardOutput = it
-                    }
-                }
-                it.toString()
-            }
-        url = uri("https://wafflestudio-405906814034.d.codeartifact.ap-northeast-1.amazonaws.com/maven/spring-waffle/")
-        credentials {
-            username = "aws"
-            password = authToken
-        }
     }
 }

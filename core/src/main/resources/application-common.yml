@@ -29,6 +29,10 @@ google:
         bundle-id:
         app-store-id:
 
+oci:
+  email:
+    compartment-id: ocid1.compartment.oc1..aaaaaaaaxzo4fga6br76o3e34rshtsl6alzripmgdh7f4lg4u4tzezosypaq
+
 oidc:
   facebook:
     app-id:
@@ -50,19 +54,22 @@ api:
     snuttev:
       base-url: http://snutt-ev-api-dev.wafflestudio.com
 
-secret-names: dev/snutt-timetable
+oci:
+  vault:
+    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqahycrebaagkzrbtah3mvjtsyrhfw6aoeaarw4iansbkra
 
 ---
-
 spring:
   config:
     activate:
       on-profile: local
 logging:
   config: classpath:logback/local.xml
+oci:
+  auth:
+    type: config
 
 ---
-
 spring:
   config:
     activate:
@@ -102,7 +109,6 @@ logging:
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 ---
-
 spring:
   config:
     activate:
@@ -136,4 +142,6 @@ api:
       base-url: http://snutt-ev.snutt-prod.svc.cluster.local
       read-timeout: 5000
 
-secret-names: prod/snutt-timetable
+oci:
+  vault:
+    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqawhuzi5tw7l3zaqqmfqlorwfqi4kr3uhrlc6r2fio7a3a
