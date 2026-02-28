@@ -2,54 +2,36 @@ package com.wafflestudio.snutt.auth.apple
 
 import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
+import com.wafflestudio.snutt.auth.oidc.OidcJwtVerifier
+import com.wafflestudio.snutt.auth.oidc.OidcVerificationOptions
 import com.wafflestudio.snutt.common.exception.InvalidAppleLoginTokenException
-import com.wafflestudio.snutt.common.extension.get
-import io.jsonwebtoken.Jwts
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
-import tools.jackson.databind.ObjectMapper
-import java.math.BigInteger
-import java.security.KeyFactory
-import java.security.PublicKey
-import java.security.spec.RSAPublicKeySpec
-import java.time.Duration
-import java.util.Base64
 
 @Component("APPLE")
-@RegisterReflectionForBinding(AppleJwk::class)
 class AppleClient(
-    private val objectMapper: ObjectMapper,
+    private val oidcJwtVerifier: OidcJwtVerifier,
+    @param:Value("\${oidc.apple.app-id:}") private val appleAppId: String,
 ) : OAuth2Client {
-    private val webClient =
-        WebClient
-            .builder()
-            .clientConnector(
-                ReactorClientHttpConnector(
-                    HttpClient.create().responseTimeout(
-                        Duration.ofSeconds(3),
-                    ),
-                ),
-            ).build()
-
     companion object {
         private const val APPLE_JWK_URI = "https://appleid.apple.com/auth/keys"
+        private const val APPLE_ISSUER = "https://appleid.apple.com"
     }
 
     override suspend fun getMe(token: String): OAuth2UserResponse? {
-        val jwtHeader = extractJwtHeader(token)
-        val appleJwk =
-            webClient
-                .get<Map<String, List<AppleJwk>>>(uri = APPLE_JWK_URI)
-                .getOrNull()
-                ?.get("keys")
-                ?.find {
-                    it.kid == jwtHeader.kid && it.alg == jwtHeader.alg
-                } ?: return null
-        val publicKey = convertJwkToPublicKey(appleJwk)
-        val jwtPayload = verifyAndDecodeToken(token, publicKey)
+        if (!oidcJwtVerifier.looksLikeJwt(token)) throw InvalidAppleLoginTokenException
+
+        val jwtPayload =
+            oidcJwtVerifier.verifyAndDecodeToken(
+                token = token,
+                options =
+                    OidcVerificationOptions(
+                        jwksUri = APPLE_JWK_URI,
+                        expectedIssuer = APPLE_ISSUER,
+                        expectedAudience = appleAppId,
+                    ),
+            ) ?: return null
+
         val appleUserInfo = AppleUserInfo(jwtPayload)
         return OAuth2UserResponse(
             socialId = appleUserInfo.sub,
@@ -59,37 +41,4 @@ class AppleClient(
             transferInfo = appleUserInfo.transferSub,
         )
     }
-
-    private suspend fun extractJwtHeader(token: String): AppleJwtHeader {
-        val headerJson = Base64.getDecoder().decode(token.substringBefore(".")).toString(Charsets.UTF_8)
-        val headerMap = objectMapper.readValue(headerJson, Map::class.java)
-        val kid = headerMap["kid"] as? String ?: throw InvalidAppleLoginTokenException
-        val alg = headerMap["alg"] as? String ?: throw InvalidAppleLoginTokenException
-        return AppleJwtHeader(
-            kid = kid,
-            alg = alg,
-        )
-    }
-
-    private suspend fun convertJwkToPublicKey(jwk: AppleJwk): PublicKey {
-        val modulus = BigInteger(1, Base64.getUrlDecoder().decode(jwk.n))
-        val exponent = BigInteger(1, Base64.getUrlDecoder().decode(jwk.e))
-        val spec = RSAPublicKeySpec(modulus, exponent)
-        return KeyFactory.getInstance("RSA").generatePublic(spec)
-    }
-
-    private suspend fun verifyAndDecodeToken(
-        token: String,
-        publicKey: PublicKey,
-    ) = Jwts
-        .parser()
-        .verifyWith(publicKey)
-        .build()
-        .parseSignedClaims(token)
-        .payload
 }
-
-private data class AppleJwtHeader(
-    val kid: String,
-    val alg: String,
-)

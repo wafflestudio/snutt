@@ -29,6 +29,12 @@ google:
         bundle-id:
         app-store-id:
 
+oidc:
+  facebook:
+    app-id:
+  apple:
+    app-id:
+
 http:
   response-timeout: 3s
 
