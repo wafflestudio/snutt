@@ -32,6 +32,8 @@ google:
 oci:
   email:
     compartment-id: ocid1.compartment.oc1..aaaaaaaaxzo4fga6br76o3e34rshtsl6alzripmgdh7f4lg4u4tzezosypaq
+  vault:
+    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqahycrebaagkzrbtah3mvjtsyrhfw6aoeaarw4iansbkra
 
 oidc:
   facebook:
@@ -53,10 +55,6 @@ api:
   server:
     snuttev:
       base-url: http://snutt-ev-api-dev.wafflestudio.com
-
-oci:
-  vault:
-    secret-ids: ocid1.vaultsecret.oc1.ap-chuncheon-1.amaaaaaat2m5lbqahycrebaagkzrbtah3mvjtsyrhfw6aoeaarw4iansbkra
 
 ---
 spring:
