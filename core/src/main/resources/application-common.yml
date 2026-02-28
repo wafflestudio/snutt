@@ -3,8 +3,6 @@ spring:
     default: local
   mongodb:
     uri:
-    username:
-    password:
   data:
     redis:
       repositories:
