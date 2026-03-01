@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.servers.Server
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springdoc.core.customizers.OpenApiCustomizer
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import tools.jackson.core.JsonParser
 
 @OpenAPIDefinition(
     servers = [Server(url = "/", description = "Local")],
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Configuration
         ),
 )
 @Configuration
+@RegisterReflectionForBinding(JsonParser.NumberType::class)
 class SwaggerConfig {
     @Bean
     fun openApiCustomizer() =
