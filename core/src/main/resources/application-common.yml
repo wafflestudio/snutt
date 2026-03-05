@@ -3,6 +3,7 @@ spring:
     default: local
   mongodb:
     uri:
+    auto-index-creation: true
   data:
     redis:
       repositories:
@@ -74,7 +75,6 @@ spring:
       on-profile: dev
   mongodb:
     uri:
-    auto-index-creation: true
   data:
     redis:
       host:
