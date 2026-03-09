@@ -50,13 +50,3 @@ jobs:
           rm -f .github_token
           docker push $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG
           echo "image=$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-      - name: Update image tag in waffle-world-oci
-        uses: ./.github/actions/update-image-tag
-        with:
-          app-id: ${{ secrets.DEPLOYER_APP_ID }}
-          private-key: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}
-          ocir-registry: ${{ env.OCIR_REGISTRY }}
-          ocir-namespace: ${{ env.OCIR_NAMESPACE }}
-          ocir-repository: ${{ env.OCIR_REPOSITORY }}
-          image-tag: ${{ env.IMAGE_TAG }}
