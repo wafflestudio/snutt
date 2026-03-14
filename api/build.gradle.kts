@@ -10,7 +10,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
     implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.2")
     runtimeOnly("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 
     testImplementation(testFixtures(project(":core")))

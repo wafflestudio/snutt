@@ -1,84 +1,108 @@
 package com.wafflestudio.snutt.common.storage
 
+import com.oracle.bmc.auth.BasicAuthenticationDetailsProvider
+import com.oracle.bmc.objectstorage.ObjectStorageAsyncClient
+import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails
+import com.oracle.bmc.objectstorage.model.CreatePreauthenticatedRequestDetails.AccessType
+import com.oracle.bmc.objectstorage.requests.CreatePreauthenticatedRequestRequest
+import com.oracle.bmc.objectstorage.requests.GetNamespaceRequest
+import com.wafflestudio.snutt.common.extension.awaitOciCall
+import com.wafflestudio.snutt.config.OciConfig
 import jakarta.annotation.PostConstruct
+import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Component
-import software.amazon.awssdk.regions.Region.AP_NORTHEAST_2
-import software.amazon.awssdk.services.s3.internal.signing.DefaultS3Presigner
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import java.time.Duration
+import java.time.Instant
+import java.util.Date
+import java.util.UUID
 
 @Component
-class StorageClient {
-    private val presigner = DefaultS3Presigner.builder().region(AP_NORTHEAST_2).build()
+class StorageClient(
+    authProvider: BasicAuthenticationDetailsProvider,
+) {
+    private val objectStorageClient =
+        ObjectStorageAsyncClient
+            .builder()
+            .region(OciConfig.REGION)
+            .build(authProvider)
+
+    private lateinit var namespace: String
 
     companion object {
-        lateinit var instance: StorageClient
-            private set
-
         private val uploadDuration = Duration.ofMinutes(10)
         private val getDuration = Duration.ofHours(1)
+        private const val ENDPOINT = "https://objectstorage.ap-chuncheon-1.oraclecloud.com"
     }
 
     @PostConstruct
-    fun init() {
-        instance = this
-    }
-
-    suspend fun generatePutSignedUris(
-        storageType: StorageType,
-        key: String,
-    ): String {
-        val request =
-            PutObjectRequest
-                .builder()
-                .bucket(storageType.bucketName)
-                .key(key)
-                .build()
-
-        val presignRequest =
-            PutObjectPresignRequest
-                .builder()
-                .signatureDuration(uploadDuration)
-                .putObjectRequest(request)
-                .build()
-
-        return presigner.presignPutObject(presignRequest).url().toString()
-    }
-
-    fun generateGetUri(originUri: String): String {
-        val bucketName = originUri.substringAfter("s3://").substringBefore("/")
-        val key = originUri.substringAfter(bucketName).substringAfter("/")
-
-        if (StorageType.from(bucketName).acl == Acl.PUBLIC_READ) {
-            return "https://$bucketName.s3.${AP_NORTHEAST_2.id()}.amazonaws.com/$key"
+    fun initializeNamespace() =
+        runBlocking {
+            namespace = fetchNamespace()
         }
 
-        return generateGetSignedUri(bucketName, key)
+    suspend fun generatePutSignedUri(
+        storageType: StorageType,
+        key: String,
+    ): String =
+        createSignedUri(
+            bucketName = storageType.bucketName,
+            key = key,
+            accessType = AccessType.ObjectWrite,
+            expiresIn = uploadDuration,
+            namePrefix = "upload",
+        )
+
+    suspend fun generateGetUri(originUri: String): String {
+        val withoutScheme = originUri.removePrefix("s3://")
+        val bucketName = withoutScheme.substringBefore("/")
+        val key = withoutScheme.substringAfter("/", missingDelimiterValue = "")
+
+        return if (StorageType.from(bucketName).acl == Acl.PUBLIC_READ) {
+            "$ENDPOINT/n/$namespace/b/$bucketName/o/$key"
+        } else {
+            createSignedUri(
+                bucketName = bucketName,
+                key = key,
+                accessType = AccessType.ObjectRead,
+                expiresIn = getDuration,
+                namePrefix = "download",
+            )
+        }
     }
 
-    private fun generateGetSignedUri(
+    private suspend fun fetchNamespace(): String =
+        awaitOciCall { handler ->
+            objectStorageClient.getNamespace(GetNamespaceRequest.builder().build(), handler)
+        }.value
+
+    private suspend fun createSignedUri(
         bucketName: String,
         key: String,
+        accessType: AccessType,
+        expiresIn: Duration,
+        namePrefix: String,
     ): String {
+        val parDetails =
+            CreatePreauthenticatedRequestDetails
+                .builder()
+                .name("$namePrefix-${UUID.randomUUID()}")
+                .objectName(key)
+                .accessType(accessType)
+                .timeExpires(Date.from(Instant.now().plus(expiresIn)))
+                .build()
+
         val request =
-            GetObjectRequest
+            CreatePreauthenticatedRequestRequest
                 .builder()
-                .bucket(bucketName)
-                .key(key)
+                .namespaceName(namespace)
+                .bucketName(bucketName)
+                .createPreauthenticatedRequestDetails(parDetails)
                 .build()
+        val accessUri =
+            awaitOciCall { handler -> objectStorageClient.createPreauthenticatedRequest(request, handler) }
+                .preauthenticatedRequest
+                .accessUri
 
-        val presignRequest =
-            GetObjectPresignRequest
-                .builder()
-                .signatureDuration(getDuration)
-                .getObjectRequest(request)
-                .build()
-
-        return presigner.presignGetObject(presignRequest).url().toString()
+        return "$ENDPOINT$accessUri"
     }
 }
-
-fun String.toGetUri(): String = StorageClient.instance.generateGetUri(this)

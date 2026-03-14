@@ -3,7 +3,7 @@ name: deploy-native-template
 on:
   workflow_call:
     inputs:
-      ecr_repository:
+      ocir_repository:
         required: true
         type: string
       dockerfile:
@@ -11,9 +11,11 @@ on:
         type: string
         description: 'Dockerfile path (e.g., api/Dockerfile-native)'
     secrets:
-      AWS_ACCESS_KEY_ID:
+      OCI_AUTH_TOKEN:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      DEPLOYER_APP_ID:
+        required: true
+      DEPLOYER_APP_PRIVATE_KEY:
         required: true
 
 jobs:
@@ -24,43 +26,27 @@ jobs:
     env:
       IMAGE_TAG: ${{ github.run_number }}
       BUILD_NUMBER: ${{ github.run_number }}
-      ECR_REGISTRY: 405906814034.dkr.ecr.ap-northeast-2.amazonaws.com
-      ECR_REPOSITORY: ${{ inputs.ecr_repository }}
+      OCIR_REGISTRY: yny.ocir.io
+      OCIR_NAMESPACE: ax1dvc8vmenm
+      OCIR_REPOSITORY: ${{ inputs.ocir_repository }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+      - name: Login to OCIR
+        run: echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login $OCIR_REGISTRY -u ax1dvc8vmenm/members/snutt-deployer --password-stdin
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Get and save Auth Token for CodeArtifact
-        id: get-save-codeartifact-auth-token
-        run: |
-          aws codeartifact get-authorization-token \
-            --domain wafflestudio \
-            --domain-owner 405906814034 \
-            --query authorizationToken \
-            --region ap-northeast-1 \
-            --output text > .codeartifact_token
-
-      - name: Docker build, tag, and push image to ECR
+      - name: Docker build, tag, and push image to OCIR
         id: build-push-image
         run: |
+          echo "${{ github.token }}" > .github_token
           docker build \
-            --secret id=codeartifact_token,src=./.codeartifact_token \
+            --secret id=github_token,src=./.github_token \
             -f ${{ inputs.dockerfile }} \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG \
             . \
             --platform linux/arm64
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
+          rm -f .github_token
+          docker push $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG
+          echo "image=$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

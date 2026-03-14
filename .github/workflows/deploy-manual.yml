@@ -3,8 +3,8 @@ name: Deploy Manual
 on:
   workflow_dispatch:
     inputs:
-      ecr_repository:
-        description: 'ECR 리포지토리 (예: snutt-dev/snutt-timetable)'
+      ocir_repository:
+        description: 'OCIR 리포지토리 (예: snutt-dev/snutt-timetable)'
         required: true
         type: string
       dockerfile:
@@ -16,8 +16,9 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy.yml
     with:
-      ecr_repository: ${{ inputs.ecr_repository }}
+      ocir_repository: ${{ inputs.ocir_repository }}
       dockerfile: ${{ inputs.dockerfile }}
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PRIVATE_KEY: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}

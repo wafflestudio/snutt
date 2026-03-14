@@ -95,7 +95,7 @@ class DiaryController(
         @CurrentUser user: User,
         @PathVariable id: String,
     ): OkResponse {
-        diaryService.removeSubmission(user.id!!, id)
+        diaryService.removeSubmission(id, user.id!!)
         return OkResponse()
     }
 }
