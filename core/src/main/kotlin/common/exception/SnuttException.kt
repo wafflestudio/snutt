@@ -135,6 +135,8 @@ object SocialProviderNotAttachedException : SnuttException(ErrorType.SOCIAL_PROV
 
 object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_NOT_FOUND)
 
+object DiaryQuestionInvalidException : SnuttException(ErrorType.DIARY_QUESTION_INVALID)
+
 object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAILY_CLASS_TYPE_NOT_FOUND)
 
 object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)

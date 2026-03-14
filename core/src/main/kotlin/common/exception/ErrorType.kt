@@ -65,6 +65,7 @@ enum class ErrorType(
     NOT_PUBLISHED_THEME(HttpStatus.BAD_REQUEST, 40022, "공유한 테마가 아닙니다", "공유한 테마가 아닙니다"),
     PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "테마마켓에서 테마를 내린 뒤 다시 시도해주세요", "테마마켓에서 테마를 내린 뒤 다시 시도해주세요"),
     TIMETABLE_LECTURE_REMINDER_INVALID_TIME(HttpStatus.BAD_REQUEST, 40024, "리마인더는 시간이 설정된 강의에만 등록할 수 있어요", "리마인더는 시간이 설정된 강의에만 등록할 수 있어요"),
+    DIARY_QUESTION_INVALID(HttpStatus.BAD_REQUEST, 40025, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
     VACANCY_NOTIFICATION_TEMPORARILY_UNAVAILABLE(
         HttpStatus.BAD_REQUEST,
         40025,
