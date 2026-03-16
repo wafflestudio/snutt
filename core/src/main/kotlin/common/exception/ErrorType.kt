@@ -65,13 +65,13 @@ enum class ErrorType(
     NOT_PUBLISHED_THEME(HttpStatus.BAD_REQUEST, 40022, "공유한 테마가 아닙니다", "공유한 테마가 아닙니다"),
     PUBLISHED_THEME_DELETE_ERROR(HttpStatus.BAD_REQUEST, 40023, "테마마켓에서 테마를 내린 뒤 다시 시도해주세요", "테마마켓에서 테마를 내린 뒤 다시 시도해주세요"),
     TIMETABLE_LECTURE_REMINDER_INVALID_TIME(HttpStatus.BAD_REQUEST, 40024, "리마인더는 시간이 설정된 강의에만 등록할 수 있어요", "리마인더는 시간이 설정된 강의에만 등록할 수 있어요"),
-    DIARY_QUESTION_INVALID(HttpStatus.BAD_REQUEST, 40025, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
     VACANCY_NOTIFICATION_TEMPORARILY_UNAVAILABLE(
         HttpStatus.BAD_REQUEST,
         40025,
         "현재 일시 중단된 기능입니다. 자세한 내용은 알림을 참고해 주세요.",
         "현재 일시 중단된 기능입니다. 자세한 내용은 알림을 참고해 주세요.",
     ),
+    DIARY_QUESTION_INVALID(HttpStatus.BAD_REQUEST, 40026, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다", "소셜 로그인에 실패했습니다"),
