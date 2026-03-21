@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundException
+import com.wafflestudio.snutt.common.exception.DiaryQuestionInvalidException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
@@ -205,6 +206,9 @@ class DiaryServiceImpl(
         val targetDailyClassTypeIds = diaryDailyClassTypeRepository.findAllByNameIn(request.targetDailyClassTypes).mapNotNull { it.id }
         if (targetDailyClassTypeIds.size != request.targetDailyClassTypes.size) {
             throw DiaryDailyClassTypeNotFoundException
+        }
+        if (request.answers.size != request.shortAnswers.size) {
+            throw DiaryQuestionInvalidException
         }
         val question =
             DiaryQuestion(
