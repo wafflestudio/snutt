@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.enums.Semester
+import com.wafflestudio.snutt.common.exception.DiaryCommentTooLongException
 import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionInvalidException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
@@ -75,6 +76,10 @@ class DiaryServiceImpl(
     private val timetableRepository: TimetableRepository,
     private val lectureService: LectureService,
 ) : DiaryService {
+    companion object {
+        const val COMMENT_MAX_LENGTH = 1000
+    }
+
     override suspend fun generateQuestionnaire(
         userId: String,
         lectureId: String,
@@ -135,6 +140,9 @@ class DiaryServiceImpl(
         userId: String,
         request: DiarySubmissionRequestDto,
     ) {
+        if (request.comment.length > COMMENT_MAX_LENGTH) {
+            throw DiaryCommentTooLongException
+        }
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
         val dailyClassTypes = diaryDailyClassTypeRepository.findAllByNameIn(request.dailyClassTypes)
         val questionIds = request.questionAnswers.map { it.questionId }
