@@ -581,7 +581,7 @@ class UserServiceImpl(
     }
 
     override suspend fun getMaskedEmail(localId: String): String {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         val email = user.email ?: throw UserNotFoundException
         val maskedEmail = email.replace(emailMaskRegex, "*")
         return maskedEmail
@@ -592,7 +592,7 @@ class UserServiceImpl(
         newPassword: String,
         code: String,
     ) {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         verifyResetPasswordCode(user, code)
         if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
         user.apply {
