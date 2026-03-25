@@ -52,6 +52,8 @@ import kotlin.random.Random
 interface UserService {
     suspend fun getUser(userId: String): User
 
+    suspend fun getUserByLocalId(localId: String): User
+
     suspend fun getUsers(userIds: List<String>): List<User>
 
     suspend fun patchUserInfo(
@@ -147,6 +149,9 @@ class UserServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
 
     override suspend fun getUser(userId: String): User = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+
+    override suspend fun getUserByLocalId(localId: String): User =
+        userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
 
     override suspend fun getUsers(userIds: List<String>): List<User> = userRepository.findAllByIdInAndActiveTrue(userIds)
 
@@ -576,7 +581,7 @@ class UserServiceImpl(
     }
 
     override suspend fun getMaskedEmail(localId: String): String {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         val email = user.email ?: throw UserNotFoundException
         val maskedEmail = email.replace(emailMaskRegex, "*")
         return maskedEmail
@@ -587,7 +592,7 @@ class UserServiceImpl(
         newPassword: String,
         code: String,
     ) {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         verifyResetPasswordCode(user, code)
         if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
         user.apply {
