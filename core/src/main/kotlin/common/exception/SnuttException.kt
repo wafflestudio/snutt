@@ -123,7 +123,7 @@ object TimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND
 
 object PrimaryTimetableNotFoundException : SnuttException(ErrorType.PRIMARY_TIMETABLE_NOT_FOUND)
 
-object TimetableNotPrimaryException : SnuttException(ErrorType.DEFAULT_ERROR)
+object TimetableNotPrimaryException : SnuttException(ErrorType.TIMETABLE_NOT_PRIMARY)
 
 object ConfigNotFoundException : SnuttException(ErrorType.CONFIG_NOT_FOUND)
 
