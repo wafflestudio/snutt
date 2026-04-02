@@ -9,7 +9,6 @@ import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TableDeleteErrorException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
-import com.wafflestudio.snutt.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snutt.coursebook.data.CoursebookDto
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.evaluation.service.EvService
@@ -326,7 +325,7 @@ class TimetableServiceImpl(
         timetableId: String,
     ) {
         val table = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        if (table.isPrimary != true) throw TimetableNotPrimaryException
+        if (table.isPrimary != true) return
         timetableRepository.save(table.copy(isPrimary = false))
     }
 
