@@ -137,6 +137,8 @@ object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_
 
 object DiaryQuestionInvalidException : SnuttException(ErrorType.DIARY_QUESTION_INVALID)
 
+object DiaryCommentTooLongException : SnuttException(ErrorType.DIARY_COMMENT_TOO_LONG)
+
 object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAILY_CLASS_TYPE_NOT_FOUND)
 
 object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)
