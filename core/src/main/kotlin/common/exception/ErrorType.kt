@@ -96,7 +96,8 @@ enum class ErrorType(
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다", "이미 사용 중인 이메일입니다", "회원가입 실패"),
     DUPLICATE_FRIEND(HttpStatus.CONFLICT, 40902, "이미 친구 관계이거나 친구 요청을 보냈습니다", "이미 친구 관계이거나 친구 요청을 보냈습니다"),
     INVALID_FRIEND(HttpStatus.CONFLICT, 40903, "친구 요청을 보낼 수 없는 유저입니다", "친구 요청을 보낼 수 없는 유저입니다"),
-    DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다", "동일한 테마 이름이 이미 있습니다. 다른 이름을 입력해 주세요", "테마 이름 중복"),
+
+    // DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다", "동일한 테마 이름이 이미 있습니다. 다른 이름을 입력해 주세요", "테마 이름 중복"),
     INVALID_THEME_TYPE(HttpStatus.CONFLICT, 40905, "적절하지 않은 유형의 테마입니다", "적절하지 않은 유형의 테마입니다"),
     DUPLICATE_POPUP_KEY(HttpStatus.CONFLICT, 40906, "중복된 팝업 키입니다", "중복된 팝업 키입니다"),
     ALREADY_DOWNLOADED_THEME(HttpStatus.CONFLICT, 40907, "이미 다운로드한 테마입니다", "이미 다운로드한 테마입니다"),
