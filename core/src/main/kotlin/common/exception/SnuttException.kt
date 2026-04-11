@@ -174,8 +174,6 @@ object DuplicateFriendException : SnuttException(ErrorType.DUPLICATE_FRIEND)
 
 object InvalidFriendException : SnuttException(ErrorType.INVALID_FRIEND)
 
-object DuplicateThemeNameException : SnuttException(ErrorType.DUPLICATE_THEME_NAME)
-
 object InvalidThemeTypeException : SnuttException(ErrorType.INVALID_THEME_TYPE)
 
 object DuplicatePopupKeyException : SnuttException(ErrorType.DUPLICATE_POPUP_KEY)
