@@ -136,7 +136,7 @@ class TimetableServiceImpl(
         return Timetable(
             userId = userId,
             year = timetableRequest.year,
-            semester = timetableRequest.semester,
+            semester = if(timetableRequest.year == 2026 && timetableRequest.semester == Semester.AUTUMN) Semester.SUMMER else timetableRequest.semester,
             title = timetableRequest.title,
             theme = defaultTheme.toBasicThemeType(),
             themeId = defaultTheme.toIdForTimetable(),
