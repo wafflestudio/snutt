@@ -41,20 +41,22 @@ data class Lecture(
 ) {
     infix fun equalsMetadata(other: Lecture): Boolean =
         this === other ||
-            academicYear == other.academicYear &&
-            category == other.category &&
-            classPlaceAndTimes == other.classPlaceAndTimes &&
-            classification == other.classification &&
-            credit == other.credit &&
-            department == other.department &&
-            instructor == other.instructor &&
-            lectureNumber == other.lectureNumber &&
-            quota == other.quota &&
-            freshmanQuota == other.freshmanQuota &&
-            remark == other.remark &&
-            semester == other.semester &&
-            year == other.year &&
-            courseNumber == other.courseNumber &&
-            courseTitle == other.courseTitle &&
-            categoryPre2025 == other.categoryPre2025
+            (
+                academicYear == other.academicYear &&
+                    category == other.category &&
+                    classPlaceAndTimes == other.classPlaceAndTimes &&
+                    classification == other.classification &&
+                    credit == other.credit &&
+                    department == other.department &&
+                    instructor == other.instructor &&
+                    lectureNumber == other.lectureNumber &&
+                    quota == other.quota &&
+                    freshmanQuota == other.freshmanQuota &&
+                    remark == other.remark &&
+                    semester == other.semester &&
+                    year == other.year &&
+                    courseNumber == other.courseNumber &&
+                    courseTitle == other.courseTitle &&
+                    categoryPre2025 == other.categoryPre2025
+            )
 }

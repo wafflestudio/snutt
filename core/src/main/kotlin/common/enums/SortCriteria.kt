@@ -30,7 +30,9 @@ enum class SortCriteria(
         fun getSort(sortCriteria: SortCriteria?): Sort =
             when (sortCriteria) {
                 RATING_DESC -> (Lecture::evInfo / EvInfo::avgRating).desc().and(Lecture::id.asc())
+
                 COUNT_DESC -> (Lecture::evInfo / EvInfo::count).desc().and(Lecture::id.asc())
+
                 // RATING_ASC -> (Lecture::evInfo / EvInfo::avgRating).asc()
                 // COUNT_ASC -> (Lecture::evInfo / EvInfo::count).asc()
                 else -> Sort.unsorted()

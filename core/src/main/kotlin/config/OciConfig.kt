@@ -25,7 +25,7 @@ class OciConfig(
     @Bean
     fun ociAuthProvider(): BasicAuthenticationDetailsProvider =
         when (authType.trim().lowercase()) {
-            "auto" ->
+            "auto" -> {
                 try {
                     instancePrincipalAuth()
                 } catch (e: Exception) {
@@ -35,13 +35,21 @@ class OciConfig(
                     )
                     configFileAuth()
                 }
+            }
 
-            "config" -> configFileAuth()
-            "instance_principal" -> instancePrincipalAuth()
-            else ->
+            "config" -> {
+                configFileAuth()
+            }
+
+            "instance_principal" -> {
+                instancePrincipalAuth()
+            }
+
+            else -> {
                 throw IllegalArgumentException(
                     "Unsupported oci.auth.type='${authType.trim()}'. Supported: auto, config, instance_principal",
                 )
+            }
         }
 
     private val log = LoggerFactory.getLogger(javaClass)
