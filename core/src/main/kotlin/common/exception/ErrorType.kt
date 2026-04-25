@@ -31,6 +31,7 @@ enum class ErrorType(
     CANNOT_RESET_CUSTOM_LECTURE(HttpStatus.FORBIDDEN, 0x300D, "cannot reset custom lectures", "직접 만든 강좌는 초기화할 수 없습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, 0x300F, "email이 유효하지 않습니다", "이메일 형식이 올바르지 않습니다. 다시 입력해 주세요"),
     USER_EMAIL_IS_NOT_VERIFIED(HttpStatus.FORBIDDEN, 0x3011, "User email is not verified", "이메일 인증이 완료된 후 강의평을 확인할 수 있습니다", "이메일 인증 필요"),
+    INVALID_TIMETABLE_SEMESTER(HttpStatus.FORBIDDEN, 0x300B, "시간표를 생성할 수 없는 학기입니다", "시간표를 생성할 수 없는 학기입니다"),
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다", "수강편람에서 찾을 수 없는 강좌입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다", "해당 정보로 가입된 사용자가 없습니다"),

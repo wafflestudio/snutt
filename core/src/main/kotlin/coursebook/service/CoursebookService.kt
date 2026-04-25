@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.coursebook.service
 
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.coursebook.repository.CoursebookRepository
 import org.springframework.stereotype.Service
@@ -10,6 +11,11 @@ interface CoursebookService {
     suspend fun getCoursebooks(): List<Coursebook>
 
     suspend fun getLastTwoCourseBooksBeforeCurrent(): List<Coursebook>
+
+    suspend fun existsCoursebook(
+        year: Int,
+        semester: Semester,
+    ): Boolean
 }
 
 @Service
@@ -24,4 +30,9 @@ class CoursebookServiceImpl(
         coursebookRepository.findTop3ByOrderByYearDescSemesterDesc().slice(
             1..2,
         )
+
+    override suspend fun existsCoursebook(
+        year: Int,
+        semester: Semester,
+    ): Boolean = coursebookRepository.existsByYearAndSemester(year, semester)
 }
