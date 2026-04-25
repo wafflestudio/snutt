@@ -41,12 +41,14 @@ class FriendCustomRepositoryImpl(
                                     Friend::isAccepted isEqualTo true,
                                 )
                             }
+
                             FriendState.REQUESTING -> {
                                 Criteria().andOperator(
                                     Friend::fromUserId isEqualTo userId,
                                     Friend::isAccepted isEqualTo false,
                                 )
                             }
+
                             FriendState.REQUESTED -> {
                                 Criteria().andOperator(
                                     Friend::toUserId isEqualTo userId,
