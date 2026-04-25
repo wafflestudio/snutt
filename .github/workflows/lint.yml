@@ -21,6 +21,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Run Lint
-        run: |
-          ./gradlew clean ktlintCheck -x compileKotlin -x compileTestKotlin \
-            -x compileTestFixturesKotlin -x compileJava -x processAot -x processTestAot
+        run: ./gradlew spotlessCheck

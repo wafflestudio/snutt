@@ -461,6 +461,7 @@ class UserServiceImpl(
                     fbName = facebookCredential.fbName
                 }
             }
+
             AuthProvider.GOOGLE -> {
                 if (user.credential.googleSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -472,6 +473,7 @@ class UserServiceImpl(
                     googleEmail = googleCredential.googleEmail
                 }
             }
+
             AuthProvider.KAKAO -> {
                 if (user.credential.kakaoSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -483,6 +485,7 @@ class UserServiceImpl(
                     kakaoEmail = kakaoCredential.kakaoEmail
                 }
             }
+
             AuthProvider.APPLE -> {
                 if (user.credential.appleSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -495,7 +498,10 @@ class UserServiceImpl(
                     appleTransferSub = appleCredential.appleTransferSub
                 }
             }
-            AuthProvider.LOCAL -> throw IllegalStateException("Cannot attach local account")
+
+            AuthProvider.LOCAL -> {
+                throw IllegalStateException("Cannot attach local account")
+            }
         }
 
         user.credentialHash = authService.generateCredentialHash(user.credential)
@@ -517,18 +523,21 @@ class UserServiceImpl(
                     fbName = null
                 }
             }
+
             AuthProvider.GOOGLE -> {
                 user.credential.apply {
                     googleSub = null
                     googleEmail = null
                 }
             }
+
             AuthProvider.KAKAO -> {
                 user.credential.apply {
                     kakaoSub = null
                     kakaoEmail = null
                 }
             }
+
             AuthProvider.APPLE -> {
                 user.credential.apply {
                     appleSub = null
@@ -536,7 +545,10 @@ class UserServiceImpl(
                     appleTransferSub = null
                 }
             }
-            AuthProvider.LOCAL -> throw IllegalStateException("Cannot detach local account")
+
+            AuthProvider.LOCAL -> {
+                throw IllegalStateException("Cannot detach local account")
+            }
         }
         user.credentialHash = authService.generateCredentialHash(user.credential)
         userRepository.save(user)

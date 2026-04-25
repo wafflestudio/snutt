@@ -111,12 +111,29 @@ class LectureCustomRepositoryImpl(
             query.split(' ').map { keyword ->
                 val fuzzyKeyword = keyword.toCharArray().joinToString(".*") { Regex.escape(it.toString()) }
                 when {
-                    keyword == "전공" -> Lecture::classification.inValues("전선", "전필")
-                    keyword in listOf("석박", "대학원") -> Lecture::academicYear.inValues("석사", "박사", "석박사통합")
-                    keyword in listOf("학부", "학사") -> Lecture::academicYear.nin("석사", "박사", "석박사통합")
-                    keyword == "체육" -> Lecture::category isEqualTo "체육"
-                    keyword in listOf("영강", "영어강의") -> Lecture::remark regex ".*ⓔ.*"
-                    keyword in listOf("군휴학", "군휴학원격") -> Lecture::remark regex ".*ⓜⓞ.*"
+                    keyword == "전공" -> {
+                        Lecture::classification.inValues("전선", "전필")
+                    }
+
+                    keyword in listOf("석박", "대학원") -> {
+                        Lecture::academicYear.inValues("석사", "박사", "석박사통합")
+                    }
+
+                    keyword in listOf("학부", "학사") -> {
+                        Lecture::academicYear.nin("석사", "박사", "석박사통합")
+                    }
+
+                    keyword == "체육" -> {
+                        Lecture::category isEqualTo "체육"
+                    }
+
+                    keyword in listOf("영강", "영어강의") -> {
+                        Lecture::remark regex ".*ⓔ.*"
+                    }
+
+                    keyword in listOf("군휴학", "군휴학원격") -> {
+                        Lecture::remark regex ".*ⓜⓞ.*"
+                    }
 
                     placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
                         val placeKeyword = keyword.replace("동", "").uppercase()
@@ -128,7 +145,7 @@ class LectureCustomRepositoryImpl(
                             )
                     }
 
-                    keyword.hasKorean() ->
+                    keyword.hasKorean() -> {
                         Criteria().orOperator(
                             listOfNotNull(
                                 Lecture::courseTitle.regex(fuzzyKeyword, "i"),
@@ -149,20 +166,28 @@ class LectureCustomRepositoryImpl(
                                                 .joinToString(".*") { Regex.escape(it.toString()) }
                                         Lecture::department.regex("^$fuzzyWithoutLastChar", "i")
                                     }
+
                                     // 마지막 글자가 '학'이라면 해당 학과의 수업이 모두 포함될 확률이 높다. 수학, 물리학, 경제학 etc
-                                    '학' -> null
-                                    else -> Lecture::department.regex("^$fuzzyKeyword", "i")
+                                    '학' -> {
+                                        null
+                                    }
+
+                                    else -> {
+                                        Lecture::department.regex("^$fuzzyKeyword", "i")
+                                    }
                                 },
                             ),
                         )
+                    }
 
-                    else ->
+                    else -> {
                         Criteria().orOperator(
                             Lecture::courseTitle.regex(Regex.escape(keyword), "i"),
                             Lecture::instructor.regex(Regex.escape(keyword), "i"),
                             Lecture::courseNumber isEqualTo keyword,
                             Lecture::lectureNumber isEqualTo keyword,
                         )
+                    }
                 }
             },
         )
