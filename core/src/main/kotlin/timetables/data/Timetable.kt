@@ -28,6 +28,7 @@ data class Timetable(
     var themeId: String?,
     @Field("is_primary")
     var isPrimary: Boolean? = null,
+    var order: Int? = null,
     @Field("updated_at")
     @param:JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
