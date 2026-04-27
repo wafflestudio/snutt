@@ -139,6 +139,8 @@ object DiaryQuestionInvalidException : SnuttException(ErrorType.DIARY_QUESTION_I
 
 object DiaryCommentTooLongException : SnuttException(ErrorType.DIARY_COMMENT_TOO_LONG)
 
+object InvalidTimetableOrderRequestException : SnuttException(ErrorType.INVALID_TIMETABLE_ORDER_REQUEST)
+
 object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAILY_CLASS_TYPE_NOT_FOUND)
 
 object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISSION_NOT_FOUND)
