@@ -17,6 +17,8 @@ import com.wafflestudio.snutt.theme.service.TimetableThemeService
 import com.wafflestudio.snutt.theme.service.toBasicThemeType
 import com.wafflestudio.snutt.theme.service.toIdForTimetable
 import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.sortedByOrder
+import com.wafflestudio.snutt.timetables.data.sortedWithinSemesters
 import com.wafflestudio.snutt.timetables.dto.TimetableDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLectureDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLectureLegacyDto
@@ -305,12 +307,6 @@ class TimetableServiceImpl(
         } else {
             timetables.maxOfOrNull { it.order!! }?.plus(1) ?: 0
         }
-
-    private fun List<Timetable>.sortedWithinSemesters(): List<Timetable> =
-        groupBy { it.year to it.semester }.values.flatMap { it.sortedByOrder() }
-
-    private fun List<Timetable>.sortedByOrder(): List<Timetable> =
-        if (any { it.order == null }) this else sortedWith(compareBy<Timetable> { it.order }.thenBy { it.id })
 
     private suspend fun getLatestCopiedTimetableNumber(
         userId: String,
