@@ -33,3 +33,8 @@ data class Timetable(
     @param:JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
 )
+
+fun List<Timetable>.sortedWithinSemesters(): List<Timetable> = groupBy { it.year to it.semester }.values.flatMap { it.sortedByOrder() }
+
+fun List<Timetable>.sortedByOrder(): List<Timetable> =
+    if (any { it.order == null }) this else sortedWith(compareBy<Timetable> { it.order }.thenBy { it.id })
