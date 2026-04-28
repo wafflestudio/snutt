@@ -51,13 +51,19 @@ class SugangSnuRepository(
             """.trimIndent().replace("\n", "")
     }
 
-    suspend fun getSearchPageHtml(pageNo: Int = 1): PooledDataBuffer =
+    suspend fun getSearchPageHtml(
+        year: Int,
+        semester: Semester,
+        pageNo: Int = 1,
+    ): PooledDataBuffer =
         sugangSnuApi
             .get()
             .uri { builder ->
                 builder
                     .path(SUGANG_SNU_SEARCH_PATH)
                     .query(DEFAULT_SEARCH_PAGE_PARAMS)
+                    .queryParam("srchOpenSchyy", year)
+                    .queryParam("srchOpenShtm", convertSemesterToSugangSnuSearchString(semester))
                     .queryParam("pageNo", pageNo)
                     .build()
             }.accept(MediaType.TEXT_HTML)

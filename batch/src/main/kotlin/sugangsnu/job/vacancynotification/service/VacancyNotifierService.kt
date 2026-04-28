@@ -65,7 +65,7 @@ class VacancyNotifierServiceImpl(
         log.info("시작: ${registrationPhase.name}")
         val pageCount =
             runCatching {
-                getPageCount()
+                getPageCount(coursebook)
             }.getOrElse {
                 log.error("에러가 발생했거나 부하 기간입니다. {}", it.message, it)
                 delay(30L.seconds)
@@ -77,7 +77,7 @@ class VacancyNotifierServiceImpl(
 
         // 수강 사이트 부하를 분산하기 위해 강의 전체를 20등분해서 각각 요청
         (1..pageCount).chunked(pageCount / 20).forEach { chunkedPages ->
-            val registrationStatus = getRegistrationStatus(chunkedPages)
+            val registrationStatus = getRegistrationStatus(chunkedPages, coursebook)
             if (registrationStatus.all { it.registrationCount == 0 }) return VacancyNotificationJobResult.REGISTRATION_IS_NOT_STARTED
 
             val registrationStatusMap =
@@ -157,19 +157,22 @@ class VacancyNotifierServiceImpl(
             this.quota == this.registrationCount
         }
 
-    private suspend fun getPageCount(): Int {
-        val firstPageContent = getSugangSnuSearchContent(1)
+    private suspend fun getPageCount(coursebook: Coursebook): Int {
+        val firstPageContent = getSugangSnuSearchContent(1, coursebook)
         val totalCount =
             firstPageContent.select("div.content > div.search-result-con > small > em").text().toInt()
         return (totalCount + 9) / COUNT_PER_PAGE
     }
 
-    private suspend fun getRegistrationStatus(pages: List<Int>): List<RegistrationStatus> =
+    private suspend fun getRegistrationStatus(
+        pages: List<Int>,
+        coursebook: Coursebook,
+    ): List<RegistrationStatus> =
         supervisorScope {
             pages
                 .map { page ->
                     async {
-                        getSugangSnuSearchContent(page).extractRegistrationStatus()
+                        getSugangSnuSearchContent(page, coursebook).extractRegistrationStatus()
                     }
                 }.awaitAll()
                 .flatten()
@@ -211,8 +214,16 @@ class VacancyNotifierServiceImpl(
                     }
             }
 
-    private suspend fun getSugangSnuSearchContent(pageNo: Int): Element {
-        val webPageDataBuffer = sugangSnuRepository.getSearchPageHtml(pageNo)
+    private suspend fun getSugangSnuSearchContent(
+        pageNo: Int,
+        coursebook: Coursebook,
+    ): Element {
+        val webPageDataBuffer =
+            sugangSnuRepository.getSearchPageHtml(
+                year = coursebook.year,
+                semester = coursebook.semester,
+                pageNo = pageNo,
+            )
         return try {
             Jsoup
                 .parse(webPageDataBuffer.asInputStream(), Charsets.UTF_8.name(), "")
