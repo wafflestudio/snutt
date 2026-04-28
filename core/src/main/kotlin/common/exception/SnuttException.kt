@@ -35,6 +35,8 @@ object InvalidEmailException : SnuttException(ErrorType.INVALID_EMAIL)
 
 object UserEmailIsNotVerifiedException : SnuttException(ErrorType.USER_EMAIL_IS_NOT_VERIFIED)
 
+object InvalidTimetableSemesterException : SnuttException(ErrorType.INVALID_TIMETABLE_SEMESTER)
+
 object LectureNotFoundException : SnuttException(ErrorType.LECTURE_NOT_FOUND)
 
 object UserNotFoundException : SnuttException(ErrorType.USER_NOT_FOUND)

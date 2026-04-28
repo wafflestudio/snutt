@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.timetable
 import BaseIntegTest
 import com.ninjasquad.springmockk.MockkBean
 import com.wafflestudio.snutt.config.USER_ATTRIBUTE_KEY
+import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.filter.ApiKeyWebFilter
 import com.wafflestudio.snutt.filter.UserAuthenticationWebFilter
@@ -29,6 +30,7 @@ import timetables.dto.TimetableBriefDto
 @AutoConfigureWebTestClient
 class TimetableIntegTest(
     @MockkBean private val mockSnuttEvService: EvService,
+    @MockkBean private val mockCoursebookService: CoursebookService,
     @MockkBean private val apiKeyWebFilter: ApiKeyWebFilter,
     @MockkBean private val userAuthenticationWebFilter: UserAuthenticationWebFilter,
     val webTestClient: WebTestClient,
@@ -39,6 +41,7 @@ class TimetableIntegTest(
 ) : BaseIntegTest({
         coEvery { mockSnuttEvService.getSummariesByIds(any()) } returns emptyList()
         coEvery { mockSnuttEvService.getEvIdsBySnuttIds(any()) } returns emptyList()
+        coEvery { mockCoursebookService.existsCoursebook(any(), any()) } returns true
         coEvery {
             apiKeyWebFilter.filter(any(), any())
         } answers {

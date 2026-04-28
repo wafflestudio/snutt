@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snutt.common.exception.InvalidTimetableSemesterException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TableDeleteErrorException
@@ -286,6 +287,9 @@ class TimetableServiceImpl(
     ) {
         if (title.isEmpty()) {
             throw InvalidTimetableTitleException
+        }
+        if (!coursebookService.existsCoursebook(year, semester)) {
+            throw InvalidTimetableSemesterException
         }
         if (timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)) {
             throw DuplicateTimetableTitleException
