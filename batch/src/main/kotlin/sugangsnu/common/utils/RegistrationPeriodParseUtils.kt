@@ -28,6 +28,7 @@ object RegistrationPeriodParseUtils {
 
     private fun parseRegistrationPhase(typeText: String): RegistrationPhase? =
         when {
+            typeText.contains("예비") -> null
             typeText.contains("전산확정") -> null
             typeText.contains("정원외") -> null
             typeText.contains("수강취소") -> null
