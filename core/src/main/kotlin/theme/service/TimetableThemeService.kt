@@ -2,7 +2,6 @@ package com.wafflestudio.snutt.theme.service
 
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.exception.AlreadyDownloadedThemeException
-import com.wafflestudio.snutt.common.exception.DuplicateThemeNameException
 import com.wafflestudio.snutt.common.exception.InvalidThemeColorCountException
 import com.wafflestudio.snutt.common.exception.InvalidThemeTypeException
 import com.wafflestudio.snutt.common.exception.NotDefaultThemeErrorException
@@ -150,7 +149,6 @@ class TimetableThemeServiceImpl(
         colors: List<ColorSet>,
     ): TimetableTheme {
         if (colors.size !in 1..MAX_COLOR_COUNT) throw InvalidThemeColorCountException
-        if (timetableThemeRepository.existsByUserIdAndName(userId, name)) throw DuplicateThemeNameException
 
         val theme =
             TimetableTheme(
@@ -171,7 +169,6 @@ class TimetableThemeServiceImpl(
         val theme = getCustomTheme(userId, themeId)
 
         name?.let {
-            if (theme.name != it && timetableThemeRepository.existsByUserIdAndName(userId, it)) throw DuplicateThemeNameException
             theme.name = it
         }
 

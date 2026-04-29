@@ -31,6 +31,7 @@ enum class ErrorType(
     CANNOT_RESET_CUSTOM_LECTURE(HttpStatus.FORBIDDEN, 0x300D, "cannot reset custom lectures", "직접 만든 강좌는 초기화할 수 없습니다"),
     INVALID_EMAIL(HttpStatus.FORBIDDEN, 0x300F, "email이 유효하지 않습니다", "이메일 형식이 올바르지 않습니다. 다시 입력해 주세요"),
     USER_EMAIL_IS_NOT_VERIFIED(HttpStatus.FORBIDDEN, 0x3011, "User email is not verified", "이메일 인증이 완료된 후 강의평을 확인할 수 있습니다", "이메일 인증 필요"),
+    INVALID_TIMETABLE_SEMESTER(HttpStatus.FORBIDDEN, 0x300B, "시간표를 생성할 수 없는 학기입니다", "시간표를 생성할 수 없는 학기입니다"),
 
     LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4003, "lecture가 없습니다", "수강편람에서 찾을 수 없는 강좌입니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 0x4004, "user가 없습니다", "해당 정보로 가입된 사용자가 없습니다"),
@@ -72,6 +73,7 @@ enum class ErrorType(
         "현재 일시 중단된 기능입니다. 자세한 내용은 알림을 참고해 주세요.",
     ),
     DIARY_QUESTION_INVALID(HttpStatus.BAD_REQUEST, 40026, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
+    DIARY_COMMENT_TOO_LONG(HttpStatus.BAD_REQUEST, 40027, "더 남기고 싶은 말은 최대 1,000자 입력할 수 있습니다", "더 남기고 싶은 말은 최대 1,000자 입력할 수 있습니다"),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다", "소셜 로그인에 실패했습니다"),
@@ -89,13 +91,14 @@ enum class ErrorType(
     SOCIAL_PROVIDER_NOT_ATTACHED(HttpStatus.NOT_FOUND, 40410, "소셜 계정이 연동되지 않았습니다", "소셜 계정이 연동되지 않았습니다"),
     DIARY_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, 40411, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
     DIARY_DAILY_CLASS_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, 40412, "강의 일기장 오늘 한 일이 유효하지 않습니다", "강의 일기장 오늘 한 일이 유효하지 않습니다"),
-    DIARY_SUBMISSION_NOT_FOUND(HttpStatus.NOT_FOUND, 40412, "강의 일기장 기록이 유효하지 않습니다", "강의 일기장 기록이 유효하지 않습니다"),
     DIARY_TARGET_LECTURE_NOT_FOUND(HttpStatus.NOT_FOUND, 40413, "강의 일기장을 작성할 강의가 없습니다", "강의 일기장을 작성할 강의가 없습니다"),
+    DIARY_SUBMISSION_NOT_FOUND(HttpStatus.NOT_FOUND, 40414, "강의 일기장 기록이 유효하지 않습니다", "강의 일기장 기록이 유효하지 않습니다"),
     DUPLICATE_VACANCY_NOTIFICATION(HttpStatus.CONFLICT, 40900, "빈자리 알림 중복", "이미 빈자리 알림을 받고 있는 강좌입니다"),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, 40901, "이미 사용 중인 이메일입니다", "이미 사용 중인 이메일입니다", "회원가입 실패"),
     DUPLICATE_FRIEND(HttpStatus.CONFLICT, 40902, "이미 친구 관계이거나 친구 요청을 보냈습니다", "이미 친구 관계이거나 친구 요청을 보냈습니다"),
     INVALID_FRIEND(HttpStatus.CONFLICT, 40903, "친구 요청을 보낼 수 없는 유저입니다", "친구 요청을 보낼 수 없는 유저입니다"),
-    DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다", "동일한 테마 이름이 이미 있습니다. 다른 이름을 입력해 주세요", "테마 이름 중복"),
+
+    // DUPLICATE_THEME_NAME(HttpStatus.CONFLICT, 40904, "중복된 테마 이름입니다", "동일한 테마 이름이 이미 있습니다. 다른 이름을 입력해 주세요", "테마 이름 중복"),
     INVALID_THEME_TYPE(HttpStatus.CONFLICT, 40905, "적절하지 않은 유형의 테마입니다", "적절하지 않은 유형의 테마입니다"),
     DUPLICATE_POPUP_KEY(HttpStatus.CONFLICT, 40906, "중복된 팝업 키입니다", "중복된 팝업 키입니다"),
     ALREADY_DOWNLOADED_THEME(HttpStatus.CONFLICT, 40907, "이미 다운로드한 테마입니다", "이미 다운로드한 테마입니다"),
