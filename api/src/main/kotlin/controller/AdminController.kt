@@ -12,6 +12,7 @@ import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
 import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
+import com.wafflestudio.snutt.diary.service.DiaryNotifierService
 import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.filter.SnuttAdminApiFilterTarget
 import com.wafflestudio.snutt.notification.service.NotificationAdminService
@@ -46,6 +47,7 @@ class AdminController(
     private val storageService: StorageService,
     private val popupService: PopupService,
     private val diaryService: DiaryService,
+    private val diaryNotifierService: DiaryNotifierService,
     private val semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
 ) {
     @PostMapping("/insert_noti")
@@ -149,6 +151,12 @@ class AdminController(
         @PathVariable id: String,
     ): OkResponse {
         diaryService.removeQuestion(id)
+        return OkResponse()
+    }
+
+    @PostMapping("/diary/notifier/trigger")
+    suspend fun triggerDiaryNotifier(): OkResponse {
+        diaryNotifierService.triggerNotifierManually()
         return OkResponse()
     }
 
