@@ -34,6 +34,6 @@ enum class SortCriteria(
                 // RATING_ASC -> (Lecture::evInfo / EvInfo::avgRating).asc()
                 // COUNT_ASC -> (Lecture::evInfo / EvInfo::count).asc()
                 else -> Sort.unsorted()
-            }
+            }.and(Lecture::id.asc())
     }
 }
