@@ -22,6 +22,8 @@ import com.wafflestudio.snutt.popup.service.PopupService
 import com.wafflestudio.snutt.registrationperiod.data.RegistrationDate
 import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
 import com.wafflestudio.snutt.registrationperiod.service.SemesterRegistrationPeriodService
+import com.wafflestudio.snutt.users.dto.AdminUserSearchResponse
+import com.wafflestudio.snutt.users.service.UserService
 import notification.dto.InsertNotificationRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -49,6 +51,7 @@ class AdminController(
     private val diaryService: DiaryService,
     private val diaryNotifierService: DiaryNotifierService,
     private val semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
+    private val userService: UserService,
 ) {
     @PostMapping("/insert_noti")
     suspend fun insertNotification(
@@ -187,4 +190,9 @@ class AdminController(
         semesterRegistrationPeriodService.delete(year, semester)
         return OkResponse()
     }
+
+    @GetMapping("/users/search")
+    suspend fun searchUsersByEmail(
+        @RequestParam email: String,
+    ): List<AdminUserSearchResponse> = userService.getUsersByEmail(email).map { AdminUserSearchResponse.from(it) }
 }
