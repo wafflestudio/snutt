@@ -10,6 +10,10 @@ import java.time.LocalDateTime
 data class User(
     @Id
     val id: String? = null,
+    @Indexed(
+        unique = true,
+        partialFilter = "{ 'active': true, 'isEmailVerified': true, 'email': { '\$type': 'string' } }",
+    )
     var email: String?,
     @Indexed(unique = true, sparse = true)
     var nickname: String,

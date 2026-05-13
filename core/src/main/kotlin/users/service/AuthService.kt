@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import tools.jackson.databind.ObjectMapper
+import java.util.Locale
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -21,6 +22,8 @@ interface AuthService {
     fun isValidEmail(email: String): Boolean
 
     fun isValidSnuMail(email: String): Boolean
+
+    fun normalizeEmail(email: String): String
 
     fun isMatchedPassword(
         user: User,
@@ -67,9 +70,14 @@ class AuthServiceImpl(
 
     override fun isValidPassword(password: String) = password.matches(passwordRegex)
 
-    override fun isValidEmail(email: String) = email.matches(emailRegex)
+    override fun isValidEmail(email: String) = normalizeEmail(email).matches(emailRegex)
 
-    override fun isValidSnuMail(email: String) = email.matches(emailRegex) && email.endsWith("@snu.ac.kr")
+    override fun isValidSnuMail(email: String): Boolean {
+        val normalizedEmail = normalizeEmail(email)
+        return normalizedEmail.matches(emailRegex) && normalizedEmail.endsWith("@snu.ac.kr")
+    }
+
+    override fun normalizeEmail(email: String) = email.trim().lowercase(Locale.ROOT)
 
     override fun isMatchedPassword(
         user: User,
