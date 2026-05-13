@@ -34,7 +34,7 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
-    suspend fun findAllByEmailIgnoreCase(email: String): List<User>
+    suspend fun findAllByEmail(email: String): List<User>
 
     suspend fun existsByCredentialFbIdAndActiveTrue(fbId: String): Boolean
 
