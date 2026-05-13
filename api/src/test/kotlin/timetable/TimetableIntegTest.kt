@@ -137,12 +137,12 @@ class TimetableIntegTest(
                     .exists()
             }
         }
-        "POST /v1/tables 요청시 기존 시간표 일부에 order가 없으면" should {
+        "POST /v1/tables 요청시" should {
             val table1 = timetableFixture.getTimetable("first").copy(order = 10).let { timetableRepository.save(it) }
-            val table2 = timetableFixture.getTimetable("second").let { timetableRepository.save(it) }
+            val table2 = timetableFixture.getTimetable("second").copy(order = 11).let { timetableRepository.save(it) }
             val table3 = timetableFixture.getTimetable("third").copy(order = 0).let { timetableRepository.save(it) }
 
-            "현재 조회 순서대로 기존 시간표와 새 시간표에 order를 다시 저장" {
+            "현재 학기의 마지막 order 다음 값으로 저장" {
                 var newTimetableId: String? = null
 
                 webTestClient
@@ -159,15 +159,15 @@ class TimetableIntegTest(
                     .responseBody
                     .should { body ->
                         body.shouldNotBeNull()
-                        body.map { it.id }.take(3) shouldBe listOf(table1.id, table2.id, table3.id)
                         body.last().title shouldBe "NewLastTable"
                         newTimetableId = body.last().id
+                        body.map { it.id } shouldBe listOf(table3.id, table1.id, table2.id, newTimetableId)
                     }
 
                 listOf(table1, table2, table3)
                     .map { timetableRepository.findById(it.id!!)!!.order }
-                    .shouldBe(listOf(0, 1, 2))
-                timetableRepository.findById(newTimetableId!!)!!.order shouldBe 3
+                    .shouldBe(listOf(10, 11, 0))
+                timetableRepository.findById(newTimetableId!!)!!.order shouldBe 12
             }
         }
         "GET /v1/tables/{tableId} 요청 시" should {
@@ -257,7 +257,7 @@ class TimetableIntegTest(
                 listOf(table3, table1, table2)
                     .map { timetableRepository.findById(it.id!!)!!.order }
                     .shouldBe(listOf(0, 1, 2))
-                timetableRepository.findById(otherSemesterTable.id!!)!!.order shouldBe null
+                timetableRepository.findById(otherSemesterTable.id!!)!!.order shouldBe 0
             }
 
             "일부 시간표가 누락되면 실패" {

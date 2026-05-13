@@ -5,8 +5,8 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
-import com.wafflestudio.snutt.common.exception.InvalidTimetableSemesterException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableOrderRequestException
+import com.wafflestudio.snutt.common.exception.InvalidTimetableSemesterException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TableDeleteErrorException
@@ -153,7 +153,7 @@ class TimetableServiceImpl(
             theme = defaultTheme.toBasicThemeType(),
             themeId = defaultTheme.toIdForTimetable(),
             isPrimary = timetables.isEmpty(),
-            order = nextOrderAndInitialize(timetables),
+            order = nextOrder(timetables),
         ).let { timetableRepository.save(it) }
     }
 
@@ -232,7 +232,7 @@ class TimetableServiceImpl(
                 updatedAt = Instant.now(),
                 title = baseTitle + " (${latestCopiedTimetableNumber + 1})",
                 isPrimary = false,
-                order = nextOrderAndInitialize(timetables),
+                order = nextOrder(timetables),
             ).let { timetableRepository.save(it) }
     }
 
@@ -294,20 +294,12 @@ class TimetableServiceImpl(
                 title = "나의 시간표",
                 theme = defaultTheme.toBasicThemeType(),
                 themeId = defaultTheme.toIdForTimetable(),
-                order = nextOrderAndInitialize(timetables),
+                order = nextOrder(timetables),
             )
         return timetableRepository.save(timetable)
     }
 
-    private suspend fun nextOrderAndInitialize(timetables: List<Timetable>): Int =
-        if (timetables.any { it.order == null }) {
-            timetableRepository
-                .saveAll(timetables.mapIndexed { index, timetable -> timetable.copy(order = index) })
-                .collect()
-            timetables.size
-        } else {
-            timetables.maxOfOrNull { it.order!! }?.plus(1) ?: 0
-        }
+    private fun nextOrder(timetables: List<Timetable>): Int = timetables.maxOfOrNull { it.order }?.plus(1) ?: 0
 
     private suspend fun getLatestCopiedTimetableNumber(
         userId: String,
