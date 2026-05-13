@@ -32,9 +32,8 @@ class DiaryNotifierServiceImpl(
 ) : DiaryNotifierService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    companion object {
-        val SAMPLE_RATE = if (PhaseUtils.getPhase().isProd) 0.1 else 1.0
-    }
+    private val sampleRate: Double
+        get() = if (PhaseUtils.getPhase().isProd) 0.1 else 1.0
 
     @Scheduled(cron = "0 0 19 * * MON,WED,FRI", zone = "Asia/Seoul")
     override suspend fun sendNotifier() {
@@ -63,7 +62,7 @@ class DiaryNotifierServiceImpl(
                 val totalCount = timetableRepository.countAllByIsPrimaryTrueAndYearAndSemester(currentYear, currentSemester)
                 val sampledUserIdPrimaryTimetableMap =
                     timetableRepository
-                        .samplePrimaryOfSizeByYearAndSemester((totalCount * SAMPLE_RATE).toLong(), currentYear, currentSemester)
+                        .samplePrimaryOfSizeByYearAndSemester((totalCount * sampleRate).toLong(), currentYear, currentSemester)
                         .toList()
                         .filter { it.lectures.size > 2 }
                         .associateBy { it.userId }
