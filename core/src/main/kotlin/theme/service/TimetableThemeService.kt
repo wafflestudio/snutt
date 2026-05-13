@@ -244,6 +244,7 @@ class TimetableThemeServiceImpl(
         themeId: String,
     ) {
         val theme = getCustomTheme(userId, themeId)
+        if (theme.status == ThemeStatus.PUBLISHED) throw PublishedThemeDeleteErrorException
 
         val timetables = timetableRepository.findByUserIdAndThemeId(userId, themeId)
 
@@ -252,8 +253,6 @@ class TimetableThemeServiceImpl(
             it.themeId = null
         }
         timetableRepository.saveAll(timetables).collect()
-
-        if (theme.status == ThemeStatus.PUBLISHED) throw PublishedThemeDeleteErrorException
 
         timetableThemeRepository.delete(theme)
     }
