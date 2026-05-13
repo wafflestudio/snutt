@@ -113,4 +113,6 @@ enum class ErrorType(
         "현재 Coursebook이 수강신청 사이트보다 최근입니다.",
     ),
     REGISTRATION_PERIOD_NOT_SET(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "학기에 대한 수강신청 기간이 설정되지 않았습니다", "학기에 대한 수강신청 기간이 설정되지 않았습니다"),
+
+    NOT_ALLOWED_IN_PROD(HttpStatus.FORBIDDEN, 40300, "프로덕션 환경에서는 사용할 수 없는 기능입니다", "프로덕션 환경에서는 사용할 수 없는 기능입니다"),
 }
