@@ -605,7 +605,7 @@ class UserServiceImpl(
         redisTemplate.delete(RESET_PASSWORD_CODE_PREFIX + user.id).subscribe()
     }
 
-    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmailIgnoreCaseAndActiveTrue(email)
+    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmailIgnoreCase(email)
 
     private suspend fun saveNewVerificationValue(
         email: String,
