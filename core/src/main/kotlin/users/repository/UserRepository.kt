@@ -30,9 +30,9 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findAllByIdInAndActiveTrue(ids: List<String>): List<User>
 
-    suspend fun existsByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email: String): Boolean
+    suspend fun existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): Boolean
 
-    suspend fun findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
+    suspend fun findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
     suspend fun findAllByEmail(email: String): List<User>
 
