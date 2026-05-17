@@ -131,6 +131,8 @@ interface UserService {
         newPassword: String,
         code: String,
     )
+
+    suspend fun getUsersByEmail(email: String): List<User>
 }
 
 @Service
@@ -602,6 +604,8 @@ class UserServiceImpl(
         userRepository.save(user)
         redisTemplate.delete(RESET_PASSWORD_CODE_PREFIX + user.id).subscribe()
     }
+
+    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmail(email)
 
     private suspend fun saveNewVerificationValue(
         email: String,
