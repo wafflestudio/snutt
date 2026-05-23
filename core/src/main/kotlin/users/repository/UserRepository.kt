@@ -45,6 +45,10 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
     )
     suspend fun findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
+    @Query(
+        value = "{ 'email': ?0 }",
+        collation = EMAIL_CASE_INSENSITIVE_COLLATION,
+    )
     suspend fun findAllByEmail(email: String): List<User>
 
     suspend fun existsByCredentialFbIdAndActiveTrue(fbId: String): Boolean
