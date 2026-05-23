@@ -60,12 +60,15 @@ class SugangSnuNotificationServiceImpl(
                             updatedCount != null && deletedCount != null -> {
                                 "강의 ${updatedCount}개가 변경, ${deletedCount}개가 삭제되었습니다. 알림함에서 자세히 확인하세요."
                             }
+
                             updatedCount != null -> {
                                 "강의 ${updatedCount}개가 변경되었습니다. 알림함에서 자세히 확인하세요."
                             }
+
                             deletedCount != null -> {
                                 "강의 ${deletedCount}개가 삭제되었습니다. 알림함에서 자세히 확인하세요."
                             }
+
                             else -> {
                                 error("This should not happen")
                             }
@@ -110,6 +113,7 @@ class SugangSnuNotificationServiceImpl(
                         DeeplinkType.TIMETABLE_LECTURE.build(timetableId, lectureId),
                     )
                 }
+
                 is BookmarkLectureUpdateResult -> {
                     Triple(
                         """
@@ -120,6 +124,7 @@ class SugangSnuNotificationServiceImpl(
                         DeeplinkType.BOOKMARKS.build(year, semester, lectureId),
                     )
                 }
+
                 // 폐강 알림
                 is TimetableLectureDeleteResult -> {
                     Triple(
@@ -131,6 +136,7 @@ class SugangSnuNotificationServiceImpl(
                         DeeplinkType.NOTIFICATIONS.build(),
                     )
                 }
+
                 is BookmarkLectureDeleteResult -> {
                     Triple(
                         """
@@ -141,6 +147,7 @@ class SugangSnuNotificationServiceImpl(
                         DeeplinkType.NOTIFICATIONS.build(),
                     )
                 }
+
                 is TimetableLectureDeleteByOverlapResult -> {
                     Triple(
                         """

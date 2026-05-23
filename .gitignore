@@ -280,4 +280,8 @@ gradle-app.setting
 # docs html,css
 api/src/main/resources/static/docs
 
+# AI tooling state
+.claude/
+.omc/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,kotlin,intellij,vim,macos,windows,linux,gradle

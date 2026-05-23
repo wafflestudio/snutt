@@ -191,3 +191,5 @@ object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_L
 object CoursebookRecentThanSugangSnuException : SnuttException(ErrorType.COURSEBOOK_RECENT_THAN_SUGANGSNU)
 
 object RegistrationPeriodNotSetException : SnuttException(ErrorType.REGISTRATION_PERIOD_NOT_SET)
+
+object NotAllowedInProdException : SnuttException(ErrorType.NOT_ALLOWED_IN_PROD)

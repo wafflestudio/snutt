@@ -49,10 +49,12 @@ class ErrorWebFilter(
                                 )
                             }
                     }
+
                     is SnuttException -> {
                         httpStatusCode = throwable.error.httpStatus
                         errorBody = makeErrorBody(throwable)
                     }
+
                     is ResponseStatusException -> {
                         httpStatusCode = throwable.statusCode
                         errorBody =
@@ -60,10 +62,12 @@ class ErrorWebFilter(
                                 SnuttException(errorMessage = throwable.body.title ?: ErrorType.DEFAULT_ERROR.errorMessage),
                             )
                     }
+
                     is AbortedException, is CancellationException -> {
                         httpStatusCode = HttpStatus.NO_CONTENT
                         errorBody = makeErrorBody(SnuttException())
                     }
+
                     else -> {
                         log.error(throwable.message, throwable)
                         httpStatusCode = HttpStatus.INTERNAL_SERVER_ERROR
