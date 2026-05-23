@@ -1,7 +1,9 @@
 package com.wafflestudio.snutt.users.repository
 
+import com.wafflestudio.snutt.users.data.EMAIL_CASE_INSENSITIVE_COLLATION
 import com.wafflestudio.snutt.users.data.User
 import kotlinx.coroutines.flow.Flow
+import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface UserRepository : CoroutineCrudRepository<User, String> {
@@ -30,8 +32,17 @@ interface UserRepository : CoroutineCrudRepository<User, String> {
 
     suspend fun findAllByIdInAndActiveTrue(ids: List<String>): List<User>
 
+    @Query(
+        value = "{ 'email': ?0, 'isEmailVerified': true, 'active': true }",
+        exists = true,
+        collation = EMAIL_CASE_INSENSITIVE_COLLATION,
+    )
     suspend fun existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): Boolean
 
+    @Query(
+        value = "{ 'email': ?0, 'isEmailVerified': true, 'active': true }",
+        collation = EMAIL_CASE_INSENSITIVE_COLLATION,
+    )
     suspend fun findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email: String): User?
 
     suspend fun findAllByEmail(email: String): List<User>
