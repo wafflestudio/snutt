@@ -6,13 +6,16 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
+const val EMAIL_CASE_INSENSITIVE_COLLATION = "{ 'locale': 'en', 'strength': 2 }"
+
 @Document("users")
 data class User(
     @Id
     val id: String? = null,
     @Indexed(
         unique = true,
-        partialFilter = "{ 'active': true, 'isEmailVerified': true, 'email': { '\$type': 'string' } }",
+        partialFilter = $$"{ 'active': true, 'isEmailVerified': true, 'email': { '$type': 'string' } }",
+        collation = EMAIL_CASE_INSENSITIVE_COLLATION,
     )
     var email: String?,
     @Indexed(unique = true, sparse = true)
