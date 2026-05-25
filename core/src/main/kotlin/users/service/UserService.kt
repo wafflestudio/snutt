@@ -572,8 +572,39 @@ class UserServiceImpl(
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
-        val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
-        mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, localId = user.credential.localId ?: throw UserNotFoundException)
+        val users = userRepository.findAllByEmail(email).filter { it.active }
+        if (users.isEmpty()) throw UserNotFoundException
+
+        val accountInfo = buildFindIdAccountInfo(users)
+        if (accountInfo.isBlank()) throw UserNotFoundException
+        mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, accountInfo = accountInfo)
+    }
+
+    private fun buildFindIdAccountInfo(users: List<User>): String {
+        val localIds = users.mapNotNull { it.credential.localId }.distinct()
+        val socialProviders =
+            users
+                .flatMap { user ->
+                    listOfNotNull(
+                        user.credential.fbId?.let { "Facebook" },
+                        user.credential.googleSub?.let { "Google" },
+                        user.credential.kakaoSub?.let { "Kakao" },
+                        user.credential.appleSub?.let { "Apple" },
+                    )
+                }.distinct()
+
+        val localIdHtml =
+            if (localIds.isEmpty()) {
+                ""
+            } else {
+                "<h3>아이디</h3><ul>${localIds.joinToString(separator = "") { "<li>$it</li>" }}</ul><br/>"
+            }
+        val socialProviderHtml =
+            socialProviders.joinToString(separator = "") { provider ->
+                "<b>$provider 로그인으로 가입된 계정이 존재합니다.</b><br/>"
+            }
+
+        return localIdHtml + socialProviderHtml
     }
 
     override suspend fun sendResetPasswordCode(email: String) {

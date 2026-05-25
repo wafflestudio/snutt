@@ -14,6 +14,7 @@ interface MailService {
         to: String,
         code: String = "",
         localId: String = "",
+        accountInfo: String = "",
     )
 }
 
@@ -32,11 +33,12 @@ class MailServiceImpl(
         to: String,
         code: String,
         localId: String,
+        accountInfo: String,
     ) {
         if (!authService.isValidEmail(to)) {
             throw InvalidEmailException
         }
-        getUserMailContent(type, to, code, localId).let { (subject, body) ->
+        getUserMailContent(type, to, code, localId, accountInfo).let { (subject, body) ->
             mailClient.sendMail(to, subject, body)
         }
     }
@@ -46,6 +48,7 @@ class MailServiceImpl(
         email: String,
         code: String,
         localId: String,
+        accountInfo: String,
     ): MailContent {
         val mailContentList =
             mailTemplateResource.inputStream
@@ -54,6 +57,7 @@ class MailServiceImpl(
                 .replace("{code}", code)
                 .replace("{email}", email)
                 .replace("{localId}", localId)
+                .replace("{accountInfo}", accountInfo)
                 .split("\n\n")
                 .windowed(2, 2, false)
                 .map { (subject, body) -> MailContent(subject, body) }

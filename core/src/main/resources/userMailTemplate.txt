@@ -18,5 +18,5 @@
 
 <h2>아이디 찾기 안내</h2><br/>
 안녕하세요. SNUTT입니다. <br/>
-<b>{email}로 가입된 아이디는 다음과 같습니다.</b><br/><br/>
-<h3>아이디</h3><h3>{localId}</h3><br/><br/>
+<b>{email}과 연결된 로그인 정보는 다음과 같습니다.</b><br/><br/>
+{accountInfo}<br/><br/>
