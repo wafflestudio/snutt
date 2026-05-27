@@ -35,6 +35,8 @@ object InvalidEmailException : SnuttException(ErrorType.INVALID_EMAIL)
 
 object UserEmailIsNotVerifiedException : SnuttException(ErrorType.USER_EMAIL_IS_NOT_VERIFIED)
 
+object InvalidTimetableSemesterException : SnuttException(ErrorType.INVALID_TIMETABLE_SEMESTER)
+
 object LectureNotFoundException : SnuttException(ErrorType.LECTURE_NOT_FOUND)
 
 object UserNotFoundException : SnuttException(ErrorType.USER_NOT_FOUND)
@@ -123,7 +125,7 @@ object TimetableNotFoundException : SnuttException(ErrorType.TIMETABLE_NOT_FOUND
 
 object PrimaryTimetableNotFoundException : SnuttException(ErrorType.PRIMARY_TIMETABLE_NOT_FOUND)
 
-object TimetableNotPrimaryException : SnuttException(ErrorType.DEFAULT_ERROR)
+object TimetableNotPrimaryException : SnuttException(ErrorType.TIMETABLE_NOT_PRIMARY)
 
 object ConfigNotFoundException : SnuttException(ErrorType.CONFIG_NOT_FOUND)
 
@@ -134,6 +136,10 @@ object FriendLinkNotFoundException : SnuttException(ErrorType.FRIEND_LINK_NOT_FO
 object SocialProviderNotAttachedException : SnuttException(ErrorType.SOCIAL_PROVIDER_NOT_ATTACHED)
 
 object DiaryQuestionNotFoundException : SnuttException(ErrorType.DIARY_QUESTION_NOT_FOUND)
+
+object DiaryQuestionInvalidException : SnuttException(ErrorType.DIARY_QUESTION_INVALID)
+
+object DiaryCommentTooLongException : SnuttException(ErrorType.DIARY_COMMENT_TOO_LONG)
 
 object DiaryDailyClassTypeNotFoundException : SnuttException(ErrorType.DIARY_DAILY_CLASS_TYPE_NOT_FOUND)
 
@@ -170,8 +176,6 @@ object DuplicateFriendException : SnuttException(ErrorType.DUPLICATE_FRIEND)
 
 object InvalidFriendException : SnuttException(ErrorType.INVALID_FRIEND)
 
-object DuplicateThemeNameException : SnuttException(ErrorType.DUPLICATE_THEME_NAME)
-
 object InvalidThemeTypeException : SnuttException(ErrorType.INVALID_THEME_TYPE)
 
 object DuplicatePopupKeyException : SnuttException(ErrorType.DUPLICATE_POPUP_KEY)
@@ -187,3 +191,5 @@ object DynamicLinkGenerationFailedException : SnuttException(ErrorType.DYNAMIC_L
 object CoursebookRecentThanSugangSnuException : SnuttException(ErrorType.COURSEBOOK_RECENT_THAN_SUGANGSNU)
 
 object RegistrationPeriodNotSetException : SnuttException(ErrorType.REGISTRATION_PERIOD_NOT_SET)
+
+object NotAllowedInProdException : SnuttException(ErrorType.NOT_ALLOWED_IN_PROD)

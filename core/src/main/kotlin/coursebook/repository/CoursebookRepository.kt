@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.coursebook.repository
 
+import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.coursebook.data.Coursebook
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
@@ -11,4 +12,9 @@ interface CoursebookRepository : CoroutineCrudRepository<Coursebook, String> {
     suspend fun findAllByOrderByYearDescSemesterDesc(): List<Coursebook>
 
     suspend fun findTop3ByOrderByYearDescSemesterDesc(): List<Coursebook>
+
+    suspend fun existsByYearAndSemester(
+        year: Int,
+        semester: Semester,
+    ): Boolean
 }

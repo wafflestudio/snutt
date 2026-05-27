@@ -52,6 +52,8 @@ import kotlin.random.Random
 interface UserService {
     suspend fun getUser(userId: String): User
 
+    suspend fun getUserByLocalId(localId: String): User
+
     suspend fun getUsers(userIds: List<String>): List<User>
 
     suspend fun patchUserInfo(
@@ -129,6 +131,8 @@ interface UserService {
         newPassword: String,
         code: String,
     )
+
+    suspend fun getUsersByEmail(email: String): List<User>
 }
 
 @Service
@@ -147,6 +151,9 @@ class UserServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
 
     override suspend fun getUser(userId: String): User = userRepository.findByIdAndActiveTrue(userId) ?: throw UserNotFoundException
+
+    override suspend fun getUserByLocalId(localId: String): User =
+        userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
 
     override suspend fun getUsers(userIds: List<String>): List<User> = userRepository.findAllByIdInAndActiveTrue(userIds)
 
@@ -456,6 +463,7 @@ class UserServiceImpl(
                     fbName = facebookCredential.fbName
                 }
             }
+
             AuthProvider.GOOGLE -> {
                 if (user.credential.googleSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialGoogleSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -467,6 +475,7 @@ class UserServiceImpl(
                     googleEmail = googleCredential.googleEmail
                 }
             }
+
             AuthProvider.KAKAO -> {
                 if (user.credential.kakaoSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialKakaoSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -478,6 +487,7 @@ class UserServiceImpl(
                     kakaoEmail = kakaoCredential.kakaoEmail
                 }
             }
+
             AuthProvider.APPLE -> {
                 if (user.credential.appleSub != null) throw AlreadySocialAccountException
                 if (userRepository.existsByCredentialAppleSubAndActiveTrue(oauth2UserResponse.socialId)) {
@@ -490,7 +500,10 @@ class UserServiceImpl(
                     appleTransferSub = appleCredential.appleTransferSub
                 }
             }
-            AuthProvider.LOCAL -> throw IllegalStateException("Cannot attach local account")
+
+            AuthProvider.LOCAL -> {
+                throw IllegalStateException("Cannot attach local account")
+            }
         }
 
         user.credentialHash = authService.generateCredentialHash(user.credential)
@@ -512,18 +525,21 @@ class UserServiceImpl(
                     fbName = null
                 }
             }
+
             AuthProvider.GOOGLE -> {
                 user.credential.apply {
                     googleSub = null
                     googleEmail = null
                 }
             }
+
             AuthProvider.KAKAO -> {
                 user.credential.apply {
                     kakaoSub = null
                     kakaoEmail = null
                 }
             }
+
             AuthProvider.APPLE -> {
                 user.credential.apply {
                     appleSub = null
@@ -531,7 +547,10 @@ class UserServiceImpl(
                     appleTransferSub = null
                 }
             }
-            AuthProvider.LOCAL -> throw IllegalStateException("Cannot detach local account")
+
+            AuthProvider.LOCAL -> {
+                throw IllegalStateException("Cannot detach local account")
+            }
         }
         user.credentialHash = authService.generateCredentialHash(user.credential)
         userRepository.save(user)
@@ -576,7 +595,7 @@ class UserServiceImpl(
     }
 
     override suspend fun getMaskedEmail(localId: String): String {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         val email = user.email ?: throw UserNotFoundException
         val maskedEmail = email.replace(emailMaskRegex, "*")
         return maskedEmail
@@ -587,7 +606,7 @@ class UserServiceImpl(
         newPassword: String,
         code: String,
     ) {
-        val user = userRepository.findByCredentialLocalIdAndActiveTrue(localId) ?: throw UserNotFoundException
+        val user = getUserByLocalId(localId)
         verifyResetPasswordCode(user, code)
         if (!authService.isValidPassword(newPassword)) throw InvalidPasswordException
         user.apply {
@@ -597,6 +616,8 @@ class UserServiceImpl(
         userRepository.save(user)
         redisTemplate.delete(RESET_PASSWORD_CODE_PREFIX + user.id).subscribe()
     }
+
+    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmail(email)
 
     private suspend fun saveNewVerificationValue(
         email: String,

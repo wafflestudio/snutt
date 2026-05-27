@@ -1,11 +1,12 @@
+import com.diffplug.gradle.spotless.SpotlessExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("com.diffplug.spotless") version "8.4.0"
     id("org.graalvm.buildtools.native") version "0.11.3" apply false
     id("org.springframework.boot") version "4.0.1" apply false
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.jlleitschuh.gradle.ktlint") version "13.0.0"
     kotlin("jvm") version "2.3.0"
     kotlin("plugin.spring") version "2.2.0"
 }
@@ -36,14 +37,32 @@ allprojects {
     }
 }
 
+spotless {
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("1.8.0")
+    }
+}
+
 subprojects {
     apply {
+        plugin("com.diffplug.spotless")
         plugin("org.graalvm.buildtools.native")
         plugin("kotlin")
-        plugin("org.jlleitschuh.gradle.ktlint")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("io.spring.dependency-management")
         plugin("kotlin-spring")
+    }
+
+    configure<SpotlessExtension> {
+        kotlin {
+            target("src/**/*.kt")
+            ktlint("1.8.0")
+        }
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint("1.8.0")
+        }
     }
 
     dependencyManagement {

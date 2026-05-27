@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.diary.service
 
 import com.wafflestudio.snutt.common.cache.Cache
 import com.wafflestudio.snutt.common.cache.CacheKey
+import com.wafflestudio.snutt.common.exception.NotAllowedInProdException
 import com.wafflestudio.snutt.common.push.DeeplinkType
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.config.PhaseUtils
@@ -18,6 +19,8 @@ import java.time.Instant
 
 interface DiaryNotifierService {
     suspend fun sendNotifier()
+
+    suspend fun triggerNotifierManually()
 }
 
 @Service
@@ -29,13 +32,23 @@ class DiaryNotifierServiceImpl(
 ) : DiaryNotifierService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    companion object {
-        val SAMPLE_RATE = if (PhaseUtils.getPhase().isProd) 0.1 else 1.0
-    }
+    private val sampleRate: Double
+        get() = if (PhaseUtils.getPhase().isProd) 0.1 else 1.0
 
     @Scheduled(cron = "0 0 19 * * MON,WED,FRI", zone = "Asia/Seoul")
     override suspend fun sendNotifier() {
         if (PhaseUtils.getPhase().isProd) return
+        sendDiaryNotifications()
+    }
+
+    override suspend fun triggerNotifierManually() {
+        if (PhaseUtils.getPhase().isProd) {
+            throw NotAllowedInProdException
+        }
+        sendDiaryNotifications()
+    }
+
+    private suspend fun sendDiaryNotifications() {
         val lockKey = CacheKey.LOCK_SEND_LECTURE_DIARY_NOTIFICATION.build()
         cache.withLock(lockKey) {
             try {
@@ -49,7 +62,7 @@ class DiaryNotifierServiceImpl(
                 val totalCount = timetableRepository.countAllByIsPrimaryTrueAndYearAndSemester(currentYear, currentSemester)
                 val sampledUserIdPrimaryTimetableMap =
                     timetableRepository
-                        .samplePrimaryOfSizeByYearAndSemester((totalCount * SAMPLE_RATE).toLong(), currentYear, currentSemester)
+                        .samplePrimaryOfSizeByYearAndSemester((totalCount * sampleRate).toLong(), currentYear, currentSemester)
                         .toList()
                         .filter { it.lectures.size > 2 }
                         .associateBy { it.userId }

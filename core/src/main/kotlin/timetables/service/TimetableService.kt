@@ -5,11 +5,11 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snutt.common.exception.InvalidTimetableSemesterException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
 import com.wafflestudio.snutt.common.exception.TableDeleteErrorException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
-import com.wafflestudio.snutt.common.exception.TimetableNotPrimaryException
 import com.wafflestudio.snutt.coursebook.data.CoursebookDto
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.evaluation.service.EvService
@@ -288,6 +288,9 @@ class TimetableServiceImpl(
         if (title.isEmpty()) {
             throw InvalidTimetableTitleException
         }
+        if (!coursebookService.existsCoursebook(year, semester)) {
+            throw InvalidTimetableSemesterException
+        }
         if (timetableRepository.existsByUserIdAndYearAndSemesterAndTitle(userId, year, semester, title)) {
             throw DuplicateTimetableTitleException
         }
@@ -326,7 +329,7 @@ class TimetableServiceImpl(
         timetableId: String,
     ) {
         val table = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
-        if (table.isPrimary != true) throw TimetableNotPrimaryException
+        if (table.isPrimary != true) return
         timetableRepository.save(table.copy(isPrimary = false))
     }
 

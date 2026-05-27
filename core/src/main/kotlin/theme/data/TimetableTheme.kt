@@ -2,7 +2,6 @@ package com.wafflestudio.snutt.theme.data
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
-import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -10,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import java.time.LocalDateTime
 
 @Document
-@CompoundIndex(def = "{ 'userId': 1, 'name': 1 }", unique = true)
 data class TimetableTheme(
     @Id
     var id: String? = null,

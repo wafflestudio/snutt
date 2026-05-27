@@ -12,6 +12,7 @@ import com.wafflestudio.snutt.common.storage.dto.FileUploadUriDto
 import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
+import com.wafflestudio.snutt.diary.service.DiaryNotifierService
 import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.filter.SnuttAdminApiFilterTarget
 import com.wafflestudio.snutt.notification.service.NotificationAdminService
@@ -21,6 +22,8 @@ import com.wafflestudio.snutt.popup.service.PopupService
 import com.wafflestudio.snutt.registrationperiod.data.RegistrationDate
 import com.wafflestudio.snutt.registrationperiod.data.SemesterRegistrationPeriod
 import com.wafflestudio.snutt.registrationperiod.service.SemesterRegistrationPeriodService
+import com.wafflestudio.snutt.users.dto.AdminUserSearchResponse
+import com.wafflestudio.snutt.users.service.UserService
 import notification.dto.InsertNotificationRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -46,7 +49,9 @@ class AdminController(
     private val storageService: StorageService,
     private val popupService: PopupService,
     private val diaryService: DiaryService,
+    private val diaryNotifierService: DiaryNotifierService,
     private val semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
+    private val userService: UserService,
 ) {
     @PostMapping("/insert_noti")
     suspend fun insertNotification(
@@ -152,6 +157,12 @@ class AdminController(
         return OkResponse()
     }
 
+    @PostMapping("/diary/notifier/trigger")
+    suspend fun triggerDiaryNotifier(): OkResponse {
+        diaryNotifierService.triggerNotifierManually()
+        return OkResponse()
+    }
+
     @GetMapping("/registrationPeriods")
     suspend fun getSemesterRegistrationPeriods(): List<SemesterRegistrationPeriod> = semesterRegistrationPeriodService.getAll()
 
@@ -179,4 +190,9 @@ class AdminController(
         semesterRegistrationPeriodService.delete(year, semester)
         return OkResponse()
     }
+
+    @GetMapping("/users/search")
+    suspend fun searchUsersByEmail(
+        @RequestParam email: String,
+    ): List<AdminUserSearchResponse> = userService.getUsersByEmail(email).map { AdminUserSearchResponse.from(it) }
 }

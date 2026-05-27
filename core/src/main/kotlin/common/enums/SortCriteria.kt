@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.common.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
+import com.wafflestudio.snutt.common.extension.asc
 import com.wafflestudio.snutt.common.extension.desc
 import com.wafflestudio.snutt.lectures.data.EvInfo
 import com.wafflestudio.snutt.lectures.data.Lecture
@@ -28,8 +29,10 @@ enum class SortCriteria(
 
         fun getSort(sortCriteria: SortCriteria?): Sort =
             when (sortCriteria) {
-                RATING_DESC -> (Lecture::evInfo / EvInfo::avgRating).desc()
-                COUNT_DESC -> (Lecture::evInfo / EvInfo::count).desc()
+                RATING_DESC -> (Lecture::evInfo / EvInfo::avgRating).desc().and(Lecture::id.asc())
+
+                COUNT_DESC -> (Lecture::evInfo / EvInfo::count).desc().and(Lecture::id.asc())
+
                 // RATING_ASC -> (Lecture::evInfo / EvInfo::avgRating).asc()
                 // COUNT_ASC -> (Lecture::evInfo / EvInfo::count).asc()
                 else -> Sort.unsorted()

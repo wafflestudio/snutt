@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class VerificationCodeRequest(
     @param:JsonProperty("user_id")
-    val userId: String? = null,
+    val localId: String? = null,
     val code: String,
 )
