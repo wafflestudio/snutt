@@ -96,6 +96,7 @@ class LectureCustomRepositoryImpl(
                                         when (etcTag) {
                                             "E" -> Lecture::remark regex ".*ⓔ.*"
                                             "MO" -> Lecture::remark regex ".*ⓜⓞ.*"
+                                            "권장과목" -> Lecture::remark regex ".*권장과목.*"
                                             else -> null
                                         }
                                     }.toTypedArray(),
@@ -117,6 +118,7 @@ class LectureCustomRepositoryImpl(
                     keyword == "체육" -> Lecture::category isEqualTo "체육"
                     keyword in listOf("영강", "영어강의") -> Lecture::remark regex ".*ⓔ.*"
                     keyword in listOf("군휴학", "군휴학원격") -> Lecture::remark regex ".*ⓜⓞ.*"
+                    keyword == "권장과목" -> Lecture::remark regex ".*권장과목.*"
 
                     placeRegex.matches(keyword) || buildingRegex.matches(keyword) -> {
                         val placeKeyword = keyword.replace("동", "").uppercase()
