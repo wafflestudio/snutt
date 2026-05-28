@@ -96,7 +96,7 @@ class LectureCustomRepositoryImpl(
                                         when (etcTag) {
                                             "E" -> Lecture::remark regex ".*ⓔ.*"
                                             "MO" -> Lecture::remark regex ".*ⓜⓞ.*"
-                                            "권장과목" -> Lecture::remark regex ".*권장과목.*"
+                                            "R" -> Lecture::remark regex ".*권장과목.*"
                                             else -> null
                                         }
                                     }.toTypedArray(),
