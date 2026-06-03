@@ -5,6 +5,7 @@ import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableTitleException
+import com.wafflestudio.snutt.common.exception.InvalidTimetableOrderRequestException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableSemesterException
 import com.wafflestudio.snutt.common.exception.InvalidTimetableTitleException
 import com.wafflestudio.snutt.common.exception.PrimaryTimetableNotFoundException
@@ -17,13 +18,14 @@ import com.wafflestudio.snutt.theme.service.TimetableThemeService
 import com.wafflestudio.snutt.theme.service.toBasicThemeType
 import com.wafflestudio.snutt.theme.service.toIdForTimetable
 import com.wafflestudio.snutt.timetables.data.Timetable
+import com.wafflestudio.snutt.timetables.data.sortedByOrder
+import com.wafflestudio.snutt.timetables.data.sortedWithinSemesters
 import com.wafflestudio.snutt.timetables.dto.TimetableDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLectureDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLectureLegacyDto
 import com.wafflestudio.snutt.timetables.dto.TimetableLegacyDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -37,11 +39,11 @@ interface TimetableService {
 
     suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable
 
-    fun getTimetablesBySemester(
+    suspend fun getTimetablesBySemester(
         userId: String,
         year: Int,
         semester: Semester,
-    ): Flow<Timetable>
+    ): List<Timetable>
 
     suspend fun addTimetable(
         userId: String,
@@ -63,6 +65,13 @@ interface TimetableService {
         timetableId: String,
         title: String,
     ): Timetable
+
+    suspend fun modifyTimetableOrder(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        timetableIds: List<String>,
+    ): List<Timetable>
 
     suspend fun deleteTimetable(
         userId: String,
@@ -116,16 +125,17 @@ class TimetableServiceImpl(
     private val dynamicLinkClient: DynamicLinkClient,
     @param:Value("\${google.firebase.dynamic-link.link-prefix}") val linkPrefix: String,
 ) : TimetableService {
-    override suspend fun getTimetables(userId: String): List<Timetable> = timetableRepository.findAllByUserId(userId).toList()
+    override suspend fun getTimetables(userId: String): List<Timetable> =
+        timetableRepository.findAllByUserId(userId).toList().sortedWithinSemesters()
 
     override suspend fun getMostRecentlyUpdatedTimetable(userId: String): Timetable =
         timetableRepository.findFirstByUserIdOrderByUpdatedAtDesc(userId) ?: throw TimetableNotFoundException
 
-    override fun getTimetablesBySemester(
+    override suspend fun getTimetablesBySemester(
         userId: String,
         year: Int,
         semester: Semester,
-    ): Flow<Timetable> = timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester)
+    ): List<Timetable> = timetableRepository.findAllByUserIdAndYearAndSemester(userId, year, semester).toList().sortedByOrder()
 
     override suspend fun addTimetable(
         userId: String,
@@ -133,6 +143,7 @@ class TimetableServiceImpl(
     ): Timetable {
         validateTimetableTitle(userId, timetableRequest.year, timetableRequest.semester, timetableRequest.title)
 
+        val timetables = getTimetablesBySemester(userId, timetableRequest.year, timetableRequest.semester)
         val defaultTheme = timetableThemeService.getDefaultTheme(userId)
         return Timetable(
             userId = userId,
@@ -141,11 +152,8 @@ class TimetableServiceImpl(
             title = timetableRequest.title,
             theme = defaultTheme.toBasicThemeType(),
             themeId = defaultTheme.toIdForTimetable(),
-            isPrimary =
-                timetableRepository
-                    .findAllByUserIdAndYearAndSemester(userId, timetableRequest.year, timetableRequest.semester)
-                    .toList()
-                    .isEmpty(),
+            isPrimary = timetables.isEmpty(),
+            order = nextOrder(timetables),
         ).let { timetableRepository.save(it) }
     }
 
@@ -175,6 +183,29 @@ class TimetableServiceImpl(
             .apply { this.title = title }
             .let { timetableRepository.save(it) }
 
+    override suspend fun modifyTimetableOrder(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        timetableIds: List<String>,
+    ): List<Timetable> {
+        val timetableIdMap =
+            getTimetablesBySemester(userId, year, semester).associateBy { it.id!! }
+        if (timetableIds.size != timetableIdMap.size || timetableIds.toSet() != timetableIdMap.keys) {
+            throw InvalidTimetableOrderRequestException
+        }
+
+        val orderedTimetables =
+            timetableIds.mapIndexed { index, timetableId ->
+                timetableIdMap.getValue(timetableId).copy(order = index)
+            }
+
+        return timetableRepository
+            .saveAll(orderedTimetables)
+            .toList()
+            .sortedBy { it.order }
+    }
+
     override suspend fun deleteTimetable(
         userId: String,
         timetableId: String,
@@ -190,6 +221,7 @@ class TimetableServiceImpl(
         title: String?,
     ): Timetable {
         val timetable = timetableRepository.findById(timetableId) ?: throw TimetableNotFoundException
+        val timetables = getTimetablesBySemester(userId, timetable.year, timetable.semester)
         val baseTitle = (title ?: timetable.title).replace(Regex("""\s\(\d+\)$"""), "")
         val latestCopiedTimetableNumber =
             getLatestCopiedTimetableNumber(userId, timetable.year, timetable.semester, title ?: timetable.title)
@@ -200,6 +232,7 @@ class TimetableServiceImpl(
                 updatedAt = Instant.now(),
                 title = baseTitle + " (${latestCopiedTimetableNumber + 1})",
                 isPrimary = false,
+                order = nextOrder(timetables),
             ).let { timetableRepository.save(it) }
     }
 
@@ -251,6 +284,7 @@ class TimetableServiceImpl(
     override suspend fun createDefaultTable(userId: String): Timetable {
         val coursebook = coursebookService.getLatestCoursebook()
         val defaultTheme = timetableThemeService.getDefaultTheme(userId)
+        val timetables = getTimetablesBySemester(userId, coursebook.year, coursebook.semester)
 
         val timetable =
             Timetable(
@@ -260,9 +294,12 @@ class TimetableServiceImpl(
                 title = "나의 시간표",
                 theme = defaultTheme.toBasicThemeType(),
                 themeId = defaultTheme.toIdForTimetable(),
+                order = nextOrder(timetables),
             )
         return timetableRepository.save(timetable)
     }
+
+    private fun nextOrder(timetables: List<Timetable>): Int = timetables.maxOfOrNull { it.order }?.plus(1) ?: 0
 
     private suspend fun getLatestCopiedTimetableNumber(
         userId: String,

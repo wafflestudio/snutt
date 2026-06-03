@@ -28,7 +28,12 @@ data class Timetable(
     var themeId: String?,
     @Field("is_primary")
     var isPrimary: Boolean? = null,
+    var order: Int,
     @Field("updated_at")
     @param:JsonProperty("updated_at")
     var updatedAt: Instant = Instant.now(),
 )
+
+fun List<Timetable>.sortedWithinSemesters(): List<Timetable> = groupBy { it.year to it.semester }.values.flatMap { it.sortedByOrder() }
+
+fun List<Timetable>.sortedByOrder(): List<Timetable> = sortedWith(compareBy<Timetable> { it.order }.thenBy { it.id })
