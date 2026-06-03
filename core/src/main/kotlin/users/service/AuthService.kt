@@ -67,9 +67,12 @@ class AuthServiceImpl(
 
     override fun isValidPassword(password: String) = password.matches(passwordRegex)
 
-    override fun isValidEmail(email: String) = email.matches(emailRegex)
+    override fun isValidEmail(email: String) = email.trim().matches(emailRegex)
 
-    override fun isValidSnuMail(email: String) = email.matches(emailRegex) && email.endsWith("@snu.ac.kr")
+    override fun isValidSnuMail(email: String): Boolean {
+        val email = email.trim()
+        return email.matches(emailRegex) && email.endsWith("@snu.ac.kr", ignoreCase = true)
+    }
 
     override fun isMatchedPassword(
         user: User,

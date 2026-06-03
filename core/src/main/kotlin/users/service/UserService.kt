@@ -40,6 +40,7 @@ import com.wafflestudio.snutt.users.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.getAndAwait
 import org.springframework.stereotype.Service
@@ -181,7 +182,7 @@ class UserServiceImpl(
     override suspend fun registerLocal(localRegisterRequest: LocalRegisterRequest): LoginResponse {
         val localId = localRegisterRequest.id
         val password = localRegisterRequest.password
-        val email = localRegisterRequest.email
+        val email = localRegisterRequest.email?.trim()
 
         val cacheKey = CacheKey.LOCK_REGISTER_LOCAL.build(localId)
 
@@ -191,7 +192,7 @@ class UserServiceImpl(
             if (!authService.isValidPassword(password)) throw InvalidPasswordException
             email?.let {
                 if (!authService.isValidEmail(email)) throw InvalidEmailException
-                userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
+                userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
                     throw DuplicateEmailException(getAttachedAuthProviders(it))
                 }
             }
@@ -235,7 +236,7 @@ class UserServiceImpl(
         val credential = authService.buildFacebookCredential(oauth2UserResponse)
 
         if (oauth2UserResponse.email != null) {
-            userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+            userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
                 throw DuplicateEmailException(getAttachedAuthProviders(it))
             }
         } else {
@@ -259,7 +260,7 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "google email is null: $oauth2UserResponse" }
-        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
         }
 
@@ -282,7 +283,7 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "kakao email is null: $oauth2UserResponse" }
-        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
         }
 
@@ -309,7 +310,7 @@ class UserServiceImpl(
         }
 
         checkNotNull(oauth2UserResponse.email) { "apple email is null: $oauth2UserResponse" }
-        userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)?.let {
             throw DuplicateEmailException(getAttachedAuthProviders(it))
         }
 
@@ -349,6 +350,7 @@ class UserServiceImpl(
         isEmailVerified: Boolean,
     ): LoginResponse {
         val credentialHash = authService.generateCredentialHash(credential)
+        val email = email?.trim()
 
         val randomNickname = userNicknameService.generateUniqueRandomNickname()
 
@@ -384,12 +386,10 @@ class UserServiceImpl(
         user: User,
         email: String,
     ) {
+        val email = email.trim()
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
         if (!authService.isValidSnuMail(email)) throw InvalidEmailException
-        if (userRepository.existsByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(
-                email,
-            )
-        ) {
+        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) {
             throw DuplicateEmailException(getAttachedAuthProviders(user))
         }
         val key = VERIFICATION_CODE_PREFIX + user.id
@@ -408,7 +408,12 @@ class UserServiceImpl(
             email = value.email
             isEmailVerified = true
         }
-        userRepository.save(user)
+        try {
+            userRepository.save(user)
+        } catch (e: DuplicateKeyException) {
+            val presentUser = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(value.email)
+            throw DuplicateEmailException(getAttachedAuthProviders(presentUser ?: user))
+        }
         redisTemplate.delete(key).subscribe()
     }
 
@@ -445,7 +450,7 @@ class UserServiceImpl(
         val token = socialLoginRequest.token
         val oauth2UserResponse = authService.socialLoginWithAccessToken(authProvider, token)
         if (oauth2UserResponse.email != null) {
-            val presentUser = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
+            val presentUser = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(oauth2UserResponse.email)
             if (presentUser != null && presentUser.id != user.id) {
                 throw DuplicateEmailException(getAttachedAuthProviders(presentUser))
             }
@@ -572,13 +577,19 @@ class UserServiceImpl(
     }
 
     override suspend fun sendLocalIdToEmail(email: String) {
-        val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
-        mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, localId = user.credential.localId ?: throw UserNotFoundException)
+        val email = email.trim()
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
+        mailService.sendUserMail(
+            type = UserMailType.FIND_ID,
+            to = email,
+            localId = user.credential.localId ?: throw UserNotFoundException,
+        )
     }
 
     override suspend fun sendResetPasswordCode(email: String) {
+        val email = email.trim()
         if (email.replace(emailMaskRegex, "*") == email) throw UpdateAppVersionException
-        val user = userRepository.findByEmailIgnoreCaseAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
         saveNewVerificationValue(email, code, key)
@@ -617,7 +628,7 @@ class UserServiceImpl(
         redisTemplate.delete(RESET_PASSWORD_CODE_PREFIX + user.id).subscribe()
     }
 
-    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmail(email)
+    override suspend fun getUsersByEmail(email: String): List<User> = userRepository.findAllByEmail(email.trim())
 
     private suspend fun saveNewVerificationValue(
         email: String,
