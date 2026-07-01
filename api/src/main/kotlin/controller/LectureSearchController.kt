@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
 import com.wafflestudio.snutt.lectures.dto.SearchDto
@@ -9,6 +11,7 @@ import com.wafflestudio.snutt.lectures.service.LectureService
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -26,8 +29,9 @@ class LectureSearchController(
     @PostMapping("")
     suspend fun searchLectures(
         @RequestBody query: SearchQueryLegacy,
-    ) = lectureService.search(query.toSearchDto()).toList().let {
-        lectureService.convertLecturesToLectureDtos(it)
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
+    ) = lectureService.search(query.toSearchDto(clientInfo.language)).toList().let {
+        lectureService.convertLecturesToLectureDtos(it, clientInfo.language)
     }
 }
 
@@ -52,10 +56,11 @@ data class SearchQueryLegacy(
     val sortCriteria: String? = null,
     val categoryPre2025: List<String>? = null,
 ) {
-    fun toSearchDto(): SearchDto =
+    fun toSearchDto(language: Language = Language.KO): SearchDto =
         SearchDto(
             year = year,
             semester = semester,
+            language = language,
             query = title,
             classification = classification,
             credit = credit,

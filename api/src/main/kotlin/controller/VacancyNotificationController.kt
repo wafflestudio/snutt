@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.ExistenceResponse
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -29,9 +31,10 @@ class VacancyNotificationController(
     @GetMapping("/lectures")
     suspend fun getVacancyNotificationLectures(
         @CurrentUser user: User,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = vacancyNotificationService
         .getVacancyNotificationLectures(user.id!!)
-        .let { lectureService.convertLecturesToLectureDtos(it) }
+        .let { lectureService.convertLecturesToLectureDtos(it, clientInfo.language) }
         .let { VacancyNotificationLecturesResponse(it) }
 
     @GetMapping("/lectures/{lectureId}/state")

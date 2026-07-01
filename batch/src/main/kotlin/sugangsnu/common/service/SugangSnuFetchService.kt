@@ -71,6 +71,19 @@ class SugangSnuFetchServiceImpl(
                         null
                     }
 
+                val extraCourseTitleEn =
+                    if (extraLectureInfo.subInfo.courseSubNameEng.isNullOrEmpty()) {
+                        extraLectureInfo.subInfo.courseNameEng
+                    } else {
+                        "${extraLectureInfo.subInfo.courseNameEng} (${extraLectureInfo.subInfo.courseSubNameEng})"
+                    }
+                val extraDepartmentEn =
+                    if (extraLectureInfo.subInfo.departmentEngNm != null && extraLectureInfo.subInfo.majorEngNm != null) {
+                        "${extraLectureInfo.subInfo.departmentEngNm}(${extraLectureInfo.subInfo.majorEngNm})"
+                    } else {
+                        null
+                    }
+
                 lecture.apply {
                     classPlaceAndTimes =
                         SugangSnuClassTimeUtils.convertTextToClassTimeObject(
@@ -86,6 +99,13 @@ class SugangSnuFetchServiceImpl(
                     quota = extraLectureInfo.subInfo.quota ?: quota
                     remark = extraLectureInfo.subInfo.remark ?: remark
                     categoryPre2025 = courseNumberCategoryPre2025Map[lecture.courseNumber]
+                    academicYearEn = extraLectureInfo.subInfo.academicCourseEng.takeIf { it != "Bachelor" }
+                        ?: extraLectureInfo.subInfo.academicYear?.let { "Year $it" } ?: academicYearEn
+                    courseTitleEn = extraCourseTitleEn ?: courseTitleEn
+                    instructorEn = (extraLectureInfo.subInfo.professorNameEng ?: instructorEn)?.substringBeforeLast(" (")
+                    categoryEn = extraLectureInfo.subInfo.categoryEng ?: categoryEn
+                    departmentEn = extraDepartmentEn ?: departmentEn
+                    remarkEn = extraLectureInfo.subInfo.remarkEng ?: remarkEn
                 }
             }
     }
@@ -131,10 +151,22 @@ class SugangSnuFetchServiceImpl(
         val remark = row.getCellByColumnName("비고")
         val registrationCount = row.getCellByColumnName("수강신청인원").toIntOrNull() ?: 0
 
+        // 영문 컬럼 (한글 컬럼과 zip으로 합쳐진 영문 엑셀 헤더). KO 파생 로직을 1:1 미러.
+        val classificationEn = row.getCellByColumnName("Course Classification")
+        val collegeEn = row.getCellByColumnName("College")
+        val departmentEn = row.getCellByColumnName("Department")
+        val academicCourseEn = row.getCellByColumnName("Degree Program")
+        val academicYearEn = row.getCellByColumnName("Academic Year")
+        val courseTitleEn = row.getCellByColumnName("Course Title")
+        val courseSubtitleEn = row.getCellByColumnName("Course Subtitle")
+        val instructorEn = row.getCellByColumnName("Instructor")
+        val remarkEn = row.getCellByColumnName("Remark")
+
         val classTimes =
             SugangSnuClassTimeUtils.convertTextToClassTimeObject(classTimeText.split("/"), location.split("/"))
 
         val courseFullTitle = if (courseSubtitle.isEmpty()) courseTitle else "$courseTitle ($courseSubtitle)"
+        val courseFullTitleEn = if (courseSubtitleEn.isEmpty()) courseTitleEn else "$courseTitleEn ($courseSubtitleEn)"
 
         return Lecture(
             classification = classification,
@@ -155,6 +187,14 @@ class SugangSnuFetchServiceImpl(
             classPlaceAndTimes = classTimes,
             registrationCount = registrationCount,
             categoryPre2025 = null,
+            // 분야(category)는 엑셀 컬럼이 없어 KO와 동일하게 비움. 나머지는 KO 파생 로직 미러.
+            classificationEn = classificationEn,
+            departmentEn = departmentEn.replace("null", "").ifEmpty { collegeEn },
+            academicYearEn = academicCourseEn.takeIf { it != "Bachelor" } ?: academicYearEn,
+            courseTitleEn = courseFullTitleEn,
+            instructorEn = instructorEn,
+            categoryEn = "",
+            remarkEn = remarkEn,
         )
     }
 }

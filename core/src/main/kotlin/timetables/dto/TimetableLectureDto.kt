@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snutt.common.client.Language
+import com.wafflestudio.snutt.common.client.select
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeLegacyDto
@@ -32,21 +34,22 @@ data class TimetableLectureDto(
 fun TimetableLectureDto(
     timetableLecture: TimetableLecture,
     snuttEvLecture: SnuttEvLectureIdDto? = null,
+    language: Language = Language.KO,
 ) = TimetableLectureDto(
     id = timetableLecture.id,
-    academicYear = timetableLecture.academicYear,
-    category = timetableLecture.category,
+    academicYear = language.select(timetableLecture.academicYear, timetableLecture.academicYearEn),
+    category = language.select(timetableLecture.category, timetableLecture.categoryEn),
     classPlaceAndTimes = timetableLecture.classPlaceAndTimes.map { ClassPlaceAndTimeDto(it) },
-    classification = timetableLecture.classification,
+    classification = language.select(timetableLecture.classification, timetableLecture.classificationEn),
     credit = timetableLecture.credit,
-    department = timetableLecture.department,
-    instructor = timetableLecture.instructor,
+    department = language.select(timetableLecture.department, timetableLecture.departmentEn),
+    instructor = language.select(timetableLecture.instructor, timetableLecture.instructorEn),
     lectureNumber = timetableLecture.lectureNumber,
     quota = timetableLecture.quota,
     freshmanQuota = timetableLecture.freshmanQuota,
-    remark = timetableLecture.remark,
+    remark = language.select(timetableLecture.remark, timetableLecture.remarkEn),
     courseNumber = timetableLecture.courseNumber,
-    courseTitle = timetableLecture.courseTitle,
+    courseTitle = language.select(timetableLecture.courseTitle, timetableLecture.courseTitleEn),
     color = timetableLecture.color,
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,
@@ -87,21 +90,22 @@ data class TimetableLectureLegacyDto(
 fun TimetableLectureLegacyDto(
     timetableLecture: TimetableLecture,
     snuttEvLecture: SnuttEvLectureIdDto? = null,
+    language: Language = Language.KO,
 ) = TimetableLectureLegacyDto(
     id = timetableLecture.id,
-    academicYear = timetableLecture.academicYear,
-    category = timetableLecture.category,
+    academicYear = language.select(timetableLecture.academicYear, timetableLecture.academicYearEn),
+    category = language.select(timetableLecture.category, timetableLecture.categoryEn),
     classPlaceAndTimes = timetableLecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
-    classification = timetableLecture.classification,
+    classification = language.select(timetableLecture.classification, timetableLecture.classificationEn),
     credit = timetableLecture.credit,
-    department = timetableLecture.department,
-    instructor = timetableLecture.instructor,
+    department = language.select(timetableLecture.department, timetableLecture.departmentEn),
+    instructor = language.select(timetableLecture.instructor, timetableLecture.instructorEn),
     lectureNumber = timetableLecture.lectureNumber,
     quota = timetableLecture.quota,
     freshmanQuota = timetableLecture.freshmanQuota,
-    remark = timetableLecture.remark,
+    remark = language.select(timetableLecture.remark, timetableLecture.remarkEn),
     courseNumber = timetableLecture.courseNumber,
-    courseTitle = timetableLecture.courseTitle,
+    courseTitle = language.select(timetableLecture.courseTitle, timetableLecture.courseTitleEn),
     color = timetableLecture.color,
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,

@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.lectures.repository
 
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.SortCriteria
 import com.wafflestudio.snutt.common.extension.isEqualTo
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
@@ -41,13 +42,34 @@ class LectureCustomRepositoryImpl(
                         Criteria().andOperator(
                             listOfNotNull(
                                 Lecture::year isEqualTo searchCondition.year and Lecture::semester isEqualTo searchCondition.semester,
-                                searchCondition.query?.let { makeSearchCriteriaFromQuery(it) },
+                                searchCondition.query?.let { makeSearchCriteriaFromQuery(it, searchCondition.language) },
                                 searchCondition.credit?.takeIf { it.isNotEmpty() }?.let { Lecture::credit inValues it },
-                                searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let { Lecture::academicYear inValues it },
+                                searchCondition.academicYear?.takeIf { it.isNotEmpty() }?.let {
+                                    if (searchCondition.isEn()) {
+                                        Criteria().orOperator(Lecture::academicYear inValues it, Lecture::academicYearEn inValues it)
+                                    } else {
+                                        Lecture::academicYear inValues it
+                                    }
+                                },
                                 searchCondition.courseNumber?.takeIf { it.isNotEmpty() }?.let { Lecture::courseNumber inValues it },
-                                searchCondition.classification?.takeIf { it.isNotEmpty() }?.let { Lecture::classification inValues it },
+                                searchCondition.classification?.takeIf { it.isNotEmpty() }?.let {
+                                    if (searchCondition.isEn()) {
+                                        Criteria().orOperator(
+                                            Lecture::classification inValues it,
+                                            Lecture::classificationEn inValues it,
+                                        )
+                                    } else {
+                                        Lecture::classification inValues it
+                                    }
+                                },
                                 listOfNotNull(
-                                    searchCondition.category?.takeIf { it.isNotEmpty() }?.let { Lecture::category inValues it },
+                                    searchCondition.category?.takeIf { it.isNotEmpty() }?.let {
+                                        if (searchCondition.isEn()) {
+                                            Criteria().orOperator(Lecture::category inValues it, Lecture::categoryEn inValues it)
+                                        } else {
+                                            Lecture::category inValues it
+                                        }
+                                    },
                                     searchCondition.categoryPre2025
                                         ?.takeIf {
                                             it.isNotEmpty()
@@ -55,7 +77,13 @@ class LectureCustomRepositoryImpl(
                                 ).takeIf { it.isNotEmpty() }?.let {
                                     Criteria().orOperator(it)
                                 },
-                                searchCondition.department?.takeIf { it.isNotEmpty() }?.let { Lecture::department inValues it },
+                                searchCondition.department?.takeIf { it.isNotEmpty() }?.let {
+                                    if (searchCondition.isEn()) {
+                                        Criteria().orOperator(Lecture::department inValues it, Lecture::departmentEn inValues it)
+                                    } else {
+                                        Lecture::department inValues it
+                                    }
+                                },
                                 searchCondition.times?.takeIf { it.isNotEmpty() }?.let { searchTimes ->
                                     Criteria().andOperator(
                                         Lecture::classPlaceAndTimes ne listOf(),
@@ -107,9 +135,26 @@ class LectureCustomRepositoryImpl(
                     .limit(searchCondition.limit),
             ).asFlow()
 
-    private fun makeSearchCriteriaFromQuery(query: String): Criteria =
+    private fun SearchDto.isEn(): Boolean = language == Language.EN
+
+    private fun makeSearchCriteriaFromQuery(
+        query: String,
+        language: Language,
+    ): Criteria =
         Criteria().andOperator(
             query.split(' ').map { keyword ->
+                // EN 검색은 스마트검색(특수키워드/학과접미사) 미지원. 제목/교수/과목번호/강좌번호 단순 매칭만.
+                // 과거 학기(_en null) 커버 위해 ko 필드도 OR 매칭.
+                if (language == Language.EN) {
+                    return@map Criteria().orOperator(
+                        Lecture::courseTitle.regex(Regex.escape(keyword), "i"),
+                        Lecture::courseTitleEn.regex(Regex.escape(keyword), "i"),
+                        Lecture::instructor.regex(Regex.escape(keyword), "i"),
+                        Lecture::instructorEn.regex(Regex.escape(keyword), "i"),
+                        Lecture::courseNumber isEqualTo keyword,
+                        Lecture::lectureNumber isEqualTo keyword,
+                    )
+                }
                 val fuzzyKeyword = keyword.toCharArray().joinToString(".*") { Regex.escape(it.toString()) }
                 when {
                     keyword == "전공" -> {

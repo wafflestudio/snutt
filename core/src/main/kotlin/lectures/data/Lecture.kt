@@ -38,6 +38,20 @@ data class Lecture(
     var wasFull: Boolean = false,
     var evInfo: EvInfo? = null,
     var categoryPre2025: String?,
+    @Field("academic_year_en")
+    var academicYearEn: String? = null,
+    @Field("category_en")
+    var categoryEn: String? = null,
+    @Field("classification_en")
+    var classificationEn: String? = null,
+    @Field("department_en")
+    var departmentEn: String? = null,
+    @Field("instructor_en")
+    var instructorEn: String? = null,
+    @Field("remark_en")
+    var remarkEn: String? = null,
+    @Field("course_title_en")
+    var courseTitleEn: String? = null,
 ) {
     infix fun equalsMetadata(other: Lecture): Boolean =
         this === other ||
@@ -57,6 +71,13 @@ data class Lecture(
                     year == other.year &&
                     courseNumber == other.courseNumber &&
                     courseTitle == other.courseTitle &&
-                    categoryPre2025 == other.categoryPre2025
+                    categoryPre2025 == other.categoryPre2025 &&
+                    academicYearEn == other.academicYearEn &&
+                    categoryEn == other.categoryEn &&
+                    classificationEn == other.classificationEn &&
+                    departmentEn == other.departmentEn &&
+                    instructorEn == other.instructorEn &&
+                    remarkEn == other.remarkEn &&
+                    courseTitleEn == other.courseTitleEn
             )
 }

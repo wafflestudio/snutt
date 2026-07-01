@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.controller
 import com.wafflestudio.snutt.bookmark.dto.BookmarkLectureModifyRequest
 import com.wafflestudio.snutt.bookmark.dto.BookmarkResponse
 import com.wafflestudio.snutt.bookmark.service.BookmarkService
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.ExistenceResponse
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.config.CurrentUser
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -33,10 +35,12 @@ class BookmarkController(
         @CurrentUser user: User,
         @RequestParam year: Int,
         @RequestParam semester: Semester,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ): BookmarkResponse {
         val userId = user.id!!
         val bookmark = bookmarkService.getBookmark(userId, year, semester)
-        val bookmarkLectureDtos = bookmarkService.convertBookmarkLecturesToBookmarkLectureDtos(bookmark.lectures)
+        val bookmarkLectureDtos =
+            bookmarkService.convertBookmarkLecturesToBookmarkLectureDtos(bookmark.lectures, clientInfo.language)
 
         return BookmarkResponse(
             year = bookmark.year,

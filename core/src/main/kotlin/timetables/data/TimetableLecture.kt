@@ -45,6 +45,21 @@ data class TimetableLecture(
     @Indexed
     var lectureId: String? = null,
     var categoryPre2025: String?,
+    @Field("academic_year_en")
+    @param:JsonProperty("academic_year_en")
+    var academicYearEn: String? = null,
+    @Field("category_en")
+    var categoryEn: String? = null,
+    @Field("classification_en")
+    var classificationEn: String? = null,
+    @Field("department_en")
+    var departmentEn: String? = null,
+    @Field("instructor_en")
+    var instructorEn: String? = null,
+    @Field("remark_en")
+    var remarkEn: String? = null,
+    @Field("course_title_en")
+    var courseTitleEn: String? = null,
 )
 
 fun TimetableLecture(
@@ -69,4 +84,11 @@ fun TimetableLecture(
     colorIndex = colorIndex,
     color = color,
     categoryPre2025 = lecture.categoryPre2025,
+    academicYearEn = lecture.academicYearEn,
+    categoryEn = lecture.categoryEn,
+    classificationEn = lecture.classificationEn,
+    departmentEn = lecture.departmentEn,
+    instructorEn = lecture.instructorEn,
+    remarkEn = lecture.remarkEn,
+    courseTitleEn = lecture.courseTitleEn,
 )

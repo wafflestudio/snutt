@@ -161,6 +161,11 @@ class SugangSnuSyncServiceImpl(
                         instructor = acc.instructor + lecture.instructor,
                         category = acc.category + lecture.category,
                         categoryPre2025 = acc.categoryPre2025 + lecture.categoryPre2025,
+                        classificationEn = acc.classificationEn + lecture.classificationEn,
+                        departmentEn = acc.departmentEn + lecture.departmentEn,
+                        academicYearEn = acc.academicYearEn + lecture.academicYearEn,
+                        instructorEn = acc.instructorEn + lecture.instructorEn,
+                        categoryEn = acc.categoryEn + lecture.categoryEn,
                     )
                 }.let { parsedTag ->
                     TagCollection(
@@ -193,6 +198,32 @@ class SugangSnuSyncServiceImpl(
                                 .sorted(),
                         categoryPre2025 =
                             parsedTag.categoryPre2025
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        // 영문 태그 (en 필터 UI/검색 매칭용). KO 필터 규칙 그대로 미러.
+                        academicYearEn =
+                            parsedTag.academicYearEn
+                                .filterNotNull()
+                                .filter { it.length > 1 }
+                                .sorted(),
+                        classificationEn =
+                            parsedTag.classificationEn
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        departmentEn =
+                            parsedTag.departmentEn
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        instructorEn =
+                            parsedTag.instructorEn
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                                .sorted(),
+                        categoryEn =
+                            parsedTag.categoryEn
                                 .filterNotNull()
                                 .filter { it.isNotBlank() }
                                 .sorted(),
@@ -264,6 +295,13 @@ class SugangSnuSyncServiceImpl(
                         courseNumber = updatedLecture.newData.courseNumber
                         courseTitle = updatedLecture.newData.courseTitle
                         categoryPre2025 = updatedLecture.newData.categoryPre2025
+                        academicYearEn = updatedLecture.newData.academicYearEn
+                        categoryEn = updatedLecture.newData.categoryEn
+                        classificationEn = updatedLecture.newData.classificationEn
+                        departmentEn = updatedLecture.newData.departmentEn
+                        instructorEn = updatedLecture.newData.instructorEn
+                        remarkEn = updatedLecture.newData.remarkEn
+                        courseTitleEn = updatedLecture.newData.courseTitleEn
                     }!!
                 bookmarkRepository.updateLecture(bookmark.id!!, updatedBookmarkLecture)
             }.map { bookmark ->
@@ -318,6 +356,13 @@ class SugangSnuSyncServiceImpl(
                         courseNumber = updatedLecture.newData.courseNumber
                         courseTitle = updatedLecture.newData.courseTitle
                         categoryPre2025 = updatedLecture.newData.categoryPre2025
+                        academicYearEn = updatedLecture.newData.academicYearEn
+                        categoryEn = updatedLecture.newData.categoryEn
+                        classificationEn = updatedLecture.newData.classificationEn
+                        departmentEn = updatedLecture.newData.departmentEn
+                        instructorEn = updatedLecture.newData.instructorEn
+                        remarkEn = updatedLecture.newData.remarkEn
+                        courseTitleEn = updatedLecture.newData.courseTitleEn
                     }
                 timeTableRepository.updateTimetableLecture(timetable.id!!, updatedTimetableLecture!!).also {
                     eventPublisher.publishEvent(TimetableLectureModifiedEvent(updatedTimetableLecture))
@@ -439,4 +484,9 @@ data class ParsedTags(
     val category: Set<String?> = setOf(),
     val etc: Set<String?> = setOf(),
     val categoryPre2025: Set<String?> = setOf(),
+    val classificationEn: Set<String?> = setOf(),
+    val departmentEn: Set<String?> = setOf(),
+    val academicYearEn: Set<String?> = setOf(),
+    val instructorEn: Set<String?> = setOf(),
+    val categoryEn: Set<String?> = setOf(),
 )

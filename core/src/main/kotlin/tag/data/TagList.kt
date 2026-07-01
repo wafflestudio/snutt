@@ -33,4 +33,14 @@ data class TagCollection(
     val instructor: List<String>,
     val category: List<String>,
     val categoryPre2025: List<String> = listOf(),
+    @Field("classification_en")
+    val classificationEn: List<String> = listOf(),
+    @Field("department_en")
+    val departmentEn: List<String> = listOf(),
+    @Field("academic_year_en")
+    val academicYearEn: List<String> = listOf(),
+    @Field("instructor_en")
+    val instructorEn: List<String> = listOf(),
+    @Field("category_en")
+    val categoryEn: List<String> = listOf(),
 )
