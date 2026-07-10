@@ -4,7 +4,7 @@ import com.wafflestudio.snutt.common.enums.Semester
 import org.springframework.web.util.DefaultUriBuilderFactory
 
 object SugangSnuUrlUtils {
-    const val REDIRECT_PREFIX_URL = "https://libproxy.snu.ac.kr/_Lib_Proxy_Url/"
+    const val SUGANG_SNU_BASE_URL = "https://sugang.snu.ac.kr"
 
     fun convertSemesterToSugangSnuSearchString(semester: Semester): String =
         when (semester) {
@@ -14,7 +14,7 @@ object SugangSnuUrlUtils {
             Semester.WINTER -> "U000200002U000300002"
         }
 
-    fun parseSyllabusUrl(
+    fun parseSyllabusPath(
         year: Int,
         semester: Semester,
         courseNumber: String,
@@ -22,8 +22,6 @@ object SugangSnuUrlUtils {
     ): String =
         DefaultUriBuilderFactory()
             .builder()
-            .scheme("https")
-            .host("sugang.snu.ac.kr")
             .path("/sugang/cc/cc103.action")
             .queryParam("openSchyy", year)
             .queryParam("openShtmFg", makeOpenShtmFg(semester))

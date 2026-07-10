@@ -6,6 +6,8 @@ spring:
 
 snutt:
   secret-key:
+  syllabus-proxy:
+    base-url: https://snutt-proxy.wafflestudio.com
 
 springdoc:
   paths-to-match: /v1/**
