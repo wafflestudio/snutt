@@ -1,12 +1,13 @@
 package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.enums.Semester
-import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.REDIRECT_PREFIX_URL
-import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.parseSyllabusUrl
+import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.SUGANG_SNU_BASE_URL
+import com.wafflestudio.snutt.common.util.SugangSnuUrlUtils.parseSyllabusPath
 import com.wafflestudio.snutt.coursebook.data.CoursebookOfficialResponse
 import com.wafflestudio.snutt.coursebook.data.CoursebookResponse
 import com.wafflestudio.snutt.coursebook.service.CoursebookService
 import com.wafflestudio.snutt.filter.SnuttNoAuthApiFilterTarget
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 )
 class CoursebookController(
     private val coursebookService: CoursebookService,
+    @param:Value("\${snutt.syllabus-proxy.base-url}") private val syllabusProxyBaseUrl: String,
 ) {
     @GetMapping("")
     suspend fun getCoursebooks() = coursebookService.getCoursebooks().map { CoursebookResponse(it) }
@@ -39,16 +41,16 @@ class CoursebookController(
         @RequestParam("course_number") courseNumber: String,
         @RequestParam("lecture_number") lectureNumber: String,
     ): CoursebookOfficialResponse {
-        val url =
-            parseSyllabusUrl(
+        val syllabusPath =
+            parseSyllabusPath(
                 year = year,
                 semester = semester,
                 courseNumber = courseNumber,
                 lectureNumber = lectureNumber,
             )
         return CoursebookOfficialResponse(
-            noProxyUrl = url,
-            proxyUrl = REDIRECT_PREFIX_URL + url,
+            noProxyUrl = SUGANG_SNU_BASE_URL + syllabusPath,
+            proxyUrl = syllabusProxyBaseUrl + syllabusPath,
         )
     }
 }
