@@ -389,8 +389,8 @@ class UserServiceImpl(
         val email = email.trim()
         if (user.isEmailVerified == true) throw EmailAlreadyVerifiedException
         if (!authService.isValidSnuMail(email)) throw InvalidEmailException
-        if (userRepository.existsByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)) {
-            throw DuplicateEmailException(getAttachedAuthProviders(user))
+        userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)?.let {
+            throw DuplicateEmailException(getAttachedAuthProviders(it))
         }
         val key = VERIFICATION_CODE_PREFIX + user.id
         val code = (Math.random() * 1000000).toInt().toString().padStart(6, '0')
