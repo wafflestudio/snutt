@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="SNUTT 개발팀 강의편람" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SNUTT" />
+    <meta property="og:description" content="SNUTT를 만들어 온 개발팀을 서울대 강의편람처럼 — 역대 개발자 32명의 수강편람" />
+    <title>SNUTT 개발팀 강의편람</title>
+    <style>
+      /*
+        컨셉: 서울대학교 "강의편람 / 수강편람".
+        각 개발자를 하나의 개설 교과목으로 표기한다.
+          - 학수번호: 역할군별 번호대(001 최초개발 · 01x 초창기 · 1xx 기획 · 2xx 안드로이드
+            · 3xx iOS · 4xx 웹 · 5xx 디자인 · 6xx 서버). 같은 사람 = 한 학수번호 고정.
+          - 학점 = 활동한 연도 수, 개설 학기 = 활동 연도 범위.
+        라이트/다크 둘 다 지원(prefers-color-scheme). 역할 팔레트·민트 브랜드색 유지.
+      */
+      :root {
+        color-scheme: light dark;
+        --brand: #1bd0c9;
+        --brand-ink: #0f9a93;
+        --bg: #f3f2ee;        /* 편람 종이 느낌의 따뜻한 뉴트럴 */
+        --surface: #ffffff;
+        --surface-2: #faf9f6;
+        --fg: #17181a;
+        --muted: #8a898e;
+        --border: #e6e4dd;
+        --rule: #1c1d1f;      /* 표지 괘선 */
+        --shadow: 0 1px 2px rgba(20, 21, 23, 0.04), 0 8px 28px rgba(20, 21, 23, 0.05);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --brand: #58c1b7;
+          --brand-ink: #5fd3c9;
+          --bg: #16171a;
+          --surface: #212226;
+          --surface-2: #1b1c20;
+          --fg: #f2f2f3;
+          --muted: #9a9aa1;
+          --border: #2f3035;
+          --rule: #e7e7ea;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        padding: 0 1.1rem 4.5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Malgun Gothic", "Noto Sans KR", sans-serif;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .wrap { max-width: 1000px; margin: 0 auto; }
+      .mono {
+        font-family: "SFMono-Regular", ui-monospace, "SF Mono", Menlo, Consolas,
+          "D2Coding", "Courier New", monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ── 표지 (Masthead) ───────────────────────────── */
+      header { padding: 3.4rem 0 1.4rem; }
+      .cover {
+        border-top: 3px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+        padding: 1.1rem 0 1.6rem;
+      }
+      .cover-top {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 1rem; flex-wrap: wrap;
+        font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+        color: var(--muted); font-weight: 600;
+      }
+      .cover-top .yr { color: var(--brand-ink); letter-spacing: 0.1em; }
+      .brand {
+        margin: 1.1rem 0 0; font-size: clamp(2.1rem, 6vw, 3.2rem); font-weight: 900;
+        letter-spacing: -0.02em; line-height: 1.08;
+      }
+      .brand .mint { color: var(--brand-ink); }
+      .brand .doc { font-weight: 400; color: var(--muted); }
+      .subtitle {
+        margin: 0.85rem 0 0; max-width: 44rem; font-size: 1rem; color: var(--fg);
+      }
+      .subtitle .sep { color: var(--border); }
+      .lead { margin: 0.55rem 0 0; max-width: 44rem; font-size: 0.92rem; color: var(--muted); }
+      .lead b { color: var(--fg); font-weight: 700; }
+
+      /* ── 학사 통계 (Stat tiles) ─────────────────────── */
+      .stats {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        gap: 0.6rem; margin: 1.6rem 0 0;
+      }
+      .stat {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 12px; padding: 0.85rem 0.95rem;
+      }
+      .stat .k { font-size: 0.7rem; color: var(--muted); font-weight: 600; letter-spacing: 0.02em; }
+      .stat .v {
+        margin-top: 0.25rem; font-size: 1.5rem; font-weight: 800; line-height: 1;
+        letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
+      }
+      .stat .v small { font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-left: 0.15rem; }
+
+      /* ── 필터 / 이수구분 범례 ──────────────────────── */
+      .toolbar { margin: 2.2rem 0 0; }
+      .toolbar-h {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.7rem;
+      }
+      .toolbar-h h2 { margin: 0; font-size: 0.82rem; font-weight: 800; letter-spacing: 0.02em; }
+      .toolbar-h .note { font-size: 0.78rem; color: var(--muted); }
+      .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+      .chip {
+        --c: var(--muted);
+        display: inline-flex; align-items: center; gap: 0.42rem;
+        padding: 0.34rem 0.7rem 0.34rem 0.55rem;
+        border: 1px solid var(--border); border-radius: 999px;
+        background: var(--surface); color: var(--fg);
+        font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        transition: border-color 0.14s ease, background 0.14s ease, transform 0.06s ease;
+      }
+      .chip .code {
+        font-size: 0.68rem; color: var(--muted); font-weight: 700;
+        font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      }
+      .chip .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+      .chip:hover { border-color: color-mix(in srgb, var(--c) 55%, var(--border)); }
+      .chip:active { transform: translateY(1px); }
+      .chip[aria-pressed="true"] {
+        border-color: var(--c);
+        background: color-mix(in srgb, var(--c) 14%, var(--surface));
+      }
+      .chip[aria-pressed="true"] .code { color: color-mix(in srgb, var(--c) 60%, var(--fg)); }
+      .chip.all { --c: var(--brand); }
+      .chip.all .dot { background: linear-gradient(135deg, #1d99e9, #2bc366, #f58d3d, #af56b3); }
+
+      /* ── 강의편람 표 ───────────────────────────────── */
+      .table-wrap {
+        margin: 0.9rem 0 0; background: var(--surface);
+        border: 1px solid var(--border); border-radius: 14px;
+        box-shadow: var(--shadow); overflow: hidden;
+      }
+      .table-scroll { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 640px; }
+      caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      thead th {
+        position: sticky; top: 0; z-index: 1;
+        background: var(--surface-2);
+        text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+        color: var(--muted); padding: 0.7rem 0.9rem;
+        border-bottom: 1.5px solid var(--rule); white-space: nowrap;
+      }
+      tbody td { padding: 0.78rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+      tbody tr:last-child td { border-bottom: none; }
+      tbody tr { transition: background 0.12s ease; }
+      tbody tr:hover { background: color-mix(in srgb, var(--brand) 6%, var(--surface)); }
+
+      .c-num { width: 1%; white-space: nowrap; }
+      .num-pill {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        font-size: 0.82rem; font-weight: 700; color: var(--fg);
+      }
+      .num-pill .band-bar { width: 4px; height: 1.05em; border-radius: 2px; background: var(--c); flex: none; }
+
+      .c-course .title { font-weight: 700; font-size: 0.96rem; letter-spacing: -0.01em; }
+      .c-course .track { margin-top: 0.12rem; font-size: 0.74rem; color: var(--muted); }
+
+      .prof .name { font-weight: 700; font-size: 0.9rem; }
+      .prof .dept { font-size: 0.76rem; color: var(--muted); }
+
+      .badge {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        padding: 0.24rem 0.6rem; border-radius: 999px;
+        background: color-mix(in srgb, var(--c) 13%, var(--surface));
+        border: 1px solid color-mix(in srgb, var(--c) 32%, transparent);
+        font-size: 0.76rem; font-weight: 700; white-space: nowrap; color: var(--fg);
+      }
+      .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+
+      .credit { display: flex; align-items: center; gap: 0.55rem; white-space: nowrap; }
+      .credit .n {
+        font-size: 0.92rem; font-weight: 800; font-variant-numeric: tabular-nums;
+        min-width: 2.4em;
+      }
+      .credit .n small { font-size: 0.7rem; font-weight: 600; color: var(--muted); margin-left: 1px; }
+      .gauge { display: inline-flex; gap: 3px; }
+      .gauge i {
+        width: 7px; height: 16px; border-radius: 2px;
+        background: var(--border);
+      }
+      .gauge i.on { background: var(--c); }
+
+      .term { white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 0.86rem; font-weight: 600; }
+      .term .live {
+        display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.42rem;
+        border-radius: 999px; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.02em;
+        color: #05413d; background: var(--brand);
+      }
+      @media (prefers-color-scheme: dark) {
+        .term .live { color: #06201e; }
+      }
+
+      .empty { padding: 2.4rem 1rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+      /* ── 하단 총원 / 푸터 ─────────────────────────── */
+      .tally {
+        margin: 1.4rem 0 0; padding: 1.15rem 1.25rem;
+        background: var(--surface); border: 1px dashed var(--border); border-radius: 14px;
+        display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+      }
+      .tally .seal {
+        flex: none; width: 44px; height: 44px; border-radius: 50%;
+        border: 2px solid var(--brand-ink); color: var(--brand-ink);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.62rem; font-weight: 800; text-align: center; line-height: 1.05;
+      }
+      .tally .msg { font-size: 0.95rem; }
+      .tally .msg b { font-weight: 800; }
+      .tally .msg .sub { display: block; font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+
+      footer { text-align: center; margin-top: 2.8rem; }
+      .logo-link { display: inline-block; opacity: 0.85; transition: opacity 0.15s; }
+      .logo-link:hover { opacity: 1; }
+      .logo-link img { width: 92px; height: auto; display: block; margin: 0 auto; }
+      .made { margin: 0.7rem 0 0; font-size: 0.78rem; color: var(--muted); }
+      .contact {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        margin-top: 1.2rem; padding: 0.62rem 1.25rem;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 0.9rem;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      .contact:hover { border-color: var(--brand); color: var(--fg); }
+      .contact strong { color: var(--brand-ink); font-weight: 700; }
+
+      /* 키보드 포커스 가시화 */
+      a:focus-visible, .chip:focus-visible {
+        outline: 2px solid var(--brand-ink); outline-offset: 2px; border-radius: 8px;
+      }
+
+      /* ── 반응형: 좁은 화면에서는 카드형으로 재구성 ── */
+      @media (max-width: 720px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        table, thead, tbody, tr, td { display: block; }
+        thead { display: none; }
+        .table-scroll { overflow-x: visible; }
+        table { min-width: 0; }
+        tbody tr {
+          border-bottom: 1px solid var(--border); padding: 0.95rem 1rem 1.05rem;
+        }
+        tbody tr:hover { background: transparent; }
+        tbody td { border: none; padding: 0.2rem 0; }
+        .c-num { margin-bottom: 0.3rem; }
+        td[data-label]::before {
+          content: attr(data-label); display: inline-block;
+          width: 4.6rem; font-size: 0.72rem; font-weight: 700; color: var(--muted);
+          letter-spacing: 0.02em; vertical-align: top;
+        }
+        .c-num::before, .c-course::before { display: none; }
+        .c-course, .prof, .c-badge, .c-credit, .c-term { display: flex; align-items: baseline; }
+        .c-course { flex-direction: column; }
+        .c-course .track { margin-top: 0.1rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="cover">
+          <div class="cover-top">
+            <span>서울대학교 시간표 앱 · SNUTT</span>
+            <span class="yr">2012 – 2026 · Course Catalog</span>
+          </div>
+          <h1 class="brand"><span class="mint">SNUTT</span> 개발팀 <span class="doc">강의편람</span></h1>
+          <p class="subtitle">
+            SNUTT를 만들어 온 사람들을 한 학기의 강의처럼 정리한 <b>역대 개발팀 수강편람</b>입니다.
+          </p>
+          <p class="lead">
+            <b>학점</b>은 함께한 햇수, <b>개설 학기</b>는 활동한 기간입니다.
+            오래 개설된 강의일수록 위쪽에 놓았습니다. 이수구분(역할)으로 걸러 볼 수 있어요.
+          </p>
+        </div>
+
+        <div class="stats" role="list" aria-label="개발팀 학사 통계">
+          <div class="stat" role="listitem"><div class="k">개설 교과목</div><div class="v" id="stat-people">32<small>과목</small></div></div>
+          <div class="stat" role="listitem"><div class="k">누적 수강신청</div><div class="v">80<small>명·학기</small></div></div>
+          <div class="stat" role="listitem"><div class="k">개설 연도</div><div class="v" style="font-size:1.15rem;padding-top:0.28rem">2012–2026</div></div>
+          <div class="stat" role="listitem"><div class="k">이수구분</div><div class="v">8<small>트랙</small></div></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="toolbar" aria-label="이수구분 필터">
+          <div class="toolbar-h">
+            <h2>이수구분으로 거르기</h2>
+            <span class="note">학점 높은 순(오래 함께한 순)으로 정렬 · <span id="visible-count">32</span>과목 표시</span>
+          </div>
+          <div class="chips" id="chips" role="group" aria-label="역할별 필터"></div>
+        </section>
+
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table id="catalog">
+              <caption>SNUTT 개발팀 강의편람 — 개발자별 개설 교과목 표</caption>
+              <thead>
+                <tr>
+                  <th scope="col">학수번호</th>
+                  <th scope="col">교과목명</th>
+                  <th scope="col">담당 교원</th>
+                  <th scope="col">이수구분</th>
+                  <th scope="col">학점</th>
+                  <th scope="col">개설 학기</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tally">
+          <div class="seal" aria-hidden="true">SNUTT<br />2026</div>
+          <div class="msg">
+            <b>총 32명</b>이 SNUTT 강의를 수강신청했습니다.
+            <span class="sub">고유 인물 32명 · 누적 person-학기 80 (개설 학기 셀 합계) · 2012년 첫 개강 이래 현재도 진행중.</span>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <a class="logo-link" href="https://wafflestudio.com" target="_blank" rel="noopener">
+          <img src="https://snutt-asset.s3.ap-northeast-2.amazonaws.com/waffle_logo.png" alt="와플스튜디오 로고 (WaffleStudio Logo)" />
+        </a>
+        <p class="made">SNUTT 개발팀 강의편람 · 만든 곳 와플스튜디오</p>
+        <a class="contact" href="mailto:snutt@wafflestudio.com">문의 <strong>snutt@wafflestudio.com</strong></a>
+      </footer>
+    </div>
+
+    <script>
+      // ── 이수구분(역할) 트랙 메타: 학수번호대 · 표시명 · 팔레트 색 ──
+      const BANDS = [
+        { key: "Founder", code: "001", label: "최초 개발", color: "#1bd0c9" },
+        { key: "Early",   code: "01x", label: "초창기",   color: "#7a8290" },
+        { key: "Plan",    code: "1xx", label: "기획",     color: "#fac52d" },
+        { key: "Android", code: "2xx", label: "안드로이드", color: "#2bc366" },
+        { key: "iOS",     code: "3xx", label: "iOS",      color: "#1d99e9" },
+        { key: "Web",     code: "4xx", label: "웹",       color: "#f58d3d" },
+        { key: "Design",  code: "5xx", label: "디자인",   color: "#af56b3" },
+        { key: "Server",  code: "6xx", label: "서버",     color: "#4f48c4" },
+      ];
+      const COLOR = Object.fromEntries(BANDS.map((b) => [b.key, b.color]));
+
+      // ── 개설 교과목(개발자) 데이터 ─ 학점 높은 순으로 정렬되어 있음 ──
+      const COURSES = [
+        { num: "601", name: "변다빈", dept: "언어학과 14", rl: "Server", band: "Server", course: "서버 운영 및 실습", cr: 6, span: "2021–2026", active: true },
+        { num: "602", name: "최한결", dept: "컴퓨터공학부 15", rl: "Server", band: "Server", course: "백엔드 아키텍처론", cr: 6, span: "2021–2026", active: true },
+        { num: "202", name: "양주현", dept: "지구환경과학부 16", rl: "Android", band: "Android", course: "Kotlin 앱 개발론", cr: 5, span: "2022–2026", active: true },
+        { num: "302", name: "박신홍", dept: "경영학과 17", rl: "iOS", band: "iOS", course: "Swift 프로그래밍 실습", cr: 5, span: "2022–2026", active: true },
+        { num: "303", name: "최유림", dept: "컴퓨터공학부 19", rl: "iOS", band: "iOS", course: "iOS 인터페이스 설계", cr: 5, span: "2022–2026", active: true },
+        { num: "203", name: "송동엽", dept: "컴퓨터공학부 22", rl: "Android", band: "Android", course: "안드로이드 UI 실습", cr: 4, span: "2023–2026", active: true },
+        { num: "402", name: "김기완", dept: "컴퓨터공학부 18", rl: "Web", band: "Web", course: "웹 애플리케이션 개발론", cr: 4, span: "2023–2026", active: true },
+        { num: "204", name: "이현도", dept: "컴퓨터공학부 23", rl: "Android", band: "Android", course: "모바일 클라이언트 설계(Android)", cr: 3, span: "2024–2026", active: true },
+        { num: "304", name: "이채민", dept: "자유전공학부 20", rl: "iOS", band: "iOS", course: "모바일 클라이언트 설계(iOS)", cr: 3, span: "2023–2025", active: false },
+        { num: "501", name: "최유진", dept: "디자인과 22", rl: "Design", band: "Design", course: "UI/UX 디자인 스튜디오", cr: 3, span: "2023–2025", active: false },
+        { num: "502", name: "민유진", dept: "디자인과 21", rl: "Design", band: "Design", course: "인터랙션 디자인 실습", cr: 3, span: "2024–2026", active: true },
+        { num: "605", name: "임찬영", dept: "컴퓨터공학부 23", rl: "Server", band: "Server", course: "데이터베이스 운용론", cr: 3, span: "2024–2026", active: true },
+        { num: "013", name: "김진형", dept: "컴퓨터공학부 14", rl: "초창기", band: "Early", course: "초기 개발 실습", cr: 2, span: "2014–2016", active: false },
+        { num: "014", name: "정형식", dept: "자유전공학부 10", rl: "초창기", band: "Early", course: "프로토타입 설계 워크숍", cr: 2, span: "2014–2016", active: false },
+        { num: "101", name: "서정록", dept: "컴퓨터공학부 18", rl: "기획", band: "Plan", course: "프로덕트 기획 세미나", cr: 2, span: "2021–2022", active: false },
+        { num: "102", name: "서정민", dept: "홍익대 회화과 15", rl: "기획·디자인", band: "Plan", course: "서비스 기획·디자인 스튜디오", cr: 2, span: "2021–2022", active: false },
+        { num: "201", name: "김상민", dept: "컴퓨터공학부 18", rl: "Android", band: "Android", course: "안드로이드 아키텍처 특강", cr: 2, span: "2021–2022", active: false },
+        { num: "205", name: "정해찬", dept: "컴퓨터공학부 24", rl: "Android", band: "Android", course: "Jetpack 심화 연구", cr: 2, span: "2025–2026", active: true },
+        { num: "301", name: "금진섭", dept: "서양사학과 14", rl: "iOS", band: "iOS", course: "iOS 앱 개발론", cr: 2, span: "2021–2022", active: false },
+        { num: "401", name: "우현민", dept: "컴퓨터공학부 19", rl: "Web", band: "Web", course: "웹 프론트엔드 설계", cr: 2, span: "2022–2023", active: false },
+        { num: "603", name: "박수빈", dept: "컴퓨터공학부 18", rl: "Server", band: "Server", course: "분산 시스템 설계", cr: 2, span: "2022–2023", active: false },
+        { num: "606", name: "조성해", dept: "건축학과 18", rl: "Server", band: "Server", course: "서버 인프라 특강", cr: 2, span: "2024–2025", active: false },
+        { num: "001", name: "이종민", dept: "컴퓨터공학부 09", rl: "최초 개발", band: "Founder", course: "SNUTT 창시론", cr: 1, span: "2012", active: false },
+        { num: "011", name: "김광래", dept: "컴퓨터공학부 12", rl: "초창기", band: "Early", course: "SNUTT 개론", cr: 1, span: "2014", active: false },
+        { num: "012", name: "김알찬", dept: "컴퓨터공학부 12", rl: "초창기", band: "Early", course: "시간표 시스템 기초", cr: 1, span: "2014", active: false },
+        { num: "015", name: "방성원", dept: "컴퓨터공학부 15", rl: "초창기", band: "Early", course: "레거시 아키텍처 개론", cr: 1, span: "2016", active: false },
+        { num: "016", name: "이주현", dept: "시각디자인 11", rl: "초창기", band: "Early", course: "초창기 개발 세미나", cr: 1, span: "2016", active: false },
+        { num: "017", name: "장렬", dept: "컴퓨터공학부 14", rl: "초창기", band: "Early", course: "기초 시스템 구축론", cr: 1, span: "2016", active: false },
+        { num: "503", name: "박소은", dept: "동양화과 21", rl: "Design", band: "Design", course: "비주얼 디자인 워크숍", cr: 1, span: "2026", active: true },
+        { num: "604", name: "강지혁", dept: "컴퓨터공학부 19", rl: "Server", band: "Server", course: "API 설계 및 실습", cr: 1, span: "2023", active: false },
+        { num: "607", name: "이정달", dept: "자유전공학부 25", rl: "Server", band: "Server", course: "트래픽 처리 세미나", cr: 1, span: "2026", active: true },
+        { num: "608", name: "최연서", dept: "물리교육과 23", rl: "Server", band: "Server", course: "백엔드 심화 연구", cr: 1, span: "2026", active: true },
+      ];
+
+      const MAX_CR = 6;
+      const active = new Set(); // 비어 있으면 전체 표시
+
+      const esc = (s) =>
+        String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+      function gauge(cr, color) {
+        let s = '<span class="gauge" aria-hidden="true">';
+        for (let i = 0; i < MAX_CR; i++) s += `<i class="${i < cr ? "on" : ""}"></i>`;
+        return s + "</span>";
+      }
+
+      function renderRows() {
+        const list = active.size ? COURSES.filter((c) => active.has(c.band)) : COURSES;
+        const tbody = document.getElementById("rows");
+        if (!list.length) {
+          tbody.innerHTML = '<tr><td class="empty" colspan="6">선택한 이수구분으로 개설된 과목이 없습니다.</td></tr>';
+        } else {
+          tbody.innerHTML = list
+            .map((c) => {
+              const col = COLOR[c.band];
+              const live = c.active ? `<span class="live">진행중</span>` : "";
+              return `<tr style="--c:${col}">
+                <td class="c-num" data-label="학수번호"><span class="num-pill mono"><span class="band-bar"></span>SNUTT&nbsp;${esc(c.num)}</span></td>
+                <td class="c-course" data-label="교과목명"><span class="title">${esc(c.course)}</span><span class="track">${esc(c.rl)} 트랙</span></td>
+                <td class="prof c-prof" data-label="담당"><span class="name">${esc(c.name)}</span>&nbsp;<span class="dept">· ${esc(c.dept)}</span></td>
+                <td class="c-badge" data-label="이수구분"><span class="badge"><span class="dot"></span>${esc(c.rl)}</span></td>
+                <td class="c-credit" data-label="학점"><span class="credit"><span class="n mono">${c.cr}<small>학점</small></span>${gauge(c.cr, col)}</span></td>
+                <td class="c-term term" data-label="개설학기">${esc(c.span)}${live}</td>
+              </tr>`;
+            })
+            .join("");
+        }
+        document.getElementById("visible-count").textContent = list.length;
+      }
+
+      function renderChips() {
+        const wrap = document.getElementById("chips");
+        // 전체
+        const all = document.createElement("button");
+        all.className = "chip all";
+        all.type = "button";
+        all.setAttribute("aria-pressed", "true");
+        all.innerHTML = '<span class="dot"></span>전체 <span class="code">ALL</span>';
+        all.addEventListener("click", () => {
+          active.clear();
+          syncChips();
+          renderRows();
+        });
+        wrap.appendChild(all);
+
+        BANDS.forEach((b) => {
+          const count = COURSES.filter((c) => c.band === b.key).length;
+          const chip = document.createElement("button");
+          chip.className = "chip";
+          chip.type = "button";
+          chip.dataset.band = b.key;
+          chip.style.setProperty("--c", b.color);
+          chip.setAttribute("aria-pressed", "false");
+          chip.setAttribute("aria-label", `${b.label} ${count}과목`);
+          chip.innerHTML = `<span class="dot"></span>${b.label} <span class="code">${b.code}</span>`;
+          chip.addEventListener("click", () => {
+            active.has(b.key) ? active.delete(b.key) : active.add(b.key);
+            syncChips();
+            renderRows();
+          });
+          wrap.appendChild(chip);
+        });
+      }
+
+      function syncChips() {
+        const wrap = document.getElementById("chips");
+        wrap.querySelector(".chip.all").setAttribute("aria-pressed", active.size === 0 ? "true" : "false");
+        wrap.querySelectorAll(".chip[data-band]").forEach((el) => {
+          el.setAttribute("aria-pressed", active.has(el.dataset.band) ? "true" : "false");
+        });
+      }
+
+      renderChips();
+      renderRows();
+    </script>
+  </body>
+</html>

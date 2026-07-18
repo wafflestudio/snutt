@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<!--
+  SNUTT 개발팀 소개 — "개발자 터미널 / git log" 컨셉
+  - 자체 완결형 단일 HTML. 외부 JS 라이브러리 없음. CSS/JS 전부 인라인.
+    유일한 외부 리소스는 스펙에서 지정한 와플스튜디오 S3 로고 이미지 1개.
+  - 컨셉상 '다크 터미널'이 기본 무드다(의도적 다크 우선). 다만 스펙 3항에 따라
+    라이트(밝은 터미널) 테마도 지원한다: 기본 :root = 다크,
+    @media (prefers-color-scheme: light) 및 [data-theme] 토글로 라이트 재정의.
+  - 역할 팔레트/민트 브랜드 색은 유지하되, 다크 배경 가독성을 위해 인디고/마젠타는
+    명도만 조정한 변형을 사용한다.
+  - 데이터 무결성: 총 person-year 80, 고유 기여자 32명 (화면 상단에 표기).
+  - 애니메이션: 명령 타이핑 + 결과 촤라락 출력. Skip으로 즉시 전체 표시.
+    prefers-reduced-motion 이면 타이핑 없이 즉시 정적 출력.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SNUTT 개발팀 — git log</title>
+<meta name="description" content="서울대 시간표 앱 SNUTT 개발팀의 2012–2026 히스토리를 터미널 git log 컨셉으로 소개합니다." />
+<style>
+  :root{
+    /* ── 다크 터미널 (기본 무드) ── */
+    --page-bg:#0e0f12;
+    --term-bg:#16171a;
+    --term-surface:#1c1d21;
+    --fg:#d5d6da;
+    --fg-strong:#f2f2f3;
+    --muted:#71737b;
+    --comment:#63656d;
+    --border:#2a2b30;
+
+    --mint:#58c1b7;
+    --mint-strong:#1bd0c9;
+
+    --p-arrow:#58c1b7;
+    --p-path:#3aa9f0;
+    --p-git:#c774cb;
+    --p-branch:#f79a4f;
+
+    /* 역할 팔레트 (다크 가독성 보정판, 색 정체성 유지) */
+    --r-ios:#3aa9f0;      /* iOS   base #1d99e9 */
+    --r-android:#33cf72;  /* Android base #2bc366 */
+    --r-web:#f79a4f;      /* Web   base #f58d3d */
+    --r-server:#8a83f2;   /* Server base #4f48c4 (명도↑) */
+    --r-design:#c774cb;   /* Design base #af56b3 (명도↑) */
+    --r-plan:#fac52d;     /* 기획   base #fac52d */
+    --r-founder:#1bd0c9;  /* Founder = 민트 */
+    --r-early:#8b929c;    /* 초창기 base #7a8290 (명도↑) */
+
+    --dot-r:#ff5f57; --dot-y:#febc2e; --dot-g:#28c840;
+    --sel:rgba(88,193,183,.28);
+  }
+  /* 시스템이 라이트를 선호하고, 사용자가 수동 토글을 하지 않은 경우 */
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme]){
+      --page-bg:#dfe2e7;
+      --term-bg:#ffffff;
+      --term-surface:#eef0f3;
+      --fg:#33353b;
+      --fg-strong:#17181a;
+      --muted:#83848a;
+      --comment:#9aa0a8;
+      --border:#e4e6ea;
+      --mint:#0f9a93;
+      --mint-strong:#0f9a93;
+      --p-arrow:#0f9a93;
+      --p-path:#1273c4;
+      --p-git:#9b3fa0;
+      --p-branch:#c46a1c;
+      --r-ios:#1273c4;
+      --r-android:#1fa055;
+      --r-web:#cf6f16;
+      --r-server:#4f48c4;
+      --r-design:#9c3aa1;
+      --r-plan:#93720a;
+      --r-founder:#0f9a93;
+      --r-early:#6b727c;
+      --sel:rgba(15,154,147,.20);
+    }
+  }
+  /* 수동 라이트 토글 */
+  :root[data-theme="light"]{
+    --page-bg:#dfe2e7;
+    --term-bg:#ffffff;
+    --term-surface:#eef0f3;
+    --fg:#33353b;
+    --fg-strong:#17181a;
+    --muted:#83848a;
+    --comment:#9aa0a8;
+    --border:#e4e6ea;
+    --mint:#0f9a93;
+    --mint-strong:#0f9a93;
+    --p-arrow:#0f9a93;
+    --p-path:#1273c4;
+    --p-git:#9b3fa0;
+    --p-branch:#c46a1c;
+    --r-ios:#1273c4;
+    --r-android:#1fa055;
+    --r-web:#cf6f16;
+    --r-server:#4f48c4;
+    --r-design:#9c3aa1;
+    --r-plan:#93720a;
+    --r-founder:#0f9a93;
+    --r-early:#6b727c;
+    --sel:rgba(15,154,147,.20);
+  }
+  /* 수동 다크 토글 (라이트 시스템 위에서 다크로) → 기본값과 동일하지만 명시 */
+  :root[data-theme="dark"]{
+    --page-bg:#0e0f12; --term-bg:#16171a; --term-surface:#1c1d21;
+    --fg:#d5d6da; --fg-strong:#f2f2f3; --muted:#71737b; --comment:#63656d; --border:#2a2b30;
+    --mint:#58c1b7; --mint-strong:#1bd0c9;
+    --p-arrow:#58c1b7; --p-path:#3aa9f0; --p-git:#c774cb; --p-branch:#f79a4f;
+    --r-ios:#3aa9f0; --r-android:#33cf72; --r-web:#f79a4f; --r-server:#8a83f2;
+    --r-design:#c774cb; --r-plan:#fac52d; --r-founder:#1bd0c9; --r-early:#8b929c;
+    --sel:rgba(88,193,183,.28);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--page-bg);
+    color:var(--fg);
+    font-family:"SFMono-Regular",ui-monospace,"SF Mono",Menlo,"D2Coding",Consolas,"Courier New",monospace;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    line-height:1.6;
+    min-height:100vh;
+    padding:clamp(14px,3vw,40px) clamp(12px,3vw,32px) 48px;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--sel);}
+  a{color:var(--mint-strong);text-underline-offset:3px;}
+  a:hover{text-decoration:underline;}
+
+  .wrap{max-width:860px;margin:0 auto;}
+
+  /* ── 페이지 헤더 ── */
+  .page-head{margin:4px 4px 20px;}
+  .kicker{
+    font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--mint);margin:0 0 6px;
+  }
+  .page-head h1{
+    font-size:clamp(1.5rem,5vw,2.15rem);
+    margin:0;color:var(--fg-strong);font-weight:700;letter-spacing:-.01em;
+  }
+  .page-head .sub{margin:8px 0 0;color:var(--muted);font-size:clamp(.82rem,2.4vw,.95rem);}
+  .page-head .sub code{
+    color:var(--fg);background:var(--term-surface);
+    border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:.85em;
+  }
+
+  /* ── 터미널 창 ── */
+  .term-window{
+    background:var(--term-bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 20px 60px -22px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.02) inset;
+  }
+  .term-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;
+    background:var(--term-surface);
+    border-bottom:1px solid var(--border);
+  }
+  .dots{display:flex;gap:8px;flex:0 0 auto;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.r{background:var(--dot-r);} .dot.y{background:var(--dot-y);} .dot.g{background:var(--dot-g);}
+  .term-title{
+    flex:1 1 auto;text-align:center;color:var(--muted);
+    font-size:.82rem;letter-spacing:.02em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .bar-actions{flex:0 0 auto;display:flex;gap:7px;align-items:center;}
+  .btn{
+    font:inherit;font-size:.76rem;
+    color:var(--fg);background:transparent;
+    border:1px solid var(--border);border-radius:7px;
+    padding:4px 10px;cursor:pointer;line-height:1.4;
+    display:inline-flex;align-items:center;gap:5px;
+    transition:background .15s,border-color .15s,color .15s;
+  }
+  .btn:hover{background:var(--term-bg);border-color:var(--mint);color:var(--mint-strong);}
+  .btn:focus-visible{outline:2px solid var(--mint);outline-offset:2px;}
+
+  .term-body{
+    padding:16px clamp(12px,3vw,20px) 22px;
+    height:min(72vh,720px);
+    overflow:auto;
+    font-size:clamp(12px,2.7vw,14px);
+    scroll-behavior:smooth;
+  }
+  .term-body:focus-visible{outline:2px solid var(--mint);outline-offset:-2px;}
+
+  .line{white-space:pre-wrap;word-break:break-word;margin:0;min-height:1.2em;}
+  .line + .line{margin-top:1px;}
+  .rin{animation:rin .18s ease both;}
+  @keyframes rin{from{opacity:0;transform:translateY(2px);} to{opacity:1;transform:none;}}
+
+  .spacer{min-height:.7em;}
+
+  /* 프롬프트 */
+  .p-arrow{color:var(--p-arrow);font-weight:700;}
+  .p-path{color:var(--p-path);}
+  .p-git{color:var(--p-git);}
+  .p-branch{color:var(--p-branch);}
+  .p-dollar{color:var(--muted);}
+  .cmd{color:var(--fg-strong);}
+  .cursor{
+    display:inline-block;width:.62em;height:1.05em;
+    background:var(--mint-strong);vertical-align:-.18em;margin-left:1px;
+    animation:blink 1s steps(1) infinite;border-radius:1px;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  .comment{color:var(--comment);}
+  .muted{color:var(--muted);}
+  .mint{color:var(--mint-strong);}
+  .strong{color:var(--fg-strong);}
+  .banner-line{color:var(--fg-strong);}
+
+  /* 역할 색 */
+  .r-ios{color:var(--r-ios);}
+  .r-android{color:var(--r-android);}
+  .r-web{color:var(--r-web);}
+  .r-server{color:var(--r-server);}
+  .r-design{color:var(--r-design);}
+  .r-plan{color:var(--r-plan);}
+  .r-founder{color:var(--r-founder);}
+  .r-early{color:var(--r-early);}
+  .nm{font-weight:600;}
+
+  /* shortlog 행 */
+  .srow{display:flex;align-items:baseline;gap:.75em;}
+  .scount{flex:0 0 3.4em;text-align:right;color:var(--mint);font-weight:600;}
+  .sname{flex:0 0 auto;}
+  .smeta{color:var(--muted);font-size:.86em;}
+
+  /* git graph */
+  .g{color:var(--mint);font-weight:700;}
+  .ghash{color:var(--p-branch);}
+  .gdec{color:var(--r-design);}
+  .gyear{color:var(--fg-strong);font-weight:700;}
+  .gmeta{color:var(--muted);}
+
+  /* contributors */
+  .chead{font-weight:700;letter-spacing:.01em;}
+  .ccount{color:var(--muted);font-weight:400;font-size:.86em;}
+  .crow{display:flex;align-items:baseline;gap:.7em;white-space:nowrap;}
+  .cname{flex:0 0 5.2em;font-weight:600;}
+  .cdept{flex:0 0 11.5em;color:var(--muted);font-size:.86em;overflow:hidden;text-overflow:ellipsis;}
+  .cyears{flex:0 0 2.4em;color:var(--fg);font-size:.86em;text-align:right;}
+  .cbar{flex:0 0 auto;letter-spacing:-1px;opacity:.85;}
+
+  /* ascii banner */
+  .ascii{
+    white-space:pre;color:var(--r-founder);
+    font-size:clamp(9px,2.2vw,12.5px);line-height:1.15;margin:2px 0;
+    text-shadow:0 0 14px color-mix(in srgb,var(--mint-strong) 40%,transparent);
+  }
+  .logo{height:22px;width:auto;vertical-align:-6px;margin-right:8px;}
+  .mail{font-weight:600;}
+
+  /* 하단 미니 푸터 */
+  .foot{margin:18px 6px 0;color:var(--muted);font-size:.78rem;text-align:center;}
+
+  @media (max-width:480px){
+    .cdept{flex-basis:8.5em;}
+    .cname{flex-basis:4.4em;}
+    .term-title{font-size:.74rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition:none !important;scroll-behavior:auto !important;}
+    .cursor{animation:none;opacity:1;}
+    .rin{animation:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="kicker">wafflestudio / snutt</p>
+      <h1>SNUTT 개발팀</h1>
+      <p class="sub">터미널에서 <code>git log</code>로 되짚어 보는 SNUTT 개발팀 · 2012–2026</p>
+    </header>
+
+    <main>
+      <section class="term-window" aria-label="SNUTT 개발팀 터미널">
+        <div class="term-bar">
+          <span class="dots" aria-hidden="true">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          </span>
+          <span class="term-title">snutt — zsh</span>
+          <span class="bar-actions">
+            <button id="skipBtn" class="btn" type="button" aria-label="애니메이션 건너뛰기">Skip <span aria-hidden="true">▶▶</span></button>
+            <button id="themeBtn" class="btn" type="button" aria-label="라이트/다크 테마 전환"><span id="themeIco" aria-hidden="true">☀</span></button>
+          </span>
+        </div>
+        <div id="screen" class="term-body" role="log" aria-label="git log 출력" tabindex="0"></div>
+      </section>
+      <p class="foot">© 2012–2026 SNUTT · 만든 사람들 · 문의 <a href="mailto:snutt@wafflestudio.com">snutt@wafflestudio.com</a></p>
+    </main>
+    <noscript>
+      <p style="color:var(--muted);margin-top:16px;text-align:center;">
+        이 페이지는 자바스크립트로 애니메이션 출력됩니다. 문의: snutt@wafflestudio.com
+      </p>
+    </noscript>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── 팀 데이터 (team_data.json 원본) ── */
+  var DATA = {
+    "years":["2012","2014","2016","2021","2022","2023","2024","2025","2026"],
+    "byYear":{
+      "2012":[{"name":"이종민","dept":"컴퓨터공학부 09","role":"최초 개발"}],
+      "2014":[{"name":"김광래","dept":"컴퓨터공학부 12","role":null},{"name":"김진형","dept":"컴퓨터공학부 14","role":null},{"name":"정형식","dept":"자유전공학부 10","role":null},{"name":"김알찬","dept":"컴퓨터공학부 12","role":null}],
+      "2016":[{"name":"김진형","dept":"컴퓨터공학부 14","role":null},{"name":"방성원","dept":"컴퓨터공학부 15","role":null},{"name":"이주현","dept":"시각디자인 11","role":null},{"name":"장렬","dept":"컴퓨터공학부 14","role":null},{"name":"정형식","dept":"자유전공학부 10","role":null}],
+      "2021":[{"name":"금진섭","dept":"서양사학과 14","role":"iOS"},{"name":"김상민","dept":"컴퓨터공학부 18","role":"Android"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"서정록","dept":"컴퓨터공학부 18","role":"기획"},{"name":"서정민","dept":"홍익대 회화과 15","role":"기획·디자인"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2022":[{"name":"금진섭","dept":"서양사학과 14","role":"iOS"},{"name":"김상민","dept":"컴퓨터공학부 18","role":"Android"},{"name":"박수빈","dept":"컴퓨터공학부 18","role":"Server"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"서정록","dept":"컴퓨터공학부 18","role":"기획"},{"name":"서정민","dept":"홍익대 회화과 15","role":"기획·디자인"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"우현민","dept":"컴퓨터공학부 19","role":"Web"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2023":[{"name":"강지혁","dept":"컴퓨터공학부 19","role":"Server"},{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"박수빈","dept":"컴퓨터공학부 18","role":"Server"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"우현민","dept":"컴퓨터공학부 19","role":"Web"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2024":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"조성해","dept":"건축학과 18","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2025":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"정해찬","dept":"컴퓨터공학부 24","role":"Android"},{"name":"조성해","dept":"건축학과 18","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2026":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박소은","dept":"동양화과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이정달","dept":"자유전공학부 25","role":"Server"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"정해찬","dept":"컴퓨터공학부 24","role":"Android"},{"name":"최연서","dept":"물리교육과 23","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}]
+    }
+  };
+
+  var YEARS = DATA.years, BY = DATA.byYear;
+
+  /* ── 역할 유틸 ── */
+  function roleKey(role){
+    if(role === null || role === undefined) return "early";
+    if(role === "최초 개발") return "founder";
+    if(role === "기획" || role === "기획·디자인") return "plan";
+    if(role === "iOS") return "ios";
+    if(role === "Android") return "android";
+    if(role === "Web") return "web";
+    if(role === "Server") return "server";
+    if(role === "Design") return "design";
+    return "early";
+  }
+  var LABEL = {ios:"iOS",android:"Android",web:"Web",server:"Server",design:"Design",plan:"기획",founder:"최초 개발",early:"초창기"};
+
+  /* ── 인물 집계 (같은 이름 = 동일 인물) ── */
+  var people = {}; var personYears = 0;
+  YEARS.forEach(function(y){
+    BY[y].forEach(function(p){
+      personYears++;
+      if(!people[p.name]) people[p.name] = {name:p.name, dept:p.dept, years:[], roles:[]};
+      var rec = people[p.name];
+      rec.years.push(y); rec.roles.push(p.role); rec.dept = p.dept;
+    });
+  });
+  Object.keys(people).forEach(function(n){
+    var r = people[n];
+    r.n = r.years.length;                          // 활동 연수
+    r.lastRole = r.roles[r.roles.length - 1];      // 대표 역할 = 마지막 등장 역할
+    r.key = roleKey(r.lastRole);
+  });
+  var uniqueCount = Object.keys(people).length;
+
+  /* ── 가상 커밋수 (활동 연수 기반 추정 · 실제 아님) ── */
+  function hash(s){var h=0;for(var i=0;i<s.length;i++){h=(h*31 + s.charCodeAt(i))>>>0;}return h;}
+  function commitsOf(p){ return p.n * 143 + (hash(p.name) % 120); } // jitter<가중치 → 연수 티어 유지
+
+  /* ── HTML 헬퍼 ── */
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function nm(name, key){return '<span class="nm r-'+key+'">'+esc(name)+'</span>';}
+  function L(html, cls){return {h:html, c:cls||""};}
+
+  /* ── 콘텐츠 빌드 ── */
+  function buildContent(){
+    var blocks = [];
+
+    /* 로그인 배너 */
+    blocks.push({cmd:null, out:[
+      L('<span class="comment">Last login: 2026-07-18 on ttys001</span>'),
+      L('<span class="strong">snutt-team</span> <span class="muted">·</span> 서울대학교 시간표 앱 · 개발팀 히스토리 <span class="mint">2012 → 2026</span>'),
+      L('<span class="muted">누적 참여</span> <span class="mint">'+personYears+'</span> <span class="muted">person-years  ·  고유 기여자</span> <span class="mint">'+uniqueCount+'</span><span class="muted">명  ·  기록된 시즌</span> <span class="mint">'+YEARS.length+'</span><span class="muted">개</span>'),
+      L('', "spacer")
+    ]});
+
+    /* 1) git shortlog -sn --all */
+    var ranked = Object.keys(people).map(function(n){return people[n];});
+    ranked.sort(function(a,b){var c=commitsOf(b)-commitsOf(a); return c!==0?c:a.name.localeCompare(b.name,"ko");});
+    var slOut = [
+      L('<span class="comment"># \'commit\' 수는 활동 연수 기반 추정치입니다 — 실제 커밋 수가 아닙니다.</span>'),
+      L('<span class="comment"># 정렬: 추정 기여도(활동 연수) 내림차순</span>'),
+      L('', "spacer")
+    ];
+    ranked.forEach(function(p){
+      slOut.push(L(
+        '<span class="scount">'+commitsOf(p)+'</span>'+
+        '<span class="sname">'+nm(p.name,p.key)+'</span>'+
+        '<span class="smeta">'+LABEL[p.key]+' · '+p.n+'y</span>',
+        "srow"
+      ));
+    });
+    slOut.push(L('', "spacer"));
+    blocks.push({cmd:"git shortlog -sn --all", out:slOut});
+
+    /* 2) git log --graph --oneline --since=2012 (연도별 커밋 노드, 최신→과거) */
+    var seen = {}; var yinfo = {};
+    YEARS.forEach(function(y){
+      var news = [];
+      BY[y].forEach(function(p){ if(!seen[p.name]) news.push(p); });
+      BY[y].forEach(function(p){ seen[p.name] = true; });
+      yinfo[y] = {count:BY[y].length, news:news};
+    });
+    var glOut = [
+      L('<span class="comment"># 각 노드 = 한 시즌. 굵은 이름 = 그 해 새로 합류한 기여자</span>'),
+      L('', "spacer")
+    ];
+    var order = YEARS.slice().reverse();
+    order.forEach(function(y, idx){
+      var info = yinfo[y];
+      var hh = ("0000000" + hash("snutt-"+y).toString(16)).slice(-7);
+      var dec = idx===0 ? ' <span class="gdec">(HEAD -> main, origin/main)</span>' : '';
+      var newsHtml = info.news.map(function(p){return nm(p.name, roleKey(p.role));}).join(" ");
+      glOut.push(L(
+        '<span class="g">*</span> <span class="ghash">'+hh+'</span>'+dec+' '+
+        '<span class="gyear">'+y+'</span>  '+
+        '<span class="gmeta">활동 '+info.count+'명 · 신규 '+info.news.length+'명 ▸</span> '+newsHtml
+      ));
+      if(idx < order.length-1){ glOut.push(L('<span class="g">|</span>')); }
+    });
+    glOut.push(L('', "spacer"));
+    blocks.push({cmd:"git log --graph --oneline --since=2012", out:glOut});
+
+    /* 3) cat CONTRIBUTORS.md (역할별 팀원, ANSI 컬러 느낌) */
+    var groupOrder = ["founder","ios","android","web","server","design","plan","early"];
+    var groups = {}; groupOrder.forEach(function(k){groups[k]=[];});
+    Object.keys(people).forEach(function(n){var p=people[n]; groups[p.key].push(p);});
+    groupOrder.forEach(function(k){
+      groups[k].sort(function(a,b){var c=b.n-a.n; return c!==0?c:a.name.localeCompare(b.name,"ko");});
+    });
+    var cOut = [
+      L('<span class="comment"># CONTRIBUTORS.md — 역할별 기여자 (막대 = 활동 연수)</span>'),
+      L('', "spacer")
+    ];
+    groupOrder.forEach(function(k){
+      var g = groups[k]; if(!g.length) return;
+      var head = (k==="early") ? "초창기 멤버 (2014–2016)" : (k==="founder" ? "Founder — 최초 개발" : LABEL[k]);
+      cOut.push(L('<span class="chead r-'+k+'">## '+esc(head)+'</span> <span class="ccount">('+g.length+')</span>'));
+      g.forEach(function(p){
+        var bar = new Array(p.n+1).join("█");
+        cOut.push(L(
+          '<span class="cname r-'+k+'">'+esc(p.name)+'</span>'+
+          '<span class="cdept">'+esc(p.dept)+'</span>'+
+          '<span class="cyears">'+p.n+'y</span>'+
+          '<span class="cbar r-'+k+'">'+bar+'</span>',
+          "crow"
+        ));
+      });
+      cOut.push(L('', "spacer"));
+    });
+    blocks.push({cmd:"cat CONTRIBUTORS.md", out:cOut});
+
+    /* 4) echo 문의 + 로고 마무리 */
+    var BANNER = [
+      "  ____  _   _ _   _ _____ _____",
+      " / ___|| \\ | | | | |_   _|_   _|",
+      " \\___ \\|  \\| | | | | | |   | |",
+      "  ___) | |\\  | |_| | | |   | |",
+      " |____/|_| \\_|\\___/  |_|   |_|"
+    ].join("\n");
+    blocks.push({cmd:'echo "문의: snutt@wafflestudio.com"', out:[
+      L('문의: <a class="mail" href="mailto:snutt@wafflestudio.com">snutt@wafflestudio.com</a>'),
+      L('', "spacer"),
+      L('<pre class="ascii">'+esc(BANNER)+'</pre>'),
+      L('<span class="muted">서울대학교 시간표, 8년째 함께 만드는 중 · 총 '+uniqueCount+'명의 기여자</span>'),
+      L('', "spacer"),
+      L('<img class="logo" src="https://snutt-asset.s3.ap-northeast-2.amazonaws.com/waffle_logo.png" alt="와플스튜디오 로고" onerror="this.style.display=\'none\'"/><span class="muted">made by </span><a href="https://wafflestudio.com" target="_blank" rel="noopener">와플스튜디오</a> <span class="comment">— © 2012–2026 SNUTT</span>')
+    ]});
+
+    return blocks;
+  }
+
+  /* ── 렌더 엔진 ── */
+  var screen = document.getElementById("screen");
+  var skipBtn = document.getElementById("skipBtn");
+  var themeBtn = document.getElementById("themeBtn");
+  var themeIco = document.getElementById("themeIco");
+
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var skip = false, running = false, done = false;
+  var BLOCKS = buildContent();
+
+  function sleep(ms){ if(skip) return Promise.resolve(); return new Promise(function(r){setTimeout(r, ms);}); }
+  function rand(a,b){ return a + Math.floor(Math.random()*(b-a)); }
+  function scrollDown(){ screen.scrollTop = screen.scrollHeight; }
+
+  function promptHTML(){
+    return '<span class="p-arrow">➜</span> <span class="p-path">snutt</span> '+
+           '<span class="p-git">git:(</span><span class="p-branch">main</span><span class="p-git">)</span> '+
+           '<span class="p-dollar">$</span> ';
+  }
+
+  function newLine(cls){
+    var d = document.createElement("div");
+    d.className = "line" + (cls ? " "+cls : "");
+    if(!skip) d.classList.add("rin");
+    screen.appendChild(d);
+    return d;
+  }
+
+  function typeCommand(text){
+    return new Promise(function(resolve){
+      var line = newLine();
+      line.innerHTML = promptHTML();
+      var cmd = document.createElement("span"); cmd.className = "cmd"; line.appendChild(cmd);
+      var cur = document.createElement("span"); cur.className = "cursor"; line.appendChild(cur);
+      scrollDown();
+      var i = 0;
+      function step(){
+        if(skip){ cmd.textContent = text; cur.remove(); return resolve(); }
+        cmd.textContent += text.charAt(i); i++;
+        scrollDown();
+        if(i >= text.length){ cur.remove(); return resolve(); }
+        setTimeout(step, rand(26, 62));
+      }
+      step();
+    });
+  }
+
+  function revealOut(lines){
+    var i = 0;
+    return new Promise(function(resolve){
+      function step(){
+        if(i >= lines.length) return resolve();
+        var ln = lines[i++];
+        var d = newLine(ln.c);
+        if(ln.h) d.innerHTML = ln.h;
+        scrollDown();
+        if(skip){ step(); }
+        else setTimeout(step, rand(9, 24));
+      }
+      step();
+    });
+  }
+
+  async function run(){
+    running = true;
+    for(var b=0; b<BLOCKS.length; b++){
+      var blk = BLOCKS[b];
+      if(blk.cmd){ await typeCommand(blk.cmd); await sleep(rand(180,320)); }
+      await revealOut(blk.out);
+      await sleep(skip ? 0 : rand(360, 520));
+    }
+    // 마지막 유휴 프롬프트 + 커서
+    var idle = newLine();
+    idle.innerHTML = promptHTML() + '<span class="cursor"></span>';
+    scrollDown();
+    running = false; done = true;
+    setSkipToReplay();
+  }
+
+  function setSkipToReplay(){
+    skipBtn.innerHTML = 'Replay <span aria-hidden="true">↻</span>';
+    skipBtn.setAttribute("aria-label", "처음부터 다시 재생");
+  }
+
+  skipBtn.addEventListener("click", function(){
+    if(done){ // Replay
+      done = false; skip = reduceMotion; screen.innerHTML = "";
+      if(reduceMotion) skip = true;
+      skipBtn.innerHTML = 'Skip <span aria-hidden="true">▶▶</span>';
+      run();
+      return;
+    }
+    skip = true;
+    scrollDown();
+  });
+
+  /* ── 테마 토글 ── */
+  function currentTheme(){
+    var attr = document.documentElement.getAttribute("data-theme");
+    if(attr) return attr;
+    return (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+  }
+  function syncIcon(){ themeIco.textContent = currentTheme()==="dark" ? "☀" : "☾"; }
+  themeBtn.addEventListener("click", function(){
+    var next = currentTheme()==="dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    syncIcon();
+  });
+  syncIcon();
+
+  /* ── 시작 ── */
+  if(reduceMotion) skip = true;
+  run();
+})();
+</script>
+</body>
+</html>
