@@ -11,24 +11,27 @@
     <style>
       @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
+      /* SNUTT design tokens (from snutt-frontend) */
       :root {
-        --brand: #1668b2;
-        --bg: #ffffff;
-        --fg: #1b1d21;
-        --muted: #6a7078;
-        --card-bg: #f6f8fa;
-        --card-border: #e6e9ee;
-        --line: #dfe3e8;
+        --brand: #1bd0c9;
+        --brand-strong: #1ca6a0;
+        --bg: #f7f8f9;
+        --surface: #ffffff;
+        --fg: #000000;
+        --muted: #8a898e;
+        --border: #ebebed;
+        --line: #dcdcde;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --brand: #4c9be8;
-          --bg: #16181d;
-          --fg: #eceef2;
-          --muted: #9aa1ab;
-          --card-bg: #1e2127;
-          --card-border: #2b2f37;
-          --line: #2b2f37;
+          --brand: #58c1b7;
+          --brand-strong: #1ca6a0;
+          --bg: #222222;
+          --surface: #2b2b2b;
+          --fg: #ffffff;
+          --muted: #b3b3b3;
+          --border: #3c3c3c;
+          --line: #505050;
         }
       }
 
@@ -39,7 +42,7 @@
         padding: 0 1rem 4rem;
         background: var(--bg);
         color: var(--fg);
-        font-family: "Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        font-family: "Noto Sans KR", "AppleSDGothicNeo", "Apple SD Gothic Neo", sans-serif;
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
       }
@@ -50,8 +53,8 @@
       .brand {
         font-size: 2.6rem;
         font-weight: 900;
-        letter-spacing: 0.02em;
-        color: var(--brand);
+        letter-spacing: 0.01em;
+        color: var(--brand-strong);
         margin: 0;
         line-height: 1.1;
       }
@@ -89,7 +92,7 @@
         background: var(--brand);
         box-shadow: 0 0 0 4px var(--bg);
       }
-      .year-num { color: var(--brand); }
+      .year-num { color: var(--brand-strong); }
       .year-suffix { color: var(--muted); font-weight: 700; }
 
       .members {
@@ -109,9 +112,9 @@
         gap: 0.5rem;
         flex-wrap: wrap;
         padding: 0.65rem 0.85rem;
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
       }
       .m-name { font-weight: 700; font-size: 1rem; }
       .m-dept { color: var(--muted); font-size: 0.82rem; }
@@ -119,33 +122,35 @@
         margin-left: auto;
         font-size: 0.72rem;
         font-weight: 700;
-        padding: 0.15rem 0.5rem;
-        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+        border-radius: 21px;
         white-space: nowrap;
-        color: #fff;
+        color: #ffffff;
       }
-      .badge.ios     { background: #0a84ff; }
-      .badge.aos     { background: #3ddc84; color: #08341a; }
-      .badge.web     { background: #e8590c; }
-      .badge.server  { background: #7048e8; }
-      .badge.design  { background: #e64980; }
-      .badge.plan    { background: #f59f00; color: #3b2600; }
-      .badge.founder { background: var(--brand); }
+      /* role colors from SNUTT category palette (theme_snutt) */
+      .badge.ios     { background: #1d99e9; }
+      .badge.aos     { background: #2bc366; }
+      .badge.web     { background: #f58d3d; }
+      .badge.server  { background: #4f48c4; }
+      .badge.design  { background: #af56b3; }
+      .badge.plan    { background: #fac52d; color: #3b2600; }
+      .badge.founder { background: #1bd0c9; }
 
       /* Footer */
       footer { text-align: center; margin-top: 3rem; }
       .contact {
         display: inline-block;
         padding: 0.7rem 1.3rem;
-        border: 1px solid var(--card-border);
-        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 21px;
         color: var(--fg);
         text-decoration: none;
         font-size: 0.95rem;
         transition: border-color 0.15s, color 0.15s;
       }
-      .contact:hover { border-color: var(--brand); color: var(--brand); }
-      .contact strong { color: var(--brand); font-weight: 800; }
+      .contact:hover { border-color: var(--brand); color: var(--brand-strong); }
+      .contact strong { color: var(--brand-strong); font-weight: 800; }
     </style>
   </head>
   <body>
