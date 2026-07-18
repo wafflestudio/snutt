@@ -587,31 +587,46 @@ class UserServiceImpl(
     }
 
     private fun buildFindIdAccountInfo(users: List<User>): String {
-        val localIds = users.mapNotNull { it.credential.localId }.distinct()
-        val socialProviders =
+        val accounts =
             users
-                .flatMap { user ->
-                    listOfNotNull(
-                        user.credential.fbId?.let { "Facebook" },
-                        user.credential.googleSub?.let { "Google" },
-                        user.credential.kakaoSub?.let { "Kakao" },
-                        user.credential.appleSub?.let { "Apple" },
-                    )
-                }.distinct()
+                .filter { it.credential.localId != null || socialProvidersOf(it).isNotEmpty() }
+                .sortedBy { it.regDate }
 
-        val localIdHtml =
-            if (localIds.isEmpty()) {
+        return when (accounts.size) {
+            0 -> {
                 ""
-            } else {
-                "<h3>아이디</h3><ul>${localIds.joinToString(separator = "") { "<li>$it</li>" }}</ul><br/>"
-            }
-        val socialProviderHtml =
-            socialProviders.joinToString(separator = "") { provider ->
-                "<b>$provider 로그인으로 가입된 계정이 존재합니다.</b><br/>"
             }
 
-        return localIdHtml + socialProviderHtml
+            1 -> {
+                renderFindIdAccount(accounts.first())
+            }
+
+            else -> {
+                accounts
+                    .mapIndexed { index, account ->
+                        "<b>&lt;계정 ${index + 1}&gt;</b><br/>" + renderFindIdAccount(account)
+                    }.joinToString(separator = "<br/>")
+            }
+        }
     }
+
+    private fun renderFindIdAccount(user: User): String {
+        val localId = user.credential.localId
+        val socialProviders = socialProvidersOf(user)
+
+        return buildList {
+            if (localId != null) add("<b>[아이디]</b> $localId")
+            if (socialProviders.isNotEmpty()) add("<b>[소셜 로그인 수단]</b> ${socialProviders.joinToString(", ")}")
+        }.joinToString(separator = "<br/>", postfix = "<br/>")
+    }
+
+    private fun socialProvidersOf(user: User): List<String> =
+        listOfNotNull(
+            user.credential.fbId?.let { "Facebook" },
+            user.credential.googleSub?.let { "Google" },
+            user.credential.kakaoSub?.let { "Kakao" },
+            user.credential.appleSub?.let { "Apple" },
+        )
 
     override suspend fun sendResetPasswordCode(email: String) {
         val email = email.trim()
