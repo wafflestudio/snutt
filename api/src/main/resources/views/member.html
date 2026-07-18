@@ -11,27 +11,33 @@
     <style>
       @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
 
-      /* SNUTT design tokens (from snutt-frontend) */
+      /* palette — SNUTT brand mint + neutral surfaces */
       :root {
         --brand: #1bd0c9;
-        --brand-strong: #1ca6a0;
-        --bg: #f7f8f9;
+        --brand-ink: #0f9a93;
+        --bg: #f6f7f9;
         --surface: #ffffff;
-        --fg: #000000;
+        --fg: #17181a;
         --muted: #8a898e;
-        --border: #ebebed;
-        --line: #dcdcde;
+        --border: #ececef;
+        --line: #eaeaee;
+        --tag-bg-a: 0.14;
+        --tag-mix: 22%;
+        --tag-mix-with: #101010;
       }
       @media (prefers-color-scheme: dark) {
         :root {
           --brand: #58c1b7;
-          --brand-strong: #1ca6a0;
-          --bg: #222222;
-          --surface: #2b2b2b;
-          --fg: #ffffff;
-          --muted: #b3b3b3;
-          --border: #3c3c3c;
-          --line: #505050;
+          --brand-ink: #5fd3c9;
+          --bg: #1b1c1f;
+          --surface: #26272b;
+          --fg: #f2f2f3;
+          --muted: #9a9aa1;
+          --border: #34353a;
+          --line: #303138;
+          --tag-bg-a: 0.24;
+          --tag-mix: 30%;
+          --tag-mix-with: #ffffff;
         }
       }
 
@@ -39,125 +45,138 @@
       html { -webkit-text-size-adjust: 100%; }
       body {
         margin: 0;
-        padding: 0 1rem 4rem;
+        padding: 0 1.25rem 5rem;
         background: var(--bg);
         color: var(--fg);
-        font-family: "Noto Sans KR", "AppleSDGothicNeo", "Apple SD Gothic Neo", sans-serif;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
-      .wrap { max-width: 720px; margin: 0 auto; }
+      .wrap { max-width: 680px; margin: 0 auto; }
 
       /* Header */
-      header { text-align: center; padding: 3.5rem 0 2rem; }
-      .brand {
-        font-size: 2.6rem;
-        font-weight: 900;
-        letter-spacing: 0.01em;
-        color: var(--brand-strong);
-        margin: 0;
-        line-height: 1.1;
-      }
-      .subtitle {
-        font-size: 1.05rem;
+      header { text-align: center; padding: 4.5rem 0 3rem; }
+      .eyebrow {
+        margin: 0 0 0.9rem;
+        font-size: 0.78rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
         color: var(--muted);
-        margin: 0.6rem 0 0;
       }
-      .logo-link { display: inline-block; margin-top: 1.8rem; }
-      .logo-link img { width: 132px; height: auto; display: block; }
-
-      /* Timeline */
-      main { margin-top: 1rem; }
-      .year {
-        position: relative;
-        padding: 1.6rem 0 0.4rem 1.4rem;
-        border-left: 2px solid var(--line);
-      }
-      .year:last-of-type { border-left-color: transparent; }
-      .year-label {
-        font-size: 1.35rem;
-        font-weight: 800;
-        margin: 0 0 1rem;
+      .brand {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.15;
         color: var(--fg);
-        position: relative;
       }
-      .year-label::before {
-        content: "";
-        position: absolute;
-        left: calc(-1.4rem - 6px);
-        top: 0.55em;
-        width: 11px;
-        height: 11px;
-        border-radius: 50%;
-        background: var(--brand);
-        box-shadow: 0 0 0 4px var(--bg);
+      .brand .mint { color: var(--brand-ink); }
+      .subtitle {
+        margin: 0.85rem 0 0;
+        font-size: 1rem;
+        color: var(--muted);
       }
-      .year-num { color: var(--brand-strong); }
-      .year-suffix { color: var(--muted); font-weight: 700; }
+      .logo-link {
+        display: inline-block;
+        margin-top: 2.2rem;
+        opacity: 0.9;
+        transition: opacity 0.15s;
+      }
+      .logo-link:hover { opacity: 1; }
+      .logo-link img { width: 104px; height: auto; display: block; }
 
+      /* Year section */
+      .year { margin-top: 2.75rem; }
+      .year-head {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-bottom: 1.1rem;
+      }
+      .year-num {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        color: var(--fg);
+        white-space: nowrap;
+      }
+      .year-num .tilde { color: var(--muted); margin-left: 1px; font-weight: 700; }
+      .rule { flex: 1; height: 1px; background: var(--line); }
+      .count { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+
+      /* Members */
       .members {
         list-style: none;
         margin: 0;
         padding: 0;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.6rem;
-      }
-      @media (max-width: 480px) {
-        .members { grid-template-columns: 1fr; }
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.55rem;
       }
       .member {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        padding: 0.65rem 0.85rem;
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.8rem 0.95rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: 12px;
+        transition: border-color 0.15s;
       }
-      .m-name { font-weight: 700; font-size: 1rem; }
-      .m-dept { color: var(--muted); font-size: 0.82rem; }
+      .member:hover { border-color: var(--brand); }
+      .m-top { display: flex; align-items: center; gap: 0.5rem; }
+      .m-name { font-weight: 700; font-size: 0.98rem; }
+      .m-dept { color: var(--muted); font-size: 0.8rem; }
+
+      /* Role tags — soft tint of the SNUTT category palette */
       .badge {
         margin-left: auto;
-        font-size: 0.72rem;
+        flex-shrink: 0;
+        font-size: 0.68rem;
         font-weight: 700;
-        padding: 0.15rem 0.6rem;
-        border-radius: 21px;
+        letter-spacing: 0.02em;
+        padding: 0.13rem 0.5rem;
+        border-radius: 6px;
         white-space: nowrap;
-        color: #ffffff;
+        background: color-mix(in srgb, var(--c) calc(var(--tag-bg-a) * 100%), transparent);
+        color: color-mix(in srgb, var(--c), var(--tag-mix-with) var(--tag-mix));
       }
-      /* role colors from SNUTT category palette (theme_snutt) */
-      .badge.ios     { background: #1d99e9; }
-      .badge.aos     { background: #2bc366; }
-      .badge.web     { background: #f58d3d; }
-      .badge.server  { background: #4f48c4; }
-      .badge.design  { background: #af56b3; }
-      .badge.plan    { background: #fac52d; color: #3b2600; }
-      .badge.founder { background: #1bd0c9; }
+      .badge.ios     { --c: #1d99e9; }
+      .badge.aos     { --c: #22b45e; }
+      .badge.web     { --c: #ef7a2f; }
+      .badge.server  { --c: #5b54d6; }
+      .badge.design  { --c: #b258b6; }
+      .badge.plan    { --c: #d99e00; }
+      .badge.founder { --c: #12b3ab; }
 
       /* Footer */
-      footer { text-align: center; margin-top: 3rem; }
+      footer { text-align: center; margin-top: 4rem; }
       .contact {
-        display: inline-block;
-        padding: 0.7rem 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.35rem;
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 21px;
-        color: var(--fg);
+        border-radius: 999px;
+        color: var(--muted);
         text-decoration: none;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         transition: border-color 0.15s, color 0.15s;
       }
-      .contact:hover { border-color: var(--brand); color: var(--brand-strong); }
-      .contact strong { color: var(--brand-strong); font-weight: 800; }
+      .contact:hover { border-color: var(--brand); color: var(--fg); }
+      .contact strong { color: var(--brand-ink); font-weight: 700; }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
-        <h1 class="brand">SNUTT 개발팀</h1>
-        <p class="subtitle">서울대학교 시간표 SNUTT를 만들어온 사람들</p>
+        <p class="eyebrow">SEOUL NATIONAL UNIVERSITY TIMETABLE</p>
+        <h1 class="brand"><span class="mint">SNUTT</span> 개발팀</h1>
+        <p class="subtitle">2012년부터 지금까지, SNUTT를 만들어온 사람들</p>
         <a class="logo-link" href="https://wafflestudio.com" target="_blank" rel="noopener">
           <img src="https://snutt-asset.s3.ap-northeast-2.amazonaws.com/waffle_logo.png" alt="와플스튜디오 로고 (WaffleStudio Logo)" />
         </a>
@@ -165,135 +184,171 @@
 
       <main>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2026</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2026<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">14명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">김기완</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">민유진</span><span class="m-dept">디자인과 21</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">박소은</span><span class="m-dept">동양화과 21</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">박신홍</span><span class="m-dept">경영학과 17</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">송동엽</span><span class="m-dept">컴퓨터공학부 22</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">양주현</span><span class="m-dept">지구환경과학부 16</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">이정달</span><span class="m-dept">자유전공학부 25</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">이현도</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">임찬영</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">정해찬</span><span class="m-dept">컴퓨터공학부 24</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">최연서</span><span class="m-dept">물리교육과 23</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">최유림</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김기완</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">민유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 21</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박소은</span><span class="badge design">Design</span></span><span class="m-dept">동양화과 21</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박신홍</span><span class="badge ios">iOS</span></span><span class="m-dept">경영학과 17</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">송동엽</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">양주현</span><span class="badge aos">Android</span></span><span class="m-dept">지구환경과학부 16</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이정달</span><span class="badge server">Server</span></span><span class="m-dept">자유전공학부 25</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이현도</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">임찬영</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">정해찬</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 24</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최연서</span><span class="badge server">Server</span></span><span class="m-dept">물리교육과 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유림</span><span class="badge ios">iOS</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2025</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2025<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">14명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">김기완</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">민유진</span><span class="m-dept">디자인과 21</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">박신홍</span><span class="m-dept">경영학과 17</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">송동엽</span><span class="m-dept">컴퓨터공학부 22</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">양주현</span><span class="m-dept">지구환경과학부 16</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">이채민</span><span class="m-dept">자유전공학부 20</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">이현도</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">임찬영</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">정해찬</span><span class="m-dept">컴퓨터공학부 24</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">조성해</span><span class="m-dept">건축학과 18</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">최유림</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최유진</span><span class="m-dept">디자인과 22</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김기완</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">민유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 21</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박신홍</span><span class="badge ios">iOS</span></span><span class="m-dept">경영학과 17</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">송동엽</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">양주현</span><span class="badge aos">Android</span></span><span class="m-dept">지구환경과학부 16</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이채민</span><span class="badge ios">iOS</span></span><span class="m-dept">자유전공학부 20</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이현도</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">임찬영</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">정해찬</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 24</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">조성해</span><span class="badge server">Server</span></span><span class="m-dept">건축학과 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유림</span><span class="badge ios">iOS</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2024</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2024<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">13명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">김기완</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">민유진</span><span class="m-dept">디자인과 21</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">박신홍</span><span class="m-dept">경영학과 17</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">송동엽</span><span class="m-dept">컴퓨터공학부 22</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">양주현</span><span class="m-dept">지구환경과학부 16</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">이채민</span><span class="m-dept">자유전공학부 20</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">이현도</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">임찬영</span><span class="m-dept">컴퓨터공학부 23</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">조성해</span><span class="m-dept">건축학과 18</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">최유림</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최유진</span><span class="m-dept">디자인과 22</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김기완</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">민유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 21</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박신홍</span><span class="badge ios">iOS</span></span><span class="m-dept">경영학과 17</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">송동엽</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">양주현</span><span class="badge aos">Android</span></span><span class="m-dept">지구환경과학부 16</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이채민</span><span class="badge ios">iOS</span></span><span class="m-dept">자유전공학부 20</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이현도</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">임찬영</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 23</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">조성해</span><span class="badge server">Server</span></span><span class="m-dept">건축학과 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유림</span><span class="badge ios">iOS</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2023</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2023<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">12명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">강지혁</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">김기완</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">박수빈</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">박신홍</span><span class="m-dept">경영학과 17</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">송동엽</span><span class="m-dept">컴퓨터공학부 22</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">양주현</span><span class="m-dept">지구환경과학부 16</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">우현민</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">이채민</span><span class="m-dept">자유전공학부 20</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최유림</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최유진</span><span class="m-dept">디자인과 22</span><span class="badge design">Design</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">강지혁</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김기완</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박수빈</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박신홍</span><span class="badge ios">iOS</span></span><span class="m-dept">경영학과 17</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">송동엽</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">양주현</span><span class="badge aos">Android</span></span><span class="m-dept">지구환경과학부 16</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">우현민</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이채민</span><span class="badge ios">iOS</span></span><span class="m-dept">자유전공학부 20</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유림</span><span class="badge ios">iOS</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유진</span><span class="badge design">Design</span></span><span class="m-dept">디자인과 22</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2022</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2022<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">11명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">금진섭</span><span class="m-dept">서양사학과 14</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">김상민</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">박수빈</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">박신홍</span><span class="m-dept">경영학과 17</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">서정록</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge plan">기획</span></li>
-            <li class="member"><span class="m-name">서정민</span><span class="m-dept">홍익대 회화과 15</span><span class="badge plan">기획·디자인</span></li>
-            <li class="member"><span class="m-name">양주현</span><span class="m-dept">지구환경과학부 16</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">우현민</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge web">Web</span></li>
-            <li class="member"><span class="m-name">최유림</span><span class="m-dept">컴퓨터공학부 19</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">금진섭</span><span class="badge ios">iOS</span></span><span class="m-dept">서양사학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김상민</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박수빈</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">박신홍</span><span class="badge ios">iOS</span></span><span class="m-dept">경영학과 17</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">서정록</span><span class="badge plan">기획</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">서정민</span><span class="badge plan">기획·디자인</span></span><span class="m-dept">홍익대 회화과 15</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">양주현</span><span class="badge aos">Android</span></span><span class="m-dept">지구환경과학부 16</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">우현민</span><span class="badge web">Web</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최유림</span><span class="badge ios">iOS</span></span><span class="m-dept">컴퓨터공학부 19</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2021</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2021<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">6명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">금진섭</span><span class="m-dept">서양사학과 14</span><span class="badge ios">iOS</span></li>
-            <li class="member"><span class="m-name">김상민</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge aos">Android</span></li>
-            <li class="member"><span class="m-name">변다빈</span><span class="m-dept">언어학과 14</span><span class="badge server">Server</span></li>
-            <li class="member"><span class="m-name">서정록</span><span class="m-dept">컴퓨터공학부 18</span><span class="badge plan">기획</span></li>
-            <li class="member"><span class="m-name">서정민</span><span class="m-dept">홍익대 회화과 15</span><span class="badge plan">기획·디자인</span></li>
-            <li class="member"><span class="m-name">최한결</span><span class="m-dept">컴퓨터공학부 15</span><span class="badge server">Server</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">금진섭</span><span class="badge ios">iOS</span></span><span class="m-dept">서양사학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김상민</span><span class="badge aos">Android</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">변다빈</span><span class="badge server">Server</span></span><span class="m-dept">언어학과 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">서정록</span><span class="badge plan">기획</span></span><span class="m-dept">컴퓨터공학부 18</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">서정민</span><span class="badge plan">기획·디자인</span></span><span class="m-dept">홍익대 회화과 15</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">최한결</span><span class="badge server">Server</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2016</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2016<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">5명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">김진형</span><span class="m-dept">컴퓨터공학부 14</span></li>
-            <li class="member"><span class="m-name">방성원</span><span class="m-dept">컴퓨터공학부 15</span></li>
-            <li class="member"><span class="m-name">이주현</span><span class="m-dept">시각디자인 11</span></li>
-            <li class="member"><span class="m-name">장렬</span><span class="m-dept">컴퓨터공학부 14</span></li>
-            <li class="member"><span class="m-name">정형식</span><span class="m-dept">자유전공학부 10</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김진형</span></span><span class="m-dept">컴퓨터공학부 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">방성원</span></span><span class="m-dept">컴퓨터공학부 15</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이주현</span></span><span class="m-dept">시각디자인 11</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">장렬</span></span><span class="m-dept">컴퓨터공학부 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">정형식</span></span><span class="m-dept">자유전공학부 10</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2014</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2014<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">4명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">김광래</span><span class="m-dept">컴퓨터공학부 12</span></li>
-            <li class="member"><span class="m-name">김진형</span><span class="m-dept">컴퓨터공학부 14</span></li>
-            <li class="member"><span class="m-name">정형식</span><span class="m-dept">자유전공학부 10</span></li>
-            <li class="member"><span class="m-name">김알찬</span><span class="m-dept">컴퓨터공학부 12</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김광래</span></span><span class="m-dept">컴퓨터공학부 12</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김진형</span></span><span class="m-dept">컴퓨터공학부 14</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">정형식</span></span><span class="m-dept">자유전공학부 10</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">김알찬</span></span><span class="m-dept">컴퓨터공학부 12</span></li>
           </ul>
         </section>
         <section class="year">
-          <h2 class="year-label"><span class="year-num">2012</span><span class="year-suffix">~</span></h2>
+          <div class="year-head">
+            <h2 class="year-num">2012<span class="tilde">~</span></h2>
+            <span class="rule"></span>
+            <span class="count">1명</span>
+          </div>
           <ul class="members">
-            <li class="member"><span class="m-name">이종민</span><span class="m-dept">컴퓨터공학부 09</span><span class="badge founder">최초 개발</span></li>
+            <li class="member"><span class="m-top"><span class="m-name">이종민</span><span class="badge founder">최초 개발</span></span><span class="m-dept">컴퓨터공학부 09</span></li>
           </ul>
         </section>
       </main>
 
       <footer>
         <a class="contact" href="mailto:snutt@wafflestudio.com">
-          문의하기 &middot; <strong>snutt@wafflestudio.com</strong>
+          문의 <strong>snutt@wafflestudio.com</strong>
         </a>
       </footer>
     </div>
