@@ -20,6 +20,7 @@ fun Language.select(
     en: String?,
 ): String = if (this == Language.EN) en ?: ko else ko
 
+@JvmName("selectNullable")
 fun Language.select(
     ko: String?,
     en: String?,
