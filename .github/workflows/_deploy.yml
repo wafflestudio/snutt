@@ -18,8 +18,6 @@ on:
     secrets:
       OCI_AUTH_TOKEN:
         required: true
-      DEPLOYER_APP_ID:
-        required: true
       DEPLOYER_APP_PRIVATE_KEY:
         required: true
 
@@ -67,5 +65,4 @@ jobs:
           image: ${{ env.OCIR_REGISTRY }}/${{ env.OCIR_NAMESPACE }}/${{ env.OCIR_REPOSITORY }}
           tag: ${{ env.IMAGE_TAG }}
           overlay-path: argocd/${{ inputs.ocir_repository }}
-          app-id: ${{ secrets.DEPLOYER_APP_ID }}
           private-key: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}
