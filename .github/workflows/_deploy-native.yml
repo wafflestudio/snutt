@@ -10,11 +10,6 @@ on:
         required: true
         type: string
         description: 'Dockerfile path (e.g., api/Dockerfile-native)'
-      update_gitops:
-        required: false
-        type: boolean
-        default: true
-        description: 'Whether to bump the image tag in the GitOps repository.'
     secrets:
       OCI_AUTH_TOKEN:
         required: true
@@ -59,7 +54,6 @@ jobs:
           echo "image=$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Update GitOps image tag
-        if: ${{ inputs.update_gitops }}
         uses: wafflestudio/waffle-world-oci/.github/actions/update-image@main
         with:
           image: ${{ env.OCIR_REGISTRY }}/${{ env.OCIR_NAMESPACE }}/${{ env.OCIR_REPOSITORY }}
