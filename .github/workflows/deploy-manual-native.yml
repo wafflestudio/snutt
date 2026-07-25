@@ -11,6 +11,11 @@ on:
         description: 'Dockerfile 경로 (예: api/Dockerfile-native)'
         required: true
         type: string
+      update_gitops:
+        description: 'GitOps 레포의 이미지 태그를 갱신할지 여부'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   deploy:
@@ -18,6 +23,7 @@ jobs:
     with:
       ocir_repository: ${{ inputs.ocir_repository }}
       dockerfile: ${{ inputs.dockerfile }}
+      update_gitops: ${{ inputs.update_gitops }}
     secrets:
       OCI_AUTH_TOKEN: ${{ secrets.OCI_AUTH_TOKEN }}
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
