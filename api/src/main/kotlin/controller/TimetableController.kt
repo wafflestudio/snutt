@@ -6,9 +6,9 @@ import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.theme.dto.request.TimetableModifyThemeRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableAddRequestDto
 import com.wafflestudio.snutt.timetables.dto.request.TimetableModifyRequestDto
+import com.wafflestudio.snutt.timetables.dto.request.TimetableOrderModifyRequestDto
 import com.wafflestudio.snutt.timetables.service.TimetableService
 import com.wafflestudio.snutt.users.data.User
-import kotlinx.coroutines.flow.toList
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -53,8 +53,7 @@ class TimetableController(
             user.id!!,
             year,
             semester,
-        ).toList()
-        .map { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).map { timetableService.convertTimetableToTimetableLegacyDto(it) }
 
     @PostMapping("")
     suspend fun addTimetable(
@@ -78,6 +77,17 @@ class TimetableController(
     ) = timetableService
         .getTimetable(user.id!!, timetableId)
         .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+
+    @PutMapping("/{year}/{semester}/order")
+    suspend fun modifyTimetableOrder(
+        @CurrentUser user: User,
+        @PathVariable year: Int,
+        @PathVariable semester: Semester,
+        @RequestBody body: TimetableOrderModifyRequestDto,
+    ): List<TimetableBriefDto> =
+        timetableService
+            .modifyTimetableOrder(user.id!!, year, semester, body.timetableIds)
+            .map(::TimetableBriefDto)
 
     @PutMapping("/{timetableId}")
     suspend fun modifyTimetable(

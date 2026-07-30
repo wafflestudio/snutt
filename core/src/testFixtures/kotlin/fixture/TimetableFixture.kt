@@ -18,6 +18,7 @@ class TimetableFixture(
             title = title,
             theme = BasicThemeType.SNUTT,
             themeId = null,
+            order = 0,
         )
     }
 }
