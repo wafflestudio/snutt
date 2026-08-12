@@ -18,10 +18,10 @@ enum class Language {
 fun Language.select(
     ko: String,
     en: String?,
-): String = if (this == Language.EN) en ?: ko else ko
+): String = if (this == Language.EN) en?.takeIf { it.isNotBlank() } ?: ko else ko
 
 @JvmName("selectNullable")
 fun Language.select(
     ko: String?,
     en: String?,
-): String? = if (this == Language.EN) en ?: ko else ko
+): String? = if (this == Language.EN) en?.takeIf { it.isNotBlank() } ?: ko else ko

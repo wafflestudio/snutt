@@ -201,11 +201,11 @@ class SugangSnuSyncServiceImpl(
                                 .filterNotNull()
                                 .filter { it.isNotBlank() }
                                 .sorted(),
-                        // 영문 태그 (en 필터 UI/검색 매칭용). KO 필터 규칙 그대로 미러.
+                        // 영문 태그 (en 필터 UI/검색 매칭용). 영문 학년은 bare 숫자("1"~)라 length 필터 대신 blank만 제외.
                         academicYearEn =
                             parsedTag.academicYearEn
                                 .filterNotNull()
-                                .filter { it.length > 1 }
+                                .filter { it.isNotBlank() }
                                 .sorted(),
                         classificationEn =
                             parsedTag.classificationEn

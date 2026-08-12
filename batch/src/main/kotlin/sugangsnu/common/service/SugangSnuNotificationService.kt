@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.sugangsnu.common.service
 import com.wafflestudio.snutt.common.push.DeeplinkType
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.coursebook.data.Coursebook
+import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.notification.data.Notification
 import com.wafflestudio.snutt.notification.data.NotificationType
 import com.wafflestudio.snutt.notification.data.PushPreferenceType
@@ -32,12 +33,34 @@ class SugangSnuNotificationServiceImpl(
     private val notificationService: NotificationService,
     private val pushService: PushService,
 ) : SugangSnuNotificationService {
+    // equalsMetadata 에 없어 단독으로는 변경 판정을 만들지 못하는 필드들.
+    // 빈자리 알림 job이 수시로 갱신하므로 _en 변경에 섞여 들어와 아래 억제 판정을 무너뜨리지 않도록 함께 무시한다.
+    private val nonNotifyingFieldNames = setOf(Lecture::registrationCount.name, Lecture::wasFull.name)
+
     override suspend fun notifyUserLectureChanges(userLectureSyncResults: List<UserLectureSyncResult>): Unit =
         coroutineScope {
-            val notifications = userLectureSyncResults.map { it.toNotification() }
+            // 스냅샷 동기화(_en 복사)는 sync 단계에서 이미 반영됐다. 여기서는 알릴 만한 변경이 없는 업데이트를
+            // 알림/푸시 대상에서 제외한다. (영문 데이터 최초 채움 sync에서 전 유저 대량 알림 방지)
+            val notifiableResults = userLectureSyncResults.filter { it.isNotifiable() }
+            val notifications = notifiableResults.map { it.toNotification() }
             notificationService.sendNotifications(notifications)
-            sendPushForTimetable(userLectureSyncResults.filterIsInstance<TimetableLectureSyncResult>())
+            sendPushForTimetable(notifiableResults.filterIsInstance<TimetableLectureSyncResult>())
         }
+
+    /**
+     * 한국어 알림 문구로 의미가 있는 변경이 하나라도 있으면 발송 대상.
+     * 영문(_en) 필드와 nonNotifyingFieldNames 만 바뀐 경우는 제외한다.
+     * 폐강 등 업데이트가 아닌 결과는 항상 발송한다.
+     */
+    private fun UserLectureSyncResult.isNotifiable(): Boolean {
+        val updatedFields =
+            when (this) {
+                is TimetableLectureUpdateResult -> updatedFields
+                is BookmarkLectureUpdateResult -> updatedFields
+                else -> return true
+            }
+        return updatedFields.any { it.name !in nonNotifyingFieldNames && !it.name.endsWith("En") }
+    }
 
     private suspend fun sendPushForTimetable(userLectureSyncResults: List<TimetableLectureSyncResult>) =
         coroutineScope {

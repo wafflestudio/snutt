@@ -85,7 +85,7 @@ data class SugangSnuLectureSubInfo(
     // 영문 비고
     @param:JsonProperty("openLtEngRemk")
     val remarkEng: String? = null,
-    // 영문 이수과정 (Bachelor / Master's / Doctorate / Combined Master's/Doctorate)
+    // 영문 이수과정 (Bachelor / Master's / Doctorate / Combined Masters/Doctorate)
     @param:JsonProperty("cptnCorsFgEngNm")
     val academicCourseEng: String? = null,
 //    @param:JsonProperty("frnStdTlsnLmtYn")
