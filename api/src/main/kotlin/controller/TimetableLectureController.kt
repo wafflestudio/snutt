@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.controller
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.timetables.dto.request.CustomTimetableLectureAddLegacyRequestDto
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -35,13 +37,14 @@ class TimetableLectureController(
         @PathVariable timetableId: String,
         @RequestParam(required = false) isForced: Boolean?,
         @RequestBody customTimetable: CustomTimetableLectureAddLegacyRequestDto,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableLectureService
         .addCustomTimetableLecture(
             userId = user.id!!,
             timetableId = timetableId,
             timetableLectureRequest = customTimetable,
             isForced = isForced ?: customTimetable.isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PostMapping("/{lectureId}")
     suspend fun addLecture(
@@ -50,13 +53,14 @@ class TimetableLectureController(
         @PathVariable lectureId: String,
         @RequestParam(required = false) isForced: Boolean?,
         @RequestBody(required = false) body: ForcedReq?,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableLectureService
         .addLecture(
             userId = user.id!!,
             timetableId = timetableId,
             lectureId = lectureId,
             isForced = isForced ?: body?.isForced ?: false,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PutMapping("/{timetableLectureId}/reset")
     suspend fun resetTimetableLecture(
@@ -65,13 +69,14 @@ class TimetableLectureController(
         @PathVariable timetableLectureId: String,
         @RequestParam(required = false) isForced: Boolean?,
         @RequestBody(required = false) body: ForcedReq?,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableLectureService
         .resetTimetableLecture(
             userId = user.id!!,
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
             isForced = isForced ?: body?.isForced ?: false,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PutMapping("/{timetableLectureId}")
     suspend fun modifyTimetableLecture(
@@ -80,6 +85,7 @@ class TimetableLectureController(
         @PathVariable timetableLectureId: String,
         @RequestParam(required = false) isForced: Boolean?,
         @RequestBody modifyRequestDto: TimetableLectureModifyLegacyRequestDto,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableLectureService
         .modifyTimetableLecture(
             userId = user.id!!,
@@ -87,19 +93,20 @@ class TimetableLectureController(
             timetableLectureId = timetableLectureId,
             modifyTimetableLectureRequestDto = modifyRequestDto,
             isForced = isForced ?: modifyRequestDto.isForced,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @DeleteMapping("/{timetableLectureId}")
     suspend fun deleteTimetableLecture(
         @CurrentUser user: User,
         @PathVariable timetableId: String,
         @PathVariable timetableLectureId: String,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableLectureService
         .deleteTimetableLecture(
             userId = user.id!!,
             timetableId = timetableId,
             timetableLectureId = timetableLectureId,
-        ).let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        ).let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     data class ForcedReq(
         @param:JsonProperty("is_forced")

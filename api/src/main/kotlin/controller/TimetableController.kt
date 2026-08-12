@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -39,22 +41,24 @@ class TimetableController(
     @GetMapping("/recent")
     suspend fun getMostRecentlyUpdatedTimetables(
         @CurrentUser user: User,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableService
         .getMostRecentlyUpdatedTimetable(user.id!!)
-        .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        .let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @GetMapping("/{year}/{semester}")
     suspend fun getTimetablesBySemester(
         @CurrentUser user: User,
         @PathVariable year: Int,
         @PathVariable semester: Semester,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableService
         .getTimetablesBySemester(
             user.id!!,
             year,
             semester,
         ).toList()
-        .map { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        .map { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PostMapping("")
     suspend fun addTimetable(
@@ -75,9 +79,10 @@ class TimetableController(
     suspend fun getTimetable(
         @CurrentUser user: User,
         @PathVariable timetableId: String,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableService
         .getTimetable(user.id!!, timetableId)
-        .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        .let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PutMapping("/{timetableId}")
     suspend fun modifyTimetable(
@@ -115,9 +120,10 @@ class TimetableController(
         @CurrentUser user: User,
         @PathVariable timetableId: String,
         @RequestBody body: TimetableModifyThemeRequestDto,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ) = timetableService
         .modifyTimetableTheme(user.id!!, timetableId, body.theme, body.themeId)
-        .let { timetableService.convertTimetableToTimetableLegacyDto(it) }
+        .let { timetableService.convertTimetableToTimetableLegacyDto(it, clientInfo.language) }
 
     @PostMapping("/{timetableId}/primary")
     suspend fun setPrimary(

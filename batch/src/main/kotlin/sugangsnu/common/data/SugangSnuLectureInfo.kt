@@ -70,8 +70,24 @@ data class SugangSnuLectureSubInfo(
     // 비고
     @param:JsonProperty("openLtRemk")
     val remark: String? = null,
-//    @param:JsonProperty("openLtEngRemk")
-//    val openLtEngRemk: String? = null,
+    // 영문 강의명
+    @param:JsonProperty("sbjtEngNm")
+    val courseNameEng: String? = null,
+    // 영문 부제
+    @param:JsonProperty("sbjtSubhEngNm")
+    val courseSubNameEng: String? = null,
+    // 영문 교수
+    @param:JsonProperty("profEngNm")
+    val professorNameEng: String? = null,
+    // 영문 분야
+    @param:JsonProperty("sbjtFldEngNm")
+    val categoryEng: String? = null,
+    // 영문 비고
+    @param:JsonProperty("openLtEngRemk")
+    val remarkEng: String? = null,
+    // 영문 이수과정 (Bachelor / Master's / Doctorate / Combined Masters/Doctorate)
+    @param:JsonProperty("cptnCorsFgEngNm")
+    val academicCourseEng: String? = null,
 //    @param:JsonProperty("frnStdTlsnLmtYn")
 //    val frnStdTlsnLmtYn: String? = null,
 //    @param:JsonProperty("mrksGvMthd")

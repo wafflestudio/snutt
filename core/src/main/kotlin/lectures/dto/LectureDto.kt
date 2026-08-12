@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.lectures.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snutt.common.client.Language
+import com.wafflestudio.snutt.common.client.select
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureSummaryDto
 import com.wafflestudio.snutt.lectures.data.Lecture
@@ -37,24 +39,25 @@ data class LectureDto(
 fun LectureDto(
     lecture: Lecture,
     snuttevLecture: SnuttEvLectureSummaryDto? = null,
+    language: Language = Language.KO,
 ): LectureDto =
     LectureDto(
         id = lecture.id,
-        academicYear = lecture.academicYear,
-        category = lecture.category,
+        academicYear = language.select(lecture.academicYear, lecture.academicYearEn),
+        category = language.select(lecture.category, lecture.categoryEn),
         classPlaceAndTimes = lecture.classPlaceAndTimes.map { ClassPlaceAndTimeLegacyDto(it) },
-        classification = lecture.classification,
+        classification = language.select(lecture.classification, lecture.classificationEn),
         credit = lecture.credit,
-        department = lecture.department,
-        instructor = lecture.instructor,
+        department = language.select(lecture.department, lecture.departmentEn),
+        instructor = language.select(lecture.instructor, lecture.instructorEn),
         lectureNumber = lecture.lectureNumber,
         quota = lecture.quota,
         freshmanQuota = lecture.freshmanQuota,
-        remark = lecture.remark,
+        remark = language.select(lecture.remark, lecture.remarkEn),
         semester = lecture.semester,
         year = lecture.year,
         courseNumber = lecture.courseNumber,
-        courseTitle = lecture.courseTitle,
+        courseTitle = language.select(lecture.courseTitle, lecture.courseTitleEn),
         registrationCount = lecture.registrationCount,
         wasFull = lecture.wasFull,
         snuttEvLecture = snuttevLecture,

@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.tag.TagListService
@@ -8,6 +9,7 @@ import com.wafflestudio.snutt.tag.data.TagListUpdateTimeResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -25,9 +27,10 @@ class TagController(
     suspend fun getTagList(
         @PathVariable year: Int,
         @PathVariable semester: Semester,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ): TagListResponse {
         val tagList = tagService.getTagList(year, semester)
-        return TagListResponse(tagList)
+        return TagListResponse(tagList, clientInfo.language)
     }
 
     @GetMapping("/{year}/{semester}/update_time")

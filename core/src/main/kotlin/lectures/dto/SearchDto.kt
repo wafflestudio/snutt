@@ -1,10 +1,12 @@
 package com.wafflestudio.snutt.lectures.dto
 
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.Semester
 
 data class SearchDto(
     val year: Int,
     val semester: Semester,
+    val language: Language = Language.KO,
     val query: String? = null,
     val classification: List<String>? = null,
     val credit: List<Int>? = null,

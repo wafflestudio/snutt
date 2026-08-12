@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.filter
 import com.wafflestudio.snutt.common.client.AppType
 import com.wafflestudio.snutt.common.client.AppVersion
 import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.client.OsType
 import com.wafflestudio.snutt.common.exception.InvalidAppTypeException
 import com.wafflestudio.snutt.common.exception.InvalidOsTypeException
@@ -46,6 +47,7 @@ class ClientInfoWebFilter(
                             appVersion = headers.getFirst("x-app-version")?.let { AppVersion(it) },
                             deviceId = headers.getFirst("x-device-id"),
                             deviceModel = headers.getFirst("x-device-model"),
+                            language = Language.from(headers.getFirst("x-language")) ?: Language.KO,
                         )
                     exchange.attributes[CLIENT_INFO_ATTRIBUTE_KEY] = clientInfo
                 }

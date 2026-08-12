@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.bookmark.service
 
 import com.wafflestudio.snutt.bookmark.data.Bookmark
 import com.wafflestudio.snutt.bookmark.repository.BookmarkRepository
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.evaluation.service.EvService
@@ -32,7 +33,10 @@ interface BookmarkService {
         lectureId: String,
     ): Bookmark
 
-    suspend fun convertBookmarkLecturesToBookmarkLectureDtos(bookmarkLectures: List<BookmarkLecture>): List<BookmarkLectureDto>
+    suspend fun convertBookmarkLecturesToBookmarkLectureDtos(
+        bookmarkLectures: List<BookmarkLecture>,
+        language: Language = Language.KO,
+    ): List<BookmarkLectureDto>
 }
 
 @Service
@@ -86,12 +90,15 @@ class BookmarkServiceImpl(
         )
     }
 
-    override suspend fun convertBookmarkLecturesToBookmarkLectureDtos(bookmarkLectures: List<BookmarkLecture>): List<BookmarkLectureDto> {
+    override suspend fun convertBookmarkLecturesToBookmarkLectureDtos(
+        bookmarkLectures: List<BookmarkLecture>,
+        language: Language,
+    ): List<BookmarkLectureDto> {
         val snuttIdtoLectureMap =
             snuttEvService.getSummariesByIds(bookmarkLectures.map { it.id!! }).associateBy { it.snuttId }
         return bookmarkLectures.map { bookmarkLecture ->
             val snuttEvLecture = snuttIdtoLectureMap[bookmarkLecture.id]
-            BookmarkLectureDto(bookmarkLecture, snuttEvLecture)
+            BookmarkLectureDto(bookmarkLecture, snuttEvLecture, language)
         }
     }
 }

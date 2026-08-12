@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.lectures.service
 
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.evaluation.service.EvService
 import com.wafflestudio.snutt.lectures.data.Lecture
@@ -26,7 +27,10 @@ interface LectureService {
 
     fun search(query: SearchDto): Flow<Lecture>
 
-    suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto>
+    suspend fun convertLecturesToLectureDtos(
+        lectures: Iterable<Lecture>,
+        language: Language = Language.KO,
+    ): List<LectureDto>
 }
 
 @Service
@@ -49,12 +53,15 @@ class LectureServiceImpl(
 
     override fun search(query: SearchDto): Flow<Lecture> = lectureRepository.searchLectures(query)
 
-    override suspend fun convertLecturesToLectureDtos(lectures: Iterable<Lecture>): List<LectureDto> {
+    override suspend fun convertLecturesToLectureDtos(
+        lectures: Iterable<Lecture>,
+        language: Language,
+    ): List<LectureDto> {
         val snuttIdToEvLectureMap =
             snuttEvService.getSummariesByIds(lectures.map { it.id!! }).associateBy { it.snuttId }
         return lectures.map { lecture ->
             val snuttEvLecture = snuttIdToEvLectureMap[lecture.id]
-            LectureDto(lecture, snuttEvLecture)
+            LectureDto(lecture, snuttEvLecture, language)
         }
     }
 }

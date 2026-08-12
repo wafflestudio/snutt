@@ -5,17 +5,19 @@ import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import kotlin.reflect.KProperty1
 
+// 영문(_en) 필드는 한글 짝과 같은 항목명으로 표기한다.
+// 한/영이 함께 바뀌어도 호출부의 distinct()로 합쳐져 '비고, 기타'가 아닌 '비고'로 나간다.
 fun KProperty1<Lecture, *>.toKoreanFieldName(): String =
     when (this) {
-        Lecture::classification -> "교과 구분"
-        Lecture::department -> "학부"
-        Lecture::academicYear -> "학년"
-        Lecture::courseTitle -> "강의명"
+        Lecture::classification, Lecture::classificationEn -> "교과 구분"
+        Lecture::department, Lecture::departmentEn -> "학부"
+        Lecture::academicYear, Lecture::academicYearEn -> "학년"
+        Lecture::courseTitle, Lecture::courseTitleEn -> "강의명"
         Lecture::credit -> "학점"
-        Lecture::instructor -> "교수"
+        Lecture::instructor, Lecture::instructorEn -> "교수"
         Lecture::quota -> "정원"
-        Lecture::remark -> "비고"
-        Lecture::category -> "교양영역"
+        Lecture::remark, Lecture::remarkEn -> "비고"
+        Lecture::category, Lecture::categoryEn -> "교양영역"
         Lecture::classPlaceAndTimes -> "강의 시간/장소"
         Lecture::categoryPre2025 -> "구) 교양영역"
         else -> "기타"
