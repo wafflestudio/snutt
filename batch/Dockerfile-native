@@ -2,7 +2,19 @@
 FROM container-registry.oracle.com/graalvm/native-image:25 AS builder
 WORKDIR /app
 COPY . /app
-RUN --mount=type=secret,id=github_token GITHUB_TOKEN=$(cat /run/secrets/github_token) ./gradlew :batch:nativeCompile
+
+# 빌드를 두 phase 로 나눠 각각의 소요 시간을 로그에 남긴다. (api/Dockerfile-native 와 동일)
+#   compile+aot   : 의존성 해석/다운로드 + Kotlin 컴파일 + Spring AOT 처리 + AOT 생성 코드 컴파일
+#   nativeCompile : GraalVM native-image 컴파일
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) \
+    sh gradle/build-phase.sh "batch:compile+aot" :batch:aotClasses
+
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) \
+    sh gradle/build-phase.sh "batch:nativeCompile" :batch:nativeCompile
+
+RUN sh gradle/build-phase.sh --summary
 
 # Runtime stage
 FROM docker.io/debian:stable-slim

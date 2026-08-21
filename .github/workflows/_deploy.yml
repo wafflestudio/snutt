@@ -36,22 +36,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # runner 컨텍스트는 job 레벨 env 에서 못 쓰기 때문에 여기서 채운다.
+      - name: Prepare build metadata
+        run: |
+          echo "DOCKER_BUILD_LOG=${RUNNER_TEMP}/docker-build.log" >> $GITHUB_ENV
+          echo "BUILD_LOG_ARTIFACT_NAME=docker-build-log-${OCIR_REPOSITORY//\//-}-${IMAGE_TAG}" >> $GITHUB_ENV
+
       - name: Login to OCIR
         run: echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login $OCIR_REGISTRY -u ax1dvc8vmenm/members/snutt-deployer --password-stdin
 
-      - name: Docker build, tag, and push image to OCIR
-        id: build-push-image
+      # build 와 push 를 별도 스텝으로 나눠야 GitHub Actions 가 각각의 소요 시간을 따로 보여준다.
+      - name: Docker build
+        id: build
         run: |
+          set -euo pipefail
           echo "${{ github.token }}" > .github_token
+          # 빌드가 실패해도 소요 시간은 기록한다. 느려서 죽는 경우가 바로 그 정보를 봐야 하는 경우다.
+          started_at=$(date +%s)
+          build_exit_code=0
           docker build \
+            --progress=plain \
             --secret id=github_token,src=./.github_token \
             -f ${{ inputs.dockerfile }} \
             -t $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG \
             . \
-            --platform linux/arm64
-          rm -f .github_token
-          docker push $OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG
-          echo "image=$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+            --platform linux/arm64 \
+            2>&1 | tee "$DOCKER_BUILD_LOG" || build_exit_code=$?
+          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> $GITHUB_OUTPUT
+          exit $build_exit_code
+
+      - name: Remove build secret
+        if: always()
+        run: rm -f .github_token
+
+      - name: Docker push
+        id: push
+        run: |
+          set -euo pipefail
+          image="$OCIR_REGISTRY/$OCIR_NAMESPACE/$OCIR_REPOSITORY:$IMAGE_TAG"
+          echo "size_bytes=$(docker image inspect -f '{{.Size}}' "$image")" >> $GITHUB_OUTPUT
+          started_at=$(date +%s)
+          docker push "$image"
+          echo "duration_seconds=$(( $(date +%s) - started_at ))" >> $GITHUB_OUTPUT
+          echo "image=$image" >> $GITHUB_OUTPUT
 
       - name: Update GitOps image tag
         uses: wafflestudio/waffle-world-oci/.github/actions/update-image@main
@@ -60,3 +87,30 @@ jobs:
           tag: ${{ env.IMAGE_TAG }}
           overlay-path: argocd/${{ inputs.ocir_repository }}
           private-key: ${{ secrets.DEPLOYER_APP_PRIVATE_KEY }}
+
+      # 빌드가 실패해도 어디까지 갔는지 봐야 하므로 always() 로 돌린다.
+      - name: Build timing summary
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "## ⏱ 빌드 소요 시간 — \`${OCIR_REPOSITORY}:${IMAGE_TAG}\` (JVM)"
+            echo ""
+            echo "| 단계 | 소요 시간 |"
+            echo "| --- | ---: |"
+            echo "| docker build | ${{ steps.build.outputs.duration_seconds || 0 }}s |"
+            echo "| docker push | ${{ steps.push.outputs.duration_seconds || 0 }}s |"
+            echo ""
+            echo "이미지 크기: ${{ steps.push.outputs.size_bytes || 0 }} bytes"
+            echo ""
+          } >> $GITHUB_STEP_SUMMARY
+          .github/scripts/summarize-docker-build.sh "$DOCKER_BUILD_LOG" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload docker build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_LOG_ARTIFACT_NAME }}
+          path: ${{ env.DOCKER_BUILD_LOG }}
+          retention-days: 7
+          if-no-files-found: ignore
