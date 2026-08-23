@@ -150,7 +150,7 @@ class LectureCustomRepositoryImpl(
                         Lecture::courseTitle.regex(Regex.escape(keyword), "i"),
                         Lecture::courseTitleEn.regex(Regex.escape(keyword), "i"),
                         Lecture::instructor.regex(Regex.escape(keyword), "i"),
-                        Lecture::instructorEn.regex(Regex.escape(keyword), "i"),
+                        Lecture::instructorEn.regex(keyword.toInstructorEnPattern(), "i"),
                         Lecture::courseNumber isEqualTo keyword,
                         Lecture::lectureNumber isEqualTo keyword,
                     )
@@ -241,6 +241,18 @@ class LectureCustomRepositoryImpl(
                 }
             },
         )
+
+    /*
+    영문 교수명 표기가 'Han, Chul-woong', 'Lee Ho Young', 'Park,  YoonJeong', 'AN/YOONGSOO'처럼 제각각이라
+    구분자(공백/쉼표/하이픈/슬래시)를 무시하고 매칭한다. 다만 노이즈를 줄이기 위해 이름 단어 첫 글자부터
+    시작하는 매치만 허용한다.
+     */
+    private fun String.toInstructorEnPattern(): String {
+        val separator = "[^A-Za-z0-9가-힣]"
+        val letters = filter { it.isLetterOrDigit() }
+        if (letters.isEmpty()) return Regex.escape(this)
+        return letters.toCharArray().joinToString("$separator*", prefix = "(?:^|$separator)") { Regex.escape(it.toString()) }
+    }
 
     private fun Char.isKoreanLetter(): Boolean = this in '가'..'힣'
 
