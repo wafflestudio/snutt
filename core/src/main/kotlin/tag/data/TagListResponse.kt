@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.tag.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.client.Language
+import com.wafflestudio.snutt.common.client.select
 import com.wafflestudio.snutt.common.enums.SortCriteria
 
 data class TagListResponse(
@@ -37,8 +38,8 @@ fun TagListResponse(
         sortCriteria =
             SortCriteria.entries
                 .sortedBy { it.value }
-                .map { it.fullName }
-                .filterNot { it == "기본값" },
+                .filterNot { it == SortCriteria.ID }
+                .map { language.select(it.fullName, it.fullNameEn) },
         updatedAt = tagList.updatedAt.toEpochMilli(),
         categoryPre2025 = tagList.tagCollection.categoryPre2025,
     )
