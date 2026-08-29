@@ -33,7 +33,7 @@ fun TagListResponse(
         classification = localize(tagList.tagCollection.classification, tagList.tagCollection.classificationEn),
         department = localize(tagList.tagCollection.department, tagList.tagCollection.departmentEn),
         academicYear = localize(tagList.tagCollection.academicYear, tagList.tagCollection.academicYearEn),
-        credit = tagList.tagCollection.credit,
+        credit = localize(tagList.tagCollection.credit, tagList.tagCollection.creditEn),
         instructor = localize(tagList.tagCollection.instructor, tagList.tagCollection.instructorEn),
         category = localize(tagList.tagCollection.category, tagList.tagCollection.categoryEn),
         sortCriteria =
