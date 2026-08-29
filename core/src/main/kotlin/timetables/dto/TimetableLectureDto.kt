@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.timetables.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.client.select
+import com.wafflestudio.snutt.common.enums.LectureCategoryPre2025
 import com.wafflestudio.snutt.evaluation.dto.SnuttEvLectureIdDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeDto
 import com.wafflestudio.snutt.lectures.dto.ClassPlaceAndTimeLegacyDto
@@ -54,7 +55,7 @@ fun TimetableLectureDto(
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,
     snuttEvLecture = snuttEvLecture,
-    categoryPre2025 = timetableLecture.categoryPre2025,
+    categoryPre2025 = timetableLecture.categoryPre2025?.let { LectureCategoryPre2025.localize(it, language) },
 )
 
 data class TimetableLectureLegacyDto(
@@ -110,5 +111,5 @@ fun TimetableLectureLegacyDto(
     colorIndex = timetableLecture.colorIndex,
     lectureId = timetableLecture.lectureId,
     snuttEvLecture = snuttEvLecture,
-    categoryPre2025 = timetableLecture.categoryPre2025,
+    categoryPre2025 = timetableLecture.categoryPre2025?.let { LectureCategoryPre2025.localize(it, language) },
 )

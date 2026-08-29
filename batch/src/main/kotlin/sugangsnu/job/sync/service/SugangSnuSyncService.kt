@@ -207,6 +207,7 @@ class SugangSnuSyncServiceImpl(
                                 .filterNotNull()
                                 .filter { it.isNotBlank() }
                                 .sorted(),
+                        creditEn = parsedTag.credit.sorted().map { if (it == 1L) "1 credit" else "$it credits" },
                         classificationEn =
                             parsedTag.classificationEn
                                 .filterNotNull()

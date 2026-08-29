@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.tag.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.client.select
+import com.wafflestudio.snutt.common.enums.LectureCategoryPre2025
 import com.wafflestudio.snutt.common.enums.SortCriteria
 
 data class TagListResponse(
@@ -32,7 +33,7 @@ fun TagListResponse(
         classification = localize(tagList.tagCollection.classification, tagList.tagCollection.classificationEn),
         department = localize(tagList.tagCollection.department, tagList.tagCollection.departmentEn),
         academicYear = localize(tagList.tagCollection.academicYear, tagList.tagCollection.academicYearEn),
-        credit = tagList.tagCollection.credit,
+        credit = localize(tagList.tagCollection.credit, tagList.tagCollection.creditEn),
         instructor = localize(tagList.tagCollection.instructor, tagList.tagCollection.instructorEn),
         category = localize(tagList.tagCollection.category, tagList.tagCollection.categoryEn),
         sortCriteria =
@@ -41,6 +42,9 @@ fun TagListResponse(
                 .filterNot { it == SortCriteria.ID }
                 .map { language.select(it.fullName, it.fullNameEn) },
         updatedAt = tagList.updatedAt.toEpochMilli(),
-        categoryPre2025 = tagList.tagCollection.categoryPre2025,
+        categoryPre2025 =
+            tagList.tagCollection.categoryPre2025.map {
+                LectureCategoryPre2025.localize(it, language)
+            },
     )
 }
