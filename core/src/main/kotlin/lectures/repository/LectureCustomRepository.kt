@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.lectures.repository
 
 import com.wafflestudio.snutt.common.client.Language
+import com.wafflestudio.snutt.common.enums.LectureCategoryPre2025
 import com.wafflestudio.snutt.common.enums.SortCriteria
 import com.wafflestudio.snutt.common.extension.isEqualTo
 import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
@@ -73,7 +74,8 @@ class LectureCustomRepositoryImpl(
                                     searchCondition.categoryPre2025
                                         ?.takeIf {
                                             it.isNotEmpty()
-                                        }?.let { Lecture::categoryPre2025 inValues it },
+                                        }?.map { LectureCategoryPre2025.toKorean(it) }
+                                        ?.let { Lecture::categoryPre2025 inValues it },
                                 ).takeIf { it.isNotEmpty() }?.let {
                                     Criteria().orOperator(it)
                                 },
