@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<!--
+  SNUTT 개발팀 — 컨트리뷰션 성좌 (Contribution Constellation)
+  ------------------------------------------------------------------
+  역대 SNUTT 개발팀을 밤하늘의 별자리로 시각화한 정적 단일 HTML 페이지.
+  · 별(노드) = 팀원 1명 / 크기·밝기 = 함께한 연수 / 색 = 역할
+  · 선(엣지) = 같은 해에 함께 활동한 사이 (연도 코호트 연결)
+  · 배치: 창립자를 중심에 둔 결정론적 방사형(궤도) 레이아웃 — 첫 활동 연도가
+          이를수록 안쪽, 최근일수록 바깥쪽. 무거운 물리엔진 대신 가벼운
+          좌표 계산 + requestAnimationFrame 앰비언트 모션.
+  무드는 '우주(다크)'를 기본으로 하되, 스펙에 따라 라이트 모드도 함께 지원한다
+  (prefers-color-scheme + 수동 토글). prefers-reduced-motion이면 모션을 정지한다.
+  외부 라이브러리/웹폰트 없음. 순수 HTML/CSS/vanilla JS + Canvas.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SNUTT 개발팀 · 컨트리뷰션 성좌</title>
+<meta name="description" content="2012년 하나의 별에서 시작한 서울대 시간표 앱 SNUTT 개발팀 — 32명이 함께 그린 별자리." />
+<style>
+  :root{
+    /* Light neutral tokens (snutt-frontend) */
+    --bg:#f6f7f9; --surface:#ffffff; --fg:#17181a; --muted:#8a898e;
+    --border:#ececef; --brand:#0f9a93; --brand-mint:#1bd0c9;
+    --card:rgba(255,255,255,.82); --card-border:rgba(20,22,28,.10);
+    --scrim-top:rgba(246,247,249,.92); --scrim-bot:rgba(246,247,249,.75);
+    --shadow:0 10px 40px rgba(20,22,28,.16);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0a0c12; --surface:#14161c; --fg:#f2f2f3; --muted:#9a9aa1;
+      --border:#242730; --brand:#58c1b7; --brand-mint:#1bd0c9;
+      --card:rgba(20,23,31,.82); --card-border:rgba(255,255,255,.10);
+      --scrim-top:rgba(10,12,18,.86); --scrim-bot:rgba(10,12,18,.66);
+      --shadow:0 12px 48px rgba(0,0,0,.5);
+    }
+  }
+  /* Explicit manual override wins in both directions */
+  :root[data-theme="light"]{
+    --bg:#f6f7f9; --surface:#ffffff; --fg:#17181a; --muted:#8a898e;
+    --border:#ececef; --brand:#0f9a93; --brand-mint:#1bd0c9;
+    --card:rgba(255,255,255,.82); --card-border:rgba(20,22,28,.10);
+    --scrim-top:rgba(246,247,249,.92); --scrim-bot:rgba(246,247,249,.75);
+    --shadow:0 10px 40px rgba(20,22,28,.16);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0c12; --surface:#14161c; --fg:#f2f2f3; --muted:#9a9aa1;
+    --border:#242730; --brand:#58c1b7; --brand-mint:#1bd0c9;
+    --card:rgba(20,23,31,.82); --card-border:rgba(255,255,255,.10);
+    --scrim-top:rgba(10,12,18,.86); --scrim-bot:rgba(10,12,18,.66);
+    --shadow:0 12px 48px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  a{ color:var(--brand); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  :focus-visible{ outline:2px solid var(--brand-mint); outline-offset:3px; border-radius:6px; }
+
+  /* ---------- Stage / Canvas ---------- */
+  .stage{
+    position:relative; width:100%;
+    height:100vh; height:100svh; min-height:600px;
+    overflow:hidden; isolation:isolate;
+  }
+  #sky{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; }
+
+  /* legibility scrims over the canvas */
+  .scrim{ position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:
+      linear-gradient(to bottom, var(--scrim-top) 0%, transparent 26%, transparent 74%, var(--scrim-bot) 100%);
+  }
+
+  .hud{ position:absolute; z-index:2; pointer-events:none; }
+  .hud a, .hud button{ pointer-events:auto; }
+
+  .hud-top{ top:clamp(20px,4vh,48px); left:clamp(18px,4vw,56px); right:clamp(18px,4vw,56px); max-width:640px; }
+  .brand{ margin:0 0 6px; font-size:12px; letter-spacing:.42em; font-weight:700;
+    color:var(--brand); text-transform:uppercase; }
+  h1{ margin:0; font-size:clamp(30px,6vw,58px); line-height:1.02; font-weight:800; letter-spacing:-.015em; }
+  .subtitle{ margin:14px 0 0; max-width:46ch; font-size:clamp(13.5px,1.7vw,16px);
+    line-height:1.65; color:var(--muted); }
+  .stats{ margin:16px 0 0; font-size:13px; color:var(--muted); letter-spacing:.01em; }
+  .stats b{ color:var(--fg); font-weight:700; }
+  .stats .sep{ opacity:.4; margin:0 8px; }
+
+  /* legend */
+  .legend{ bottom:clamp(84px,15vh,120px); left:clamp(18px,4vw,56px);
+    display:flex; flex-direction:column; gap:9px; pointer-events:none; }
+  .legend h2{ margin:0 0 3px; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .legend-items{ display:flex; flex-wrap:wrap; gap:6px 8px; max-width:min(78vw,360px); pointer-events:auto; }
+  .chip{ display:inline-flex; align-items:center; gap:7px; padding:5px 10px 5px 8px;
+    font-size:12px; font-weight:600; color:var(--fg);
+    background:var(--card); border:1px solid var(--card-border); border-radius:999px;
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    cursor:pointer; transition:transform .15s ease, opacity .15s ease, border-color .15s ease; }
+  .chip:hover, .chip:focus-visible, .chip[aria-pressed="true"]{ transform:translateY(-1px); border-color:var(--brand-mint); }
+  .chip .dot{ width:10px; height:10px; border-radius:50%; flex:0 0 auto;
+    box-shadow:0 0 8px 0 currentColor; }
+  .legend.dimmed .chip:not([aria-pressed="true"]){ opacity:.42; }
+
+  /* theme toggle */
+  .theme-toggle{ position:absolute; z-index:3; top:clamp(18px,3.4vh,40px); right:clamp(18px,4vw,56px);
+    width:42px; height:42px; border-radius:50%; cursor:pointer;
+    display:grid; place-items:center; font-size:18px; line-height:1;
+    color:var(--fg); background:var(--card); border:1px solid var(--card-border);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    transition:transform .15s ease, border-color .15s ease; }
+  .theme-toggle:hover{ transform:scale(1.06); border-color:var(--brand-mint); }
+
+  /* hint */
+  .hint{ position:absolute; z-index:2; bottom:clamp(70px,13vh,104px); right:clamp(18px,4vw,56px);
+    margin:0; font-size:12px; color:var(--muted); pointer-events:none; text-align:right;
+    animation:breathe 3.6s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ opacity:.5 } 50%{ opacity:1 } }
+
+  /* footer */
+  .hud-bottom{ bottom:clamp(18px,3vh,32px); left:clamp(18px,4vw,56px); right:clamp(18px,4vw,56px);
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .maker{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--muted); }
+  .maker img{ width:22px; height:22px; object-fit:contain; border-radius:5px; opacity:.9; }
+  .contact{ font-size:12.5px; color:var(--muted); }
+  .contact a{ font-weight:600; }
+
+  /* tooltip card */
+  .tooltip{ position:absolute; z-index:4; pointer-events:none; opacity:0;
+    max-width:280px; min-width:200px; padding:14px 16px;
+    background:var(--card); border:1px solid var(--card-border); border-radius:14px;
+    box-shadow:var(--shadow); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    transform:translate(-50%, calc(-100% - 18px)) scale(.96);
+    transition:opacity .13s ease, transform .13s ease; }
+  .tooltip.show{ opacity:1; transform:translate(-50%, calc(-100% - 18px)) scale(1); }
+  .tt-head{ display:flex; align-items:center; gap:9px; }
+  .tt-name{ font-size:16px; font-weight:800; letter-spacing:-.01em; }
+  .tt-role{ display:inline-flex; align-items:center; gap:6px; margin-top:9px;
+    font-size:12px; font-weight:700; padding:3px 9px; border-radius:999px;
+    color:#fff; }
+  .tt-role .rd{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.9); }
+  .tt-dept{ margin-top:10px; font-size:13px; color:var(--fg); opacity:.85; }
+  .tt-meta{ margin-top:10px; padding-top:10px; border-top:1px solid var(--card-border);
+    display:flex; gap:14px; font-size:12px; color:var(--muted); }
+  .tt-meta b{ color:var(--fg); font-weight:700; }
+
+  /* ---------- Roster (accessible fallback) ---------- */
+  .roster{ background:var(--surface); border-top:1px solid var(--border);
+    padding:clamp(40px,7vw,88px) clamp(18px,5vw,64px) clamp(56px,9vw,110px); }
+  .roster-inner{ max-width:1080px; margin:0 auto; }
+  .roster h2{ margin:0; font-size:clamp(20px,3vw,28px); font-weight:800; letter-spacing:-.01em; }
+  .roster .lead{ margin:12px 0 0; color:var(--muted); font-size:14.5px; line-height:1.6; max-width:60ch; }
+  details.roster-details{ margin-top:26px; border:1px solid var(--border); border-radius:14px; background:var(--bg); }
+  details.roster-details > summary{ list-style:none; cursor:pointer; padding:16px 20px;
+    font-weight:700; font-size:14.5px; display:flex; align-items:center; gap:10px; }
+  details.roster-details > summary::-webkit-details-marker{ display:none; }
+  details.roster-details > summary::before{ content:"▸"; color:var(--brand); transition:transform .15s ease; }
+  details.roster-details[open] > summary::before{ transform:rotate(90deg); }
+  .summary-count{ margin-left:auto; color:var(--muted); font-weight:600; }
+  .roster-grid{ list-style:none; margin:0; padding:8px 12px 16px;
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:8px; }
+  .roster-item{ width:100%; text-align:left; cursor:pointer;
+    display:grid; grid-template-columns:auto 1fr; align-items:center; gap:10px 12px;
+    padding:12px 14px; border:1px solid transparent; border-radius:11px;
+    background:var(--surface); color:var(--fg);
+    font-family:inherit; transition:border-color .13s ease, transform .13s ease, background .13s ease; }
+  .roster-item:hover, .roster-item:focus-visible{ border-color:var(--brand-mint); transform:translateY(-1px);
+    background:var(--card); }
+  .ri-dot{ width:12px; height:12px; border-radius:50%; box-shadow:0 0 10px 0 currentColor; }
+  .ri-main{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .ri-line1{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .ri-name{ font-weight:800; font-size:15px; }
+  .ri-role{ font-size:11.5px; font-weight:700; padding:1px 7px; border-radius:999px; color:#fff; }
+  .ri-sub{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ri-years{ font-variant-numeric:tabular-nums; }
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+  @media (max-width:560px){
+    .legend{ bottom:auto; top:auto; }
+    .subtitle{ display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+    .hint{ display:none; }
+  }
+  @media (max-width:820px) and (min-width:561px){
+    .legend{ bottom:clamp(96px,18vh,140px); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+    .hint{ animation:none; opacity:.8; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="stage" id="stage" aria-label="SNUTT 개발팀 성좌 시각화">
+    <canvas id="sky" role="img"
+      aria-label="SNUTT 개발팀 컨트리뷰션 성좌. 별 하나가 팀원 한 명이며, 크고 밝을수록 오래 함께한 사람, 색은 역할을 나타냅니다. 같은 해에 함께 활동한 팀원끼리 선으로 이어집니다. 자세한 명단은 아래 목록을 참고하세요."></canvas>
+    <div class="scrim" aria-hidden="true"></div>
+
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="라이트/다크 테마 전환" title="테마 전환">☾</button>
+
+    <header class="hud hud-top">
+      <p class="brand">Contribution Constellation</p>
+      <h1>SNUTT 개발팀</h1>
+      <p class="subtitle">2012년, 단 하나의 별에서 시작했습니다. 그 빛을 이어받아 오늘까지 SNUTT를 만들어 온 사람들의 궤적입니다. 별 하나가 한 사람 — 크고 밝을수록 오래 함께했고, 색은 맡은 역할, 선은 같은 해를 함께 보낸 인연입니다.</p>
+      <p class="stats" id="stats">
+        고유 인물 <b id="s-people">32</b>명<span class="sep">·</span>활동 연도 <b id="s-years">9</b>개(2012–2026)<span class="sep">·</span>누적 참여 <b id="s-cells">80</b>
+      </p>
+    </header>
+
+    <div class="hud legend" id="legend">
+      <h2>역할</h2>
+      <div class="legend-items" id="legendItems" role="group" aria-label="역할 범례 (누르면 해당 역할 별 강조)"></div>
+    </div>
+
+    <p class="hint" aria-hidden="true">별에 마우스를 올리거나 눌러 보세요</p>
+
+    <div class="tooltip" id="tip" role="status" aria-hidden="true"></div>
+
+    <footer class="hud hud-bottom">
+      <span class="maker">
+        <img src="https://snutt-asset.s3.ap-northeast-2.amazonaws.com/waffle_logo.png" alt="와플스튜디오 로고" onerror="this.style.display='none'"/>
+        SNUTT는 와플스튜디오가 만듭니다
+      </span>
+      <span class="contact">문의 · <a href="mailto:snutt@wafflestudio.com">snutt@wafflestudio.com</a></span>
+    </footer>
+  </section>
+
+  <!-- 접근성 · 폴백용 팀원 명단 (스크린리더/키보드) -->
+  <section class="roster" aria-label="SNUTT 개발팀 전체 명단">
+    <div class="roster-inner">
+      <h2>함께 만든 사람들</h2>
+      <p class="lead">캔버스를 볼 수 없는 환경을 위한 전체 명단입니다. 오래 함께한 순으로 정렬했으며, 각 항목에 마우스를 올리거나 포커스하면 위 성좌에서 해당 별이 함께 빛납니다.</p>
+      <details class="roster-details">
+        <summary>전체 팀원 명단 <span class="summary-count" id="rosterCount"></span></summary>
+        <ul class="roster-grid" id="rosterList"></ul>
+      </details>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================ DATA ============================ */
+  const TEAM = {
+    "years":["2012","2014","2016","2021","2022","2023","2024","2025","2026"],
+    "byYear":{
+      "2012":[{"name":"이종민","dept":"컴퓨터공학부 09","role":"최초 개발"}],
+      "2014":[{"name":"김광래","dept":"컴퓨터공학부 12","role":null},{"name":"김진형","dept":"컴퓨터공학부 14","role":null},{"name":"정형식","dept":"자유전공학부 10","role":null},{"name":"김알찬","dept":"컴퓨터공학부 12","role":null}],
+      "2016":[{"name":"김진형","dept":"컴퓨터공학부 14","role":null},{"name":"방성원","dept":"컴퓨터공학부 15","role":null},{"name":"이주현","dept":"시각디자인 11","role":null},{"name":"장렬","dept":"컴퓨터공학부 14","role":null},{"name":"정형식","dept":"자유전공학부 10","role":null}],
+      "2021":[{"name":"금진섭","dept":"서양사학과 14","role":"iOS"},{"name":"김상민","dept":"컴퓨터공학부 18","role":"Android"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"서정록","dept":"컴퓨터공학부 18","role":"기획"},{"name":"서정민","dept":"홍익대 회화과 15","role":"기획·디자인"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2022":[{"name":"금진섭","dept":"서양사학과 14","role":"iOS"},{"name":"김상민","dept":"컴퓨터공학부 18","role":"Android"},{"name":"박수빈","dept":"컴퓨터공학부 18","role":"Server"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"서정록","dept":"컴퓨터공학부 18","role":"기획"},{"name":"서정민","dept":"홍익대 회화과 15","role":"기획·디자인"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"우현민","dept":"컴퓨터공학부 19","role":"Web"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2023":[{"name":"강지혁","dept":"컴퓨터공학부 19","role":"Server"},{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"박수빈","dept":"컴퓨터공학부 18","role":"Server"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"우현민","dept":"컴퓨터공학부 19","role":"Web"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2024":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"조성해","dept":"건축학과 18","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2025":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이채민","dept":"자유전공학부 20","role":"iOS"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"정해찬","dept":"컴퓨터공학부 24","role":"Android"},{"name":"조성해","dept":"건축학과 18","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최유진","dept":"디자인과 22","role":"Design"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}],
+      "2026":[{"name":"김기완","dept":"컴퓨터공학부 18","role":"Web"},{"name":"민유진","dept":"디자인과 21","role":"Design"},{"name":"박소은","dept":"동양화과 21","role":"Design"},{"name":"박신홍","dept":"경영학과 17","role":"iOS"},{"name":"변다빈","dept":"언어학과 14","role":"Server"},{"name":"송동엽","dept":"컴퓨터공학부 22","role":"Android"},{"name":"양주현","dept":"지구환경과학부 16","role":"Android"},{"name":"이정달","dept":"자유전공학부 25","role":"Server"},{"name":"이현도","dept":"컴퓨터공학부 23","role":"Android"},{"name":"임찬영","dept":"컴퓨터공학부 23","role":"Server"},{"name":"정해찬","dept":"컴퓨터공학부 24","role":"Android"},{"name":"최연서","dept":"물리교육과 23","role":"Server"},{"name":"최유림","dept":"컴퓨터공학부 19","role":"iOS"},{"name":"최한결","dept":"컴퓨터공학부 15","role":"Server"}]
+    }
+  };
+
+  /* Role palette (SNUTT category tokens). dark = spec base, light = legibility-adjusted */
+  const ROLE_META = {
+    "최초 개발": {label:"최초 개발", dark:"#1bd0c9", light:"#0f9a93"},
+    "Server":    {label:"Server",    dark:"#4f48c4", light:"#4f48c4"},
+    "iOS":       {label:"iOS",       dark:"#1d99e9", light:"#1478c4"},
+    "Android":   {label:"Android",   dark:"#2bc366", light:"#1f9e50"},
+    "Web":       {label:"Web",       dark:"#f58d3d", light:"#d9700f"},
+    "Design":    {label:"Design",    dark:"#af56b3", light:"#8f3f93"},
+    "기획":      {label:"기획",      dark:"#fac52d", light:"#b8860b"},
+    "초창기":    {label:"초창기 멤버", dark:"#7a8290", light:"#6a727d"}
+  };
+  const LEGEND_ORDER = ["최초 개발","Server","iOS","Android","Web","Design","기획","초창기"];
+
+  function roleKeyOf(role){
+    if(role==null) return "초창기";
+    if(role==="기획·디자인") return "기획";
+    return role;
+  }
+
+  /* ============================ HELPERS ============================ */
+  function hash32(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+  function mulberry32(a){ return function(){ a|=0; a=(a+0x6D2B79F5)|0; let t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+  function hexA(hex,a){
+    hex=hex.replace("#","");
+    if(hex.length===3) hex=hex.split("").map(c=>c+c).join("");
+    const n=parseInt(hex,16);
+    return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a+")";
+  }
+  const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+
+  /* ============================ BUILD MODEL ============================ */
+  const years = TEAM.years;
+  const yearIndex = {}; years.forEach((y,i)=>yearIndex[y]=i);
+  const maxRing = years.length-1;
+
+  const peopleMap = new Map();
+  for(const y of years){
+    for(const m of TEAM.byYear[y]){
+      let p = peopleMap.get(m.name);
+      if(!p){ p={ name:m.name, dept:m.dept, role:m.role, years:[] }; peopleMap.set(m.name,p); }
+      p.years.push(y);
+      // prefer a non-null role / keep latest dept (data is consistent; defensive)
+      if(p.role==null && m.role!=null) p.role=m.role;
+      p.dept = m.dept;
+    }
+  }
+
+  const nodes = [];
+  for(const p of peopleMap.values()){
+    p.years.sort();
+    const rk = roleKeyOf(p.role);
+    const firstIdx = yearIndex[p.years[0]];
+    const pr = mulberry32(hash32(p.name));
+    nodes.push({
+      name:p.name, dept:p.dept, role:p.role, roleKey:rk,
+      years:p.years, ya:p.years.length, firstIdx,
+      isFounder: rk==="최초 개발",
+      jr:pr(), ja:pr(),
+      phase:pr()*6.2832, phase2:pr()*6.2832,
+      wsp:0.14+pr()*0.22, wsp2:0.14+pr()*0.22,
+      tsp:0.5+pr()*1.1, tph:pr()*6.2832,
+      nx:0, ny:0, px:0, py:0
+    });
+  }
+  const nodeByName = new Map(nodes.map(n=>[n.name,n]));
+
+  // Co-occurrence edges (dedup) + adjacency
+  const edgeMap = new Map();
+  const adj = new Map(nodes.map(n=>[n.name,new Set()]));
+  for(const y of years){
+    const arr = TEAM.byYear[y];
+    for(let i=0;i<arr.length;i++){
+      for(let j=i+1;j<arr.length;j++){
+        const a=arr[i].name, b=arr[j].name;
+        if(a===b) continue;
+        const key=a<b?a+" "+b:b+" "+a;
+        edgeMap.set(key,(edgeMap.get(key)||0)+1);
+        adj.get(a).add(b); adj.get(b).add(a);
+      }
+    }
+  }
+  const edges = [];
+  for(const [key,w] of edgeMap){ const s=key.split(" "); edges.push({a:s[0],b:s[1],w}); }
+
+  // ---- Deterministic radial (orbital) layout: founder at center, first-year -> radius ----
+  const byRing = new Map();
+  for(const n of nodes){ if(!byRing.has(n.firstIdx)) byRing.set(n.firstIdx,[]); byRing.get(n.firstIdx).push(n); }
+  const GOLD = 2.399963229728653; // golden angle, rotate each ring
+  function ringRadius(r){ return r===0 ? 0 : 0.12 + 0.88*Math.pow(r/maxRing, 0.85); }
+  for(const [r,members] of byRing){
+    members.sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+    const count = members.length;
+    const offset = r*GOLD + (r*1.7);
+    members.forEach((n,k)=>{
+      const ang = count===1 ? offset : offset + k*(2*Math.PI/count);
+      const aj = (n.ja*2-1) * (0.55/Math.max(count,3));
+      let rn = ringRadius(r) + (n.jr*2-1)*0.035;
+      if(r===0) rn = 0; // keep founder dead-center
+      const a = ang + aj;
+      n.nx = rn*Math.cos(a);
+      n.ny = rn*Math.sin(a);
+    });
+  }
+
+  // background dust (dark mode only)
+  const dust=[]; { const dr=mulberry32(20260718);
+    for(let i=0;i<170;i++){ dust.push({x:dr(),y:dr(),r:0.3+dr()*1.1,ph:dr()*6.2832,sp:0.4+dr()*1.4,br:0.3+dr()*0.7}); }
+  }
+
+  /* ============================ THEME ============================ */
+  const root = document.documentElement;
+  const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function effectiveTheme(){
+    const attr = root.getAttribute("data-theme");
+    if(attr==="light"||attr==="dark") return attr;
+    return mqDark.matches ? "dark" : "light";
+  }
+  function colorFor(roleKey){ const m=ROLE_META[roleKey]||ROLE_META["초창기"]; return effectiveTheme()==="dark"?m.dark:m.light; }
+
+  /* ============================ CANVAS ============================ */
+  const canvas = document.getElementById("sky");
+  const ctx = canvas.getContext("2d");
+  const stage = document.getElementById("stage");
+  const tip = document.getElementById("tip");
+
+  let W=0,H=0,DPR=1,scale=1,cx=0,cy=0,sizeScale=1;
+  let reduced = mqReduce.matches;
+  let running = !reduced, lastT=0;
+
+  function resize(){
+    const rect = stage.getBoundingClientRect();
+    W=Math.max(1,rect.width); H=Math.max(1,rect.height);
+    DPR=Math.min(window.devicePixelRatio||1, 2.5);
+    canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
+    canvas.style.width=W+"px"; canvas.style.height=H+"px";
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    cx=W/2; cy=H*0.5;
+    scale=Math.min(W, H*1.06)*0.5*0.9;
+    sizeScale=clamp(scale/470,0.72,1.5);
+    if(!running) render(lastT);
+  }
+
+  // interaction state
+  let hovered=null, selected=null, legendRole=null;
+  function activeName(){ return hovered || selected; }
+
+  function coreRadius(n){
+    let r = 2.4 + ((n.ya-1)/5)*4.6;         // 1yr -> 2.4 ... 6yr -> 7.0
+    if(n.isFounder) r = Math.max(r, 6.4);
+    return r*sizeScale;
+  }
+  function brightness(n){ return 0.55 + ((n.ya-1)/5)*0.45; }  // 0.55 .. 1.0
+
+  function computePositions(t){
+    const amp = reduced?0:2.6*sizeScale;
+    for(const n of nodes){
+      const wx = reduced?0:Math.sin(t*n.wsp + n.phase)*amp;
+      const wy = reduced?0:Math.cos(t*n.wsp2 + n.phase2)*amp*0.8;
+      n.px = cx + n.nx*scale + wx;
+      n.py = cy + n.ny*scale + wy;
+    }
+  }
+
+  function render(t){
+    lastT=t;
+    const dark = effectiveTheme()==="dark";
+    computePositions(t);
+
+    // ---- background ----
+    ctx.clearRect(0,0,W,H);
+    const g = ctx.createRadialGradient(cx, cy*0.92, Math.min(W,H)*0.05, cx, cy, Math.max(W,H)*0.72);
+    if(dark){ g.addColorStop(0,"#111726"); g.addColorStop(0.55,"#0a0c14"); g.addColorStop(1,"#05060b"); }
+    else    { g.addColorStop(0,"#ffffff"); g.addColorStop(0.6,"#f2f4f7"); g.addColorStop(1,"#e9ecf1"); }
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // ---- dust (dark) ----
+    if(dark){
+      ctx.fillStyle = "#cdd7ff";
+      for(const d of dust){
+        const tw = reduced?0.6:(0.35+0.65*(0.5+0.5*Math.sin(t*d.sp+d.ph)));
+        ctx.globalAlpha = 0.5*d.br*tw;
+        ctx.beginPath(); ctx.arc(d.x*W, d.y*H, d.r*sizeScale, 0, 6.2832); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    }
+
+    const act = activeName();
+    const focusRole = act ? null : legendRole;
+
+    // ---- edges ----
+    const baseEdge = dark ? "rgba(150,170,215," : "rgba(70,80,105,";
+    const baseA = dark ? 0.06 : 0.05;
+    const bright = [];
+    ctx.lineWidth = 0.7*sizeScale;
+    for(const e of edges){
+      const related = act && (e.a===act || e.b===act);
+      if(related){ bright.push(e); continue; }
+      const A = nodeByName.get(e.a), B=nodeByName.get(e.b);
+      let alpha = baseA * (0.6 + 0.4*Math.min(e.w,3)/3);
+      if(act) alpha *= 0.22;                 // fade non-related when focusing a star
+      if(focusRole){
+        const on = A.roleKey===focusRole || B.roleKey===focusRole;
+        alpha *= on ? 1.6 : 0.28;
+      }
+      ctx.strokeStyle = baseEdge + alpha.toFixed(3) + ")";
+      ctx.beginPath(); ctx.moveTo(A.px,A.py); ctx.lineTo(B.px,B.py); ctx.stroke();
+    }
+    // bright (focused) edges radiate in the star's colour
+    if(bright.length){
+      const src = nodeByName.get(act);
+      const col = colorFor(src.roleKey);
+      ctx.lineWidth = 1.5*sizeScale;
+      for(const e of bright){
+        const A=nodeByName.get(e.a), B=nodeByName.get(e.b);
+        const grd = ctx.createLinearGradient(A.px,A.py,B.px,B.py);
+        grd.addColorStop(0, hexA(col, 0.75));
+        grd.addColorStop(1, hexA(col, 0.28));
+        ctx.strokeStyle=grd;
+        ctx.beginPath(); ctx.moveTo(A.px,A.py); ctx.lineTo(B.px,B.py); ctx.stroke();
+      }
+    }
+
+    // ---- nodes ----
+    const neighbors = act ? adj.get(act) : null;
+    for(const n of nodes){
+      let mul=1;
+      if(act){ mul = (n.name===act)?1 : (neighbors.has(n.name)?0.92:0.12); }
+      else if(focusRole){ mul = (n.roleKey===focusRole)?1:0.14; }
+      drawStar(n, mul, dark, t, n.name===act);
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function drawStar(n, mul, dark, t, isActive){
+    const col = colorFor(n.roleKey);
+    const tw = reduced?1:(0.82+0.18*Math.sin(t*n.tsp+n.tph));
+    let core = coreRadius(n) * (isActive?1.28:1);
+    const b = brightness(n)*tw*mul;
+    const glowR = core * (dark?4.0:2.4) * (isActive?1.25:1);
+
+    // glow
+    const gg = ctx.createRadialGradient(n.px,n.py,0, n.px,n.py, glowR);
+    gg.addColorStop(0, hexA(col, (dark?0.55:0.32)*b));
+    gg.addColorStop(0.45, hexA(col, (dark?0.20:0.12)*b));
+    gg.addColorStop(1, hexA(col, 0));
+    ctx.fillStyle=gg;
+    ctx.beginPath(); ctx.arc(n.px,n.py,glowR,0,6.2832); ctx.fill();
+
+    // founder halo rings
+    if(n.isFounder){
+      ctx.globalAlpha = 0.5*mul;
+      ctx.strokeStyle = hexA(col, dark?0.5:0.4);
+      ctx.lineWidth = 1.2*sizeScale;
+      const pr = reduced?1:(1+0.06*Math.sin(t*0.9));
+      ctx.beginPath(); ctx.arc(n.px,n.py, core*2.1*pr, 0, 6.2832); ctx.stroke();
+      ctx.globalAlpha = 0.28*mul;
+      ctx.beginPath(); ctx.arc(n.px,n.py, core*3.1*pr, 0, 6.2832); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+
+    // core
+    ctx.globalAlpha = clamp(mul,0.12,1);
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(n.px,n.py,core,0,6.2832); ctx.fill();
+    // light-mode definition stroke
+    if(!dark){ ctx.strokeStyle=hexA("#000",0.14*mul); ctx.lineWidth=1; ctx.stroke(); }
+    // sparkle highlight
+    ctx.globalAlpha = (dark?0.9:0.55)*tw*mul;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(n.px-core*0.28, n.py-core*0.30, core*0.34, 0, 6.2832); ctx.fill();
+
+    // active ring
+    if(isActive){
+      ctx.globalAlpha=1;
+      ctx.strokeStyle = dark?"rgba(255,255,255,.85)":hexA(col,0.9);
+      ctx.lineWidth=1.6*sizeScale;
+      ctx.beginPath(); ctx.arc(n.px,n.py, core+5*sizeScale, 0, 6.2832); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  /* ============================ HIT TEST + TOOLTIP ============================ */
+  function hitTest(x,y){
+    let best=null, bd=Infinity;
+    for(const n of nodes){
+      const dx=n.px-x, dy=n.py-y, d=dx*dx+dy*dy;
+      const rr = coreRadius(n)+12*sizeScale;
+      if(d < rr*rr && d<bd){ bd=d; best=n; }
+    }
+    return best;
+  }
+
+  function roleLabel(n){
+    if(n.roleKey==="초창기") return "초창기 멤버";
+    return ROLE_META[n.roleKey] ? ROLE_META[n.roleKey].label : n.roleKey;
+  }
+  function yearsRange(n){ const a=n.years[0], b=n.years[n.years.length-1]; return a===b?a:a+"–"+b; }
+
+  function showTip(n, atX, atY){
+    if(!n){ hideTip(); return; }
+    const col = colorFor(n.roleKey);
+    const mates = adj.get(n.name).size;
+    tip.innerHTML =
+      '<div class="tt-head"><span class="tt-name">'+esc(n.name)+'</span></div>'+
+      '<span class="tt-role" style="background:'+col+';'+(n.roleKey==="기획"?"color:#3a2e00;":"")+'"><span class="rd"></span>'+esc(roleLabel(n))+'</span>'+
+      '<div class="tt-dept">'+esc(n.dept)+'</div>'+
+      '<div class="tt-meta"><span><b>'+yearsRange(n)+'</b> · '+n.ya+'년 활동</span><span>함께한 동료 <b>'+mates+'</b>명</span></div>';
+    const pad=14, tw=tip.offsetWidth||220, th=tip.offsetHeight||120;
+    let left=clamp(atX, tw/2+pad, W-tw/2-pad);
+    let top=atY;
+    if(top - th - 24 < 0) top = atY + th + 40; // flip below if no room above
+    tip.style.left=left+"px"; tip.style.top=top+"px";
+    tip.classList.add("show"); tip.setAttribute("aria-hidden","false");
+  }
+  function hideTip(){ tip.classList.remove("show"); tip.setAttribute("aria-hidden","true"); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  /* ============================ EVENTS ============================ */
+  function localPoint(ev){
+    const r=canvas.getBoundingClientRect();
+    return { x:ev.clientX-r.left, y:ev.clientY-r.top };
+  }
+  canvas.addEventListener("pointermove", ev=>{
+    if(ev.pointerType==="touch") return; // touch handled on tap
+    const p=localPoint(ev);
+    const n=hitTest(p.x,p.y);
+    const changed = (n?n.name:null)!==hovered;
+    hovered = n?n.name:null;
+    canvas.style.cursor = n?"pointer":"default";
+    if(n) showTip(n, n.px, n.py); else if(!selected) hideTip();
+    if(changed && !running) render(lastT);
+  });
+  canvas.addEventListener("pointerleave", ()=>{
+    hovered=null; if(!selected) hideTip();
+    if(!running) render(lastT);
+  });
+  canvas.addEventListener("pointerdown", ev=>{
+    const p=localPoint(ev);
+    const n=hitTest(p.x,p.y);
+    selected = n?n.name:null;
+    if(n){ showTip(n, n.px, n.py); } else { hideTip(); }
+    if(!running) render(lastT);
+  });
+
+  /* ============================ LEGEND ============================ */
+  const legendItems = document.getElementById("legendItems");
+  const legendWrap = document.getElementById("legend");
+  LEGEND_ORDER.forEach(rk=>{
+    const btn=document.createElement("button");
+    btn.type="button"; btn.className="chip"; btn.setAttribute("aria-pressed","false");
+    btn.dataset.role=rk;
+    const m=ROLE_META[rk];
+    const dot=document.createElement("span"); dot.className="dot";
+    btn.appendChild(dot);
+    const lab=document.createElement("span"); lab.textContent=m.label; btn.appendChild(lab);
+    const setColors=()=>{ dot.style.background=colorFor(rk); dot.style.color=colorFor(rk); };
+    setColors(); btn._setColors=setColors;
+    const on=()=>{ legendRole=rk; legendWrap.classList.add("dimmed"); if(!running) render(lastT); };
+    const off=()=>{ if(btn.getAttribute("aria-pressed")==="true") return; legendRole=null; legendWrap.classList.remove("dimmed"); if(!running) render(lastT); };
+    btn.addEventListener("mouseenter", on);
+    btn.addEventListener("mouseleave", off);
+    btn.addEventListener("focus", on);
+    btn.addEventListener("blur", off);
+    btn.addEventListener("click", ()=>{
+      const pressed = btn.getAttribute("aria-pressed")==="true";
+      legendItems.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+      if(pressed){ legendRole=null; legendWrap.classList.remove("dimmed"); }
+      else { btn.setAttribute("aria-pressed","true"); legendRole=rk; legendWrap.classList.add("dimmed"); }
+      if(!running) render(lastT);
+    });
+    legendItems.appendChild(btn);
+  });
+
+  /* ============================ ROSTER ============================ */
+  const rosterList = document.getElementById("rosterList");
+  document.getElementById("rosterCount").textContent = "· "+nodes.length+"명";
+  const sorted = nodes.slice().sort((a,b)=> b.ya-a.ya || a.firstIdx-b.firstIdx || a.name.localeCompare(b.name,"ko"));
+  for(const n of sorted){
+    const li=document.createElement("li");
+    const btn=document.createElement("button");
+    btn.type="button"; btn.className="roster-item"; btn.dataset.name=n.name;
+    const col=colorFor(n.roleKey);
+
+    const dot=document.createElement("span"); dot.className="ri-dot";
+    dot.style.background=col; dot.style.color=col; btn._dot=dot; btn._n=n;
+
+    const main=document.createElement("span"); main.className="ri-main";
+    const l1=document.createElement("span"); l1.className="ri-line1";
+    const nm=document.createElement("span"); nm.className="ri-name"; nm.textContent=n.name;
+    const rl=document.createElement("span"); rl.className="ri-role";
+    rl.textContent=roleLabel(n); rl.style.background=col;
+    if(n.roleKey==="기획") rl.style.color="#3a2e00";
+    btn._role=rl;
+    l1.appendChild(nm); l1.appendChild(rl);
+    const sub=document.createElement("span"); sub.className="ri-sub";
+    sub.innerHTML = esc(n.dept)+' · <span class="ri-years">'+yearsRange(n)+"</span> · "+n.ya+"년";
+    main.appendChild(l1); main.appendChild(sub);
+
+    const sr=document.createElement("span"); sr.className="sr-only";
+    sr.textContent = n.name+", "+roleLabel(n)+", "+n.dept+", "+n.years.join(", ")+" 활동, 총 "+n.ya+"년.";
+
+    btn.appendChild(dot); btn.appendChild(main); btn.appendChild(sr);
+    btn.addEventListener("mouseenter", ()=>{ selected=n.name; if(!running) render(lastT); });
+    btn.addEventListener("mouseleave", ()=>{ if(selected===n.name){ selected=null; if(!running) render(lastT);} });
+    btn.addEventListener("focus", ()=>{ selected=n.name; if(!running) render(lastT); });
+    btn.addEventListener("blur", ()=>{ if(selected===n.name){ selected=null; if(!running) render(lastT);} });
+    li.appendChild(btn); rosterList.appendChild(li);
+  }
+
+  function refreshThemeColors(){
+    legendItems.querySelectorAll(".chip").forEach(c=>{ if(c._setColors) c._setColors(); });
+    rosterList.querySelectorAll(".roster-item").forEach(b=>{
+      const col=colorFor(b._n.roleKey);
+      b._dot.style.background=col; b._dot.style.color=col;
+      b._role.style.background=col;
+    });
+  }
+
+  /* ============================ THEME TOGGLE ============================ */
+  const toggle=document.getElementById("themeToggle");
+  function syncToggleIcon(){ toggle.textContent = effectiveTheme()==="dark" ? "☀" : "☾"; }
+  syncToggleIcon();
+  toggle.addEventListener("click", ()=>{
+    const next = effectiveTheme()==="dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    syncToggleIcon(); refreshThemeColors();
+    if(!running) render(lastT);
+  });
+  mqDark.addEventListener("change", ()=>{
+    if(!root.getAttribute("data-theme")){ syncToggleIcon(); refreshThemeColors(); if(!running) render(lastT); }
+  });
+  mqReduce.addEventListener("change", e=>{
+    reduced=e.matches; running=!reduced;
+    if(running) requestAnimationFrame(loop); else render(lastT);
+  });
+
+  /* ============================ LOOP ============================ */
+  function loop(ts){ render(ts/1000); if(running) requestAnimationFrame(loop); }
+
+  window.addEventListener("resize", resize, {passive:true});
+  resize();
+  if(running) requestAnimationFrame(loop); else render(0);
+})();
+</script>
+</body>
+</html>
