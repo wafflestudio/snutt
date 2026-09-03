@@ -1,7 +1,9 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.dto.ListResponse
 import com.wafflestudio.snutt.config.CurrentUser
+import com.wafflestudio.snutt.debug.service.FriendListDebugService
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.friend.dto.FriendRequest
 import com.wafflestudio.snutt.friend.dto.FriendRequestLinkResponse
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -32,11 +35,18 @@ import org.springframework.web.bind.annotation.RestController
 class FriendController(
     private val friendService: FriendService,
     private val userNicknameService: UserNicknameService,
+    private val friendListDebugService: FriendListDebugService,
 ) {
     @GetMapping("")
     suspend fun getFriends(
         @CurrentUser user: User,
         @RequestParam state: String,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
+    ): ListResponse<FriendResponse> = friendListDebugService.capture(user, state, clientInfo) { getFriendList(user, state) }
+
+    private suspend fun getFriendList(
+        user: User,
+        state: String,
     ): ListResponse<FriendResponse> {
         val userId = user.id!!
         val friendState = FriendState.from(state) ?: throw IllegalArgumentException("Invalid state")
