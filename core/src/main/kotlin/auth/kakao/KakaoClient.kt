@@ -32,7 +32,7 @@ class KakaoClient : OAuth2Client {
                     headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
                 ).getOrNull()
 
-        log.info("token=$token, kakaoUserResponse=$kakaoUserResponse")
+        log.info("kakao getMe: socialId={}", kakaoUserResponse?.id)
 
         return kakaoUserResponse?.let {
             OAuth2UserResponse(

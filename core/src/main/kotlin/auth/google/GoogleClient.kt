@@ -32,7 +32,7 @@ class GoogleClient : OAuth2Client {
                     headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
                 ).getOrNull()
 
-        log.info("token=$token, googleUserResponse=$googleUserResponse")
+        log.info("google getMe: socialId={}", googleUserResponse?.id)
 
         return googleUserResponse?.let {
             OAuth2UserResponse(

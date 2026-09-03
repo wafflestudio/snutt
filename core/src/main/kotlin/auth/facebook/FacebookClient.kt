@@ -50,7 +50,7 @@ class FacebookClient(
                     params = mapOf("access_token" to token),
                 ).getOrNull()
 
-        log.info("token=$token, facebookUserResponse=$facebookUserResponse")
+        log.info("facebook getMe: socialId={}", facebookUserResponse?.id)
 
         return facebookUserResponse?.let {
             OAuth2UserResponse(
