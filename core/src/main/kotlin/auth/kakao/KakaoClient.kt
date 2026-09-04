@@ -3,7 +3,6 @@ package com.wafflestudio.snutt.auth.kakao
 import com.wafflestudio.snutt.auth.OAuth2Client
 import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.common.extension.get
-import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -15,8 +14,6 @@ import java.time.Duration
 @Component("KAKAO")
 @RegisterReflectionForBinding(KakaoOAuth2UserResponse::class)
 class KakaoClient : OAuth2Client {
-    private val log = LoggerFactory.getLogger(javaClass)
-
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
     private val webClient = WebClient.builder().clientConnector(ReactorClientHttpConnector(httpClient)).build()
 
@@ -31,8 +28,6 @@ class KakaoClient : OAuth2Client {
                     uri = USER_INFO_URI,
                     headers = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $token"),
                 ).getOrNull()
-
-        log.info("kakao getMe: socialId={}", kakaoUserResponse?.id)
 
         return kakaoUserResponse?.let {
             OAuth2UserResponse(
