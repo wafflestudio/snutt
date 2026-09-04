@@ -62,7 +62,7 @@ class OidcJwtVerifier(
 
             claims
         }.onFailure {
-            log.warn("failed to verify oidc token {}: {}", token, it.message)
+            log.warn("failed to verify oidc token: {}", it.message)
         }.getOrNull()
 
     fun looksLikeJwt(token: String): Boolean {
