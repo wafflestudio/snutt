@@ -1,0 +1,180 @@
+// Gradle 빌드의 태스크별 소요 시간을 측정해 빌드 종료 시 콘솔에 표로 출력한다.
+// native image 빌드가 오래 걸릴 때 어느 태스크(nativeCompile / processAot / compileKotlin ...)가
+// 시간을 쓰는지 CI 로그만 보고 판단할 수 있게 하는 것이 목적이다.
+//
+// 사용법:
+//   ./gradlew <task> --init-script gradle/build-timing.init.gradle
+//
+// 환경변수:
+//   BUILD_TIMING_LABEL       리포트 헤더에 붙는 라벨 (여러 gradle 호출을 구분할 때)
+//   BUILD_TIMING_MIN_MILLIS  이 시간 미만인 태스크는 개별 행으로 출력하지 않는다 (기본 500)
+//   BUILD_TIMING_OUTPUT      지정 시 "duration_millis<TAB>outcome<TAB>task" TSV 를 이 경로에 추가로 기록
+
+import org.gradle.api.initialization.Settings
+import org.gradle.api.provider.Property
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
+import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.tooling.events.FinishEvent
+import org.gradle.tooling.events.OperationCompletionListener
+import org.gradle.tooling.events.task.TaskFailureResult
+import org.gradle.tooling.events.task.TaskFinishEvent
+import org.gradle.tooling.events.task.TaskSkippedResult
+import org.gradle.tooling.events.task.TaskSuccessResult
+
+import javax.inject.Inject
+import java.util.concurrent.ConcurrentLinkedQueue
+
+abstract class BuildTimingService
+    implements BuildService<BuildTimingService.Params>, OperationCompletionListener, AutoCloseable {
+
+    interface Params extends BuildServiceParameters {
+        Property<Long> getBuildStartedAt()
+    }
+
+    private final Queue<Map<String, Object>> records = new ConcurrentLinkedQueue<>()
+
+    @Override
+    void onFinish(FinishEvent event) {
+        if (!(event instanceof TaskFinishEvent)) {
+            return
+        }
+        def result = event.result
+        records.add([
+            path    : event.descriptor.taskPath,
+            startedAt: result.startTime,
+            finishedAt: result.endTime,
+            duration: result.endTime - result.startTime,
+            outcome : describeOutcome(result),
+        ])
+    }
+
+    static String describeOutcome(result) {
+        if (result instanceof TaskSuccessResult) {
+            if (result.upToDate) {
+                return 'UP-TO-DATE'
+            }
+            if (result.fromCache) {
+                return 'FROM-CACHE'
+            }
+            return 'EXECUTED'
+        }
+        if (result instanceof TaskSkippedResult) {
+            return 'SKIPPED'
+        }
+        if (result instanceof TaskFailureResult) {
+            return 'FAILED'
+        }
+        return 'UNKNOWN'
+    }
+
+    @Override
+    void close() {
+        def wallMillis = System.currentTimeMillis() - parameters.buildStartedAt.get()
+        def sorted = records.toList().sort { -it.duration }
+        def totalTaskMillis = sorted.sum { it.duration } ?: 0L
+        def label = System.getenv('BUILD_TIMING_LABEL') ?: 'gradle'
+        def minMillis = (System.getenv('BUILD_TIMING_MIN_MILLIS') ?: '500') as long
+
+        def report = new StringBuilder()
+        report.append('\n')
+        report.append('=' * 78).append('\n')
+        report.append("BUILD TIMING [${label}]\n")
+        report.append("  gradle wall time : ${formatSeconds(wallMillis)}\n")
+        if (!sorted.isEmpty()) {
+            // 첫 태스크가 시작되기 전까지 = 설정 단계 + 의존성 해석/다운로드.
+            // 태스크가 병렬로 돌아도 정확한 값이라 sum 과 wall time 의 차이보다 신뢰할 만하다.
+            def beforeFirstTaskMillis = sorted.min { it.startedAt }.startedAt - parameters.buildStartedAt.get()
+            def taskWindowMillis = sorted.max { it.finishedAt }.finishedAt - sorted.min { it.startedAt }.startedAt
+            report.append("  configuration + dependency resolution : ${formatSeconds(beforeFirstTaskMillis)}\n")
+            report.append("  task execution window                 : ${formatSeconds(taskWindowMillis)}\n")
+        }
+        report.append("  task time (sum)  : ${formatSeconds(totalTaskMillis)} (병렬 실행 시 window 보다 클 수 있음)\n")
+        report.append("  tasks            : ${sorted.size()} (executed ${sorted.count { it.outcome == 'EXECUTED' }})\n")
+        report.append('-' * 78).append('\n')
+        report.append(String.format('%9s %6s  %-11s %s%n', 'DURATION', 'SHARE', 'OUTCOME', 'TASK'))
+
+        def shown = 0
+        def hiddenMillis = 0L
+        sorted.each { record ->
+            if (record.duration < minMillis) {
+                hiddenMillis += record.duration
+                return
+            }
+            shown++
+            def share = totalTaskMillis > 0 ? (record.duration * 100.0d / totalTaskMillis) : 0.0d
+            report.append(String.format(
+                '%9s %5.1f%%  %-11s %s%n',
+                formatSeconds(record.duration), share, record.outcome, record.path,
+            ))
+        }
+        if (shown == 0) {
+            report.append("  (${minMillis}ms 이상 걸린 태스크 없음)\n")
+        }
+        if (hiddenMillis > 0) {
+            report.append(String.format(
+                '%9s %6s  %-11s %s%n',
+                formatSeconds(hiddenMillis), '', '',
+                "그 외 ${sorted.size() - shown}개 태스크 (< ${minMillis}ms)",
+            ))
+        }
+        report.append('=' * 78).append('\n')
+
+        // System.out 으로 직접 쓴다. 이 시점에는 Gradle logger 가 이미 닫혀 있을 수 있다.
+        System.out.print(report.toString())
+        System.out.flush()
+
+        writeTsv(sorted)
+    }
+
+    void writeTsv(List<Map<String, Object>> sorted) {
+        def outputPath = System.getenv('BUILD_TIMING_OUTPUT')
+        if (!outputPath) {
+            return
+        }
+        try {
+            def file = new File(outputPath)
+            file.parentFile?.mkdirs()
+            file.withWriterAppend('UTF-8') { writer ->
+                sorted.each { record ->
+                    writer.writeLine("${record.duration}\t${record.outcome}\t${record.path}")
+                }
+            }
+        } catch (Exception exception) {
+            System.err.println("[build-timing] TSV 기록 실패 (${outputPath}): ${exception.message}")
+        }
+    }
+
+    static String formatSeconds(long millis) {
+        return String.format('%.2fs', millis / 1000.0d)
+    }
+}
+
+abstract class BuildTimingPlugin implements Plugin<Settings> {
+
+    @Inject
+    abstract BuildEventsListenerRegistry getBuildEventsListenerRegistry()
+
+    @Override
+    void apply(Settings settings) {
+        // 아래 settingsEvaluated 에서 이미 등록해 두었으므로 여기서는 그 인스턴스를 돌려받는다.
+        // (BuildEventsListenerRegistry 는 @Inject 로만 얻을 수 있어서 플러그인이 필요하다.)
+        def service = settings.gradle.sharedServices.registerIfAbsent(
+            'buildTiming', BuildTimingService,
+        ) {}
+        buildEventsListenerRegistry.onTaskCompletion(service)
+    }
+}
+
+// 이 init script 는 빌드마다 새로 실행되므로 여기서 시각을 잡아야 한다.
+// 클래스의 static 필드에 담으면 Gradle 데몬이 클래스를 재사용하면서 첫 빌드 시각이 그대로 남는다.
+def buildStartedAt = System.currentTimeMillis()
+
+settingsEvaluated { settings ->
+    settings.gradle.sharedServices.registerIfAbsent(
+        'buildTiming', BuildTimingService,
+    ) { spec ->
+        spec.parameters.buildStartedAt.set(buildStartedAt)
+    }
+    settings.pluginManager.apply(BuildTimingPlugin)
+}

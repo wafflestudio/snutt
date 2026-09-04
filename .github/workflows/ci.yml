@@ -23,5 +23,24 @@ jobs:
       - name: Run Tests
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BUILD_TIMING_LABEL: ci-test
         run: |
-          ./gradlew clean test -x processAot -x processTestAot
+          set -euo pipefail
+          ./gradlew clean test -x processAot -x processTestAot \
+            --console=plain \
+            --init-script gradle/build-timing.init.gradle \
+            2>&1 | tee "${RUNNER_TEMP}/gradle-test.log"
+
+      - name: Test timing summary
+        if: always()
+        run: |
+          set -euo pipefail
+          log="${RUNNER_TEMP}/gradle-test.log"
+          [ -f "$log" ] || exit 0
+          {
+            echo "## ⏱ 테스트 소요 시간"
+            echo ""
+            echo '```'
+            sed -n '/^BUILD TIMING \[/,/^=\{20,\}$/p' "$log" | head -100 || true
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY

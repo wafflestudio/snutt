@@ -2,7 +2,25 @@
 FROM container-registry.oracle.com/graalvm/native-image:25 AS builder
 WORKDIR /app
 COPY . /app
-RUN --mount=type=secret,id=github_token GITHUB_TOKEN=$(cat /run/secrets/github_token) ./gradlew :api:nativeCompile
+
+# 빌드를 두 phase 로 나눠 각각의 소요 시간을 로그에 남긴다.
+# 이렇게 두면 BuildKit 이 레이어별 DONE 시간을 찍어주고, build-phase.sh 가 phase 요약을,
+# build-timing.init.gradle 이 태스크별 소요 시간을 찍는다.
+#
+#   compile+aot   : 의존성 해석/다운로드 + Kotlin 컴파일 + Spring AOT 처리 + AOT 생성 코드 컴파일
+#   nativeCompile : GraalVM native-image 컴파일
+#
+# aotClasses 가 nativeCompile 직전까지의 태스크를 모두 포함하므로 phase 경계로 쓴다.
+# (processAot 로 끊으면 AOT 생성 소스 컴파일이 nativeCompile phase 로 넘어가 측정이 흐려진다.)
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) \
+    sh gradle/build-phase.sh "api:compile+aot" :api:aotClasses
+
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) \
+    sh gradle/build-phase.sh "api:nativeCompile" :api:nativeCompile
+
+RUN sh gradle/build-phase.sh --summary
 
 # Runtime stage
 FROM docker.io/debian:stable-slim
