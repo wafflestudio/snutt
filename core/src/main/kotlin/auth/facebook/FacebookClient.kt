@@ -5,7 +5,6 @@ import com.wafflestudio.snutt.auth.OAuth2UserResponse
 import com.wafflestudio.snutt.auth.oidc.OidcJwtVerifier
 import com.wafflestudio.snutt.auth.oidc.OidcVerificationOptions
 import com.wafflestudio.snutt.common.extension.get
-import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -20,8 +19,6 @@ class FacebookClient(
     private val oidcJwtVerifier: OidcJwtVerifier,
     @param:Value("\${oidc.facebook.app-id:}") private val facebookAppId: String,
 ) : OAuth2Client {
-    private val log = LoggerFactory.getLogger(javaClass)
-
     private val httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(3))
     private val webClient =
         WebClient
@@ -49,8 +46,6 @@ class FacebookClient(
                     uri = USER_INFO_URI,
                     params = mapOf("access_token" to token),
                 ).getOrNull()
-
-        log.info("token=$token, facebookUserResponse=$facebookUserResponse")
 
         return facebookUserResponse?.let {
             OAuth2UserResponse(

@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.ClientInfo
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.FriendNotFoundException
 import com.wafflestudio.snutt.config.CurrentUser
@@ -12,6 +13,7 @@ import com.wafflestudio.snutt.users.data.User
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -33,6 +35,7 @@ class FriendTableController(
         @PathVariable friendId: String,
         @RequestParam semester: Semester,
         @RequestParam year: Int,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ): TimetableDto {
         val userId = user.id!!
         val friend =
@@ -43,7 +46,7 @@ class FriendTableController(
 
         return timetableService
             .getUserPrimaryTable(friend.getPartnerUserId(userId), year, semester)
-            .let(::TimetableDto)
+            .let { TimetableDto(it, clientInfo.language) }
     }
 
     @GetMapping("/coursebooks")

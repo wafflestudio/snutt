@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.timetables.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.enums.BasicThemeType
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.timetables.data.Timetable
@@ -19,11 +20,13 @@ data class TimetableDto(
     var updatedAt: Instant = Instant.now(),
 )
 
-fun TimetableDto(timetable: Timetable) =
-    TimetableDto(
-        timetable = timetable,
-        lectures = timetable.lectures.map { TimetableLectureDto(it) },
-    )
+fun TimetableDto(
+    timetable: Timetable,
+    language: Language = Language.KO,
+) = TimetableDto(
+    timetable = timetable,
+    lectures = timetable.lectures.map { TimetableLectureDto(it, language = language) },
+)
 
 fun TimetableDto(
     timetable: Timetable,

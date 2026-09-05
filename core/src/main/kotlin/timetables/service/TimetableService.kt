@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.timetables.service
 
+import com.wafflestudio.snutt.common.client.Language
 import com.wafflestudio.snutt.common.dynamiclink.client.DynamicLinkClient
 import com.wafflestudio.snutt.common.dynamiclink.dto.DynamicLinkResponse
 import com.wafflestudio.snutt.common.enums.BasicThemeType
@@ -102,9 +103,15 @@ interface TimetableService {
         timetableId: String,
     )
 
-    suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto
+    suspend fun convertTimetableToTimetableLegacyDto(
+        timetable: Timetable,
+        language: Language = Language.KO,
+    ): TimetableLegacyDto
 
-    suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto
+    suspend fun convertTimetableToTimetableDto(
+        timetable: Timetable,
+        language: Language = Language.KO,
+    ): TimetableDto
 }
 
 @Service
@@ -333,17 +340,23 @@ class TimetableServiceImpl(
         timetableRepository.save(table.copy(isPrimary = false))
     }
 
-    override suspend fun convertTimetableToTimetableLegacyDto(timetable: Timetable): TimetableLegacyDto {
+    override suspend fun convertTimetableToTimetableLegacyDto(
+        timetable: Timetable,
+        language: Language,
+    ): TimetableLegacyDto {
         val evLectureIdMap =
             evService.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
-        val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.lectureId]) }
+        val timetableLectures = timetable.lectures.map { TimetableLectureLegacyDto(it, evLectureIdMap[it.lectureId], language) }
         return TimetableLegacyDto(timetable, timetableLectures)
     }
 
-    override suspend fun convertTimetableToTimetableDto(timetable: Timetable): TimetableDto {
+    override suspend fun convertTimetableToTimetableDto(
+        timetable: Timetable,
+        language: Language,
+    ): TimetableDto {
         val evLectureIdMap =
             evService.getEvIdsBySnuttIds(timetable.lectures.mapNotNull { it.lectureId }).associateBy { it.snuttId }
-        val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.lectureId]) }
+        val timetableLectures = timetable.lectures.map { TimetableLectureDto(it, evLectureIdMap[it.lectureId], language) }
         return TimetableDto(timetable, timetableLectures)
     }
 }

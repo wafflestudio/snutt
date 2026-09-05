@@ -7,4 +7,5 @@ data class ClientInfo(
     val appVersion: AppVersion?,
     val deviceId: String?,
     val deviceModel: String?,
+    val language: Language = Language.KO,
 )

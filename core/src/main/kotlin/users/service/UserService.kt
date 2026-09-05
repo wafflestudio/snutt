@@ -240,7 +240,7 @@ class UserServiceImpl(
                 throw DuplicateEmailException(getAttachedAuthProviders(it))
             }
         } else {
-            log.warn("facebook email is null: $oauth2UserResponse")
+            log.warn("facebook email is null: socialId={}", oauth2UserResponse.socialId)
         }
 
         return signup(credential, oauth2UserResponse.email, false)

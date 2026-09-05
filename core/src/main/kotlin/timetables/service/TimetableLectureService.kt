@@ -1,5 +1,6 @@
 package com.wafflestudio.snutt.timetables.service
 
+import com.wafflestudio.snutt.common.enums.LectureCategoryPre2025
 import com.wafflestudio.snutt.common.exception.CustomLectureResetException
 import com.wafflestudio.snutt.common.exception.DuplicateTimetableLectureException
 import com.wafflestudio.snutt.common.exception.InvalidTimeException
@@ -146,7 +147,9 @@ class TimetableLectureServiceImpl(
             color = modifyTimetableLectureRequestDto.color ?: color
             colorIndex = modifyTimetableLectureRequestDto.colorIndex ?: colorIndex
             classPlaceAndTimes = newClassPlaceAndTimes
-            categoryPre2025 = modifyTimetableLectureRequestDto.categoryPre2025 ?: categoryPre2025
+            categoryPre2025 =
+                modifyTimetableLectureRequestDto.categoryPre2025
+                    ?.let { LectureCategoryPre2025.toKorean(it) } ?: categoryPre2025
         }
         resolveTimeConflict(timetable, timetableLecture, isForced)
         return timetableRepository.updateTimetableLecture(timetableId, timetableLecture).also {
