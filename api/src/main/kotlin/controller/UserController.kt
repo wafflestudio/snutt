@@ -187,8 +187,8 @@ class UsersController(
         UserDto(
             id = user.id!!,
             isAdmin = user.isAdmin,
-            regDate = user.regDate,
-            notificationCheckedAt = user.notificationCheckedAt,
+            regDate = user.regDate.toZonedDateTime(),
+            notificationCheckedAt = user.notificationCheckedAt.toZonedDateTime(),
             email = user.email,
             localId = user.credential.localId,
             fbName = user.credential.fbName,

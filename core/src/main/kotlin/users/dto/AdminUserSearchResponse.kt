@@ -1,8 +1,9 @@
 package com.wafflestudio.snutt.users.dto
 
 import com.wafflestudio.snutt.auth.AuthProvider
+import com.wafflestudio.snutt.common.extension.toZonedDateTime
 import com.wafflestudio.snutt.users.data.User
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class AdminUserSearchResponse(
     val id: String,
@@ -12,7 +13,7 @@ data class AdminUserSearchResponse(
     val localId: String?,
     val isAdmin: Boolean,
     val active: Boolean,
-    val regDate: LocalDateTime,
+    val regDate: ZonedDateTime,
     val lastLoginTimestamp: Long,
     val authProviders: List<AuthProvider>,
     val socialAccounts: SocialAccounts,
@@ -34,7 +35,7 @@ data class AdminUserSearchResponse(
                 localId = user.credential.localId,
                 isAdmin = user.isAdmin,
                 active = user.active,
-                regDate = user.regDate,
+                regDate = user.regDate.toZonedDateTime(),
                 lastLoginTimestamp = user.lastLoginTimestamp,
                 authProviders =
                     listOfNotNull(
