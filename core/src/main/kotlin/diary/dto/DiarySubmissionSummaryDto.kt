@@ -1,12 +1,13 @@
 package com.wafflestudio.snutt.diary.dto
 
+import com.wafflestudio.snutt.common.extension.toZonedDateTime
 import com.wafflestudio.snutt.diary.data.DiarySubmission
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 data class DiarySubmissionSummaryDto(
     val id: String,
     val lectureId: String,
-    val date: LocalDateTime,
+    val date: ZonedDateTime,
     val courseTitle: String,
     val shortQuestionReplies: List<DiaryShortQuestionReply>,
     val comment: String,
@@ -24,7 +25,7 @@ fun DiarySubmissionSummaryDto(
     DiarySubmissionSummaryDto(
         id = submission.id!!,
         lectureId = submission.lectureId,
-        date = submission.createdAt,
+        date = submission.createdAt.toZonedDateTime(),
         courseTitle = submission.courseTitle,
         shortQuestionReplies = shortQuestionReplies,
         comment = submission.comment,
