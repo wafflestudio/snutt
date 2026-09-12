@@ -1,6 +1,7 @@
 package com.wafflestudio.snutt.controller
 
 import com.wafflestudio.snutt.common.dto.ListResponse
+import com.wafflestudio.snutt.common.extension.toZonedDateTime
 import com.wafflestudio.snutt.config.CurrentUser
 import com.wafflestudio.snutt.filter.SnuttDefaultApiFilterTarget
 import com.wafflestudio.snutt.friend.dto.FriendRequest
@@ -49,7 +50,7 @@ class FriendController(
                     userId = partner.id!!,
                     displayName = partnerDisplayName,
                     nickname = userNicknameService.getNicknameDto(partner.nickname),
-                    createdAt = friend.createdAt,
+                    createdAt = friend.createdAt.toZonedDateTime(),
                 )
             }
 
@@ -110,7 +111,7 @@ class FriendController(
                 userId = partner.id!!,
                 displayName = friend.getPartnerDisplayName(user.id!!),
                 nickname = userNicknameService.getNicknameDto(partner.nickname),
-                createdAt = friend.createdAt,
+                createdAt = friend.createdAt.toZonedDateTime(),
             )
         }
 }
