@@ -1,5 +1,8 @@
 package com.wafflestudio.snutt.controller
 
+import com.wafflestudio.snutt.common.client.AppVersion
+import com.wafflestudio.snutt.common.client.ClientInfo
+import com.wafflestudio.snutt.common.client.OsType
 import com.wafflestudio.snutt.common.dto.OkResponse
 import com.wafflestudio.snutt.common.enums.Semester
 import com.wafflestudio.snutt.common.exception.DiaryTargetLectureNotFoundException
@@ -19,10 +22,13 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+
+private val ANDROID_LEGACY_DATE_MAX_VERSION = AppVersion("3.12.4")
 
 @RestController
 @SnuttDefaultApiFilterTarget
@@ -56,9 +62,15 @@ class DiaryController(
     @GetMapping("/my")
     suspend fun getMySubmissions(
         @CurrentUser user: User,
+        @RequestAttribute("clientInfo") clientInfo: ClientInfo,
     ): List<DiarySubmissionsOfYearSemesterDto> {
         val submissions = diaryService.getMySubmissions(user.id!!)
         val submissionIdShortQuestionRepliesMap = diaryService.getSubmissionIdShortQuestionRepliesMap(submissions)
+        val appVersion = clientInfo.appVersion
+        val useLegacyDateFormat =
+            clientInfo.osType == OsType.ANDROID &&
+                appVersion != null &&
+                appVersion <= ANDROID_LEGACY_DATE_MAX_VERSION
 
         return submissions
             .groupBy { submission ->
@@ -69,7 +81,7 @@ class DiaryController(
                     semester = it.key.second.value,
                     submissions =
                         it.value.map { submission ->
-                            DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id]!!)
+                            DiarySubmissionSummaryDto(submission, submissionIdShortQuestionRepliesMap[submission.id]!!, useLegacyDateFormat)
                         },
                 )
             }.sortedWith(compareByDescending<DiarySubmissionsOfYearSemesterDto> { it.year }.thenByDescending { it.semester })
