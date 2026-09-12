@@ -7,6 +7,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("tools.jackson.module:jackson-module-kotlin")
     api("com.fasterxml.jackson.core:jackson-annotations:2.20")
+    compileOnly("io.swagger.core.v3:swagger-annotations-jakarta:2.2.43")
     api("org.springframework.boot:spring-boot-starter-webflux")
     api("io.projectreactor.kotlin:reactor-kotlin-extensions")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
