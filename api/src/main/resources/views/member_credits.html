@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<!--
+  SNUTT 개발팀 — Cinematic End Credits
+  ------------------------------------------------------------
+  컨셉: 영화 엔딩 크레딧 롤. 크레딧이 아래에서 위로 천천히 자동 스크롤된다.
+  - 역할별 섹션(Founder / Server / iOS / Android / Web / Design / 기획 / 초창기 멤버)으로 구성.
+  - 각 인물은 "가장 최근 역할" 기준으로 한 번만 분류(동명이인 없음, 고유 인물 32명).
+  - 모션: requestAnimationFrame으로 위로 흐르는 자동 스크롤. 콘텐츠 위에 마우스를 올리거나
+    누르면 일시정지, 벗어나면 재생. 스크롤바/휠/터치로 수동 탐색 가능(자동+수동 공존).
+    하단 도크에 재생·정지, 속도(1x/1.5x/2x), 시크바(위치 이동), 테마 토글.
+    끝까지 가면 멈춰서 마무리 카드(로고+문의) 표시, "다시 재생" 제공.
+  - prefers-reduced-motion: 자동 스크롤 끔(정적으로 읽기). 사용자가 원하면 재생 버튼으로 시작 가능.
+  - 테마: 시스템(prefers-color-scheme)을 기본으로 따르고, 도크의 토글로 라이트/다크 수동 전환.
+    다크가 시네마틱 기본, 라이트는 밝은 스크린 느낌.
+  - 자체 완결형 단일 파일. 외부 JS 라이브러리 없음. 시스템 폰트 스택.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SNUTT 개발팀 — 엔딩 크레딧</title>
+<style>
+  :root{
+    /* 뉴트럴(라이트 = 밝은 스크린) */
+    --bg:#f6f7f9;
+    --bg2:#eef0f4;
+    --surface:#ffffff;
+    --fg:#17181a;
+    --muted:#8a898e;
+    --border:#ececef;
+    --brand:#0f9a93;      /* 라이트에선 진한 민트가 읽힘 */
+    --brand-hi:#1bd0c9;
+    --star-op:0;          /* 라이트에선 별 숨김 */
+    --sky-1:rgba(27,208,201,0.05);
+    --sky-2:rgba(79,72,196,0.04);
+    --vignette:var(--bg);
+    --track-bg:rgba(0,0,0,0.12);
+    --dock-bg:rgba(255,255,255,0.82);
+    --dock-br:rgba(0,0,0,0.08);
+    --edge:rgba(0,0,0,0.06);
+
+    /* 역할 팔레트 (라이트/다크 공통) */
+    --r-ios:#1d99e9;
+    --r-android:#2bc366;
+    --r-web:#f58d3d;
+    --r-server:#4f48c4;
+    --r-design:#af56b3;
+    --r-plan:#fac52d;
+    --r-founder:#1bd0c9;
+    --r-early:#7a8290;
+
+    --gutter:clamp(18px, 5vw, 40px);
+    --col:min(720px, 100%);
+  }
+
+  /* 시스템 다크 → 시네마틱 딥 스페이스 */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0a0b10;
+      --bg2:#05060a;
+      --surface:#212226;
+      --fg:#f2f2f3;
+      --muted:#9a9aa1;
+      --border:#2f3035;
+      --brand:#58c1b7;
+      --brand-hi:#1bd0c9;
+      --star-op:1;
+      --sky-1:rgba(27,208,201,0.10);
+      --sky-2:rgba(79,72,196,0.14);
+      --vignette:#0a0b10;
+      --track-bg:rgba(255,255,255,0.16);
+      --dock-bg:rgba(18,20,26,0.72);
+      --dock-br:rgba(255,255,255,0.10);
+      --edge:rgba(255,255,255,0.06);
+      --r-server:#7a74e6; /* 다크 배경에서 서버 보라를 살짝 밝게 */
+    }
+  }
+  /* 수동 토글이 시스템 설정을 이긴다 */
+  :root[data-theme="light"]{
+    --bg:#f6f7f9; --bg2:#eef0f4; --surface:#ffffff; --fg:#17181a; --muted:#8a898e;
+    --border:#ececef; --brand:#0f9a93; --brand-hi:#1bd0c9; --star-op:0;
+    --sky-1:rgba(27,208,201,0.05); --sky-2:rgba(79,72,196,0.04); --vignette:#f6f7f9;
+    --track-bg:rgba(0,0,0,0.12); --dock-bg:rgba(255,255,255,0.82); --dock-br:rgba(0,0,0,0.08);
+    --edge:rgba(0,0,0,0.06); --r-server:#4f48c4;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0b10; --bg2:#05060a; --surface:#212226; --fg:#f2f2f3; --muted:#9a9aa1;
+    --border:#2f3035; --brand:#58c1b7; --brand-hi:#1bd0c9; --star-op:1;
+    --sky-1:rgba(27,208,201,0.10); --sky-2:rgba(79,72,196,0.14); --vignette:#0a0b10;
+    --track-bg:rgba(255,255,255,0.16); --dock-bg:rgba(18,20,26,0.72); --dock-br:rgba(255,255,255,0.10);
+    --edge:rgba(255,255,255,0.06); --r-server:#7a74e6;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow:hidden;               /* 스크롤은 .reel이 담당 */
+    overscroll-behavior:none;
+  }
+
+  /* ---------- 배경: 별밤 / 네뷸라 ---------- */
+  .sky{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+        background:
+          radial-gradient(120% 90% at 78% 8%, var(--sky-1), transparent 60%),
+          radial-gradient(120% 90% at 18% 92%, var(--sky-2), transparent 60%),
+          linear-gradient(180deg, var(--bg), var(--bg2)); }
+  .stars, .stars--far{ position:absolute; left:-10%; right:-10%; top:-10%; bottom:-10%;
+        opacity:var(--star-op); }
+  .stars{
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 22%, #ffffff, transparent 60%),
+      radial-gradient(1.2px 1.2px at 34% 68%, #d7fbff, transparent 60%),
+      radial-gradient(1.6px 1.6px at 58% 14%, #ffffff, transparent 60%),
+      radial-gradient(1.2px 1.2px at 72% 82%, #ffffff, transparent 60%),
+      radial-gradient(1.4px 1.4px at 88% 40%, #c9f6ff, transparent 60%),
+      radial-gradient(1.1px 1.1px at 8% 88%, #ffffff, transparent 60%),
+      radial-gradient(1.3px 1.3px at 46% 44%, #ffffff, transparent 60%),
+      radial-gradient(1.2px 1.2px at 92% 74%, #ffffff, transparent 60%);
+    background-repeat:repeat; background-size:340px 340px;
+    animation:twinkle 5.5s ease-in-out infinite, drift 90s linear infinite;
+  }
+  .stars--far{
+    background-image:
+      radial-gradient(1px 1px at 24% 40%, #ffffff, transparent 60%),
+      radial-gradient(1px 1px at 62% 30%, #bfefff, transparent 60%),
+      radial-gradient(1px 1px at 80% 60%, #ffffff, transparent 60%),
+      radial-gradient(1px 1px at 40% 84%, #ffffff, transparent 60%),
+      radial-gradient(1px 1px at 6% 54%, #ffffff, transparent 60%);
+    background-repeat:repeat; background-size:220px 220px;
+    opacity:calc(var(--star-op) * .6);
+    animation:twinkle 7s ease-in-out infinite reverse, drift 140s linear infinite;
+  }
+  @keyframes twinkle{ 0%,100%{ opacity:calc(var(--star-op)*1) } 50%{ opacity:calc(var(--star-op)*.55) } }
+  @keyframes drift{ from{ transform:translateY(0) } to{ transform:translateY(-60px) } }
+
+  /* ---------- 상단 워드마크 ---------- */
+  .brandmark{ position:fixed; top:max(14px, env(safe-area-inset-top)); left:var(--gutter); z-index:6;
+    font-size:.74rem; letter-spacing:.28em; text-transform:uppercase; color:var(--muted);
+    font-weight:600; pointer-events:none; }
+  .brandmark b{ color:var(--brand); }
+
+  /* ---------- 릴(스크롤 컨테이너) ---------- */
+  .reel{ position:fixed; inset:0; z-index:2; overflow-y:auto; overflow-x:hidden;
+    scrollbar-width:thin; scrollbar-color:color-mix(in srgb, var(--brand) 60%, transparent) transparent; }
+  .reel::-webkit-scrollbar{ width:9px; }
+  .reel::-webkit-scrollbar-thumb{ background:color-mix(in srgb, var(--brand) 55%, transparent);
+    border-radius:9px; border:2px solid transparent; background-clip:padding-box; }
+  .reel::-webkit-scrollbar-track{ background:transparent; }
+
+  /* 위/아래 시네마틱 비네트(텍스트 페이드) */
+  .vignette{ position:fixed; left:0; right:0; z-index:4; pointer-events:none; height:26vh; }
+  .vignette--top{ top:0; background:linear-gradient(180deg, var(--vignette) 8%, transparent); }
+  .vignette--bottom{ bottom:0; background:linear-gradient(0deg, var(--vignette) 22%, transparent); }
+
+  /* 크레딧 본문(중앙 컬럼) — hover 감지 대상 */
+  .credits{ width:var(--col); margin:0 auto; padding:0 var(--gutter);
+    padding-top:46vh; padding-bottom:36vh; text-align:center; }
+
+  /* ---------- 오프닝 ---------- */
+  .opening{ padding-bottom:30vh; }
+  .opening .pre{ margin:0 0 1.1rem; font-size:clamp(.62rem,2.4vw,.78rem); letter-spacing:.42em;
+    text-transform:uppercase; color:var(--muted); }
+  .logo{ margin:0; font-size:clamp(3.4rem,17vw,8.5rem); line-height:.92; font-weight:800;
+    letter-spacing:.06em;
+    background:linear-gradient(180deg, var(--fg), color-mix(in srgb, var(--brand) 70%, var(--fg)));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 8px 40px color-mix(in srgb, var(--brand) 30%, transparent)); }
+  .opening .role{ margin:.5rem 0 0; font-size:clamp(1.1rem,5vw,1.7rem); font-weight:500;
+    letter-spacing:.5em; text-indent:.5em; color:var(--fg); }
+  .opening .tag{ margin:1.9rem auto 0; max-width:34ch; font-size:clamp(.85rem,3.4vw,1rem);
+    line-height:1.75; color:var(--muted); font-weight:400; }
+
+  /* ---------- 섹션 헤더 ---------- */
+  .sect{ margin:0 0 2.1rem; }
+  .sect .rule{ display:block; width:56px; height:2px; margin:0 auto 1.5rem;
+    background:var(--role); border-radius:2px;
+    box-shadow:0 0 18px color-mix(in srgb, var(--role) 65%, transparent); }
+  .sect .eng{ margin:0; font-size:clamp(1.5rem,7vw,2.7rem); font-weight:700; letter-spacing:.34em;
+    text-indent:.34em; text-transform:uppercase; color:var(--role);
+    text-shadow:0 0 30px color-mix(in srgb, var(--role) 30%, transparent); }
+  .sect .kor{ margin:.55rem 0 0; font-size:clamp(.66rem,2.8vw,.82rem); letter-spacing:.34em;
+    text-indent:.34em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+
+  /* ---------- 이름 리스트 ---------- */
+  .block{ margin:0 0 clamp(4.5rem, 12vh, 8rem); }
+  .names{ list-style:none; margin:0 auto; padding:0; max-width:640px;
+    display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:1.75rem 2.5rem; }
+  .names li{ display:flex; flex-direction:column; align-items:center; gap:.28rem; min-width:0; }
+  .nm{ font-size:clamp(1.2rem,5vw,1.7rem); font-weight:300; letter-spacing:.04em; color:var(--fg);
+    line-height:1.15; }
+  .dp{ font-size:clamp(.72rem,3vw,.82rem); color:var(--muted); font-weight:400; letter-spacing:.02em; }
+
+  /* 한 명뿐인 섹션(Founder 등)은 한 줄 중앙 */
+  .names.solo{ grid-template-columns:1fr; }
+
+  /* ---------- Founder 헌사 카드 ---------- */
+  .founder{ margin:0 auto clamp(5rem,13vh,9rem); max-width:560px;
+    padding:clamp(2rem,7vw,3rem) clamp(1.6rem,6vw,2.6rem);
+    border:1px solid color-mix(in srgb, var(--r-founder) 35%, var(--border));
+    border-radius:22px;
+    background:
+      radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--r-founder) 12%, transparent), transparent 70%),
+      color-mix(in srgb, var(--surface) 70%, transparent);
+    box-shadow:0 20px 60px color-mix(in srgb, var(--r-founder) 18%, transparent); }
+  .founder .rule{ background:var(--r-founder); box-shadow:0 0 22px color-mix(in srgb, var(--r-founder) 70%, transparent); }
+  .founder .eng{ font-size:clamp(1.3rem,6vw,2.1rem); color:var(--r-founder); }
+  .founder .dedication{ margin:0 0 1.4rem; font-size:clamp(.85rem,3.4vw,1rem); line-height:1.7; color:var(--muted); }
+  .founder .fname{ font-size:clamp(2rem,9vw,3rem); font-weight:300; letter-spacing:.05em; color:var(--fg); }
+  .founder .fdept{ margin-top:.5rem; font-size:clamp(.78rem,3vw,.9rem); color:var(--muted); letter-spacing:.2em; }
+
+  /* ---------- 엔딩 카드 ---------- */
+  .ending{ padding-top:8vh; }
+  .waffle{ width:clamp(56px,16vw,84px); height:auto; opacity:.95;
+    filter:drop-shadow(0 6px 24px rgba(0,0,0,.25)); }
+  .ending .fin{ margin:1.4rem 0 0; font-size:clamp(1.5rem,7vw,2.4rem); font-weight:600; letter-spacing:.14em; }
+  .chips{ display:flex; flex-wrap:wrap; gap:.55rem; justify-content:center; margin:1.6rem 0 0; }
+  .chip{ font-size:clamp(.72rem,3vw,.82rem); letter-spacing:.06em; color:var(--fg);
+    padding:.4rem .85rem; border:1px solid var(--border); border-radius:999px;
+    background:color-mix(in srgb, var(--surface) 60%, transparent); }
+  .chip b{ color:var(--brand); font-weight:700; }
+  .ending .thanks{ margin:1.9rem auto 0; max-width:30ch; font-size:clamp(.9rem,3.6vw,1.05rem);
+    line-height:1.7; color:var(--fg); font-weight:400; }
+  .mail{ display:inline-block; margin-top:1.5rem; font-size:clamp(.9rem,3.6vw,1.05rem);
+    color:var(--brand); text-decoration:none; letter-spacing:.02em;
+    border-bottom:1px solid color-mix(in srgb, var(--brand) 45%, transparent); padding-bottom:2px; }
+  .mail:hover{ border-bottom-color:var(--brand); }
+  .made{ margin:2rem 0 0; font-size:.7rem; letter-spacing:.34em; text-transform:uppercase; color:var(--muted); }
+
+  /* ---------- 하단 컨트롤 도크 ---------- */
+  .dock{ position:fixed; z-index:7; left:50%; transform:translateX(-50%);
+    bottom:max(16px, calc(env(safe-area-inset-bottom) + 12px));
+    width:min(680px, calc(100% - 24px));
+    display:flex; align-items:center; gap:.5rem;
+    padding:.5rem .65rem;
+    background:var(--dock-bg);
+    border:1px solid var(--dock-br); border-radius:999px;
+    backdrop-filter:blur(16px) saturate(1.2); -webkit-backdrop-filter:blur(16px) saturate(1.2);
+    box-shadow:0 10px 40px rgba(0,0,0,.28); }
+  .ctl{ appearance:none; border:none; cursor:pointer; color:var(--fg);
+    background:transparent; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px; flex:0 0 auto; transition:background .15s ease, color .15s ease; }
+  .ctl:hover{ background:var(--edge); }
+  .ctl svg{ width:19px; height:19px; display:block; }
+  #speedBtn{ width:auto; padding:0 .7rem; font-weight:700; font-size:.82rem; letter-spacing:.03em;
+    font-variant-numeric:tabular-nums; color:var(--brand); }
+  .scrub{ flex:1 1 auto; display:flex; align-items:center; min-width:0; padding:0 .3rem; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:20px;
+    background:transparent; cursor:pointer; margin:0; }
+  input[type=range]::-webkit-slider-runnable-track{ height:3px; border-radius:3px;
+    background:linear-gradient(90deg, var(--brand) calc(var(--p,0)*100%), var(--track-bg) calc(var(--p,0)*100%)); }
+  input[type=range]::-moz-range-track{ height:3px; border-radius:3px; background:var(--track-bg); }
+  input[type=range]::-moz-range-progress{ height:3px; border-radius:3px; background:var(--brand); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none;
+    width:13px; height:13px; margin-top:-5px; border-radius:50%; background:var(--brand);
+    box-shadow:0 0 0 4px color-mix(in srgb, var(--brand) 22%, transparent); }
+  input[type=range]::-moz-range-thumb{ width:13px; height:13px; border:none; border-radius:50%;
+    background:var(--brand); box-shadow:0 0 0 4px color-mix(in srgb, var(--brand) 22%, transparent); }
+
+  /* 재생 상태별 아이콘 표시 */
+  .ic{ display:none; }
+  #playBtn .ic-pause{ display:block; }
+  #playBtn.paused .ic-pause{ display:none; }
+  #playBtn.paused .ic-play{ display:block; }
+  #playBtn.ended .ic-pause,#playBtn.ended .ic-play{ display:none; }
+  #playBtn.ended .ic-replay{ display:block; }
+
+  /* 힌트 */
+  .hint{ position:fixed; z-index:6; left:50%; transform:translateX(-50%);
+    bottom:calc(max(16px, env(safe-area-inset-bottom)) + 62px);
+    font-size:.72rem; letter-spacing:.06em; color:var(--muted); white-space:nowrap;
+    background:var(--dock-bg); border:1px solid var(--dock-br); border-radius:999px;
+    padding:.3rem .8rem; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    transition:opacity .6s ease; pointer-events:none; }
+  .hint.gone{ opacity:0; }
+
+  /* 포커스 가시화 */
+  :focus-visible{ outline:2px solid var(--brand); outline-offset:3px; border-radius:6px; }
+  a:focus-visible, .ctl:focus-visible{ outline-offset:2px; }
+
+  /* 반응형: 좁은 화면은 1열 */
+  @media (max-width:560px){
+    .names{ grid-template-columns:1fr; gap:1.45rem; max-width:340px; }
+    .credits{ padding-top:40vh; }
+    #speedBtn{ padding:0 .5rem; }
+  }
+
+  /* reduced-motion: 배경 애니메이션 정지(자동 스크롤은 JS에서 끔) */
+  @media (prefers-reduced-motion: reduce){
+    .stars, .stars--far{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="sky" aria-hidden="true">
+    <div class="stars--far"></div>
+    <div class="stars"></div>
+  </div>
+
+  <p class="brandmark"><b>SNUTT</b>&nbsp;&nbsp;개발팀 크레딧</p>
+
+  <div class="vignette vignette--top" aria-hidden="true"></div>
+  <div class="vignette vignette--bottom" aria-hidden="true"></div>
+
+  <main class="reel" id="reel" tabindex="-1">
+    <div class="credits" id="credits">
+
+      <!-- 오프닝 -->
+      <section class="opening">
+        <p class="pre">Seoul National University Timetable</p>
+        <h1 class="logo">SNUTT</h1>
+        <p class="role">개발팀</p>
+        <p class="tag">2012년부터 지금까지, 서울대학교의 시간표를 만들어 온 사람들.</p>
+      </section>
+
+      <!-- Founder 헌사 -->
+      <section class="founder">
+        <span class="rule" aria-hidden="true"></span>
+        <p class="eng">Founder</p>
+        <p class="dedication">모든 이야기의 시작.<br>SNUTT는 한 사람의 작은 프로젝트에서 출발했습니다.</p>
+        <p class="fname">이종민</p>
+        <p class="fdept">컴퓨터공학부 09 · 최초 개발, 2012</p>
+      </section>
+
+      <!-- Server -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-server)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Server</p>
+          <p class="kor">서버 개발</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">변다빈</span><span class="dp">언어학과 14</span></li>
+          <li><span class="nm">최한결</span><span class="dp">컴퓨터공학부 15</span></li>
+          <li><span class="nm">박수빈</span><span class="dp">컴퓨터공학부 18</span></li>
+          <li><span class="nm">조성해</span><span class="dp">건축학과 18</span></li>
+          <li><span class="nm">강지혁</span><span class="dp">컴퓨터공학부 19</span></li>
+          <li><span class="nm">임찬영</span><span class="dp">컴퓨터공학부 23</span></li>
+          <li><span class="nm">최연서</span><span class="dp">물리교육과 23</span></li>
+          <li><span class="nm">이정달</span><span class="dp">자유전공학부 25</span></li>
+        </ol>
+      </section>
+
+      <!-- iOS -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-ios)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">iOS</p>
+          <p class="kor">iOS 앱</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">금진섭</span><span class="dp">서양사학과 14</span></li>
+          <li><span class="nm">박신홍</span><span class="dp">경영학과 17</span></li>
+          <li><span class="nm">최유림</span><span class="dp">컴퓨터공학부 19</span></li>
+          <li><span class="nm">이채민</span><span class="dp">자유전공학부 20</span></li>
+        </ol>
+      </section>
+
+      <!-- Android -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-android)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Android</p>
+          <p class="kor">안드로이드 앱</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">김상민</span><span class="dp">컴퓨터공학부 18</span></li>
+          <li><span class="nm">양주현</span><span class="dp">지구환경과학부 16</span></li>
+          <li><span class="nm">송동엽</span><span class="dp">컴퓨터공학부 22</span></li>
+          <li><span class="nm">이현도</span><span class="dp">컴퓨터공학부 23</span></li>
+          <li><span class="nm">정해찬</span><span class="dp">컴퓨터공학부 24</span></li>
+        </ol>
+      </section>
+
+      <!-- Web -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-web)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Web</p>
+          <p class="kor">웹 프론트엔드</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">김기완</span><span class="dp">컴퓨터공학부 18</span></li>
+          <li><span class="nm">우현민</span><span class="dp">컴퓨터공학부 19</span></li>
+        </ol>
+      </section>
+
+      <!-- Design -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-design)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Design</p>
+          <p class="kor">디자인</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">민유진</span><span class="dp">디자인과 21</span></li>
+          <li><span class="nm">박소은</span><span class="dp">동양화과 21</span></li>
+          <li><span class="nm">최유진</span><span class="dp">디자인과 22</span></li>
+        </ol>
+      </section>
+
+      <!-- 기획 -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-plan)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Planning</p>
+          <p class="kor">기획</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">서정록</span><span class="dp">컴퓨터공학부 18</span></li>
+          <li><span class="nm">서정민</span><span class="dp">홍익대 회화과 15 · 기획·디자인</span></li>
+        </ol>
+      </section>
+
+      <!-- 초창기 멤버 -->
+      <section class="block">
+        <header class="sect" style="--role:var(--r-early)">
+          <span class="rule" aria-hidden="true"></span>
+          <p class="eng">Early Days</p>
+          <p class="kor">초창기 멤버</p>
+        </header>
+        <ol class="names">
+          <li><span class="nm">정형식</span><span class="dp">자유전공학부 10</span></li>
+          <li><span class="nm">이주현</span><span class="dp">시각디자인 11</span></li>
+          <li><span class="nm">김광래</span><span class="dp">컴퓨터공학부 12</span></li>
+          <li><span class="nm">김알찬</span><span class="dp">컴퓨터공학부 12</span></li>
+          <li><span class="nm">김진형</span><span class="dp">컴퓨터공학부 14</span></li>
+          <li><span class="nm">장렬</span><span class="dp">컴퓨터공학부 14</span></li>
+          <li><span class="nm">방성원</span><span class="dp">컴퓨터공학부 15</span></li>
+        </ol>
+      </section>
+
+      <!-- 엔딩 카드 -->
+      <section class="ending">
+        <img class="waffle" src="https://snutt-asset.s3.ap-northeast-2.amazonaws.com/waffle_logo.png" alt="와플스튜디오 로고" loading="lazy">
+        <p class="fin">SNUTT 개발팀</p>
+        <div class="chips">
+          <span class="chip"><b>2012</b>&nbsp;–&nbsp;<b>2026</b></span>
+          <span class="chip">개발자 <b>32</b>명</span>
+          <span class="chip">누적 참여 <b>80</b></span>
+        </div>
+        <p class="thanks">지금의 SNUTT를 함께 만들어 주신 모든 분들께 고맙습니다.</p>
+        <a class="mail" href="mailto:snutt@wafflestudio.com">snutt@wafflestudio.com</a>
+        <p class="made">made by wafflestudio</p>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="hint" id="hint">화면 위에 마우스를 올리거나 누르면 멈춰요</div>
+
+  <div class="dock" role="group" aria-label="크레딧 재생 컨트롤">
+    <button class="ctl" id="playBtn" type="button" aria-label="일시정지" aria-pressed="true">
+      <span class="ic ic-pause" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.2"/></svg></span>
+      <span class="ic ic-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.53.85l10-6.5a1 1 0 0 0 0-1.7l-10-6.5A1 1 0 0 0 8 5.5Z"/></svg></span>
+      <span class="ic ic-replay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/></svg></span>
+    </button>
+
+    <button class="ctl" id="speedBtn" type="button" aria-label="재생 속도 1배속">1x</button>
+
+    <div class="scrub">
+      <input id="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="크레딧 위치">
+    </div>
+
+    <button class="ctl" id="themeBtn" type="button" aria-label="테마 전환">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v2M12 19v2M4.5 4.5l1.4 1.4M18.1 18.1l1.4 1.4M3 12h2M19 12h2M4.5 19.5l1.4-1.4M18.1 5.9l1.4-1.4"/></svg>
+    </button>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var reel    = document.getElementById('reel');
+  var credits = document.getElementById('credits');
+  var playBtn = document.getElementById('playBtn');
+  var speedBtn= document.getElementById('speedBtn');
+  var themeBtn= document.getElementById('themeBtn');
+  var scrub   = document.getElementById('scrub');
+  var hint    = document.getElementById('hint');
+  var root    = document.documentElement;
+
+  var reducedMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduced   = reducedMQ.matches;
+
+  var BASE = 48; // 기본 px/초
+  var speeds = [1, 1.5, 2];
+  var speedLabels = ['1x','1.5x','2x'];
+  var spdIx = 0;
+
+  var master  = !reduced;   // reduced면 정지 상태로 시작(사용자가 재생 누르면 시작)
+  var over    = false;      // 크레딧 본문 위 hover
+  var pressing= false;      // 포인터 누름(스크롤바 드래그/터치)
+  var seeking = false;      // 시크바 조작 중
+  var atEnd   = false;
+  var last    = null;
+
+  function maxScroll(){ return Math.max(1, reel.scrollHeight - reel.clientHeight); }
+  function playing(){ return master && !over && !pressing && !seeking && !atEnd; }
+
+  function updatePlayUI(){
+    playBtn.classList.toggle('ended', atEnd);
+    playBtn.classList.toggle('paused', !atEnd && !master);
+    if(atEnd){
+      playBtn.setAttribute('aria-label','다시 재생');
+      playBtn.setAttribute('aria-pressed','false');
+    } else if(master){
+      playBtn.setAttribute('aria-label','일시정지');
+      playBtn.setAttribute('aria-pressed','true');
+    } else {
+      playBtn.setAttribute('aria-label','재생');
+      playBtn.setAttribute('aria-pressed','false');
+    }
+  }
+
+  function updateScrub(){
+    if(seeking) return;
+    var p = reel.scrollTop / maxScroll();
+    if(p > 1) p = 1; if(p < 0) p = 0;
+    scrub.value = Math.round(p * 1000);
+    scrub.style.setProperty('--p', p);
+  }
+
+  function frame(t){
+    if(last === null) last = t;
+    var dt = (t - last) / 1000; last = t;
+    if(dt > 0.1) dt = 0.1; // 탭 비활성 후 점프 방지
+    if(playing()){
+      reel.scrollTop += BASE * speeds[spdIx] * dt;
+      if(reel.scrollTop >= maxScroll() - 0.5){
+        reel.scrollTop = maxScroll();
+        atEnd = true;
+        updatePlayUI();
+      }
+    }
+    updateScrub();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* 콘텐츠 위 hover → 일시정지 */
+  credits.addEventListener('pointerenter', function(){ over = true; });
+  credits.addEventListener('pointerleave', function(){ over = false; });
+
+  /* 누르는 동안(스크롤바 드래그·터치) 일시정지 */
+  reel.addEventListener('pointerdown', function(){ pressing = true; dismissHint(); });
+  window.addEventListener('pointerup', function(e){
+    pressing = false;
+    if(e.pointerType === 'touch') over = false;
+    last = null;
+  });
+  window.addEventListener('pointercancel', function(){ pressing = false; over = false; });
+
+  /* 재생/정지 (끝이면 다시 재생) */
+  playBtn.addEventListener('click', function(){
+    if(atEnd){
+      reel.scrollTop = 0;
+      atEnd = false;
+      master = true;
+    } else {
+      master = !master;
+    }
+    last = null;
+    updatePlayUI();
+    dismissHint();
+  });
+
+  /* 속도 토글 */
+  speedBtn.addEventListener('click', function(){
+    spdIx = (spdIx + 1) % speeds.length;
+    speedBtn.textContent = speedLabels[spdIx];
+    speedBtn.setAttribute('aria-label', '재생 속도 ' + speedLabels[spdIx].replace('x','') + '배속');
+  });
+
+  /* 시크바(수동 위치 이동) */
+  scrub.addEventListener('pointerdown', function(){ seeking = true; });
+  scrub.addEventListener('input', function(){
+    seeking = true;
+    var p = scrub.value / 1000;
+    reel.scrollTop = p * maxScroll();
+    scrub.style.setProperty('--p', p);
+    if(atEnd && p < 0.999){ atEnd = false; updatePlayUI(); }
+  });
+  scrub.addEventListener('change', function(){ seeking = false; last = null; });
+  window.addEventListener('pointerup', function(){ seeking = false; });
+
+  /* 릴을 직접 휠/키로 넘기면 힌트 숨김 + 끝 상태 해제 */
+  reel.addEventListener('wheel', function(){ dismissHint(); }, {passive:true});
+  reel.addEventListener('scroll', function(){
+    if(atEnd && reel.scrollTop < maxScroll() - 2){ atEnd = false; updatePlayUI(); }
+  }, {passive:true});
+
+  /* 스페이스바로 재생/정지 (버튼·시크바 포커스가 아닐 때) */
+  document.addEventListener('keydown', function(e){
+    if(e.code === 'Space' && e.target === document.body){
+      e.preventDefault();
+      playBtn.click();
+    }
+  });
+
+  /* ---------- 테마 ---------- */
+  var darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+  function currentIsDark(){
+    var t = root.getAttribute('data-theme');
+    if(t === 'dark') return true;
+    if(t === 'light') return false;
+    return darkMQ.matches;
+  }
+  themeBtn.addEventListener('click', function(){
+    var next = currentIsDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    themeBtn.setAttribute('aria-label', next === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환');
+  });
+
+  /* ---------- 힌트 자동 숨김 ---------- */
+  var hintGone = false;
+  function dismissHint(){ if(hintGone) return; hintGone = true; hint.classList.add('gone'); }
+  setTimeout(dismissHint, 5000);
+
+  /* reduced-motion 변경 실시간 반영 */
+  reducedMQ.addEventListener && reducedMQ.addEventListener('change', function(e){
+    reduced = e.matches;
+    if(reduced){ master = false; }
+    updatePlayUI();
+  });
+
+  updatePlayUI();
+  updateScrub();
+})();
+</script>
+</body>
+</html>
