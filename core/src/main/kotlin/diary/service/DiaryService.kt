@@ -146,9 +146,12 @@ class DiaryServiceImpl(
             throw DiaryCommentTooLongException
         }
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
-        val latestSubmission =
-            diarySubmissionRepository.findFirstByUserIdAndLectureIdOrderByCreatedAtDesc(userId, request.lectureId)
-        if (latestSubmission != null && latestSubmission.createdAt.isAfter(LocalDateTime.now().minusHours(SUBMISSION_COOLDOWN_HOURS))) {
+        if (diarySubmissionRepository.existsByUserIdAndLectureIdAndCreatedAtIsAfter(
+                userId,
+                request.lectureId,
+                LocalDateTime.now().minusHours(SUBMISSION_COOLDOWN_HOURS),
+            )
+        ) {
             throw DiarySubmissionTooFrequentException
         }
         val dailyClassTypes = diaryDailyClassTypeRepository.findAllByNameIn(request.dailyClassTypes)
