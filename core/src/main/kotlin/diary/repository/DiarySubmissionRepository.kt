@@ -11,4 +11,9 @@ interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, S
         userId: String,
         createdAt: LocalDateTime,
     ): Set<DiarySubmission>
+
+    suspend fun findFirstByUserIdAndLectureIdOrderByCreatedAtDesc(
+        userId: String,
+        lectureId: String,
+    ): DiarySubmission?
 }
