@@ -11,4 +11,10 @@ interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, S
         userId: String,
         createdAt: LocalDateTime,
     ): Set<DiarySubmission>
+
+    suspend fun existsByUserIdAndLectureIdAndCreatedAtIsAfter(
+        userId: String,
+        lectureId: String,
+        createdAt: LocalDateTime,
+    ): Boolean
 }
