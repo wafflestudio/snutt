@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundExcept
 import com.wafflestudio.snutt.common.exception.DiaryQuestionInvalidException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionNotFoundException
 import com.wafflestudio.snutt.common.exception.DiarySubmissionNotFoundException
+import com.wafflestudio.snutt.common.exception.DiarySubmissionTooFrequentException
 import com.wafflestudio.snutt.common.exception.LectureNotFoundException
 import com.wafflestudio.snutt.common.exception.TimetableNotFoundException
 import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
@@ -78,6 +79,7 @@ class DiaryServiceImpl(
 ) : DiaryService {
     companion object {
         const val COMMENT_MAX_LENGTH = 1000
+        const val SUBMISSION_COOLDOWN_HOURS = 12L
     }
 
     override suspend fun generateQuestionnaire(
@@ -144,6 +146,14 @@ class DiaryServiceImpl(
             throw DiaryCommentTooLongException
         }
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
+        if (diarySubmissionRepository.existsByUserIdAndLectureIdAndCreatedAtIsAfter(
+                userId,
+                request.lectureId,
+                LocalDateTime.now().minusHours(SUBMISSION_COOLDOWN_HOURS),
+            )
+        ) {
+            throw DiarySubmissionTooFrequentException
+        }
         val dailyClassTypes = diaryDailyClassTypeRepository.findAllByNameIn(request.dailyClassTypes)
         val questionIds = request.questionAnswers.map { it.questionId }
         if (diaryQuestionRepository.countByIdIn(questionIds) != questionIds.size) {

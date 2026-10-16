@@ -74,6 +74,7 @@ enum class ErrorType(
     ),
     DIARY_QUESTION_INVALID(HttpStatus.BAD_REQUEST, 40026, "강의 일기장 질문이 유효하지 않습니다", "강의 일기장 질문이 유효하지 않습니다"),
     DIARY_COMMENT_TOO_LONG(HttpStatus.BAD_REQUEST, 40027, "더 남기고 싶은 말은 최대 1,000자 입력할 수 있습니다", "더 남기고 싶은 말은 최대 1,000자 입력할 수 있습니다"),
+    DIARY_SUBMISSION_TOO_FREQUENT(HttpStatus.BAD_REQUEST, 40028, "오늘 이미 강의 일기장을 작성했습니다", "오늘 이미 강의 일기장을 작성했습니다"),
 
     SOCIAL_CONNECT_FAIL(HttpStatus.UNAUTHORIZED, 40100, "소셜 로그인에 실패했습니다", "소셜 로그인에 실패했습니다"),
     INVALID_APPLE_LOGIN_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "유효하지 않은 애플 로그인 토큰입니다", "소셜 로그인에 실패했습니다"),
