@@ -19,7 +19,7 @@ on:
 jobs:
   deploy:
     name: Deploy Native
-    runs-on: ubuntu-24.04-arm
+    runs-on: blacksmith-16vcpu-ubuntu-2404-arm
 
     concurrency:
       group: deploy-${{ inputs.ocir_repository }}
