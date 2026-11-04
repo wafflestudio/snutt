@@ -21,6 +21,7 @@ import com.wafflestudio.snutt.common.exception.UserNotFoundException
 import com.wafflestudio.snutt.common.exception.WrongLocalIdException
 import com.wafflestudio.snutt.common.exception.WrongPasswordException
 import com.wafflestudio.snutt.common.exception.WrongUserTokenException
+import com.wafflestudio.snutt.mail.data.MailLogStatus
 import com.wafflestudio.snutt.mail.data.UserMailType
 import com.wafflestudio.snutt.mail.service.MailService
 import com.wafflestudio.snutt.notification.service.DeviceService
@@ -579,10 +580,11 @@ class UserServiceImpl(
     override suspend fun sendLocalIdToEmail(email: String) {
         val email = email.trim()
         val users = userRepository.findAllByEmail(email).filter { it.active }
-        if (users.isEmpty()) throw UserNotFoundException
-
         val accountInfo = buildFindIdAccountInfo(users)
-        if (accountInfo.isBlank()) throw UserNotFoundException
+        if (accountInfo.isBlank()) {
+            mailService.recordMailLog(UserMailType.FIND_ID, MailLogStatus.NO_ACCOUNT, email)
+            throw UserNotFoundException
+        }
         mailService.sendUserMail(type = UserMailType.FIND_ID, to = email, accountInfo = accountInfo)
     }
 
@@ -630,12 +632,20 @@ class UserServiceImpl(
 
     override suspend fun sendResetPasswordCode(email: String) {
         val email = email.trim()
-        if (email.replace(emailMaskRegex, "*") == email) throw UpdateAppVersionException
-        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email) ?: throw UserNotFoundException
+        if (email.replace(emailMaskRegex, "*") == email) {
+            mailService.recordMailLog(UserMailType.PASSWORD_RESET, MailLogStatus.FAILED, email, UpdateAppVersionException)
+            throw UpdateAppVersionException
+        }
+        val user = userRepository.findByEmailAndIsEmailVerifiedTrueAndActiveTrue(email)
+        if (user == null) {
+            mailService.recordMailLog(UserMailType.PASSWORD_RESET, MailLogStatus.NO_ACCOUNT, email)
+            throw UserNotFoundException
+        }
         val key = RESET_PASSWORD_CODE_PREFIX + user.id
         val code = Base64.getUrlEncoder().encodeToString(Random.nextBytes(6))
-        saveNewVerificationValue(email, code, key)
-        mailService.sendUserMail(type = UserMailType.PASSWORD_RESET, to = email, code = code)
+        mailService.sendUserMail(type = UserMailType.PASSWORD_RESET, to = email, code = code) {
+            saveNewVerificationValue(email, code, key)
+        }
     }
 
     override suspend fun verifyResetPasswordCode(
