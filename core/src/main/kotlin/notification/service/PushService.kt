@@ -30,7 +30,7 @@ interface PushService {
 
     suspend fun sendGlobalPush(pushMessage: PushMessage)
 
-    suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): PushSendResult
+    suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult
 
     suspend fun sendPush(
         pushMessage: PushMessage,
@@ -47,7 +47,7 @@ interface PushService {
     suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
-    ): PushSendResult
+    ): TargetPushResult
 }
 
 /**
@@ -57,7 +57,7 @@ interface PushService {
  * @property sentUserCount 푸시 설정 필터와 기기 유무 필터를 통과해 실제로 발송한 유저 수
  * @property sentTokenCount 실제로 발송한 FCM 토큰 수
  */
-data class PushSendResult(
+data class TargetPushResult(
     val pushId: String,
     val pushType: String,
     val targetUserCount: Int,
@@ -79,6 +79,7 @@ class PushServiceImpl internal constructor(
             DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneId.of("Asia/Seoul"))
         private val PUSH_ID_SUFFIX_CHARS = ('a'..'z') + ('0'..'9')
         private const val PUSH_ID_SUFFIX_LENGTH = 6
+        private const val GLOBAL_PUSH_TYPE = "global"
     }
 
     override suspend fun sendPush(
@@ -98,9 +99,9 @@ class PushServiceImpl internal constructor(
 
     override suspend fun sendGlobalPush(pushMessage: PushMessage) {
         val sentAt = Instant.now()
-        val pushType = PushPreferenceType.NORMAL.pushTypeValue
+        val pushType = GLOBAL_PUSH_TYPE
         val pushId = generatePushId(pushType, sentAt)
-        pushClient.sendGlobalMessage(pushMessage.withTracking(pushId, pushType))
+        pushClient.sendGlobalMessage(pushMessage.copy(pushId = pushId, pushType = pushType))
         log.info("푸시 전송: push_id={}, push_type={}, topic={}", pushId, pushType, PushClient.GLOBAL_TOPIC)
         pushHistoryRecorder.record(
             PushHistory(
@@ -117,7 +118,7 @@ class PushServiceImpl internal constructor(
         )
     }
 
-    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): PushSendResult =
+    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult =
         sendToUsers(userToPushMessage, PushPreferenceType.NORMAL, userToPushMessage.size)
 
     override suspend fun sendPush(
@@ -147,7 +148,7 @@ class PushServiceImpl internal constructor(
     override suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
-    ): PushSendResult {
+    ): TargetPushResult {
         val userPushPreferenceEnabled = pushPreferenceService.isPushPreferenceEnabled(userToPushMessage.keys.toList(), pushPreferenceType)
 
         val filteredUserToPushMessage =
@@ -168,7 +169,7 @@ class PushServiceImpl internal constructor(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
         targetUserCount: Int,
-    ): PushSendResult {
+    ): TargetPushResult {
         val sentAt = Instant.now()
         val pushType = pushPreferenceType.pushTypeValue
         val pushId = generatePushId(pushType, sentAt)
@@ -178,7 +179,7 @@ class PushServiceImpl internal constructor(
         val sentUserIds = userToPushMessage.keys.filter { !usersDevicesMap[it].isNullOrEmpty() }
         val targetedPushMessageWithTokens =
             sentUserIds.flatMap { userId ->
-                val pushMessage = userToPushMessage.getValue(userId).withTracking(pushId, pushType)
+                val pushMessage = userToPushMessage.getValue(userId).copy(pushId = pushId, pushType = pushType)
                 usersDevicesMap.getValue(userId).map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
             }
         if (targetedPushMessageWithTokens.isNotEmpty()) {
@@ -186,7 +187,7 @@ class PushServiceImpl internal constructor(
         }
 
         val result =
-            PushSendResult(
+            TargetPushResult(
                 pushId = pushId,
                 pushType = pushType,
                 targetUserCount = targetUserCount,

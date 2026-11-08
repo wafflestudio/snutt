@@ -60,8 +60,8 @@ class PushServiceImplTest :
                 Then("모든 메시지에 같은 push_id와 push_type을 data로 싣는다") {
                     sentMessages.captured shouldHaveSize 2
                     sentMessages.captured.forEach {
-                        it.message.data.payload[PushMessage.TrackingKeys.PUSH_ID] shouldBe result.pushId
-                        it.message.data.payload[PushMessage.TrackingKeys.PUSH_TYPE] shouldBe "diary"
+                        it.message.pushId shouldBe result.pushId
+                        it.message.pushType shouldBe "diary"
                     }
                 }
             }
@@ -77,11 +77,12 @@ class PushServiceImplTest :
             When("sendGlobalPush를 호출하면") {
                 pushService.sendGlobalPush(message)
 
-                Then("기존 data를 유지하면서 push_id와 push_type을 싣고 topic 발송으로 기록한다") {
+                Then("기존 data를 유지하면서 push_id와 push_type(global)을 싣고 topic 발송으로 기록한다") {
                     coVerify(exactly = 1) { pushClient.sendGlobalMessage(any()) }
                     sentMessage.captured.data.payload["key"] shouldBe "value"
-                    sentMessage.captured.data.payload[PushMessage.TrackingKeys.PUSH_TYPE] shouldBe "normal"
-                    sentMessage.captured.data.payload[PushMessage.TrackingKeys.PUSH_ID] shouldBe history.captured.pushId
+                    sentMessage.captured.pushType shouldBe "global"
+                    sentMessage.captured.pushId shouldBe history.captured.pushId
+                    history.captured.pushId shouldMatch Regex("global-\\d{8}-\\d{6}-[a-z0-9]{6}")
                     history.captured.isGlobal shouldBe true
                     history.captured.topic shouldBe PushClient.GLOBAL_TOPIC
                     history.captured.targetUserCount shouldBe null

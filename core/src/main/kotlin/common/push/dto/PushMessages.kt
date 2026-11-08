@@ -44,34 +44,19 @@ data class PushMessage(
      * @see [Firebase 문서](https://firebase.google.com/docs/cloud-messaging/customize-messages/set-message-type)
      */
     val shouldSendAsDataMessage: Boolean = false,
+    /**
+     * 푸시 발송 1회를 식별하는 id. [com.wafflestudio.snutt.notification.service.PushService]가 발송 시점에 채운다.
+     * FCM data의 `push_id`로 전송되며 클라이언트(Android/iOS)가 이 key에 의존한다.
+     */
+    val pushId: String? = null,
+    /**
+     * 푸시 종류 (diary, lecture_update, vacancy_notification, normal, global). FCM data의 `push_type`으로 전송된다.
+     */
+    val pushType: String? = null,
 ) {
     data class Data(
         val payload: Map<String, String>,
     )
-
-    /**
-     * 푸시 클릭률 추적용 data key(`push_id`, `push_type`)를 붙인 메시지를 반환한다.
-     * 클라이언트(Android/iOS)가 이 key 이름에 의존하므로 바꾸면 안 된다.
-     */
-    fun withTracking(
-        pushId: String,
-        pushType: String,
-    ): PushMessage =
-        copy(
-            data =
-                Data(
-                    data.payload +
-                        mapOf(
-                            TrackingKeys.PUSH_ID to pushId,
-                            TrackingKeys.PUSH_TYPE to pushType,
-                        ),
-                ),
-        )
-
-    object TrackingKeys {
-        const val PUSH_ID = "push_id"
-        const val PUSH_TYPE = "push_type"
-    }
 
     fun toNotification(
         notificationType: NotificationType,
