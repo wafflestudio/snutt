@@ -49,6 +49,30 @@ data class PushMessage(
         val payload: Map<String, String>,
     )
 
+    /**
+     * 푸시 클릭률 추적용 data key(`push_id`, `push_type`)를 붙인 메시지를 반환한다.
+     * 클라이언트(Android/iOS)가 이 key 이름에 의존하므로 바꾸면 안 된다.
+     */
+    fun withTracking(
+        pushId: String,
+        pushType: String,
+    ): PushMessage =
+        copy(
+            data =
+                Data(
+                    data.payload +
+                        mapOf(
+                            TrackingKeys.PUSH_ID to pushId,
+                            TrackingKeys.PUSH_TYPE to pushType,
+                        ),
+                ),
+        )
+
+    object TrackingKeys {
+        const val PUSH_ID = "push_id"
+        const val PUSH_TYPE = "push_type"
+    }
+
     fun toNotification(
         notificationType: NotificationType,
         userId: String?,

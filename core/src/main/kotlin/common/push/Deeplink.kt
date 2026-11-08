@@ -1,7 +1,6 @@
 package com.wafflestudio.snutt.common.push
 
 import com.wafflestudio.snutt.config.PhaseUtils
-import java.net.URLEncoder
 
 @JvmInline
 value class Deeplink(
@@ -22,19 +21,11 @@ enum class DeeplinkType(
     fun build(
         vararg params: Any,
         referrer: String? = null,
-        pushId: String? = null,
     ): Deeplink {
         val phase = PhaseUtils.getPhase()
         val protocol = if (phase.isProd) "snutt" else "snutt-dev"
 
-        val baseScheme = "$protocol://${url.format(*params)}"
-        val fullScheme =
-            if (pushId.isNullOrBlank()) {
-                baseScheme
-            } else {
-                val separator = if (baseScheme.contains('?')) "&" else "?"
-                "$baseScheme${separator}push_id=${URLEncoder.encode(pushId, "UTF-8")}"
-            }
+        val fullScheme = "$protocol://${url.format(*params)}"
 
         if (referrer.isNullOrBlank()) {
             return Deeplink(fullScheme)

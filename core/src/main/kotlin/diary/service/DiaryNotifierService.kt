@@ -16,8 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.net.URLEncoder
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 interface DiaryNotifierService {
     suspend fun sendNotifier()
@@ -55,7 +53,6 @@ class DiaryNotifierServiceImpl(
             try {
                 logger.debug("강의 일기장 알림 전송 작업을 시작합니다.")
                 val currentTime = Instant.now()
-                val pushId = PUSH_ID_FORMATTER.format(currentTime)
                 val (currentYear, currentSemester) =
                     semesterService.getCurrentYearAndSemester(currentTime) ?: run {
                         logger.debug("현재 진행 중인 학기가 없습니다.")
@@ -76,14 +73,14 @@ class DiaryNotifierServiceImpl(
                                     .filterNot { lecture -> lecture.lectureId == null }
                                     .randomOrNull()
                                     ?: return@mapNotNull null
-                            it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle, pushId)
+                            it.key to buildPushMessage(targetLecture.lectureId!!, targetLecture.courseTitle)
                         }.toMap()
 
-                logger.info("[$pushId] ${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
+                logger.info("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
                 val result = pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
                 logger.info(
-                    "[$pushId] 강의 일기장 알림 전송 완료: 대상 ${targetedPushMessages.size}명, " +
-                        "푸시 설정 필터 후 ${result.userCount}명, FCM 토큰 ${result.tokenCount}개",
+                    "[${result.pushId}] 강의 일기장 알림 전송 완료: 대상 ${result.targetUserCount}명, " +
+                        "실제 발송 ${result.sentUserCount}명, FCM 토큰 ${result.sentTokenCount}개",
                 )
             } catch (e: Exception) {
                 logger.error("강의 일기장 알림 전송 중 문제 발생", e)
@@ -94,17 +91,11 @@ class DiaryNotifierServiceImpl(
     private fun buildPushMessage(
         lectureId: String,
         courseTitle: String,
-        pushId: String,
     ): PushMessage =
         PushMessage(
             title = "이번주 강의일기를 작성해보세요.",
             body = "최근 수강한 <$courseTitle> 강의에 대한 강의일기를 작성해보세요.\uD83D\uDCD4 ",
-            urlScheme = DeeplinkType.DIARY.build(lectureId, URLEncoder.encode(courseTitle, "UTF-8"), pushId = pushId),
+            urlScheme = DeeplinkType.DIARY.build(lectureId, URLEncoder.encode(courseTitle, "UTF-8")),
             isUrgentOnAndroid = false,
         )
-
-    companion object {
-        private val PUSH_ID_FORMATTER: DateTimeFormatter =
-            DateTimeFormatter.ofPattern("'diary-'yyyyMMdd-HHmm").withZone(ZoneId.of("Asia/Seoul"))
-    }
 }

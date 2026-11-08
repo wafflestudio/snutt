@@ -11,6 +11,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
 import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.push.PushClient.Companion.GLOBAL_TOPIC
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
@@ -51,7 +52,6 @@ internal class FcmPushClient(
 
     companion object {
         private const val FCM_MESSAGE_COUNT_LIMIT = 500
-        private const val GLOBAL_TOPIC = "global"
     }
 
     override suspend fun sendMessage(pushMessage: TargetedPushMessageWithToken) {

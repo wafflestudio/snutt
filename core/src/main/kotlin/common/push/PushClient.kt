@@ -16,4 +16,8 @@ interface PushClient {
     suspend fun subscribeGlobalTopic(registrationId: String)
 
     suspend fun unsubscribeGlobalTopic(registrationId: String)
+
+    companion object {
+        const val GLOBAL_TOPIC = "global"
+    }
 }
