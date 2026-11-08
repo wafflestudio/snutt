@@ -22,7 +22,7 @@ interface PushService {
 
     suspend fun sendGlobalPush(pushMessage: PushMessage)
 
-    suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>)
+    suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult
 
     suspend fun sendPush(
         pushMessage: PushMessage,
@@ -39,8 +39,17 @@ interface PushService {
     suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
-    )
+    ): TargetPushResult
 }
+
+/**
+ * @property userCount 발송 대상 유저 수 (푸시 설정 필터가 있으면 필터를 통과한 유저 수)
+ * @property tokenCount 실제로 발송한 FCM 토큰 수
+ */
+data class TargetPushResult(
+    val userCount: Int,
+    val tokenCount: Int,
+)
 
 @Service
 class PushServiceImpl internal constructor(
@@ -75,13 +84,15 @@ class PushServiceImpl internal constructor(
 
     override suspend fun sendGlobalPush(pushMessage: PushMessage) = pushClient.sendGlobalMessage(pushMessage)
 
-    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>) {
+    override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult {
         val usersDevicesMap = deviceService.getUsersDevices(userToPushMessage.keys.toList())
-        userToPushMessage.entries
-            .flatMap { (userId, pushMessage) ->
-                usersDevicesMap[userId]?.map { it.fcmRegistrationId to pushMessage } ?: listOf()
-            }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
-            .let { pushClient.sendMessages(it) }
+        val targetedPushMessageWithTokens =
+            userToPushMessage.entries
+                .flatMap { (userId, pushMessage) ->
+                    usersDevicesMap[userId]?.map { it.fcmRegistrationId to pushMessage } ?: listOf()
+                }.map { (fcmRegistrationId, message) -> TargetedPushMessageWithToken(fcmRegistrationId, message) }
+        pushClient.sendMessages(targetedPushMessageWithTokens)
+        return TargetPushResult(userCount = userToPushMessage.size, tokenCount = targetedPushMessageWithTokens.size)
     }
 
     override suspend fun sendPush(
@@ -109,7 +120,7 @@ class PushServiceImpl internal constructor(
     override suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
         pushPreferenceType: PushPreferenceType,
-    ) {
+    ): TargetPushResult {
         val userPushPreferenceEnabled = pushPreferenceService.isPushPreferenceEnabled(userToPushMessage.keys.toList(), pushPreferenceType)
 
         val filteredUserToPushMessage =
@@ -117,8 +128,9 @@ class PushServiceImpl internal constructor(
                 userPushPreferenceEnabled[userId] ?: pushPreferenceType.isEnabledByDefault
             }
 
-        if (filteredUserToPushMessage.isNotEmpty()) {
-            sendTargetPushes(filteredUserToPushMessage)
+        if (filteredUserToPushMessage.isEmpty()) {
+            return TargetPushResult(userCount = 0, tokenCount = 0)
         }
+        return sendTargetPushes(filteredUserToPushMessage)
     }
 }
