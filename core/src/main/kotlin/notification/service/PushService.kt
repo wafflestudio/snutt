@@ -51,8 +51,6 @@ interface PushService {
 }
 
 /**
- * 푸시 발송 1회의 결과
- *
  * @property targetUserCount 푸시 설정 필터 전 대상 유저 수
  * @property sentUserCount 푸시 설정 필터와 기기 유무 필터를 통과해 실제로 발송한 유저 수
  * @property sentTokenCount 실제로 발송한 FCM 토큰 수
@@ -160,10 +158,9 @@ class PushServiceImpl internal constructor(
     }
 
     /**
-     * 토큰 단위 발송의 공통 경로. 호출 1회 = push id 1개.
+     * 호출 1회 = push id 1개.
      *
      * @param userToPushMessage 푸시 설정 필터를 이미 통과한 유저별 메시지
-     * @param targetUserCount 푸시 설정 필터 전 대상 유저 수
      */
     private suspend fun sendToUsers(
         userToPushMessage: Map<String, PushMessage>,
