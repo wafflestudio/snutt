@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
 /**
  * 유저 기기에 푸시를 보내는 서비스입니다.
  *
- * 모든 발송 호출마다 push id를 하나 생성해 FCM data의 `push_id`, `push_type`으로 싣고,
+ * 모든 발송 호출마다 push id를 하나 생성해 FCM data의 `push_id`로 싣고,
  * 발송 결과를 [PushHistoryRecorder]로 기록합니다.
  */
 interface PushService {
@@ -101,7 +101,7 @@ class PushServiceImpl internal constructor(
         val sentAt = Instant.now()
         val pushType = GLOBAL_PUSH_TYPE
         val pushId = generatePushId(pushType, sentAt)
-        pushClient.sendGlobalMessage(pushMessage.copy(pushId = pushId, pushType = pushType))
+        pushClient.sendGlobalMessage(pushMessage.copy(pushId = pushId))
         log.info("푸시 전송: push_id={}, push_type={}, topic={}", pushId, pushType, PushClient.GLOBAL_TOPIC)
         pushHistoryRecorder.record(
             PushHistory(
@@ -179,7 +179,7 @@ class PushServiceImpl internal constructor(
         val sentUserIds = userToPushMessage.keys.filter { !usersDevicesMap[it].isNullOrEmpty() }
         val targetedPushMessageWithTokens =
             sentUserIds.flatMap { userId ->
-                val pushMessage = userToPushMessage.getValue(userId).copy(pushId = pushId, pushType = pushType)
+                val pushMessage = userToPushMessage.getValue(userId).copy(pushId = pushId)
                 usersDevicesMap.getValue(userId).map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
             }
         if (targetedPushMessageWithTokens.isNotEmpty()) {

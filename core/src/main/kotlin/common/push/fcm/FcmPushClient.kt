@@ -38,7 +38,6 @@ internal class FcmPushClient(
 
         // 푸시 클릭률 추적용. 클라이언트(Android/iOS)가 이 key 이름에 의존하므로 바꾸면 안 된다.
         const val PUSH_ID = "push_id"
-        const val PUSH_TYPE = "push_type"
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -141,7 +140,6 @@ internal class FcmPushClient(
             }
             message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.value) }
             message.pushId?.let { putData(PayloadKeys.PUSH_ID, it) }
-            message.pushType?.let { putData(PayloadKeys.PUSH_TYPE, it) }
             if (message.shouldSendAsDataMessage) {
                 putData(PayloadKeys.TITLE, message.title)
                 putData(PayloadKeys.BODY, message.body)

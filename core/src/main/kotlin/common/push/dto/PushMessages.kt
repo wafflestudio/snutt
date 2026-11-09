@@ -49,10 +49,6 @@ data class PushMessage(
      * FCM data의 `push_id`로 전송되며 클라이언트(Android/iOS)가 이 key에 의존한다.
      */
     val pushId: String? = null,
-    /**
-     * 푸시 종류 (diary, lecture_update, vacancy_notification, normal, global). FCM data의 `push_type`으로 전송된다.
-     */
-    val pushType: String? = null,
 ) {
     data class Data(
         val payload: Map<String, String>,
