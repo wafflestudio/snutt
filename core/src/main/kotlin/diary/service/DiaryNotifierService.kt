@@ -91,7 +91,7 @@ class DiaryNotifierServiceImpl(
         PushMessage(
             title = "이번주 강의일기를 작성해보세요.",
             body = "최근 수강한 <$courseTitle> 강의에 대한 강의일기를 작성해보세요.\uD83D\uDCD4 ",
-            urlScheme = DeeplinkType.DIARY.build(lectureId, URLEncoder.encode(courseTitle, "UTF-8")),
+            urlScheme = DeeplinkType.DIARY.build(lectureId, URLEncoder.encode(courseTitle, "UTF-8").replace("+", "%20")),
             isUrgentOnAndroid = false,
         )
 }
