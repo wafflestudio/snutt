@@ -15,6 +15,8 @@ import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.service.DiaryNotifierService
 import com.wafflestudio.snutt.diary.service.DiaryService
 import com.wafflestudio.snutt.filter.SnuttAdminApiFilterTarget
+import com.wafflestudio.snutt.mail.dto.AdminMailLogResponse
+import com.wafflestudio.snutt.mail.service.MailService
 import com.wafflestudio.snutt.notification.service.NotificationAdminService
 import com.wafflestudio.snutt.popup.dto.PopupResponse
 import com.wafflestudio.snutt.popup.dto.PostPopupRequest
@@ -52,6 +54,7 @@ class AdminController(
     private val diaryNotifierService: DiaryNotifierService,
     private val semesterRegistrationPeriodService: SemesterRegistrationPeriodService,
     private val userService: UserService,
+    private val mailService: MailService,
 ) {
     @PostMapping("/insert_noti")
     suspend fun insertNotification(
@@ -195,4 +198,9 @@ class AdminController(
     suspend fun searchUsersByEmail(
         @RequestParam email: String,
     ): List<AdminUserSearchResponse> = userService.getUsersByEmail(email).map { AdminUserSearchResponse.from(it) }
+
+    @GetMapping("/mailLogs")
+    suspend fun getMailLogs(
+        @RequestParam email: String,
+    ): List<AdminMailLogResponse> = mailService.getMailLogs(email).map { AdminMailLogResponse.from(it) }
 }

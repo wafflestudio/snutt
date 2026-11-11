@@ -11,6 +11,11 @@ import com.wafflestudio.snutt.common.extension.awaitOciCall
 import com.wafflestudio.snutt.config.OciConfig
 import org.springframework.stereotype.Component
 
+enum class MailSendOutcome {
+    SENT,
+    SUPPRESSED,
+}
+
 @Component
 class MailClient(
     authProvider: BasicAuthenticationDetailsProvider,
@@ -28,7 +33,7 @@ class MailClient(
         to: String,
         subject: String,
         body: String,
-    ) {
+    ): MailSendOutcome {
         val emailDetails =
             SubmitEmailDetails
                 .builder()
@@ -64,6 +69,11 @@ class MailClient(
                 .submitEmailDetails(emailDetails)
                 .build()
 
-        awaitOciCall { handler -> emailClient.submitEmail(request, handler) }
+        val response = awaitOciCall { handler -> emailClient.submitEmail(request, handler) }
+        return if (response.emailSubmittedResponse?.suppressedRecipients.isNullOrEmpty()) {
+            MailSendOutcome.SENT
+        } else {
+            MailSendOutcome.SUPPRESSED
+        }
     }
 }
