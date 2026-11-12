@@ -6,6 +6,7 @@ import com.wafflestudio.snutt.coursebook.data.Coursebook
 import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.notification.data.Notification
 import com.wafflestudio.snutt.notification.data.NotificationType
+import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import com.wafflestudio.snutt.notification.service.NotificationService
 import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.notification.service.PushWithNotificationService
@@ -101,7 +102,7 @@ class SugangSnuNotificationServiceImpl(
                         urlScheme = DeeplinkType.NOTIFICATIONS.build(),
                     )
                 }
-            pushService.sendTargetPushes(userIdToMessage, NotificationType.LECTURE_UPDATE)
+            pushService.sendTargetPushes(userIdToMessage, PushPreferenceType.LECTURE_UPDATE)
         }
 
     override suspend fun notifyCoursebookUpdate(coursebook: Coursebook) {

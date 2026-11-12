@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.notification.service
 
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.notification.data.NotificationType
+import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
@@ -46,7 +47,7 @@ class PushWithNotificationServiceImpl internal constructor(
     ): Unit =
         coroutineScope {
             launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId)) }
-            launch { pushService.sendPush(pushMessage, userId, notificationType) }
+            launch { pushService.sendPush(pushMessage, userId, PushPreferenceType(notificationType)) }
         }
 
     override suspend fun sendPushesAndNotifications(
@@ -65,7 +66,7 @@ class PushWithNotificationServiceImpl internal constructor(
                     },
                 )
             }
-            launch { pushService.sendPushes(pushMessage, userIds, notificationType) }
+            launch { pushService.sendPushes(pushMessage, userIds, PushPreferenceType(notificationType)) }
         }
 
     override suspend fun sendGlobalPushAndNotification(
@@ -74,6 +75,6 @@ class PushWithNotificationServiceImpl internal constructor(
     ): Unit =
         coroutineScope {
             launch { notificationService.sendNotification(pushMessage.toNotification(notificationType, userId = null)) }
-            launch { pushService.sendGlobalPush(pushMessage, notificationType) }
+            launch { pushService.sendGlobalPush(pushMessage) }
         }
 }
