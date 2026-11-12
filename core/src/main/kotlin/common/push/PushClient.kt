@@ -9,11 +9,18 @@ interface PushClient {
 
     suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>)
 
-    suspend fun sendGlobalMessage(pushMessage: PushMessage)
+    suspend fun sendGlobalMessage(
+        pushMessage: PushMessage,
+        pushId: String,
+    )
 
     suspend fun sendTopicMessage(pushMessage: TargetedPushMessageWithTopic)
 
     suspend fun subscribeGlobalTopic(registrationId: String)
 
     suspend fun unsubscribeGlobalTopic(registrationId: String)
+
+    companion object {
+        const val GLOBAL_TOPIC = "global"
+    }
 }

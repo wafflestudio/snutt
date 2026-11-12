@@ -77,7 +77,11 @@ class DiaryNotifierServiceImpl(
                         }.toMap()
 
                 logger.info("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
-                pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
+                val result = pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
+                logger.info(
+                    "[${result.pushId}] 강의 일기장 알림 전송 완료: 대상 ${result.targetUserCount}명, " +
+                        "실제 발송 ${result.sentUserCount}명, FCM 토큰 ${result.sentTokenCount}개",
+                )
             } catch (e: Exception) {
                 logger.error("강의 일기장 알림 전송 중 문제 발생", e)
             }

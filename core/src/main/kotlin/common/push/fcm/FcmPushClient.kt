@@ -11,6 +11,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
 import com.wafflestudio.snutt.common.push.PushClient
+import com.wafflestudio.snutt.common.push.PushClient.Companion.GLOBAL_TOPIC
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
@@ -34,6 +35,9 @@ internal class FcmPushClient(
         const val TITLE = "title"
         const val BODY = "body"
         const val URL_SCHEME = "url_scheme"
+
+        // 푸시 클릭률 추적용. 클라이언트(Android/iOS)가 이 key 이름에 의존하므로 바꾸면 안 된다.
+        const val PUSH_ID = "push_id"
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -51,7 +55,6 @@ internal class FcmPushClient(
 
     companion object {
         private const val FCM_MESSAGE_COUNT_LIMIT = 500
-        private const val GLOBAL_TOPIC = "global"
     }
 
     override suspend fun sendMessage(pushMessage: TargetedPushMessageWithToken) {
@@ -85,8 +88,11 @@ internal class FcmPushClient(
                 .map { (message, response) -> log.info("Message Request Sent: $message, response : $response") }
         }
 
-    override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
-        sendTopicMessage(TargetedPushMessageWithTopic(GLOBAL_TOPIC, pushMessage))
+    override suspend fun sendGlobalMessage(
+        pushMessage: PushMessage,
+        pushId: String,
+    ) {
+        sendTopicMessage(TargetedPushMessageWithTopic(GLOBAL_TOPIC, pushMessage, pushId))
     }
 
     override suspend fun sendTopicMessage(pushMessage: TargetedPushMessageWithTopic) {
@@ -151,6 +157,8 @@ internal class FcmPushClient(
             setAndroidConfig(androidConfig)
             setApnsConfig(apnsConfig)
             putAllData(message.data.payload)
+            // 관리자 dataPayload에 push_id가 있어도 발송 기록과 같은 id가 나가도록 마지막에 넣는다
+            putData(PayloadKeys.PUSH_ID, pushId)
             build()
         }
     }

@@ -23,6 +23,9 @@ dependencies {
     implementation("com.wafflestudio.spring:spring-boot-starter-waffle-oci-vault:2.1.0")
     implementation("com.wafflestudio.spring.truffle:spring-boot-starter-truffle:2.1.0")
     implementation("com.google.firebase:firebase-admin:9.7.0")
+    // firebase-admin 9.7.0이 import하는 libraries-bom과 같은 버전으로 google-cloud 의존성을 맞춘다
+    implementation(platform("com.google.cloud:libraries-bom:26.67.0"))
+    implementation("com.google.cloud:google-cloud-bigquery")
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
     implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
