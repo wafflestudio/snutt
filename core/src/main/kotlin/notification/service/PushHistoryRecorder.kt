@@ -5,11 +5,18 @@ import com.google.cloud.bigquery.BigQuery
 import com.google.cloud.bigquery.BigQueryOptions
 import com.google.cloud.bigquery.InsertAllRequest
 import com.google.cloud.bigquery.TableId
-import com.wafflestudio.snutt.common.util.CoroutineUtils
 import com.wafflestudio.snutt.notification.data.PushHistory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -30,8 +37,15 @@ internal class BigQueryPushHistoryRecorder(
     @param:Value("\${google.bigquery.push-history.table:push_history}") table: String,
     @param:Value("\${google.firebase.project-id}") firebaseProjectId: String,
     @param:Value("\${google.firebase.service-account}") private val serviceAccountString: String,
-) : PushHistoryRecorder {
+) : PushHistoryRecorder,
+    DisposableBean {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    companion object {
+        private const val SHUTDOWN_TIMEOUT_MILLIS = 10_000L
+    }
 
     private val tableId = TableId.of(projectId.ifBlank { firebaseProjectId }, dataset, table)
 
@@ -46,10 +60,23 @@ internal class BigQueryPushHistoryRecorder(
 
     override fun record(pushHistory: PushHistory) {
         if (!enabled) return
-        CoroutineUtils.applicationScope.launch(Dispatchers.IO) {
+        scope.launch {
             runCatching { insert(pushHistory) }
                 .onFailure { log.warn("push_history BigQuery 적재 실패 (push_id={})", pushHistory.pushId, it) }
         }
+    }
+
+    // batch는 발송 직후 프로세스가 끝나므로 종료 전에 남은 적재를 기다린다
+    override fun destroy() {
+        val pending =
+            scope.coroutineContext.job.children
+                .toList()
+        runBlocking {
+            if (withTimeoutOrNull(SHUTDOWN_TIMEOUT_MILLIS) { pending.joinAll() } == null) {
+                log.warn("종료 전에 push_history 적재 {}건을 마치지 못했습니다", pending.count { it.isActive })
+            }
+        }
+        scope.cancel()
     }
 
     private fun insert(pushHistory: PushHistory) {
