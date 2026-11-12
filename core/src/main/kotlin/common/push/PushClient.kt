@@ -9,7 +9,10 @@ interface PushClient {
 
     suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>)
 
-    suspend fun sendGlobalMessage(pushMessage: PushMessage)
+    suspend fun sendGlobalMessage(
+        pushMessage: PushMessage,
+        pushId: String,
+    )
 
     suspend fun sendTopicMessage(pushMessage: TargetedPushMessageWithTopic)
 

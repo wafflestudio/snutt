@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.notification.service
 import com.wafflestudio.snutt.common.push.PushClient
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.common.push.dto.TargetedPushMessageWithToken
+import com.wafflestudio.snutt.notification.data.NotificationType
 import com.wafflestudio.snutt.notification.data.PushHistory
 import com.wafflestudio.snutt.notification.data.PushPreferenceType
 import org.slf4j.LoggerFactory
@@ -28,25 +29,28 @@ interface PushService {
         userIds: List<String>,
     )
 
-    suspend fun sendGlobalPush(pushMessage: PushMessage)
+    suspend fun sendGlobalPush(
+        pushMessage: PushMessage,
+        notificationType: NotificationType,
+    )
 
     suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult
 
     suspend fun sendPush(
         pushMessage: PushMessage,
         userId: String,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     )
 
     suspend fun sendPushes(
         pushMessage: PushMessage,
         userIds: List<String>,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     )
 
     suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     ): TargetPushResult
 }
 
@@ -57,7 +61,7 @@ interface PushService {
  */
 data class TargetPushResult(
     val pushId: String,
-    val pushType: String,
+    val pushType: NotificationType,
     val targetUserCount: Int,
     val sentUserCount: Int,
     val sentTokenCount: Int,
@@ -77,14 +81,13 @@ class PushServiceImpl internal constructor(
             DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneId.of("Asia/Seoul"))
         private val PUSH_ID_SUFFIX_CHARS = ('a'..'z') + ('0'..'9')
         private const val PUSH_ID_SUFFIX_LENGTH = 6
-        private const val GLOBAL_PUSH_TYPE = "global"
     }
 
     override suspend fun sendPush(
         pushMessage: PushMessage,
         userId: String,
     ) {
-        sendToUsers(mapOf(userId to pushMessage), PushPreferenceType.NORMAL, targetUserCount = 1)
+        sendToUsers(mapOf(userId to pushMessage), NotificationType.NORMAL, targetUserCount = 1)
     }
 
     override suspend fun sendPushes(
@@ -92,19 +95,21 @@ class PushServiceImpl internal constructor(
         userIds: List<String>,
     ) {
         val distinctUserIds = userIds.distinct()
-        sendToUsers(distinctUserIds.associateWith { pushMessage }, PushPreferenceType.NORMAL, distinctUserIds.size)
+        sendToUsers(distinctUserIds.associateWith { pushMessage }, NotificationType.NORMAL, distinctUserIds.size)
     }
 
-    override suspend fun sendGlobalPush(pushMessage: PushMessage) {
+    override suspend fun sendGlobalPush(
+        pushMessage: PushMessage,
+        notificationType: NotificationType,
+    ) {
         val sentAt = Instant.now()
-        val pushType = GLOBAL_PUSH_TYPE
-        val pushId = generatePushId(pushType, sentAt)
-        pushClient.sendGlobalMessage(pushMessage.copy(pushId = pushId))
-        log.info("푸시 전송: push_id={}, push_type={}, topic={}", pushId, pushType, PushClient.GLOBAL_TOPIC)
+        val pushId = generatePushId(notificationType, sentAt)
+        pushClient.sendGlobalMessage(pushMessage, pushId)
+        log.info("푸시 전송: push_id={}, push_type={}, topic={}", pushId, notificationType.pushTypeValue, PushClient.GLOBAL_TOPIC)
         pushHistoryRecorder.record(
             PushHistory(
                 pushId = pushId,
-                pushType = pushType,
+                pushType = notificationType.pushTypeValue,
                 sentAt = sentAt,
                 targetUserCount = null,
                 sentUserCount = null,
@@ -117,36 +122,37 @@ class PushServiceImpl internal constructor(
     }
 
     override suspend fun sendTargetPushes(userToPushMessage: Map<String, PushMessage>): TargetPushResult =
-        sendToUsers(userToPushMessage, PushPreferenceType.NORMAL, userToPushMessage.size)
+        sendToUsers(userToPushMessage, NotificationType.NORMAL, userToPushMessage.size)
 
     override suspend fun sendPush(
         pushMessage: PushMessage,
         userId: String,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     ) {
         val userToPushMessage =
-            if (pushPreferenceService.isPushPreferenceEnabled(userId, pushPreferenceType)) {
+            if (pushPreferenceService.isPushPreferenceEnabled(userId, PushPreferenceType(notificationType))) {
                 mapOf(userId to pushMessage)
             } else {
                 emptyMap()
             }
-        sendToUsers(userToPushMessage, pushPreferenceType, targetUserCount = 1)
+        sendToUsers(userToPushMessage, notificationType, targetUserCount = 1)
     }
 
     override suspend fun sendPushes(
         pushMessage: PushMessage,
         userIds: List<String>,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     ) {
         val distinctUserIds = userIds.distinct()
-        val filteredUserIds = pushPreferenceService.filterUsersByPushPreference(distinctUserIds, pushPreferenceType)
-        sendToUsers(filteredUserIds.associateWith { pushMessage }, pushPreferenceType, distinctUserIds.size)
+        val filteredUserIds = pushPreferenceService.filterUsersByPushPreference(distinctUserIds, PushPreferenceType(notificationType))
+        sendToUsers(filteredUserIds.associateWith { pushMessage }, notificationType, distinctUserIds.size)
     }
 
     override suspend fun sendTargetPushes(
         userToPushMessage: Map<String, PushMessage>,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
     ): TargetPushResult {
+        val pushPreferenceType = PushPreferenceType(notificationType)
         val userPushPreferenceEnabled = pushPreferenceService.isPushPreferenceEnabled(userToPushMessage.keys.toList(), pushPreferenceType)
 
         val filteredUserToPushMessage =
@@ -154,7 +160,7 @@ class PushServiceImpl internal constructor(
                 userPushPreferenceEnabled[userId] ?: pushPreferenceType.isEnabledByDefault
             }
 
-        return sendToUsers(filteredUserToPushMessage, pushPreferenceType, userToPushMessage.size)
+        return sendToUsers(filteredUserToPushMessage, notificationType, userToPushMessage.size)
     }
 
     /**
@@ -164,20 +170,19 @@ class PushServiceImpl internal constructor(
      */
     private suspend fun sendToUsers(
         userToPushMessage: Map<String, PushMessage>,
-        pushPreferenceType: PushPreferenceType,
+        notificationType: NotificationType,
         targetUserCount: Int,
     ): TargetPushResult {
         val sentAt = Instant.now()
-        val pushType = pushPreferenceType.pushTypeValue
-        val pushId = generatePushId(pushType, sentAt)
+        val pushId = generatePushId(notificationType, sentAt)
 
         val usersDevicesMap =
             if (userToPushMessage.isEmpty()) emptyMap() else deviceService.getUsersDevices(userToPushMessage.keys.toList())
         val sentUserIds = userToPushMessage.keys.filter { !usersDevicesMap[it].isNullOrEmpty() }
         val targetedPushMessageWithTokens =
             sentUserIds.flatMap { userId ->
-                val pushMessage = userToPushMessage.getValue(userId).copy(pushId = pushId)
-                usersDevicesMap.getValue(userId).map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage) }
+                val pushMessage = userToPushMessage.getValue(userId)
+                usersDevicesMap.getValue(userId).map { TargetedPushMessageWithToken(it.fcmRegistrationId, pushMessage, pushId) }
             }
         if (targetedPushMessageWithTokens.isNotEmpty()) {
             pushClient.sendMessages(targetedPushMessageWithTokens)
@@ -186,7 +191,7 @@ class PushServiceImpl internal constructor(
         val result =
             TargetPushResult(
                 pushId = pushId,
-                pushType = pushType,
+                pushType = notificationType,
                 targetUserCount = targetUserCount,
                 sentUserCount = sentUserIds.size,
                 sentTokenCount = targetedPushMessageWithTokens.size,
@@ -194,7 +199,7 @@ class PushServiceImpl internal constructor(
         log.info(
             "푸시 전송: push_id={}, push_type={}, target_user_count={}, sent_user_count={}, sent_token_count={}",
             result.pushId,
-            result.pushType,
+            result.pushType.pushTypeValue,
             result.targetUserCount,
             result.sentUserCount,
             result.sentTokenCount,
@@ -202,7 +207,7 @@ class PushServiceImpl internal constructor(
         pushHistoryRecorder.record(
             PushHistory(
                 pushId = pushId,
-                pushType = pushType,
+                pushType = notificationType.pushTypeValue,
                 sentAt = sentAt,
                 targetUserCount = targetUserCount,
                 sentUserCount = result.sentUserCount,
@@ -220,17 +225,17 @@ class PushServiceImpl internal constructor(
         return result
     }
 
-    private val PushPreferenceType.pushTypeValue: String
+    private val NotificationType.pushTypeValue: String
         get() = name.lowercase()
 
     /**
      * `{push_type}-{yyyyMMdd-HHmmss(Asia/Seoul)}-{6자리 랜덤}` 예: `diary-20261014-190000-k3x9ab`
      */
     private fun generatePushId(
-        pushType: String,
+        notificationType: NotificationType,
         sentAt: Instant,
     ): String {
         val suffix = (1..PUSH_ID_SUFFIX_LENGTH).map { PUSH_ID_SUFFIX_CHARS.random() }.joinToString("")
-        return "$pushType-${PUSH_ID_TIME_FORMATTER.format(sentAt)}-$suffix"
+        return "${notificationType.pushTypeValue}-${PUSH_ID_TIME_FORMATTER.format(sentAt)}-$suffix"
     }
 }

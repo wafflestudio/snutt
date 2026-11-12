@@ -6,7 +6,7 @@ import com.wafflestudio.snutt.common.exception.NotAllowedInProdException
 import com.wafflestudio.snutt.common.push.DeeplinkType
 import com.wafflestudio.snutt.common.push.dto.PushMessage
 import com.wafflestudio.snutt.config.PhaseUtils
-import com.wafflestudio.snutt.notification.data.PushPreferenceType
+import com.wafflestudio.snutt.notification.data.NotificationType
 import com.wafflestudio.snutt.notification.service.PushService
 import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
@@ -77,7 +77,7 @@ class DiaryNotifierServiceImpl(
                         }.toMap()
 
                 logger.info("${targetedPushMessages.size}개의 강의 일기장 알림을 전송합니다.")
-                val result = pushService.sendTargetPushes(targetedPushMessages, PushPreferenceType.DIARY)
+                val result = pushService.sendTargetPushes(targetedPushMessages, NotificationType.DIARY)
                 logger.info(
                     "[${result.pushId}] 강의 일기장 알림 전송 완료: 대상 ${result.targetUserCount}명, " +
                         "실제 발송 ${result.sentUserCount}명, FCM 토큰 ${result.sentTokenCount}개",

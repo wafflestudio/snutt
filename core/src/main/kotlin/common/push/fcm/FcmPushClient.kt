@@ -88,8 +88,11 @@ internal class FcmPushClient(
                 .map { (message, response) -> log.info("Message Request Sent: $message, response : $response") }
         }
 
-    override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
-        sendTopicMessage(TargetedPushMessageWithTopic(GLOBAL_TOPIC, pushMessage))
+    override suspend fun sendGlobalMessage(
+        pushMessage: PushMessage,
+        pushId: String,
+    ) {
+        sendTopicMessage(TargetedPushMessageWithTopic(GLOBAL_TOPIC, pushMessage, pushId))
     }
 
     override suspend fun sendTopicMessage(pushMessage: TargetedPushMessageWithTopic) {
@@ -139,7 +142,6 @@ internal class FcmPushClient(
                 is TargetedPushMessageWithTopic -> setTopic(topic)
             }
             message.urlScheme?.let { putData(PayloadKeys.URL_SCHEME, it.value) }
-            message.pushId?.let { putData(PayloadKeys.PUSH_ID, it) }
             if (message.shouldSendAsDataMessage) {
                 putData(PayloadKeys.TITLE, message.title)
                 putData(PayloadKeys.BODY, message.body)
@@ -155,6 +157,8 @@ internal class FcmPushClient(
             setAndroidConfig(androidConfig)
             setApnsConfig(apnsConfig)
             putAllData(message.data.payload)
+            // 관리자 dataPayload에 push_id가 있어도 발송 기록과 같은 id가 나가도록 마지막에 넣는다
+            putData(PayloadKeys.PUSH_ID, pushId)
             build()
         }
     }
