@@ -29,6 +29,14 @@ google:
       ios:
         bundle-id:
         app-store-id:
+  bigquery:
+    push-history:
+      # 푸시 발송 기록(push_history) BigQuery 적재. prod 프로필에서만 켠다
+      enabled: false
+      # 비우면 google.firebase.project-id 사용
+      project-id:
+      dataset: server_events
+      table: push_history
 
 oci:
   email:
@@ -133,6 +141,9 @@ google:
       ios:
         bundle-id:
         app-store-id:
+  bigquery:
+    push-history:
+      enabled: true
 
 api:
   server:

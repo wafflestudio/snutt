@@ -4,8 +4,12 @@ import com.wafflestudio.snutt.common.push.Deeplink
 import com.wafflestudio.snutt.notification.data.Notification
 import com.wafflestudio.snutt.notification.data.NotificationType
 
+/**
+ * @property pushId 발송 1회를 식별하는 id. FCM data의 `push_id`로 전송되며 클라이언트(Android/iOS)가 이 key에 의존한다.
+ */
 sealed class TargetedPushMessage(
     open val message: PushMessage,
+    open val pushId: String,
 )
 
 /**
@@ -14,7 +18,8 @@ sealed class TargetedPushMessage(
 data class TargetedPushMessageWithToken(
     val targetToken: String,
     override val message: PushMessage,
-) : TargetedPushMessage(message)
+    override val pushId: String,
+) : TargetedPushMessage(message, pushId)
 
 /**
  * Send Message By FCM Topic
@@ -22,7 +27,8 @@ data class TargetedPushMessageWithToken(
 data class TargetedPushMessageWithTopic(
     val topic: String,
     override val message: PushMessage,
-) : TargetedPushMessage(message)
+    override val pushId: String,
+) : TargetedPushMessage(message, pushId)
 
 /**
  * 푸시 메시지로 전송할 데이터

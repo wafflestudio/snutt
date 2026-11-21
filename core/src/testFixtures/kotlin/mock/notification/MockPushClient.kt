@@ -16,7 +16,10 @@ class MockPushClient : PushClient {
     override suspend fun sendMessages(pushMessages: List<TargetedPushMessageWithToken>) {
     }
 
-    override suspend fun sendGlobalMessage(pushMessage: PushMessage) {
+    override suspend fun sendGlobalMessage(
+        pushMessage: PushMessage,
+        pushId: String,
+    ) {
     }
 
     override suspend fun sendTopicMessage(pushMessage: TargetedPushMessageWithTopic) {
