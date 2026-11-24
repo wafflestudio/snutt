@@ -11,4 +11,5 @@ data class DiaryDailyClassType(
     @Indexed(unique = true)
     val name: String,
     var active: Boolean = true,
+    var displayOrder: Int = 0,
 )

@@ -60,7 +60,10 @@ interface DiaryService {
 
     suspend fun getSubmissionIdShortQuestionRepliesMap(submissions: List<DiarySubmission>): Map<String, List<DiaryShortQuestionReply>>
 
-    suspend fun addOrEnableDailyClassType(name: String)
+    suspend fun addOrEnableDailyClassType(
+        name: String,
+        displayOrder: Int?,
+    )
 
     suspend fun disableDailyClassType(name: String)
 
@@ -132,7 +135,8 @@ class DiaryServiceImpl(
         return nextLectureCandidates.randomOrNull()
     }
 
-    override suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAllByActiveTrue()
+    override suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType> =
+        diaryDailyClassTypeRepository.findAllByActiveTrueOrderByDisplayOrderAsc()
 
     override suspend fun getAllDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAll().toList()
 
@@ -208,9 +212,13 @@ class DiaryServiceImpl(
         }
     }
 
-    override suspend fun addOrEnableDailyClassType(name: String) {
+    override suspend fun addOrEnableDailyClassType(
+        name: String,
+        displayOrder: Int?,
+    ) {
         val dailyClassType = diaryDailyClassTypeRepository.findByName(name) ?: DiaryDailyClassType(name = name, active = true)
         dailyClassType.active = true
+        displayOrder?.let { dailyClassType.displayOrder = it }
         diaryDailyClassTypeRepository.save(dailyClassType)
     }
 

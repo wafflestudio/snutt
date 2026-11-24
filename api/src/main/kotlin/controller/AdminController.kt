@@ -128,8 +128,9 @@ class AdminController(
     @PostMapping("/diary/dailyClassTypes")
     suspend fun insertDiaryDailyClassType(
         @RequestParam name: String,
+        @RequestParam(required = false) displayOrder: Int?,
     ): OkResponse {
-        diaryService.addOrEnableDailyClassType(name)
+        diaryService.addOrEnableDailyClassType(name, displayOrder)
         return OkResponse()
     }
 
