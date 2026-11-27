@@ -147,6 +147,8 @@ object DiarySubmissionNotFoundException : SnuttException(ErrorType.DIARY_SUBMISS
 
 object DiarySubmissionTooFrequentException : SnuttException(ErrorType.DIARY_SUBMISSION_TOO_FREQUENT)
 
+object DiaryClassDateInvalidException : SnuttException(ErrorType.DIARY_CLASS_DATE_INVALID)
+
 object DiaryTargetLectureNotFoundException : SnuttException(ErrorType.DIARY_TARGET_LECTURE_NOT_FOUND)
 
 object UserNotFoundByNicknameException : SnuttException(ErrorType.USER_NOT_FOUND_BY_NICKNAME)

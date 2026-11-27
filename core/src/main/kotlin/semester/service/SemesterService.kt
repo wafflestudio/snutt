@@ -11,6 +11,11 @@ interface SemesterService {
     fun getCurrentYearAndSemester(currentTime: Instant): YearAndSemester?
 
     fun getNextYearAndSemester(currentTime: Instant): YearAndSemester
+
+    fun getDateRange(
+        year: Int,
+        semester: Semester,
+    ): ClosedRange<LocalDate>
 }
 
 @Service
@@ -67,6 +72,14 @@ class SemesterServiceImpl : SemesterService {
             .first { currentDate < it.startDate }
             .let { YearAndSemester(year = it.year, semester = it.semester) }
     }
+
+    override fun getDateRange(
+        year: Int,
+        semester: Semester,
+    ): ClosedRange<LocalDate> =
+        generateSemesterSequence(year)
+            .first { it.year == year && it.semester == semester }
+            .let { it.startDate..it.endDate }
 
     companion object {
         private val KST = ZoneId.of("Asia/Seoul")
