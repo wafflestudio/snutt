@@ -11,6 +11,7 @@ import com.wafflestudio.snutt.diary.dto.DiaryDailyClassTypeDto
 import com.wafflestudio.snutt.diary.dto.DiaryQuestionnaireDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionSummaryDto
 import com.wafflestudio.snutt.diary.dto.DiarySubmissionsOfYearSemesterDto
+import com.wafflestudio.snutt.diary.dto.DiaryTargetLectureCandidateDto
 import com.wafflestudio.snutt.diary.dto.DiaryTargetLectureDto
 import com.wafflestudio.snutt.diary.dto.request.DiaryQuestionnaireRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
@@ -58,6 +59,14 @@ class DiaryController(
             diaryService.getDiaryTargetLecture(user.id!!, year, semester, listOf()) ?: throw DiaryTargetLectureNotFoundException
         return DiaryTargetLectureDto(targetLecture)
     }
+
+    @GetMapping("/targets")
+    suspend fun getTargetLectureCandidates(
+        @CurrentUser user: User,
+        @RequestParam year: Int,
+        @RequestParam semester: Semester,
+    ): List<DiaryTargetLectureCandidateDto> =
+        diaryService.getDiaryTargetCandidates(user.id!!, year, semester).map { DiaryTargetLectureCandidateDto(it) }
 
     @GetMapping("/my")
     suspend fun getMySubmissions(

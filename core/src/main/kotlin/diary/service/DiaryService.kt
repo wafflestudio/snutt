@@ -15,6 +15,7 @@ import com.wafflestudio.snutt.diary.data.DiaryDailyClassType
 import com.wafflestudio.snutt.diary.data.DiaryQuestion
 import com.wafflestudio.snutt.diary.data.DiaryQuestionnaire
 import com.wafflestudio.snutt.diary.data.DiarySubmission
+import com.wafflestudio.snutt.diary.data.DiaryTargetCandidate
 import com.wafflestudio.snutt.diary.dto.DiaryShortQuestionReply
 import com.wafflestudio.snutt.diary.dto.request.DiaryAddQuestionRequestDto
 import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
@@ -40,6 +41,7 @@ interface DiaryService {
         userId: String,
         lectureId: String,
         dailyClassTypeNames: List<String>,
+        now: Instant = Instant.now(),
     ): DiaryQuestionnaire
 
     suspend fun getDiaryTargetLecture(
@@ -48,6 +50,13 @@ interface DiaryService {
         semester: Semester,
         idsToExclude: List<String>,
     ): TimetableLecture?
+
+    suspend fun getDiaryTargetCandidates(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        now: Instant = Instant.now(),
+    ): List<DiaryTargetCandidate>
 
     suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType>
 
@@ -97,6 +106,7 @@ class DiaryServiceImpl(
         userId: String,
         lectureId: String,
         dailyClassTypeNames: List<String>,
+        now: Instant,
     ): DiaryQuestionnaire {
         val dailyClassTypeIds = diaryDailyClassTypeRepository.findAllByNameIn(dailyClassTypeNames).map { it.id!! }
         val availableQuestions = diaryQuestionRepository.findByTargetDailyClassTypeIdsInAndActiveTrue(dailyClassTypeIds)
@@ -106,7 +116,10 @@ class DiaryServiceImpl(
                 .take(3)
 
         val lecture = lectureService.getByIdOrNull(lectureId) ?: throw LectureNotFoundException
-        val nextLecture = getDiaryTargetLecture(userId, lecture.year, lecture.semester, listOf(lecture.id!!))
+        val nextLecture =
+            getDiaryTargetCandidates(userId, lecture.year, lecture.semester, now)
+                .filter { it.writable && it.lecture.lectureId != lecture.id }
+                .let { writable -> writable.firstOrNull { it.heldToday } ?: writable.randomOrNull() }
 
         return DiaryQuestionnaire(
             courseTitle = lecture.courseTitle,
@@ -141,6 +154,58 @@ class DiaryServiceImpl(
                 }
 
         return nextLectureCandidates.randomOrNull()
+    }
+
+    override suspend fun getDiaryTargetCandidates(
+        userId: String,
+        year: Int,
+        semester: Semester,
+        now: Instant,
+    ): List<DiaryTargetCandidate> {
+        val userTimetable =
+            timetableRepository.findByUserIdAndYearAndSemesterAndIsPrimaryTrue(userId, year, semester)
+                ?: return emptyList()
+        val nowInKst = now.atZone(KST)
+        val today = nowInKst.toLocalDate()
+        val nowMinute = nowInKst.hour * 60 + nowInKst.minute
+        val semesterDateRange = semesterService.getDateRange(year, semester)
+
+        val lecturesWithLastClassDate =
+            userTimetable.lectures
+                .filterNot { it.lectureId == null }
+                .distinctBy { it.lectureId }
+                .map { it to lastClassDate(it.classPlaceAndTimes, semesterDateRange, nowInKst) }
+        val submittedLectureIdClassDates =
+            diarySubmissionRepository
+                .findAllByUserIdAndClassDateIn(userId, lecturesWithLastClassDate.map { (_, date) -> date ?: today }.toSet())
+                .map { it.lectureId to it.classDate }
+                .toSet()
+
+        return lecturesWithLastClassDate
+            .map { (lecture, lastClassDate) ->
+                val heldToday = lastClassDate == today
+                val writable = (lecture.lectureId to (lastClassDate ?: today)) !in submittedLectureIdClassDates
+                val order =
+                    if (heldToday) {
+                        val todayEndMinutes = lecture.classPlaceAndTimes.filter { it.day == today.toSnuttDayOfWeek() }.map { it.endMinute }
+                        todayClassOrder(todayEndMinutes, nowMinute)
+                    } else {
+                        2 to 0
+                    }
+                DiaryTargetCandidate(lecture, heldToday, writable, lastClassDate) to order
+            }.sortedWith(compareBy({ (_, order) -> order.first }, { (_, order) -> order.second }))
+            .map { (candidate, _) -> candidate }
+    }
+
+    // 오늘 이미 끝난 수업이 있는 강의는 가장 최근에 끝난 순, 아직 끝나지 않은 강의는 곧 끝나는 순, 오늘 수업이 없는 강의는 시간표 순.
+    private fun todayClassOrder(
+        todayEndMinutes: List<Int>,
+        nowMinute: Int,
+    ): Pair<Int, Int> {
+        if (todayEndMinutes.isEmpty()) return 2 to 0
+        val lastEndedMinute = todayEndMinutes.filter { it <= nowMinute }.maxOrNull()
+        if (lastEndedMinute != null) return 0 to nowMinute - lastEndedMinute
+        return 1 to todayEndMinutes.min() - nowMinute
     }
 
     // 학기 안에서 at 시점까지 이 강의 수업이 시작된 가장 최근 날(KST). 수업 시간이 없거나 그런 날이 없으면 null.

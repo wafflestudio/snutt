@@ -18,4 +18,9 @@ interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, S
         lectureId: String,
         classDate: LocalDate,
     ): Boolean
+
+    suspend fun findAllByUserIdAndClassDateIn(
+        userId: String,
+        classDates: Collection<LocalDate>,
+    ): List<DiarySubmission>
 }
