@@ -2,6 +2,7 @@ package com.wafflestudio.snutt.diary.repository
 
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, String> {
@@ -12,9 +13,9 @@ interface DiarySubmissionRepository : CoroutineCrudRepository<DiarySubmission, S
         createdAt: LocalDateTime,
     ): Set<DiarySubmission>
 
-    suspend fun existsByUserIdAndLectureIdAndCreatedAtIsAfter(
+    suspend fun existsByUserIdAndLectureIdAndClassDate(
         userId: String,
         lectureId: String,
-        createdAt: LocalDateTime,
+        classDate: LocalDate,
     ): Boolean
 }

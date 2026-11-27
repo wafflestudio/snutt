@@ -1,6 +1,8 @@
 package com.wafflestudio.snutt.diary.service
 
+import com.wafflestudio.snutt.common.enums.DayOfWeek
 import com.wafflestudio.snutt.common.enums.Semester
+import com.wafflestudio.snutt.common.exception.DiaryClassDateInvalidException
 import com.wafflestudio.snutt.common.exception.DiaryCommentTooLongException
 import com.wafflestudio.snutt.common.exception.DiaryDailyClassTypeNotFoundException
 import com.wafflestudio.snutt.common.exception.DiaryQuestionInvalidException
@@ -19,12 +21,19 @@ import com.wafflestudio.snutt.diary.dto.request.DiarySubmissionRequestDto
 import com.wafflestudio.snutt.diary.repository.DiaryDailyClassTypeRepository
 import com.wafflestudio.snutt.diary.repository.DiaryQuestionRepository
 import com.wafflestudio.snutt.diary.repository.DiarySubmissionRepository
+import com.wafflestudio.snutt.lectures.data.ClassPlaceAndTime
+import com.wafflestudio.snutt.lectures.data.Lecture
 import com.wafflestudio.snutt.lectures.service.LectureService
+import com.wafflestudio.snutt.semester.service.SemesterService
 import com.wafflestudio.snutt.timetables.data.TimetableLecture
 import com.wafflestudio.snutt.timetables.repository.TimetableRepository
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 interface DiaryService {
     suspend fun generateQuestionnaire(
@@ -49,6 +58,7 @@ interface DiaryService {
     suspend fun submitDiary(
         userId: String,
         request: DiarySubmissionRequestDto,
+        now: Instant = Instant.now(),
     )
 
     suspend fun getMySubmissions(userId: String): List<DiarySubmission>
@@ -76,10 +86,11 @@ class DiaryServiceImpl(
     private val diarySubmissionRepository: DiarySubmissionRepository,
     private val timetableRepository: TimetableRepository,
     private val lectureService: LectureService,
+    private val semesterService: SemesterService,
 ) : DiaryService {
     companion object {
         const val COMMENT_MAX_LENGTH = 1000
-        const val SUBMISSION_COOLDOWN_HOURS = 12L
+        private val KST = ZoneId.of("Asia/Seoul")
     }
 
     override suspend fun generateQuestionnaire(
@@ -132,6 +143,39 @@ class DiaryServiceImpl(
         return nextLectureCandidates.randomOrNull()
     }
 
+    // 학기 안에서 at 시점까지 이 강의 수업이 시작된 가장 최근 날(KST). 수업 시간이 없거나 그런 날이 없으면 null.
+    private fun lastClassDate(
+        classPlaceAndTimes: List<ClassPlaceAndTime>,
+        semesterDateRange: ClosedRange<LocalDate>,
+        at: ZonedDateTime,
+    ): LocalDate? {
+        val today = at.toLocalDate()
+        val nowMinute = at.hour * 60 + at.minute
+        val latest = minOf(today, semesterDateRange.endInclusive)
+        return generateSequence(latest) { it.minusDays(1) }
+            .take(8)
+            .filter { it >= semesterDateRange.start }
+            .firstOrNull { date ->
+                classPlaceAndTimes.any { it.day == date.toSnuttDayOfWeek() && (date < today || it.startMinute <= nowMinute) }
+            }
+    }
+
+    // 서버가 정해 주는 날짜이거나, 학기 안의 오늘 이전 수업 요일이면 유효하다.
+    private fun isValidClassDate(
+        classDate: LocalDate,
+        lecture: Lecture,
+        nowInKst: ZonedDateTime,
+    ): Boolean {
+        val today = nowInKst.toLocalDate()
+        val semesterDateRange = semesterService.getDateRange(lecture.year, lecture.semester)
+        if (classDate == (lastClassDate(lecture.classPlaceAndTimes, semesterDateRange, nowInKst) ?: today)) return true
+        return classDate <= today &&
+            classDate in semesterDateRange &&
+            lecture.classPlaceAndTimes.any { it.day == classDate.toSnuttDayOfWeek() }
+    }
+
+    private fun LocalDate.toSnuttDayOfWeek(): DayOfWeek = DayOfWeek.getOfValue(dayOfWeek.value - 1)!!
+
     override suspend fun getActiveDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAllByActiveTrue()
 
     override suspend fun getAllDailyClassTypes(): List<DiaryDailyClassType> = diaryDailyClassTypeRepository.findAll().toList()
@@ -141,17 +185,19 @@ class DiaryServiceImpl(
     override suspend fun submitDiary(
         userId: String,
         request: DiarySubmissionRequestDto,
+        now: Instant,
     ) {
         if (request.comment.length > COMMENT_MAX_LENGTH) {
             throw DiaryCommentTooLongException
         }
         val lecture = lectureService.getByIdOrNull(request.lectureId) ?: throw LectureNotFoundException
-        if (diarySubmissionRepository.existsByUserIdAndLectureIdAndCreatedAtIsAfter(
-                userId,
-                request.lectureId,
-                LocalDateTime.now().minusHours(SUBMISSION_COOLDOWN_HOURS),
-            )
-        ) {
+        val nowInKst = now.atZone(KST)
+        val classDate =
+            request.classDate
+                ?.also { if (!isValidClassDate(it, lecture, nowInKst)) throw DiaryClassDateInvalidException }
+                ?: lastClassDate(lecture.classPlaceAndTimes, semesterService.getDateRange(lecture.year, lecture.semester), nowInKst)
+                ?: nowInKst.toLocalDate()
+        if (diarySubmissionRepository.existsByUserIdAndLectureIdAndClassDate(userId, request.lectureId, classDate)) {
             throw DiarySubmissionTooFrequentException
         }
         val dailyClassTypes = diaryDailyClassTypeRepository.findAllByNameIn(request.dailyClassTypes)
@@ -172,6 +218,7 @@ class DiaryServiceImpl(
                 dailyClassTypeIds = dailyClassTypes.map { it.id!! },
                 year = lecture.year,
                 semester = lecture.semester,
+                classDate = classDate,
             )
         diarySubmissionRepository.save(submission)
     }
