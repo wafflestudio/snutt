@@ -163,6 +163,10 @@ class AdminController(
         return OkResponse()
     }
 
+    // 수업 날짜 도입 전 강의일기 기록의 classDate 를 작성 시각 기준으로 채운다. 여러 번 호출해도 안전하다.
+    @PostMapping("/diary/submissions/backfill-class-date")
+    suspend fun backfillDiarySubmissionClassDates(): Map<String, Int> = mapOf("count" to diaryService.backfillSubmissionClassDates())
+
     @GetMapping("/registrationPeriods")
     suspend fun getSemesterRegistrationPeriods(): List<SemesterRegistrationPeriod> = semesterRegistrationPeriodService.getAll()
 

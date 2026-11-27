@@ -3,6 +3,7 @@ package com.wafflestudio.snutt.diary.dto
 import com.wafflestudio.snutt.common.extension.toZonedDateTime
 import com.wafflestudio.snutt.diary.data.DiarySubmission
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 data class DiarySubmissionSummaryDto(
@@ -13,6 +14,7 @@ data class DiarySubmissionSummaryDto(
     val courseTitle: String,
     val shortQuestionReplies: List<DiaryShortQuestionReply>,
     val comment: String,
+    val classDate: LocalDate?,
 )
 
 data class DiaryShortQuestionReply(
@@ -37,4 +39,5 @@ fun DiarySubmissionSummaryDto(
         courseTitle = submission.courseTitle,
         shortQuestionReplies = shortQuestionReplies,
         comment = submission.comment,
+        classDate = submission.classDate,
     )

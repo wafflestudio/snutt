@@ -81,6 +81,7 @@ class DiaryIntegTest(
         }
 
         val userId = userFixture.testUser.id!!
+        val kst = ZoneId.of("Asia/Seoul")
 
         // 2026-11-18(수) 14:00 KST, 2026년 2학기(09-01 ~ 12-19) 중
         val now = Instant.parse("2026-11-18T05:00:00Z")
@@ -258,6 +259,64 @@ class DiaryIntegTest(
                     .expectBody()
                     .jsonPath("$.errcode")
                     .isEqualTo(40029)
+            }
+        }
+
+        "backfillSubmissionClassDates" should {
+            "classDate 가 없는 기록을 작성 시각 이전 가장 최근 수업일로 채운다" {
+                val lecture =
+                    timetableLecture(
+                        "월수 수업",
+                        classTime(DayOfWeek.MONDAY, 12 * 60 + 30, 13 * 60 + 45),
+                        classTime(DayOfWeek.WEDNESDAY, 12 * 60 + 30, 13 * 60 + 45),
+                    )
+                val deletedLecture = timetableLecture("폐강", classTime(DayOfWeek.WEDNESDAY, 9 * 60, 10 * 60))
+                saveLecture(lecture)
+
+                fun kstToLocal(dateTime: LocalDateTime) = dateTime.atZone(kst).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+
+                val beforeClass = saveSubmission(lecture, null, kstToLocal(LocalDateTime.of(2026, 11, 18, 11, 0)))
+                val afterClass = saveSubmission(lecture, null, kstToLocal(LocalDateTime.of(2026, 11, 18, 14, 0)))
+                val noLecture = saveSubmission(deletedLecture, null, kstToLocal(LocalDateTime.of(2026, 11, 18, 23, 30)))
+                val alreadyFilled = saveSubmission(lecture, LocalDate.of(2026, 11, 2))
+
+                diaryService.backfillSubmissionClassDates() shouldBe 3
+
+                val classDates = diarySubmissionRepository.findAll().toList().associate { it.id to it.classDate }
+                classDates[beforeClass.id] shouldBe LocalDate.of(2026, 11, 16)
+                classDates[afterClass.id] shouldBe today
+                classDates[noLecture.id] shouldBe today
+                classDates[alreadyFilled.id] shouldBe LocalDate.of(2026, 11, 2)
+                diaryService.backfillSubmissionClassDates() shouldBe 0
+            }
+        }
+
+        "GET /v1/diary/my" should {
+            "기록마다 classDate 를 yyyy-MM-dd 로 내려준다" {
+                val lecture = timetableLecture("수요일 수업", classTime(DayOfWeek.WEDNESDAY, 9 * 60, 10 * 60))
+                saveLecture(lecture)
+
+                webTestClient
+                    .post()
+                    .uri("/v1/diary")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("x-access-token", userFixture.testUser.credentialHash)
+                    .bodyValue(
+                        """{"lectureId":"${lecture.lectureId}","dailyClassTypes":[],"questionAnswers":[],"comment":"","classDate":"2026-11-18"}""",
+                    ).exchange()
+                    .expectStatus()
+                    .isOk
+
+                webTestClient
+                    .get()
+                    .uri("/v1/diary/my")
+                    .header("x-access-token", userFixture.testUser.credentialHash)
+                    .exchange()
+                    .expectStatus()
+                    .isOk
+                    .expectBody()
+                    .jsonPath("$[0].submissions[0].classDate")
+                    .isEqualTo("2026-11-18")
             }
         }
     })

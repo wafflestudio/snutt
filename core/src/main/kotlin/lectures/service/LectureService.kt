@@ -9,12 +9,15 @@ import com.wafflestudio.snutt.lectures.dto.SearchDto
 import com.wafflestudio.snutt.lectures.repository.LectureRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 
 interface LectureService {
     fun findAll(): Flow<Lecture>
 
     suspend fun getByIdOrNull(lectureId: String): Lecture?
+
+    suspend fun getByIds(lectureIds: Collection<String>): List<Lecture>
 
     suspend fun upsertLectures(lectures: Iterable<Lecture>)
 
@@ -41,6 +44,8 @@ class LectureServiceImpl(
     override fun findAll(): Flow<Lecture> = lectureRepository.findAll()
 
     override suspend fun getByIdOrNull(lectureId: String): Lecture? = lectureRepository.findById(lectureId)
+
+    override suspend fun getByIds(lectureIds: Collection<String>): List<Lecture> = lectureRepository.findAllById(lectureIds).toList()
 
     override fun getLecturesByYearAndSemesterAsFlow(
         year: Int,

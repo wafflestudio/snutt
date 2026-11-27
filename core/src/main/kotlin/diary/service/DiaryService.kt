@@ -77,6 +77,8 @@ interface DiaryService {
     suspend fun addQuestion(request: DiaryAddQuestionRequestDto)
 
     suspend fun removeQuestion(questionId: String)
+
+    suspend fun backfillSubmissionClassDates(): Int
 }
 
 @Service
@@ -290,5 +292,28 @@ class DiaryServiceImpl(
         val question = diaryQuestionRepository.findById(questionId) ?: return
         question.active = false
         diaryQuestionRepository.save(question)
+    }
+
+    override suspend fun backfillSubmissionClassDates(): Int {
+        val submissions = diarySubmissionRepository.findAllByClassDateIsNull()
+        val lecturesById =
+            lectureService
+                .getByIds(submissions.map { it.lectureId }.distinct())
+                .associateBy { it.id }
+        val backfilled =
+            submissions.map { submission ->
+                val createdAtInKst = submission.createdAt.atZone(ZoneId.systemDefault()).withZoneSameInstant(KST)
+                val classDate =
+                    lecturesById[submission.lectureId]?.let { lecture ->
+                        lastClassDate(
+                            lecture.classPlaceAndTimes,
+                            semesterService.getDateRange(submission.year, submission.semester),
+                            createdAtInKst,
+                        )
+                    } ?: createdAtInKst.toLocalDate()
+                submission.copy(classDate = classDate)
+            }
+        diarySubmissionRepository.saveAll(backfilled).toList()
+        return backfilled.size
     }
 }
